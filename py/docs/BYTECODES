@@ -1,0 +1,635 @@
+# BC_PUSH_N
+
+Opcode: 100
+
+This pushes the value in the next memory cell to the stack. The type is
+set to NUMBER.
+
+In memory, this is structured as:
+
+    +-----------+
+    | BC_PUSH_N |
+    +-----------+
+    | value     |
+    +-----------+
+
+----
+
+# BC_PUSH_S
+
+Opcode: 101
+
+This pushes the value in the next memory cell to the stack. The type is
+set to STRING.
+
+In memory, this is structured as:
+
+    +-----------+
+    | BC_PUSH_S |
+    +-----------+
+    | pointer   |
+    +-----------+
+
+----
+
+# BC_PUSH_C
+
+Opcode: 102
+
+This pushes the value in the next memory cell to the stack. The type is
+set to CHARACTER.
+
+In memory, this is structured as:
+
+    +-------------+
+    | BC_PUSH_C   |
+    +-------------+
+    | ASCII value |
+    +-------------+
+
+----
+
+# BC_PUSH_F
+
+Opcode: 103
+
+This pushes the value in the next memory cell to the stack. The type is
+set to FUNCTION.
+
+In memory, this is structured as:
+
+    +-----------+
+    | BC_PUSH_F |
+    +-----------+
+    | pointer   |
+    +-----------+
+
+----
+
+# BC_PUSH_COMMENT
+
+Opcode: 104
+
+This ignores the value in the next cell. The following cell will contain a
+pointer to a comment.
+
+In memory, this is structured as:
+
+    +-----------------+
+    | BC_PUSH_COMMENT |
+    +-----------------+
+    | pointer         |
+    +-----------------+
+
+----
+
+# BC_TYPE_N
+
+Opcode: 110
+
+Convert the value on the stack to a NUMBER.
+
+If the value is a STRING, it is parsed as a number and the result is pushed.
+
+If the value is a CHARACTER, it is converted to the corresponding ASCII code.
+
+If the value is a POINTER, the type is converted to number.
+
+If the value is a FLAG, one of the following is returned: -1 for *true*, 0 for
+*false*, or 1 for *malformed flag*.
+
+If the value is a NUMBER, no change occurs.
+
+----
+
+# BC_TYPE_S
+
+Opcode: 111
+
+Convert the value on the stack to a new STRING. If the value is already a STRING
+this does nothing.
+
+----
+
+# BC_TYPE_C
+
+Opcode: 112
+
+Convert the value on the stack to a CHARACTER.
+
+----
+
+# BC_TYPE_F
+
+Opcode: 113
+
+Convert the value on the stack to a POINTER.
+
+----
+
+# BC_TYPE_FLAG
+
+Opcode: 114
+
+Convert the value on the stack to a FLAG.
+
+If value is a NUMBER, the following applies:
+
+    +--------+----------------+
+    | -1     | true           |
+    +--------+----------------+
+    |  0     | false          |
+    +--------+----------------+
+    | others | malformed flag |
+    +--------+----------------+
+
+If the value is a STRING, the following applies:
+
+    +---------+----------------+
+    | 'true'  | true           |
+    +---------+----------------+
+    | 'false' | false          |
+    +---------+----------------+
+    | others  | malformed flag |
+    +---------+----------------+
+
+Behaviour for CHARACTER and POINTER types is not defined.
+
+----
+
+# BC_GET_TYPE
+
+Opcode: 120
+
+Pushes a NUMBER to the stack indicating the data type of the top element. Valid
+types are:
+
+    +-----+-------------+
+    | 100 | *NUMBER*    |
+    +-----+-------------+
+    | 200 | *STRING*    |
+    +-----+-------------+
+    | 300 | *CHARACTER* |
+    +-----+-------------+
+    | 400 | *POINTER*   |
+    +-----+-------------+
+    | 500 | *FLAG*      |
+    +-----+-------------+
+
+----
+
+# BC_ADD
+
+Opcode: 200
+
+If the top two values are NUMBER, pop them off the stack, add them together, and
+push the resulting NUMBER back to the stack.
+
+If the top two values are STRING, pop them off, concatencate them together, and
+push the new STRING to the stack.
+
+The use of this instruction is not defined for other types of values.
+
+----
+
+# BC_SUBTRACT
+
+Opcode: 201
+
+Pop two NUMBER values off the stack, subtract them, and push the resulting
+NUMBER back to the stack.
+
+The use of this instruction is not defined for other types of values.
+
+----
+
+# BC_MULTIPLY
+
+Opcode: 202
+
+Pop two NUMBER values off the stack, multiply them, and push the resulting
+NUMBER back to the stack.
+
+The use of this instruction is not defined for other types of values.
+
+----
+
+# BC_DIVIDE
+
+Opcode: 203
+
+Pop two NUMBER values off the stack, divide them, and push the resulting
+NUMBER back to the stack.
+
+The use of this instruction is not defined for other types of values.
+
+----
+
+# BC_REMAINDER
+
+Opcode: 204
+
+Pop two NUMBER values off the stack, find the remainder, and push the resulting
+NUMBER back to the stack.
+
+The use of this instruction is not defined for other types of values.
+
+----
+
+# BC_FLOOR
+
+Opcode: 205
+
+Round the NUMBER on top of stack down to the nearest integer value.
+
+The use of this instruction is not defined for other types of values.
+
+----
+
+# BC_BITWISE_SHIFT
+
+Opcode: 210
+
+Shifts a value left or right by the specified number of bits. Shifts right if
+positive, or left if negative.
+
+----
+
+# BC_BITWISE_AND
+
+Opcode: 211
+
+Perform a bitwise AND operation on two NUMBER values.
+
+----
+
+# BC_BITWISE_OR
+
+Opcode: 212
+
+Perform a bitwise OR operation on two NUMBER values.
+
+----
+
+# BC_BITWISE_XOR
+
+Opcode: 213
+
+Perform a bitwise XOR operation on two NUMBER values.
+
+----
+
+# BC_COMPARE_LT
+
+Opcode: 220
+
+Compare two values to see if one is less than the other.
+
+Given a stack:
+
+    +----+-----+
+    | n0 | TOS |
+    +----+-----+
+    | n1 |     |
+    +----+-----+
+    
+This will compare n1 < n0, and return a flag
+    
+----
+
+# BC_COMPARE_GT
+
+Opcode: 221
+
+Compare two values to see if one is greater than the other.
+
+Given a stack:
+
+    +----+-----+
+    | n0 | TOS |
+    +----+-----+
+    | n1 |     |
+    +----+-----+
+    
+This will compare n1 > n0, and return a flag
+
+----
+
+# BC_COMPARE_LTEQ
+
+Opcode: 222
+
+Compare two values to see if one is less than or equal to the other.
+
+Given a stack:
+
+    +----+-----+
+    | n0 | TOS |
+    +----+-----+
+    | n1 |     |
+    +----+-----+
+    
+This will compare n1 <= n0, and return a flag
+
+----
+
+# BC_COMPARE_GTEQ
+
+Opcode: 223
+
+Compare two values to see if one is less than or equal to the other.
+
+Given a stack:
+
+    +----+-----+
+    | n0 | TOS |
+    +----+-----+
+    | n1 |     |
+    +----+-----+
+    
+This will compare n1 >= n0, and return a flag
+
+----
+
+# BC_COMPARE_EQ
+
+Opcode: 224
+
+Compare two values for equality.
+
+If the values are strings, it compares the actual strings, not their pointers.
+
+----
+
+# BC_COMPARE_NEQ
+
+Opcode: 225
+
+Compare two values for inequality.
+
+If the values are strings, it compares the actual strings, not their pointers.
+
+----
+
+# BC_FLOW_IF
+
+Opcode: 300
+
+Takes three elements (two quotes, and a flag), and conditionally executes
+one of the quotes based on the flag.
+
+Example stack:
+
+    +------+-----+
+    | q0   | TOS |
+    +------+-----+
+    | q1   |     |
+    +------+-----+
+    | flag |     |
+    +------+-----+
+    
+If FLAG is true, executes q1. If false, executes q0.
+
+----
+
+# BC_FLOW_WHILE
+
+Opcode: 301
+
+Takes a quote from the stack, and executes the quote. If the quote returns a
+true FLAG, executes it again until the returned flag is false.
+
+----
+
+# BC_FLOW_UNTIL
+
+Opcode: 302
+
+Takes a quote from the stack, and executes the quote. If the quote returns a
+false FLAG, executes it again until the returned flag is true.
+
+----
+
+# BC_FLOW_TIMES
+
+Opcode: 303
+
+----
+
+# BC_FLOW_CALL
+
+Opcode: 304
+
+----
+
+# BC_FLOW_CALL_F
+
+Opcode: 305
+
+----
+
+# BC_FLOW_DIP
+
+Opcode: 306
+
+----
+
+# BC_FLOW_SIP
+
+Opcode: 307
+
+----
+
+# BC_FLOW_BI
+
+Opcode: 308
+
+----
+
+# BC_FLOW_TRI
+
+Opcode: 309
+
+----
+
+# BC_FLOW_RETURN
+
+Opcode: 399
+
+----
+
+# BC_MEM_COPY
+
+Opcode: 400
+
+----
+
+# BC_MEM_FETCH
+
+Opcode: 401
+
+----
+
+# BC_MEM_STORE
+
+Opcode: 402
+
+----
+
+# BC_MEM_REQUEST
+
+Opcode: 403
+
+Request a memory slice. Pushes a pointer to the stack.
+
+----
+
+# BC_MEM_RELEASE
+
+Opcode: 404
+
+Remove a pointer from the stack and release the corresponding slice.
+
+----
+
+# BC_MEM_COLLECT
+
+Opcode: 405
+
+Scan memory and recover unused slices where possible.
+
+The approach I used was to:
+
+- scan the dictionary and stack for pointers to named slices
+- keep any slices referenced by these, or their dependencies
+- free everything else
+
+----
+
+# BC_STACK_DUP
+
+Opcode: 500
+
+Make a copy of the top item on the stack. (For STRING values, this creates
+a copy of the original string).
+
+----
+
+# BC_STACK_DROP
+
+Opcode: 501
+
+Remove the top value from the stack.
+
+----
+
+# BC_STACK_SWAP
+
+Opcode: 502
+
+Exchange the positions of the top two items on the stack.
+
+----
+
+# BC_STACK_OVER
+
+Opcode: 503
+
+----
+
+# BC_STACK_TUCK
+
+Opcode: 504
+
+----
+
+# BC_STACK_NIP
+
+Opcode: 505
+
+Remove the second item on the stack.
+
+----
+
+# BC_STACK_DEPTH
+
+Opcode: 506
+
+Pushes the a NUMBER indicating the number of items on the stack.
+
+----
+
+# BC_STACK_CLEAR
+
+Opcode: 507
+
+Removes all values from the stack.
+
+----
+
+# BC_QUOTE_NAME
+
+Opcode: 600
+
+Attaches a name to a quotation. This is mapped to *define* by the core language,
+and is considered a built-in part of the core language (along with the core
+syntax).
+
+Usage:  pointer name --
+
+----
+
+# BC_STRING_SEEK
+
+Opcode: 700
+
+----
+
+# BC_STRING_SUBSTR
+
+Opcode: 701
+
+string, start, end
+
+----
+
+# BC_STRING_NUMERIC
+
+Opcode: 702
+
+Returns a TRUE flag if the string on TOS can be parsed as a NUMBER, or FALSE
+otherwise. This consumes the string.
+
+----
+
+# BC_TO_LOWER
+
+Opcode: 800
+
+Convert the CHARACTER or STRING value on the stack to lower case. If the value
+is a STRING, returns a new STRING.
+
+----
+
+# BC_TO_UPPER
+
+Opcode: 801
+
+Convert the CHARACTER or STRING value on the stack to upper case. If the value
+is a STRING, returns a new STRING.
+
+----
+
+# BC_LENGTH
+
+Opcode: 802
+
+Returns the length of a string on the stack. This consumes the string.
+
+----
+
+# BC_REPORT_ERROR
+
+Opcode: 900
+
+

@@ -1,0 +1,40 @@
+This is Parable, a small programming language.
+
+It is stack based and concatenative in nature. It has a trivial syntax
+(whitespace delimited tokens, with single character prefixes that guide
+the compiler), a dictionary mapping names to functions and data elements,
+and support for a few simple data types (numbers, characters, strings,
+flags, and pointers)
+
+In implementing this, I have left out any form of I/O. The byte codes
+and interpreter can be easily modified to allow for I/O functionality
+that your applications may need.
+
+=========================================================================
+
+# parable.py
+
+This contains the core language (compiler, byte code interpreter), but no
+user interface code.
+
+
+=========================================================================
+
+# listener.py
+
+This uses parable.py and provides a minimalistic read-eval-print
+loop and tools for displaying the stack contents.
+
+=========================================================================
+
+export.py
+
+Allows export of the Parable dictionary, stack, and memory contents in
+JSON format. Other formats should be provided eventually as well.
+
+=========================================================================
+
+legend.py
+
+A full screen console environment for interacting with Parable. Provides
+a bit more than listener.py
