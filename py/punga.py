@@ -99,7 +99,7 @@ print """
 
   <div class="row">
     <div class="span6">
-      <form name='editor' id='editor' action='punga.cgi' method='post'>
+      <form name='editor' id='editor' action='punga.py' method='post'>
 """
 sys.stdout.write("<textarea rows='12' class='span6' name='code' placeholder='enter your code here'>")
 form = cgi.FieldStorage()
