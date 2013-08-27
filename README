@@ -2,13 +2,32 @@ Parable: a concatenative, stack-oriented programming language designed
 to be clean, consistent, and easily adaptable for use within larger
 applications.
 
+----
+
 Files:
 
  - README
 
+   This file.
+
  - LICENSE
+
+   Legal stuff (copyright notice, usage terms, disclaimer of warranty, etc)
 
  - py/*
 
+   The Python implementation.
+
  - php/*
 
+   The PHP implementation.
+
+----
+
+Older source history can be found in the following repositories:
+
+    lp:~crc-x/+junk/parable-py
+    lp:~crc-x/+junk/parable-php
+
+The sources from 8/26 were merged and committed into this repository
+on 8/27/2013.
