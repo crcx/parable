@@ -1,6 +1,8 @@
 "This code parses a UPS Type 1Z tracking number and returns the subsections"
 "in a readable format."
 
+"See http://osiris.978.org/~alex/ups.html for a list of service codes."
+
 [ [ #0 #2 substring '1Z' = ] sip swap ] 'valid?' define
 [ [ #2 #8 substring 'Account: ' swap + ] sip ] 'account' define
 [ [ #8 #10 substring 'Service code: ' swap + ] sip ] 'service-code' define
