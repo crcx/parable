@@ -22,6 +22,14 @@ Files:
 
    The PHP implementation.
 
+ - tests/*
+
+   Code to help with testing implementations
+
+ - examples/*
+
+   Small sample programs
+
 ----
 
 Older source history can be found in the following repositories:
