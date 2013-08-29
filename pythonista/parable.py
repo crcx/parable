@@ -1373,9 +1373,9 @@ def generate_source():
 #
 # Commands recognized are:
 #
-# :s  display the stack
-# :w  display all named elements
-# :q  exit listener
+# :stack  display the stack
+# :defined  display all named elements
+# :quit  exit listener
 #
 
 import sys
@@ -1431,11 +1431,11 @@ if __name__ == '__main__':
 
         src = sys.stdin.readline()
 
-        if ' '.join(src.split()) == ':q':
+        if ' '.join(src.split()) == ':quit':
             completed = 1
-        elif ' '.join(src.split()) == ':w':
+        elif ' '.join(src.split()) == ':defined':
             dump_dict()
-        elif ' '.join(src.split()) == ':s':
+        elif ' '.join(src.split()) == ':stack':
             dump_stack()
         else:
             if len(src) > 1:
