@@ -1,8 +1,11 @@
-# parable + listener
+# parable + listener for pythonista
 # Copyright (c) 2012, 2013, Charles Childers
 # =====================================================================
-# Adapted for use under Pythonista for iOS
+# This is a work in progress, intending to eventually provide better
+# support for Parable on iOS
 
+
+# =====================================================================
 
 #
 # The bootstrap.p file, setup as an array for easy loading.
@@ -152,6 +155,7 @@ bootstrap.append(""" "more stuff" """)
 bootstrap.append(""" [ [ [ new-slice length [ #1 - ] sip [ dup-pair fetch slice-store #1 - ] repeat drop-pair #0 slice-store &*slice-current* @ :p :s ] preserve-slice ] if-string ] 'reverse' define """)
 
 
+# =====================================================================
 
 #
 # Dependencies
@@ -1254,6 +1258,12 @@ def compile(str, slice):
     return slice
 
 
+#
+# this is the only modified routine from the standard parable.py
+# we can't load bootstrap from a file, so this uses the array
+# set up earlier.
+#
+
 def parse_bootstrap():
     global bootstrap
     for line in bootstrap:
@@ -1355,12 +1365,7 @@ def generate_source():
     return src + "\n"
 
 
-
-
-
-
-
-
+# =====================================================================
 
 # This implements a pretty minimal user interface for parable. It
 # allows code (or a couple of commands) to be typed in, compiled,
@@ -1368,13 +1373,9 @@ def generate_source():
 #
 # Commands recognized are:
 #
-# .s     display the stack
-# words  display all named elements
-# bye    exit listener
-#
-# Anything else is treated as parable code.
-#
-# For a nicer interface, try legend.py
+# :s  display the stack
+# :w  display all named elements
+# :q  exit listener
 #
 
 import sys
@@ -1417,24 +1418,24 @@ def dump_dict():
 
 
 if __name__ == '__main__':
-    sys.stdout.write("parable (listener 2013-05-24)\n")
-    sys.stdout.write("Type bye to exit, words for a list of functions, or")
-    sys.stdout.write(" .s for a stack display\n")
+    sys.stdout.write("parable (listener 2013-08-29)\n\n")
     prepare_slices()
     prepare_dictionary()
     parse_bootstrap()
 
-    while 1 == 1:
-        sys.stdout.write("\nok ")
+    completed = 0
+
+    while completed == 0:
+        sys.stdout.write("\n>> ")
         sys.stdout.flush()
 
         src = sys.stdin.readline()
 
-        if ' '.join(src.split()) == 'bye':
-            exit()
-        elif ' '.join(src.split()) == 'words':
+        if ' '.join(src.split()) == ':q':
+            completed = 1
+        elif ' '.join(src.split()) == ':w':
             dump_dict()
-        elif ' '.join(src.split()) == '.s':
+        elif ' '.join(src.split()) == ':s':
             dump_stack()
         else:
             if len(src) > 1:
