@@ -1,0 +1,17 @@
+* backport automatic garbage collection from legend
+* legend-style stack display
+
+  * slices for strings
+  * pointer name resolution
+  * color coded
+
+* more streamlined user interface (we can scratch
+  the prompt, and maybe other elements, and focus on
+  the resulting stack more)
+* code export
+
+  * markdown
+  * raw text
+  * to gist
+  * to clipboard
+
