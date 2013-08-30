@@ -1103,9 +1103,8 @@ def compile(str, slice):
     return slice
 
 
-def parse_bootstrap():
-    """load bootstrap.parable and compile it into memory"""
-    f = open('bootstrap.parable').readlines()
+def parse_bootstrap(f):
+    """compile the bootstrap package it into memory"""
     for line in f:
         if len(line) > 1:
             s = compile(line, request_slice())

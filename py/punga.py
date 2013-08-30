@@ -115,7 +115,7 @@ print """
 
 prepare_slices()
 prepare_dictionary()
-parse_bootstrap()
+parse_bootstrap(open('bootstrap.parable').readlines())
 collect_unused_slices()
 
 f = message.split("\n")
