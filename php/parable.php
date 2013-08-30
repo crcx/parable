@@ -1436,7 +1436,7 @@ function stack_change_type($type)
 
 prepare_memory();
 prepare_dictionary();
-$bootstrap = file('bootstrap.parable');
+$bootstrap = file('bootstrap.p');
 
 foreach ($bootstrap as $src)
 {

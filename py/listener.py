@@ -61,7 +61,7 @@ if __name__ == '__main__':
     sys.stdout.write(" .s for a stack display\n")
     prepare_slices()
     prepare_dictionary()
-    parse_bootstrap(open('bootstrap.parable').readlines())
+    parse_bootstrap(open('bootstrap.p').readlines())
 
     while 1 == 1:
         sys.stdout.write("\nok ")

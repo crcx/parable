@@ -214,7 +214,7 @@ if __name__ == '__main__':
     (width, height) = getTerminalSize()
     prepare_slices()
     prepare_dictionary()
-    parse_bootstrap(open('bootstrap.parable').readlines())
+    parse_bootstrap(open('bootstrap.p').readlines())
     collect_unused_slices()
 
     counter = 0
