@@ -1,4 +1,3 @@
-* backport automatic garbage collection from legend
 * legend-style stack display
 
   * slices for strings
@@ -8,6 +7,7 @@
 * more streamlined user interface (we can scratch
   the prompt, and maybe other elements, and focus on
   the resulting stack more)
+
 * code export
 
   * markdown
