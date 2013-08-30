@@ -162,6 +162,8 @@ bootstrap.append(""" [ [ [ new-slice length [ #1 - ] sip [ dup-pair fetch slice-
 #
 
 from math import floor
+import console
+
 
 #
 # Memory Configuration
@@ -1418,7 +1420,8 @@ def dump_dict():
 
 
 if __name__ == '__main__':
-    sys.stdout.write("parable (listener 2013-08-29)\n\n")
+    console.clear()
+    sys.stdout.write("parable for pythonista\n\n")
     prepare_slices()
     prepare_dictionary()
     parse_bootstrap()
@@ -1426,8 +1429,10 @@ if __name__ == '__main__':
     completed = 0
 
     while completed == 0:
+        console.set_color(.16, .128, .112)
         sys.stdout.write("\n>> ")
         sys.stdout.flush()
+        console.set_color(0, 0, 0)
 
         src = sys.stdin.readline()
 
@@ -1445,4 +1450,5 @@ if __name__ == '__main__':
             sys.stdout.write(e)
 
         clear_errors()
+        console.set_color(0, 0, 0)
         sys.stdout.flush()
