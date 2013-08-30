@@ -1397,13 +1397,16 @@ def dump_dict():
 
 
 if __name__ == '__main__':
+    global bootstrap
     console.clear()
     sys.stdout.write("parable for pythonista\n\n")
     prepare_slices()
     prepare_dictionary()
     parse_bootstrap(bootstrap)
+    collect_unused_slices()
 
     completed = 0
+    counter = 0
 
     while completed == 0:
         console.set_color(.16, .128, .112)
@@ -1427,5 +1430,12 @@ if __name__ == '__main__':
             sys.stdout.write(e)
 
         clear_errors()
+
+        counter += 1
+        if counter > 100:
+            if len(stack) == 0:
+                collect_unused_slices()
+                counter = 0
+
         console.set_color(0, 0, 0)
         sys.stdout.flush()

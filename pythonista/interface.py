@@ -50,6 +50,7 @@ def dump_dict():
 
 
 if __name__ == '__main__':
+    global bootstrap
     console.clear()
     sys.stdout.write("parable for pythonista\n\n")
     prepare_slices()
