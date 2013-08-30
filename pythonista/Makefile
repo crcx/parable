@@ -1,5 +1,4 @@
 default:
-	cp ../py/bootstrap.parable .
 	python convert.py > bootstrap
 	cat bootstrap ../py/parable.py interface.py > parable-pythonista.py
-	rm -f bootstrap.parable bootstrap
+	rm -f bootstrap
