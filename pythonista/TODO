@@ -1,12 +1,12 @@
-* legend-style stack display
+* legend-style stack display (8/30)
 
-  * slices for strings
-  * pointer name resolution
-  * color coded
+  * slices for strings (8/30)
+  * pointer name resolution (8/30)
+  * color coded (8/30)
 
 * more streamlined user interface (we can scratch
   the prompt, and maybe other elements, and focus on
-  the resulting stack more)
+  the resulting stack more) (8/30)
 
 * code export
 

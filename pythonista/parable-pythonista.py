@@ -1356,8 +1356,8 @@ def generate_source():
 # :quit  exit listener
 #
 
-import sys
 import console
+import sys
 
 def dump_stack():
     """display the stack"""
@@ -1367,46 +1367,38 @@ def dump_stack():
         console.set_color(0, 0, 0)
         print "\t" + str(i),
         if types[i] == TYPE_NUMBER:
-            console.set_color(141/255, 182/255, 205/255)
+            console.set_color(141/255.0, 182/255.0, 205/255.0)
             print "\t#" + str(stack[i])
         elif types[i] == TYPE_CHARACTER:
-            console.set_color(139/255, 168/255, 112/255)
+            console.set_color(139/255.0, 168/255.0, 112/255.0)
             print "\t$" + str(chr(stack[i]))
         elif types[i] == TYPE_STRING:
-            console.set_color(140/255, 120/255, 83/255)
+            console.set_color(140/255.0, 120/255.0, 83/255.0)
             print "\t'" + slice_to_string(stack[i]) +"'"
             console.set_color(0, 0, 0)
             print "\t\tstored at: " + str(stack[i])
         elif types[i] == TYPE_FUNCTION:
-            console.set_color(143/255, 143/255, 188/255)
+            console.set_color(143/255.0, 143/255.0, 188/255.0)
             print "\t&" + str(stack[i])
             if pointer_to_name(stack[i]) != "":
                 console.set_color(0, 0, 0)
                 print "\t\tpointer to: " + pointer_to_name(stack[i])
         elif types[i] == TYPE_FLAG:
-            console.set_color(142/255, 35/255, 107/255)
+            console.set_color(142/255.0, 35/255.0, 107/255.0)
             if stack[i] == -1:
-                print "true"
+                print "\ttrue"
             elif stack[i] == 0:
-                print "false"
+                print "\tfalse"
             else:
-                print "malformed flag"
+                print "\tmalformed flag"
         else:
             print "unmatched type on stack!"
         i += 1
 
 
-def dump_dict():
-    """display named items"""
-    l = ''
-    for w in dictionary_names:
-        l = l + w + ' '
-    print l
-
-
-
 def interface():
     global bootstrap
+    global errors
 
     prepare_slices()
     prepare_dictionary()
@@ -1424,27 +1416,18 @@ def interface():
 
         dump_stack()
 
-        console.set_color(0, 0, 0)
-
-        print '- - - - - - - - - -'
-
         for e in errors:
-            console.set_color(214/255, 111/255, 98/255)
+            console.set_color(214/255.0, 111/255.0, 98/255.0)
             print e
-
-        if (len(errors) > 0):
-            print '- - - - - - - - - -'
 
         clear_errors()
 
-        sys.stdout.flush()
+        console.set_color(0, 0, 0)
 
         src = sys.stdin.readline()
 
         if ' '.join(src.split()) == ':quit':
             completed = 1
-        elif ' '.join(src.split()) == ':defined':
-            dump_dict()
         else:
             if len(src) > 0:
                 interpret(compile(src, request_slice()))
