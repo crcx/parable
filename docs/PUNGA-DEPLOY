@@ -4,19 +4,14 @@
 
     punga.py
     parable.py
-    bootstrap.parable
+    bootstrap.p
 
-2. Setup a symlink to punga:
-
-    ln -s punga.py punga.cgi
-
-3. Create an .htaccess:
+2. Create an .htaccess:
 
     AddHandler cgi-script .cgi
     Options FollowSymLinks +ExecCGI
-    DirectoryIndex punga.cgi
+    DirectoryIndex punga.py
 
-4. Set punga.cgi as executable:
+4. Set punga.py as executable:
 
-    chmod +x punga.cgi
-
+    chmod +x punga.py
