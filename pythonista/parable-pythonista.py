@@ -1,16 +1,3 @@
-# parable + listener for pythonista
-# Copyright (c) 2012, 2013, Charles Childers
-# =====================================================================
-# This is a work in progress, intending to eventually provide better
-# support for Parable on iOS
-
-
-# =====================================================================
-
-#
-# The bootstrap.p file, setup as an array for easy loading.
-#
-
 bootstrap = []
 bootstrap.append(""" "Primitives" """)
 bootstrap.append(""" [ `110 ] ':n' define """)
@@ -153,17 +140,15 @@ bootstrap.append(""" [ &*array:filter* ! over array-length [ over array-pop &*ar
 bootstrap.append(""" [ request [ copy ] sip &*array:source* ! [ #0 &*array:source* @ array-length [ &*array:source* @ over array-fetch swap #1 + ] repeat drop ] array-from-quote ] 'array-reverse' define """)
 bootstrap.append(""" "more stuff" """)
 bootstrap.append(""" [ [ [ new-slice length [ #1 - ] sip [ dup-pair fetch slice-store #1 - ] repeat drop-pair #0 slice-store &*slice-current* @ :p :s ] preserve-slice ] if-string ] 'reverse' define """)
-
-
-# =====================================================================
+# parable
+# Copyright (c) 2012, 2013, Charles Childers
+# ==========================================
 
 #
 # Dependencies
 #
 
 from math import floor
-import console
-
 
 #
 # Memory Configuration
@@ -1260,15 +1245,9 @@ def compile(str, slice):
     return slice
 
 
-#
-# this is the only modified routine from the standard parable.py
-# we can't load bootstrap from a file, so this uses the array
-# set up earlier.
-#
-
-def parse_bootstrap():
-    global bootstrap
-    for line in bootstrap:
+def parse_bootstrap(f):
+    """compile the bootstrap package it into memory"""
+    for line in f:
         if len(line) > 1:
             s = compile(line, request_slice())
             interpret(s)
@@ -1366,9 +1345,6 @@ def generate_source():
         src += "' define\n"
     return src + "\n"
 
-
-# =====================================================================
-
 # This implements a pretty minimal user interface for parable. It
 # allows code (or a couple of commands) to be typed in, compiled,
 # and run.
@@ -1381,6 +1357,7 @@ def generate_source():
 #
 
 import sys
+import console
 
 def dump_stack():
     """display the stack"""
@@ -1424,7 +1401,7 @@ if __name__ == '__main__':
     sys.stdout.write("parable for pythonista\n\n")
     prepare_slices()
     prepare_dictionary()
-    parse_bootstrap()
+    parse_bootstrap(bootstrap)
 
     completed = 0
 
