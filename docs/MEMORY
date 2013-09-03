@@ -1,0 +1,72 @@
+# Memory Model
+
+Parable has a highly segmented memory model.
+
+## General Layout
+
+Memory is organized into a series of *slices*. There are a fixed number
+of slices, each of which is a consistent length. The current defaults
+are:
+
+        MAX_SLICES = 64000
+        SLICE_LEN = 1000
+
+Slices contain a linear sequence of numeric values. All compiled byte
+code, strings, and other data are stored in slices.
+
+## Access
+
+Each memory location within a slice is accessed via a pointer and offset
+pair. Both the pointer and the offset are zero based, and run in a strict
+linear order.
+
+An example implementation in Python:
+
+        p_slices = []
+
+        def fetch(slice, offset):
+            global p_slices
+            return p_slices[int(slice)][int(offset)]
+
+        def store(value, slice, offset):
+            global p_slices
+            p_slices[int(slice)] = value
+
+
+        # fetch the first value in slice 0
+        fetch(0, 0)
+
+        # fetch the second value in slice 0
+        fetch(0, 1)
+
+Parable uses floating point values. These are restricted to integers when
+accessing slices and offsets.
+
+Within Parable, use the *fetch* and *store* functions to access values in
+slices:
+
+        #0 #0 fetch        "get first value in slice 0"
+        #0 #1 fetch        "get second value in slice 0"
+        #9 #1000 #3 store  "set fourth value of slice 1000 to 9"
+
+## Allocations
+
+Parable maintains a map of allocated slices. When a new slice is requested,
+the next unused slice is marked as occupied and a pointer to it is returned.
+
+The list is scanned each time an allocation is requested, and the first free
+slot is allocated and returned.
+
+When a slice is released, the map position corresponding to it is marked as
+free.
+
+Allocation should reset the slice to an empty state.
+
+## Garbage Collection
+
+A very limited form of garbage collection is provided.
+
+The system can scan all named slices, and build a list of all values
+stored in those slices. This is sorted, and all duplicates removed.
+Any values not in this list are assumed to be garbage, and can then
+be collected.
