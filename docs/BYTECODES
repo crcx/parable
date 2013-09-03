@@ -292,9 +292,9 @@ Given a stack:
     +----+-----+
     | n1 |     |
     +----+-----+
-    
+
 This will compare n1 < n0, and return a flag
-    
+
 ----
 
 # BC_COMPARE_GT
@@ -310,7 +310,7 @@ Given a stack:
     +----+-----+
     | n1 |     |
     +----+-----+
-    
+
 This will compare n1 > n0, and return a flag
 
 ----
@@ -328,7 +328,7 @@ Given a stack:
     +----+-----+
     | n1 |     |
     +----+-----+
-    
+
 This will compare n1 <= n0, and return a flag
 
 ----
@@ -346,7 +346,7 @@ Given a stack:
     +----+-----+
     | n1 |     |
     +----+-----+
-    
+
 This will compare n1 >= n0, and return a flag
 
 ----
@@ -387,7 +387,7 @@ Example stack:
     +------+-----+
     | flag |     |
     +------+-----+
-    
+
 If FLAG is true, executes q1. If false, executes q0.
 
 ----
