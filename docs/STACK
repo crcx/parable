@@ -1,0 +1,56 @@
+# Stack Implementation
+
+Parable is built around the concept of a last-in, first-out (LIFO) stack.
+This is used to pass data between functions, and generally holds all input
+and output generated.
+
+The stack implementation consists of two fundamental parts: something that
+holds the values, and something that holds the corresponding data types.
+In the implementations done so far, these have been arrays or lists.
+
+Internally, the stack only holds numeric values. The actual types are handled
+via conventions within the byte code interpreter. As an example:
+
+        #100.50
+        $a
+        'hello'
+
+Parable will push a value to the stack:
+
+             Stack    Type
+             -------+----------------
+             100.50   TYPE_NUMBER
+             97       TYPE_CHARACTER
+        top: 8        TYPE_STRING
+
+The byte codes will look at the type listing to decide how to interpret
+the corresponding values. If the user does something like:
+
+        'hello' to-uppercase
+
+The compiler will generate byte codes:
+
+        BC_PUSH_S     <pointer to 'hello'>
+        BC_FLOW_CALL  <pointer to 'to-uppercase'>
+
+The interpreter will push the pointer to 'hello' to the stack, with a type
+of TYPE_STRING. When the bytecode for BC\_TO\_UPPER is reached during the
+call operation, it will convert the Parable string into a native string,
+make the case conversion, convert back to a Parable string, and store the
+results in a new slice. All operations on non-numeric data will do any
+necessary conversions automatically.
+
+Parable only exposes the data stack. No addressing or alternate stacks are
+provided.
+
+The stack values can correspond to one of the following data types:
+
+        Type             Value
+        ---------------+------
+        TYPE_NUMBER      100
+        TYPE_STRING      200
+        TYPE_CHARACTER   300
+        TYPE_FUNCTION    400
+        TYPE_FLAG        500
+
+Any other type value should be considered an error.
