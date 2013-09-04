@@ -110,7 +110,7 @@ Put a copy of the top item under the second item. If the top
 value is a string, makes a copy and pushes the pointer to the
 copy rather than the original pointer.
 
-**stack_change_type(type)**
+**stack\_change\_type(type)**
 
 Convert the type of an item on the stack to a different type.
 This is subject to a few rules, based on the requested type:
@@ -146,3 +146,100 @@ This is subject to a few rules, based on the requested type:
 
 Unless otherwise noted, only the type portion of the stack record is
 modified.
+
+## other functionality
+
+Additional functionality in the byte code is built over the functions
+listed above. These are the remaining stack functions and some Python
+snippits showing simple implementations of them.
+
+**nip**
+
+Remove the second item from the stack.
+
+        stack_swap()
+        stack_drop()
+
+**depth**
+
+Return the number of items on the stack.
+
+        stack_push(len(stack), TYPE_NUMBER)
+
+**dip**
+
+Given a quote and a value, invoke the quote with the value
+temporarily removed from the stack.
+
+        quote = stack_pop()
+        type = stack_type()
+        value = stack_pop()
+        interpret(quote)
+        stack_push(value, type)
+
+**sip**
+
+Given a quote and a value, execute the quote with the value on the stack,
+then place a copy of the value back on the stack after execution.
+
+        quote = stack_pop()
+        stack_dup()
+        type = stack_type()
+        value = stack_pop()
+        interpret(quote)
+        stack_push(value, type)
+
+**bi**
+
+Given two quotes and value, apply each quote to a copy of the value.
+
+         # get the two quotes
+         a = stack_pop()
+         b = stack_pop()
+
+         # make a copy of the stack value
+         stack_dup()
+         type = stack_type()
+         value = stack_pop()
+
+         # execute a quote against the original value
+         interpret(b)
+
+         # execute a quote against the copied value
+         stack_push(value, type)
+         interpret(a)
+
+**tri**
+
+Given three quotes and a value, apply each quote to a copy of the value.
+
+         # get the three quotes
+         a = stack_pop()
+         b = stack_pop()
+         c = stack_pop()
+
+         # make a copy of the stack value
+         stack_dup()
+         type_a = stack_type()
+         value_a = stack_pop()
+
+         # make another copy of the stack value
+         stack_dup()
+         type_b = stack_type()
+         value_b = stack_pop()
+
+         # execute a quote against the original value
+         interpret(c)
+
+         # execute a quote against the first copy
+         stack_push(value_a, type_a)
+         interpret(b)
+
+         # execute a quote against the second copy
+         stack_push(value_b, type_b)
+         interpret(a)
+
+**check_depth(cells)**
+
+Returns True if the stack contains at least *cells* number of items, or
+False otherwise. If False, reports an underflow error.

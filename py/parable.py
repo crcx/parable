@@ -132,7 +132,7 @@ def report_error(text):
 
 
 def check_depth(cells):
-    """returns True if the stac has at least cells number of items, or"""
+    """returns True if the stack has at least *cells* number of items, or"""
     """False otherwise. If False, reports an underflow error."""
     global stack
     if len(stack) < cells:
@@ -1206,4 +1206,3 @@ def generate_source():
         src += " '" + pointer_to_name(s)
         src += "' define\n"
     return src + "\n"
-
