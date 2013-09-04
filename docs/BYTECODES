@@ -1,4 +1,4 @@
-# BC_PUSH_N
+# BC\_PUSH\_N
 
 Opcode: 100
 
@@ -15,7 +15,7 @@ In memory, this is structured as:
 
 ----
 
-# BC_PUSH_S
+# BC\_PUSH\_S
 
 Opcode: 101
 
@@ -32,7 +32,7 @@ In memory, this is structured as:
 
 ----
 
-# BC_PUSH_C
+# BC\_PUSH\_C
 
 Opcode: 102
 
@@ -49,7 +49,7 @@ In memory, this is structured as:
 
 ----
 
-# BC_PUSH_F
+# BC\_PUSH\_F
 
 Opcode: 103
 
@@ -66,7 +66,7 @@ In memory, this is structured as:
 
 ----
 
-# BC_PUSH_COMMENT
+# BC\_PUSH\_COMMENT
 
 Opcode: 104
 
@@ -83,7 +83,7 @@ In memory, this is structured as:
 
 ----
 
-# BC_TYPE_N
+# BC\_TYPE\_N
 
 Opcode: 110
 
@@ -102,7 +102,7 @@ If the value is a NUMBER, no change occurs.
 
 ----
 
-# BC_TYPE_S
+# BC\_TYPE\_S
 
 Opcode: 111
 
@@ -111,7 +111,7 @@ this does nothing.
 
 ----
 
-# BC_TYPE_C
+# BC\_TYPE\_C
 
 Opcode: 112
 
@@ -119,7 +119,7 @@ Convert the value on the stack to a CHARACTER.
 
 ----
 
-# BC_TYPE_F
+# BC\_TYPE\_F
 
 Opcode: 113
 
@@ -127,7 +127,7 @@ Convert the value on the stack to a POINTER.
 
 ----
 
-# BC_TYPE_FLAG
+# BC\_TYPE\_FLAG
 
 Opcode: 114
 
@@ -157,7 +157,7 @@ Behaviour for CHARACTER and POINTER types is not defined.
 
 ----
 
-# BC_GET_TYPE
+# BC\_GET\_TYPE
 
 Opcode: 120
 
@@ -178,7 +178,7 @@ types are:
 
 ----
 
-# BC_ADD
+# BC\_ADD
 
 Opcode: 200
 
@@ -192,7 +192,7 @@ The use of this instruction is not defined for other types of values.
 
 ----
 
-# BC_SUBTRACT
+# BC\_SUBTRACT
 
 Opcode: 201
 
@@ -203,7 +203,7 @@ The use of this instruction is not defined for other types of values.
 
 ----
 
-# BC_MULTIPLY
+# BC\_MULTIPLY
 
 Opcode: 202
 
@@ -214,7 +214,7 @@ The use of this instruction is not defined for other types of values.
 
 ----
 
-# BC_DIVIDE
+# BC\_DIVIDE
 
 Opcode: 203
 
@@ -225,7 +225,7 @@ The use of this instruction is not defined for other types of values.
 
 ----
 
-# BC_REMAINDER
+# BC\_REMAINDER
 
 Opcode: 204
 
@@ -236,7 +236,7 @@ The use of this instruction is not defined for other types of values.
 
 ----
 
-# BC_FLOOR
+# BC\_FLOOR
 
 Opcode: 205
 
@@ -246,7 +246,7 @@ The use of this instruction is not defined for other types of values.
 
 ----
 
-# BC_BITWISE_SHIFT
+# BC\_BITWISE\_SHIFT
 
 Opcode: 210
 
@@ -255,7 +255,7 @@ positive, or left if negative.
 
 ----
 
-# BC_BITWISE_AND
+# BC\_BITWISE\_AND
 
 Opcode: 211
 
@@ -263,7 +263,7 @@ Perform a bitwise AND operation on two NUMBER values.
 
 ----
 
-# BC_BITWISE_OR
+# BC\_BITWISE\_OR
 
 Opcode: 212
 
@@ -271,7 +271,7 @@ Perform a bitwise OR operation on two NUMBER values.
 
 ----
 
-# BC_BITWISE_XOR
+# BC\_BITWISE\_XOR
 
 Opcode: 213
 
@@ -279,7 +279,7 @@ Perform a bitwise XOR operation on two NUMBER values.
 
 ----
 
-# BC_COMPARE_LT
+# BC\_COMPARE\_LT
 
 Opcode: 220
 
@@ -297,7 +297,7 @@ This will compare n1 < n0, and return a flag
 
 ----
 
-# BC_COMPARE_GT
+# BC\_COMPARE\_GT
 
 Opcode: 221
 
@@ -315,7 +315,7 @@ This will compare n1 > n0, and return a flag
 
 ----
 
-# BC_COMPARE_LTEQ
+# BC\_COMPARE\_LTEQ
 
 Opcode: 222
 
@@ -333,7 +333,7 @@ This will compare n1 <= n0, and return a flag
 
 ----
 
-# BC_COMPARE_GTEQ
+# BC\_COMPARE\_GTEQ
 
 Opcode: 223
 
@@ -351,7 +351,7 @@ This will compare n1 >= n0, and return a flag
 
 ----
 
-# BC_COMPARE_EQ
+# BC\_COMPARE\_EQ
 
 Opcode: 224
 
@@ -361,7 +361,7 @@ If the values are strings, it compares the actual strings, not their pointers.
 
 ----
 
-# BC_COMPARE_NEQ
+# BC\_COMPARE\_NEQ
 
 Opcode: 225
 
@@ -371,7 +371,7 @@ If the values are strings, it compares the actual strings, not their pointers.
 
 ----
 
-# BC_FLOW_IF
+# BC\_FLOW\_IF
 
 Opcode: 300
 
@@ -392,7 +392,7 @@ If FLAG is true, executes q1. If false, executes q0.
 
 ----
 
-# BC_FLOW_WHILE
+# BC\_FLOW\_WHILE
 
 Opcode: 301
 
@@ -401,7 +401,7 @@ true FLAG, executes it again until the returned flag is false.
 
 ----
 
-# BC_FLOW_UNTIL
+# BC\_FLOW\_UNTIL
 
 Opcode: 302
 
@@ -410,73 +410,73 @@ false FLAG, executes it again until the returned flag is true.
 
 ----
 
-# BC_FLOW_TIMES
+# BC\_FLOW\_TIMES
 
 Opcode: 303
 
 ----
 
-# BC_FLOW_CALL
+# BC\_FLOW\_CALL
 
 Opcode: 304
 
 ----
 
-# BC_FLOW_CALL_F
+# BC\_FLOW\_CALL\_F
 
 Opcode: 305
 
 ----
 
-# BC_FLOW_DIP
+# BC\_FLOW\_DIP
 
 Opcode: 306
 
 ----
 
-# BC_FLOW_SIP
+# BC\_FLOW\_SIP
 
 Opcode: 307
 
 ----
 
-# BC_FLOW_BI
+# BC\_FLOW\_BI
 
 Opcode: 308
 
 ----
 
-# BC_FLOW_TRI
+# BC\_FLOW\_TRI
 
 Opcode: 309
 
 ----
 
-# BC_FLOW_RETURN
+# BC\_FLOW\_RETURN
 
 Opcode: 399
 
 ----
 
-# BC_MEM_COPY
+# BC\_MEM\_COPY
 
 Opcode: 400
 
 ----
 
-# BC_MEM_FETCH
+# BC\_MEM\_FETCH
 
 Opcode: 401
 
 ----
 
-# BC_MEM_STORE
+# BC\_MEM\_STORE
 
 Opcode: 402
 
 ----
 
-# BC_MEM_REQUEST
+# BC\_MEM\_REQUEST
 
 Opcode: 403
 
@@ -484,7 +484,7 @@ Request a memory slice. Pushes a pointer to the stack.
 
 ----
 
-# BC_MEM_RELEASE
+# BC\_MEM\_RELEASE
 
 Opcode: 404
 
@@ -492,7 +492,7 @@ Remove a pointer from the stack and release the corresponding slice.
 
 ----
 
-# BC_MEM_COLLECT
+# BC\_MEM\_COLLECT
 
 Opcode: 405
 
@@ -506,7 +506,7 @@ The approach I used was to:
 
 ----
 
-# BC_STACK_DUP
+# BC\_STACK\_DUP
 
 Opcode: 500
 
@@ -515,7 +515,7 @@ a copy of the original string).
 
 ----
 
-# BC_STACK_DROP
+# BC\_STACK\_DROP
 
 Opcode: 501
 
@@ -523,7 +523,7 @@ Remove the top value from the stack.
 
 ----
 
-# BC_STACK_SWAP
+# BC\_STACK\_SWAP
 
 Opcode: 502
 
@@ -531,19 +531,19 @@ Exchange the positions of the top two items on the stack.
 
 ----
 
-# BC_STACK_OVER
+# BC\_STACK\_OVER
 
 Opcode: 503
 
 ----
 
-# BC_STACK_TUCK
+# BC\_STACK\_TUCK
 
 Opcode: 504
 
 ----
 
-# BC_STACK_NIP
+# BC\_STACK\_NIP
 
 Opcode: 505
 
@@ -551,7 +551,7 @@ Remove the second item on the stack.
 
 ----
 
-# BC_STACK_DEPTH
+# BC\_STACK\_DEPTH
 
 Opcode: 506
 
@@ -559,7 +559,7 @@ Pushes the a NUMBER indicating the number of items on the stack.
 
 ----
 
-# BC_STACK_CLEAR
+# BC\_STACK\_CLEAR
 
 Opcode: 507
 
@@ -567,7 +567,7 @@ Removes all values from the stack.
 
 ----
 
-# BC_QUOTE_NAME
+# BC\_QUOTE\_NAME
 
 Opcode: 600
 
@@ -579,13 +579,13 @@ Usage:  pointer name --
 
 ----
 
-# BC_STRING_SEEK
+# BC\_STRING\_SEEK
 
 Opcode: 700
 
 ----
 
-# BC_STRING_SUBSTR
+# BC\_STRING\_SUBSTR
 
 Opcode: 701
 
@@ -593,7 +593,7 @@ string, start, end
 
 ----
 
-# BC_STRING_NUMERIC
+# BC\_STRING\_NUMERIC
 
 Opcode: 702
 
@@ -602,7 +602,7 @@ otherwise. This consumes the string.
 
 ----
 
-# BC_TO_LOWER
+# BC\_TO\_LOWER
 
 Opcode: 800
 
@@ -611,7 +611,7 @@ is a STRING, returns a new STRING.
 
 ----
 
-# BC_TO_UPPER
+# BC\_TO\_UPPER
 
 Opcode: 801
 
@@ -620,7 +620,7 @@ is a STRING, returns a new STRING.
 
 ----
 
-# BC_LENGTH
+# BC\_LENGTH
 
 Opcode: 802
 
@@ -628,7 +628,7 @@ Returns the length of a string on the stack. This consumes the string.
 
 ----
 
-# BC_REPORT_ERROR
+# BC\_REPORT\_ERROR
 
 Opcode: 900
 
