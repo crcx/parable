@@ -1,0 +1,52 @@
+# Dictionary Model
+
+Slices are mapped to names through a construct called a *dictionary*.
+
+The reference implementation does this through two arrays. The first one
+contains a list of all names. The second contains pointers to slices for
+each named item.
+
+## general principles
+
+* Each slice can be mapped to one or more names.
+
+  You can create an alias by doing something like:
+
+        [ 'hello' ] 'foo' define
+        &foo 'bar' define
+
+* Names must be unique.
+
+  Reuse of names is not possible. They are assigned globally.
+
+* Redefinitions change existing functionality.
+
+  If you redefine a name, the original slice will be altered. For
+  instance:
+
+        [ 'hello' ] 'foo' define
+        [ foo ] 'bar' define
+        bar
+        [ 'world!' ] 'foo' define
+        bar
+
+## functions
+
+        dictionary_names = []
+        dictionary_slices = []
+
+**in_dictionary(name)**
+
+Returns *True* if the name is in the dictionary, or *False* if
+it could not be found.
+
+**lookup_pointer(name)**
+
+Returns a pointer to the slice corresponding to *name*, or -1
+if the name could not be found.
+
+**add_definition(name, slice)**
+
+Adds an entry for *name* that points to the specified *slice*. If
+the name already exists, it copies the target slice over the slice
+originally attached to the name.
