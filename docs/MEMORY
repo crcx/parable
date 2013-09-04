@@ -70,3 +70,33 @@ The system can scan all named slices, and build a list of all values
 stored in those slices. This is sorted, and all duplicates removed.
 Any values not in this list are assumed to be garbage, and can then
 be collected.
+
+Neither the compiler nor the byte code interpreter in Parable will
+invoke the garbage collector. It can be invoked by the user using
+the *collect-garbage* function. A front end can also invoke the
+collector as needed.
+
+It's generally worth running the collector after the initial bootstrap.
+This will add a minimal amount of time to startup, but frees a bunch
+of slices right off the bat.
+
+If you implement a front end, it's best not to invoke the collector
+if there are items on the stack. (The stack could contain pointers
+to slices that aren't attached to named elements; these could potentially
+become problematic if the referenced slice is reused.)
+
+A simple implementation that invokes the collector every 100 or so lines
+might look like:
+
+        counter = 0
+        for line in source_array:
+            if len(line) > 1:
+                s = compile(line, request_slice())
+                interpret(s)
+                counter += 1
+                if counter > 100:
+                    if len(stack) == 0:
+                        collect_unused_slices()
+                        counter = 0
+
+
