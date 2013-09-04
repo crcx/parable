@@ -39,6 +39,9 @@ code generated is dependent on the first character of the token.
         BC_PUSH_F
         pointer
 
+  If the token does not correspond to a slot number or named item,
+  the compiler will compile a pointer to slot 0, and report an error.
+
 - if the first character is a ', then the token is the start of a string
 
   This (and the similar " prefix) are more complex. It will check to see

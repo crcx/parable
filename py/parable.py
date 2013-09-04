@@ -1062,7 +1062,11 @@ def compile(str, slice):
             if is_number(tokens[i][1:]):
                 store(float(tokens[i][1:]), slice, offset)
             else:
-                store(lookup_pointer(tokens[i][1:]), slice, offset)
+                if lookup_pointer(tokens[i][1:]) != -1:
+                    store(lookup_pointer(tokens[i][1:]), slice, offset)
+                else:
+                    store(0, slice, offset)
+                    report_error('Unable to map ' + tokens[i] + ' to a pointer')
             offset += 1
         elif tokens[i].startswith("#"):
             store(BC_PUSH_N, slice, offset)

@@ -267,13 +267,21 @@ function compile($str, $slice)
         {
             store($BC_PUSH_F, $slice, $offset);
             $offset += 1;
-            if (lookup_pointer(substr($tokens[$i], 1)) == -1)
+            if (is_numeric(substr($tokens[$i], 1)))
             {
                 store(intval(substr($tokens[$i], 1)), $slice, $offset);
             }
             else
             {
-                store($dictionary_map[lookup_pointer(substr($tokens[$i], 1))], $slice, $offset);
+                if (lookup_pointer(substr($tokens[$i], 1)) == -1)
+                {
+                    report_error("ERROR: unable to map '". substr($tokens[$i], 1) ."' to a slice!");
+                    store(0, $slice, $offset);
+                }
+                else
+                {
+                    store($dictionary_map[lookup_pointer(substr($tokens[$i], 1))], $slice, $offset);
+                }
             }
             $offset += 1;
         }
