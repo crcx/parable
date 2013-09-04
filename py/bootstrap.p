@@ -70,6 +70,7 @@
 [ [ ] swap if ] 'if-false' define
 [ dup-pair > [ swap ] if-true [ over ] dip <= [ >= ] dip and :f ] 'between?' define
 [ #0 <> ] 'true?' define
+[ #0 = ] 'false?' define
 [ #2 rem #0 = ] 'even?' define
 [ #2 rem #0 <> ] 'odd?' define
 [ #0 < ] 'negative?' define
