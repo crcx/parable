@@ -1,6 +1,8 @@
 # Parable Compiler Implementation
 
-The compiler in Parable has a trivial, single-pass design.
+The compiler in Parable has a trivial, single-pass design. For the sake of
+simplicity, the compiler only deals with a small subset of byte codes and
+a very rigid syntax.
 
 ## Input Preparation
 
