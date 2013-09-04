@@ -54,3 +54,95 @@ The stack values can correspond to one of the following data types:
         TYPE_FLAG        500
 
 Any other type value should be considered an error.
+
+## functions
+
+The following functions and data structures are provided by the
+reference implementation:
+
+        stack = []
+        types = []
+
+
+**stack_clear()**
+
+Removes all values from the stack.
+
+**stack_push(value, type)**
+
+Push a value (of the specified type) to the stack.
+
+**stack_drop()**
+
+Remove the top value from the stack.
+
+**stack_pop()**
+
+Remove and return the top value from the stack.
+
+**stack_tos()**
+
+Returns a copy of the top value on the stack.
+
+**stack_type()**
+
+Returns the type identifier for the top item on the stack.
+
+**stack_swap()**
+
+Switch the positions of the top two items on the stack.
+
+**stack_dup()**
+
+Duplicates the top value on the stack. If this value is a
+string, it makes a copy and pushes the pointer to the copy
+rather than duplicate the original pointer.
+
+**stack_over()**
+
+Put a copy of the second item on the stack over the top item.
+If the second value is a string, makes a copy of it and pushes
+the pointer to that rather than the original pointer.
+
+**stack_tuck()**
+
+Put a copy of the top item under the second item. If the top
+value is a string, makes a copy and pushes the pointer to the
+copy rather than the original pointer.
+
+**stack_change_type(type)**
+
+Convert the type of an item on the stack to a different type.
+This is subject to a few rules, based on the requested type:
+
+* TYPE_NUMBER
+
+  * TYPE_STRING is converted to a number
+  * If TYPE_STRING can not be converted to a number, a zero is pushed
+
+* TYPE_STRING
+
+  * TYPE_NUMBER is converted to a string
+  * TYPE_CHARACTER is converted to a string
+  * TYPE_FLAG becomes one of:
+
+     * 'true'
+     * 'false'
+     * 'malformed flag'
+
+  * TYPE_FUNCTION becomes a string
+
+* TYPE_CHARACTER
+
+  * TYPE_STRING gets the first character returned
+
+* TYPE_FLAG
+
+  * TYPE_STRING conversion based on the following rules:
+
+     * 'true' -> true
+     * 'false' -> false
+     * anything else is a malformed flag
+
+Unless otherwise noted, only the type portion of the stack record is
+modified.
