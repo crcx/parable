@@ -133,9 +133,6 @@ for line in f:
 
 dump_stack()
 
-# from vmstat import *
-# print "<p>Used " + str(vm_slices_used()) + " of " + str(MAX_SLICES) + " slices.</p>"
-
 print """
       &nbsp;
     </div>
