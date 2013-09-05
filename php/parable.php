@@ -1441,24 +1441,25 @@ function stack_change_type($type)
 }
 
 
+function parse_bootstrap($lines)
+{
+    foreach ($lines as $src)
+    {
+        if (strlen(trim($src)) > 0)
+        {
+            $s = compile($src, request_slice());
+            interpret($s);
+        }
+
+        foreach ($errors as $err)
+        {
+            echo "<tt>$err</tt><br>";
+        }
+        $errors = array();
+    }
+}
 
 prepare_memory();
 prepare_dictionary();
-$bootstrap = file('bootstrap.p');
-
-foreach ($bootstrap as $src)
-{
-    if (strlen(trim($src)) > 0)
-    {
-        $s = compile($src, request_slice());
-        interpret($s);
-    }
-
-    foreach ($errors as $err)
-    {
-        echo "<tt>$err</tt><br>";
-    }
-    $errors = array();
-
-}
+parse_bootstrap(file('bootstrap.p'));
 ?>
