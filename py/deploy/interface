@@ -48,8 +48,9 @@ def load_file(file):
     f = open(file).readlines()
     for line in f:
         if len(line) > 1:
-            s = compile(line, request_slice())
-            interpret(s)
+            if not line.startswith("#!"):
+                s = compile(line, request_slice())
+                interpret(s)
 
 
 if __name__ == '__main__':
