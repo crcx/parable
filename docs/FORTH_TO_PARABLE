@@ -20,6 +20,15 @@ between Parable and Forth. It is not an exhaustive comparsion.
         >r ... r@ ... r>    [ [ ... ] sip ... ] sip
         dup >r ... r>       [ ... ] sip
 
+One other form is that of saving and restoring a variable. In a Forth,
+something like this is done:
+
+        variable @ >r ... r> variable !
+
+In Parable, the equivilent would use the **preserve** combinator:
+
+        &variable [ ... ] preserve
+
 Parable does *not* provide access to an address/return stack.
 
 ## defining functions
