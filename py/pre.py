@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Copyright (c) 2013, Charles Childers
 #
 # pre is the "parable runtime", a quick tool for running a parable

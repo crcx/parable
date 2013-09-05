@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Copyright (c) 2013, Charles Childers
 #
 # legend is a full screen console interface to the parable language.
