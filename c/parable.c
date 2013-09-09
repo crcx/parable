@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "bytecodes.h"
 #include "types.h"
@@ -268,6 +269,7 @@ void interpret(int slice)
                 stack_push(b % a, TYPE_NUMBER);
                 break;
             case BC_FLOOR:
+                stack_push(floor(stack_pop()), TYPE_NUMBER);
                 break;
             case BC_BITWISE_SHIFT:
                 break;
