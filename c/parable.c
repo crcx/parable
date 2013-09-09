@@ -27,6 +27,10 @@ double slices[10000][1024];
 int slice_map[10000];
 int sp;
 
+
+
+/*  Memory Manager  */
+
 int request_slice()
 {
     int offset = 0;
@@ -42,11 +46,15 @@ int request_slice()
     return -1;
 }
 
+
 void release_slice(int slice)
 {
     slice_map[slice] = 0;
 }
 
+
+
+/*  Data Stack  */
 
 void stack_push(double value, double type)
 {
@@ -76,6 +84,8 @@ void stack_swap()
     types[sp - 1] = yt;
 }
 
+
+/*  Load and run bootstrap  */
 
 void read_line(FILE *file, char *line_buffer)
 {
@@ -123,6 +133,9 @@ void parse_bootstrap()
 
     fclose(fp);
 }
+
+
+/*  Byte Code Interpreter  */
 
 void interpret(int slice)
 {
@@ -185,6 +198,10 @@ void interpret(int slice)
     }
 }
 
+
+
+
+/*  Compiler  */
 int compile_cell(float value, int slice, int offset)
 {
     slices[slice][offset] = value;
@@ -264,15 +281,11 @@ int compile(char *source, int s)
 }
 
 
-int main()
+
+/*  main() - to be moved to a separate file later  */
+
+void dump_stack()
 {
-    int s, o;
-    sp = 0;
-    char test[] = "$a $1 `502 [ #2 #3 ] #100 #200 `200 #-45.44 [ 'hello' ]";
-//    parse_bootstrap();
-    s = request_slice();
-    compile(test, s);
-    interpret(s);
     while (sp > 0)
     {
         printf("%i: ", sp);
@@ -284,5 +297,17 @@ int main()
         if (types[sp] == TYPE_FUNCTION)
             printf("&%f\n", data[sp]);
     }
+}
+
+int main()
+{
+    int s, o;
+    sp = 0;
+    char test[] = "$a $1 `502 [ #2 #3 ] #100 #200 `200 #-45.44 [ 'hello' ]";
+//    parse_bootstrap();
+    s = request_slice();
+    compile(test, s);
+    interpret(s);
+    dump_stack();
     return 0;
 }
