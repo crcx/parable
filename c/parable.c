@@ -48,6 +48,41 @@ void release_slice(int slice)
 }
 
 
+double fetch(int s, int o)
+{
+    return slices[s][o];
+}
+
+void store(double v, int s, int o)
+{
+    slices[s][o] = v;
+}
+
+char *slice_to_string(int s)
+{
+    char *string = malloc(1024);
+    int o = 0;
+
+    while (fetch(s, o) != 0)
+    {
+        string[o] = (char) fetch(s, o);
+        o++;
+    }
+    return string;
+}
+
+int string_to_slice(char *string)
+{
+    int s = request_slice();
+    int o = 0;
+    int l = strlen(string);
+    while (o > l)
+    {
+        store(string[o], s, o);
+        o++;
+    }
+}
+
 
 /*  Data Stack  */
 
@@ -375,12 +410,16 @@ void dump_stack()
     {
         printf("%i: ", sp);
         sp--;
-       if (types[sp] == TYPE_CHARACTER)
+        if (types[sp] == TYPE_CHARACTER)
             printf("$%c\n", (char)data[sp]);
         if (types[sp] == TYPE_NUMBER)
             printf("#%f\n", data[sp]);
         if (types[sp] == TYPE_FUNCTION)
             printf("&%f\n", data[sp]);
+        if (types[sp] == TYPE_STRING)
+        {
+            printf("'%s'\n", slice_to_string(data[sp]));
+        }
     }
 }
 
@@ -394,6 +433,13 @@ int main()
     s = request_slice();
     compile(test, s);
     interpret(s);
+    s = request_slice();
+    o = 0;
+    o = compile_cell(98, s, o);
+    o = compile_cell(99, s, o);
+    o = compile_cell(100, s, o);
+    o = compile_cell(0, s, o);
+    stack_push(s, TYPE_STRING);
     dump_stack();
     return 0;
 }
