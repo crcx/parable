@@ -1,39 +1,5 @@
 /* parable language
  * copyright (c)2013, charles childers
- *
- * This is an attempt to implement Parable in C. I have a couple of
- * purposes in doing this.
- *
- * 1. The ability to provide Parable as an executable with no dependency
- *    on installing a larger language.
- * 2. The ability to eventually embed in other applications more easily.
- * 3. Possibility of offering better overall performance.
- *
- * 2013-09-07    Work begins on this project. I have implemented a few
- *               routines and skeleton routines for later expansions.
- *
- *               read_line()               read a source line from bootstrap
- *               parse_bootstrap()         stub; currently just outputs lines
- *               request_slice()           testing
- *               release_slice()           testing
- *               interpret()               stub
- *               compile()                 stub
- *
- * 2013-09-09    compile() now works for numbers
- *                         and also for characters
- *                         attempts to compile nested quotes
- *
- *               interpret() pushes numbers to stack
- *                           and also characters
- *
- *               stack display for numbers, characters
- *               is working
- *
- *               start implementing stack functions
- *
- *               byte code names added (bytecodes.h)
- *               type names added (types.h)
- *
  */
 
 #include <stdio.h>
@@ -177,7 +143,22 @@ void interpret(int slice)
             case BC_ADD:
                 a = stack_pop();
                 b = stack_pop();
-                stack_push(a+b, TYPE_NUMBER);
+                stack_push(b + a, TYPE_NUMBER);
+                break;
+            case BC_SUBTRACT:
+                a = stack_pop();
+                b = stack_pop();
+                stack_push(b - a, TYPE_NUMBER);
+                break;
+            case BC_MULTIPLY:
+                a = stack_pop();
+                b = stack_pop();
+                stack_push(b * a, TYPE_NUMBER);
+                break;
+            case BC_DIVIDE:
+                a = stack_pop();
+                b = stack_pop();
+                stack_push(b / a, TYPE_NUMBER);
                 break;
         }
         offset++;
