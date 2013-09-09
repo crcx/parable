@@ -198,27 +198,32 @@ void interpret(int slice)
                 offset++;
                 stack_push(slices[slice][offset], TYPE_NUMBER);
                 break;
-            case BC_PUSH_C:
-                offset++;
-                stack_push(slices[slice][offset], TYPE_CHARACTER);
-                break;
             case BC_PUSH_S:
                 offset++;
                 stack_push(slices[slice][offset], TYPE_STRING);
+                break;
+            case BC_PUSH_C:
+                offset++;
+                stack_push(slices[slice][offset], TYPE_CHARACTER);
                 break;
             case BC_PUSH_F:
                 offset++;
                 stack_push(slices[slice][offset], TYPE_FUNCTION);
                 break;
-            case BC_FLOW_CALL:
-                offset++;
-                interpret((int)slices[slice][offset]);
-                break;
             case BC_PUSH_COMMENT:
                 offset++;
                 break;
-            case BC_FLOW_RETURN:
-                offset = 1024;
+            case BC_TYPE_N:
+                break;
+            case BC_TYPE_S:
+                break;
+            case BC_TYPE_C:
+                break;
+            case BC_TYPE_F:
+                break;
+            case BC_TYPE_FLAG:
+                break;
+            case BC_GET_TYPE:
                 break;
             case BC_ADD:
                 if (tos_type() == TYPE_NUMBER && nos_type() == TYPE_NUMBER)
@@ -257,20 +262,109 @@ void interpret(int slice)
                 b = stack_pop();
                 stack_push(b / a, TYPE_NUMBER);
                 break;
-            case BC_STACK_SWAP:
-                stack_swap();
+            case BC_REMAINDER:
+                a = stack_pop();
+                b = stack_pop();
+                stack_push(b % a, TYPE_NUMBER);
+                break;
+            case BC_FLOOR:
+                break;
+            case BC_BITWISE_SHIFT:
+                break;
+            case BC_BITWISE_AND:
+                break;
+            case BC_BITWISE_OR:
+                break;
+            case BC_BITWISE_XOR:
+                break;
+            case BC_COMPARE_LT:
+                break;
+            case BC_COMPARE_GT:
+                break;
+            case BC_COMPARE_LTEQ:
+                break;
+            case BC_COMPARE_GTEQ:
+                break;
+            case BC_COMPARE_EQ:
+                break;
+            case BC_COMPARE_NEQ:
+                break;
+            case BC_FLOW_IF:
+                break;
+            case BC_FLOW_WHILE:
+                break;
+            case BC_FLOW_UNTIL:
+                break;
+            case BC_FLOW_TIMES:
+                break;
+            case BC_FLOW_CALL:
+                offset++;
+                interpret((int)slices[slice][offset]);
+                break;
+            case BC_FLOW_CALL_F:
+                interpret(stack_pop());
+                break;
+            case BC_FLOW_DIP:
+                break;
+            case BC_FLOW_SIP:
+                break;
+            case BC_FLOW_BI:
+                break;
+            case BC_FLOW_TRI:
+                break;
+            case BC_FLOW_RETURN:
+                offset = 1024;
+                break;
+            case BC_MEM_COPY:
+                break;
+            case BC_MEM_FETCH:
+                break;
+            case BC_MEM_STORE:
+                break;
+            case BC_MEM_REQUEST:
+                break;
+            case BC_MEM_RELEASE:
+                break;
+            case BC_MEM_COLLECT:
+                break;
+            case BC_STACK_DUP:
                 break;
             case BC_STACK_DROP:
                 stack_pop();
+                break;
+            case BC_STACK_SWAP:
+                stack_swap();
+                break;
+            case BC_STACK_OVER:
+                break;
+            case BC_STACK_TUCK:
                 break;
             case BC_STACK_NIP:
                 stack_swap();
                 stack_pop();
                 break;
+            case BC_STACK_DEPTH:
+                break;
+            case BC_STACK_CLEAR:
+                break;
             case BC_QUOTE_NAME:
                 a = stack_pop();
                 b = stack_pop();
                 add_definition(slice_to_string(a), b);
+                break;
+            case BC_STRING_SEEK:
+                break;
+            case BC_STRING_SUBSTR:
+                break;
+            case BC_STRING_NUMERIC:
+                break;
+            case BC_TO_LOWER:
+                break;
+            case BC_TO_UPPER:
+                break;
+            case BC_LENGTH:
+                break;
+            case BC_REPORT_ERROR:
                 break;
         }
         offset++;
