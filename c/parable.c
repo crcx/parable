@@ -63,6 +63,20 @@ double stack_pop()
 }
 
 
+void stack_swap()
+{
+    double x, y, xt, yt;
+    xt = types[sp - 1];
+    x  = data[sp - 1];
+    yt = types[sp - 2];
+    y  = data[sp - 2];
+    data[sp - 2] = x;
+    types[sp - 2] = xt;
+    data[sp - 1] = y;
+    types[sp - 1] = yt;
+}
+
+
 void read_line(FILE *file, char *line_buffer)
 {
     if (file == NULL)
@@ -160,6 +174,12 @@ void interpret(int slice)
                 b = stack_pop();
                 stack_push(b / a, TYPE_NUMBER);
                 break;
+            case BC_STACK_SWAP:
+                stack_swap();
+                break;
+            case BC_STACK_DROP:
+                stack_pop();
+                break;
         }
         offset++;
     }
@@ -248,7 +268,7 @@ int main()
 {
     int s, o;
     sp = 0;
-    char test[] = "$a $1 [ #2 #3 ] #100 #200 `200 #-45.44 [ 'hello' ]";
+    char test[] = "$a $1 `502 [ #2 #3 ] #100 #200 `200 #-45.44 [ 'hello' ]";
 //    parse_bootstrap();
     s = request_slice();
     compile(test, s);
