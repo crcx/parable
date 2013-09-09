@@ -1,4 +1,3 @@
-"Primitives"
 [ `110 ] ':n' define
 [ `111 ] ':s' define
 [ `112 ] ':c' define
@@ -51,19 +50,13 @@
 [ `801 ] 'to-uppercase' define
 [ `802 ] 'length' define
 [ `900 ] 'report-error' define
-
-"Constants for data types recognized by Parable's VM"
 [ #100 ] 'NUMBER' define
 [ #200 ] 'STRING' define
 [ #300 ] 'CHARACTER' define
 [ #400 ] 'POINTER' define
 [ #500 ] 'FLAG' define
-
-"Stack Flow"
 [ over over ] 'dup-pair' define
 [ drop drop ] 'drop-pair' define
-
-"Conditionals"
 [ #-1 :f ] 'true' define
 [ #0 :f ] 'false' define
 [ [ ] if ] 'if-true' define
@@ -81,41 +74,27 @@
 [ [ type? NUMBER = ] dip if-true ] 'if-number' define
 [ [ type? POINTER = ] dip if-true ] 'if-pointer' define
 [ [ type? FLAG = ] dip if-true ] 'if-flag' define
-
-"combinators"
 [ [ dip ] dip invoke ] 'bi*' define
 [ dup bi* ] 'bi@' define
-
-"variables"
 [ #0 fetch ] '@' define
 [ #0 store ] '!' define
 [ [ @ #1 + ] sip ! ] 'increment' define
 [ [ @ #1 - ] sip ! ] 'decrement' define
 [ request swap define ] 'variable' define
 [ swap request dup-pair copy swap [ [ invoke ] dip ] dip copy ] 'preserve' define
-
-"numeric ranges"
 [ dup-pair < [ [ [ dup #1 + ] dip dup-pair = ] while-false ] [ [ [ dup #1 - ] dip dup-pair = ] while-false ] if drop ] 'expand-range' define
 [ #1 - [ + ] repeat ] 'sum-range' define
-
-"String and Character"
 [ dup to-lowercase = ] 'lowercase?' define
 [ dup to-uppercase = ] 'uppercase?' define
 [ [ [ uppercase? ] [ lowercase? ] bi or :f ] if-character ] 'letter?' define
 [ [ $0 $9 between? ] if-character ] 'digit?' define
 [ to-lowercase :s 'abcdefghijklmnopqrstuvwxyz1234567890' swap find [ false ] [ true ] if ] 'alphanumeric?' define
 [ to-lowercase :s 'aeiou' swap find [ false ] [ true ] if ] 'vowel?' define
-
-"Helpful Math"
 [ dup negative? [ #-1 * ] if-true ] 'abs' define
 [ dup-pair < [ drop ] [ nip ] if ] 'min' define
 [ dup-pair < [ nip ] [ drop ] if ] 'max' define
-
-"Misc"
 [ depth [ invoke ] dip depth swap - ] 'invoke-count-items' define
 [ [ drop ] repeat ] 'drop-multiple' define
-
-"Sliced Memory Access"
 '*slice-current*' variable
 '*slice-offset*' variable
 [ &*slice-current* @ &*slice-offset* @ ] 'slice-position' define
@@ -131,8 +110,6 @@
 [ [ slice-store ] repeat ] 'slice-store-items' define
 [ request slice-set ] 'new-slice' define
 [ &*slice-current* @ [ &*slice-offset* @ [ invoke ] dip &*slice-offset* ! ] dip &*slice-current* ! ] 'preserve-slice' define
-
-"arrays"
 '*array:filter*' variable
 '*array:source*' variable
 '*array:results*' variable
@@ -149,6 +126,4 @@
 [ dup-pair [ array-length ] bi@ = [ dup array-length true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define
 [ &*array:filter* ! over array-length [ over array-pop &*array:filter* @ invoke ] repeat nip ] 'array-reduce' define
 [ request [ copy ] sip &*array:source* ! [ #0 &*array:source* @ array-length [ &*array:source* @ over array-fetch swap #1 + ] repeat drop ] array-from-quote ] 'array-reverse' define
-
-"more stuff"
 [ [ [ new-slice length [ #1 - ] sip [ dup-pair fetch slice-store #1 - ] repeat drop-pair #0 slice-store &*slice-current* @ :p :s ] preserve-slice ] if-string ] 'reverse' define

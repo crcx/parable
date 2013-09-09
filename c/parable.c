@@ -12,6 +12,7 @@
 int compile(char *, int);
 int request_slice();
 void release_slice(int);
+void interpret(int slice);
 
 void stack_push(double, double);
 double stack_pop();
@@ -19,6 +20,7 @@ void stack_swap();
 void stack_over();
 void stack_tuck();
 double stack_depth();
+void add_definition(char *name, int slice);
 
 
 /*  Memory Manager  */
@@ -78,7 +80,7 @@ int string_to_slice(char *string)
     int l = strlen(string);
     while (o < l)
     {
-        store((float) string[o], s, o);
+        store((double) string[o], s, o);
         o++;
     }
     return s;
@@ -175,7 +177,7 @@ void parse_bootstrap()
     while (!feof(fp))
     {
         read_line(fp, source);
-        compile(source, request_slice());
+        interpret(compile(source, request_slice()));
     }
 
     fclose(fp);
@@ -265,6 +267,11 @@ void interpret(int slice)
                 stack_swap();
                 stack_pop();
                 break;
+            case BC_QUOTE_NAME:
+                a = stack_pop();
+                b = stack_pop();
+                add_definition(slice_to_string(a), b);
+                break;
         }
         offset++;
     }
@@ -290,13 +297,9 @@ void prepare_dictionary()
 {
     namep = 0;
     char def[] = "`600";
-    char def2[] = "`200";
     int s = request_slice();
     compile(def, s);
     add_definition("define", s);
-    s = request_slice();
-    compile(def2, s);
-    add_definition("+", s);
 }
 
 
@@ -315,7 +318,7 @@ int lookup_definition(char *name)
 
 
 /*  Compiler  */
-int compile_cell(float value, int slice, int offset)
+int compile_cell(double value, int slice, int offset)
 {
     slices[slice][offset] = value;
     offset++;
@@ -336,7 +339,6 @@ int compile(char *source, int s)
     int np = 0;
     int current = s;
 
-    printf("-------------------\n");
     for (token = strtok_r(source, " ", &state); token != NULL; token = strtok_r(NULL, " ", &state))
     {
         prefix = (char)token[0];
@@ -354,7 +356,15 @@ int compile(char *source, int s)
                     printf("multi token string parser not implemented\n");
                 break;
             case '"':
-                printf("comment parser not implemented\n");
+                if (token[strlen(token) - 1] == '"')
+                {
+                    memcpy(reform, &token[1], strlen(token) - 2);
+                    reform[strlen(token) - 2] = '\0';
+                    o = compile_cell(BC_PUSH_COMMENT, s, o);
+                    o = compile_cell((double) string_to_slice(reform), s, o);
+                }
+                else
+                    printf("multi token comment parser not implemented\n");
                 break;
             case '#':
                 memcpy(reform, &token[1], strlen(token));
@@ -438,7 +448,7 @@ int main()
     sp = 0;
     char test[] = "$a $1 [ #2 #3 ] #100 #200 + #-45.44 [ 'hello' ] 'test'";
     prepare_dictionary();
-//    parse_bootstrap();
+    parse_bootstrap();
     s = request_slice();
     compile(test, s);
     interpret(s);
@@ -450,5 +460,11 @@ int main()
     o = compile_cell(0, s, o);
     stack_push(s, TYPE_STRING);
     dump_stack();
+    while (namep > 0)
+    {
+        namep--;
+        printf("%s ", names[namep]);
+    }
+    printf("\n");
     return 0;
 }
