@@ -234,6 +234,43 @@ void interpret(int slice)
 
 
 
+/*  Dictionary  */
+char names[10000][1024];
+int pointers[10000];
+int namep;
+
+void add_definition(char *name, int slice)
+{
+    strcpy(names[namep], name);
+    pointers[namep] = slice;
+    namep++;
+}
+
+
+void prepare_dictionary()
+{
+    namep = 0;
+    char def[] = "`600";
+    int s = request_slice();
+    compile(def, s);
+    add_definition("define", s);
+}
+
+
+int lookup_definition(char *name)
+{
+    int slice = -1;
+    int n = namep;
+    while (n > 0)
+    {
+        n--;
+        if (strcmp(names[n], name) == 0)
+            slice = n;
+    }
+    return slice;
+}
+
+
 /*  Compiler  */
 int compile_cell(float value, int slice, int offset)
 {
@@ -260,7 +297,6 @@ int compile(char *source, int s)
     for (token = strtok_r(source, " ", &state); token != NULL; token = strtok_r(NULL, " ", &state))
     {
         prefix = (char)token[0];
-//        printf("token: %s\n", token);
         switch (prefix)
         {
             case '\'':
@@ -276,7 +312,11 @@ int compile(char *source, int s)
                 o = compile_cell(scratch, s, o);
                 break;
             case '&':
-                printf("pointer parser not implemented\n");
+                /* TODO: named pointers */
+                memcpy(reform, &token[1], strlen(token));
+                scratch = (double) atof(reform);
+                o = compile_cell(BC_PUSH_F, s, o);
+                o = compile_cell(scratch, s, o);
                 break;
             case '$':
                 scratch = (double) token[1];
@@ -337,6 +377,7 @@ int main()
     int s, o;
     sp = 0;
     char test[] = "$a $1 `502 [ #2 #3 ] #100 #200 `200 #-45.44 [ 'hello' ]";
+    prepare_dictionary();
 //    parse_bootstrap();
     s = request_slice();
     compile(test, s);
