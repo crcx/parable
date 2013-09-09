@@ -76,11 +76,12 @@ int string_to_slice(char *string)
     int s = request_slice();
     int o = 0;
     int l = strlen(string);
-    while (o > l)
+    while (o < l)
     {
-        store(string[o], s, o);
+        store((float) string[o], s, o);
         o++;
     }
+    return s;
 }
 
 
@@ -342,7 +343,15 @@ int compile(char *source, int s)
         switch (prefix)
         {
             case '\'':
-                printf("string parser not implemented\n");
+                if (token[strlen(token) - 1] == '\'')
+                {
+                    memcpy(reform, &token[1], strlen(token) - 2);
+                    reform[strlen(token) - 2] = '\0';
+                    o = compile_cell(BC_PUSH_S, s, o);
+                    o = compile_cell((double) string_to_slice(reform), s, o);
+                }
+                else
+                    printf("multi token string parser not implemented\n");
                 break;
             case '"':
                 printf("comment parser not implemented\n");
@@ -427,7 +436,7 @@ int main()
 {
     int s, o;
     sp = 0;
-    char test[] = "$a $1 [ #2 #3 ] #100 #200 + #-45.44 [ 'hello' ]";
+    char test[] = "$a $1 [ #2 #3 ] #100 #200 + #-45.44 [ 'hello' ] 'test'";
     prepare_dictionary();
 //    parse_bootstrap();
     s = request_slice();
