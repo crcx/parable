@@ -21,15 +21,10 @@ void stack_tuck();
 double stack_depth();
 
 
-double data[64000];
-double types[64000];
+/*  Memory Manager  */
+
 double slices[10000][1024];
 int slice_map[10000];
-int sp;
-
-
-
-/*  Memory Manager  */
 
 int request_slice()
 {
@@ -55,6 +50,10 @@ void release_slice(int slice)
 
 
 /*  Data Stack  */
+
+double data[64000];
+double types[64000];
+int sp;
 
 void stack_push(double value, double type)
 {
@@ -173,6 +172,10 @@ void interpret(int slice)
                 offset++;
                 stack_push(slices[slice][offset], TYPE_FUNCTION);
                 break;
+            case BC_FLOW_CALL:
+                offset++;
+                interpret((int)slices[slice][offset]);
+                break;
             case BC_PUSH_COMMENT:
                 offset++;
                 break;
@@ -251,9 +254,13 @@ void prepare_dictionary()
 {
     namep = 0;
     char def[] = "`600";
+    char def2[] = "`200";
     int s = request_slice();
     compile(def, s);
     add_definition("define", s);
+    s = request_slice();
+    compile(def2, s);
+    add_definition("+", s);
 }
 
 
@@ -345,9 +352,14 @@ int compile(char *source, int s)
                 o = compile_cell(current, s, o);
                 break;
             default:
-                printf("function call parser not implemented\n");
+                if (lookup_definition(token) != -1)
+                {
+                    o = compile_cell(BC_FLOW_CALL, s, o);
+                    o = compile_cell(lookup_definition(token), s, o);
+                }
+                else
+                    printf("function %s not found\n", token);
                 break;
-
         }
     }
     return s;
@@ -363,7 +375,7 @@ void dump_stack()
     {
         printf("%i: ", sp);
         sp--;
-        if (types[sp] == TYPE_CHARACTER)
+       if (types[sp] == TYPE_CHARACTER)
             printf("$%c\n", (char)data[sp]);
         if (types[sp] == TYPE_NUMBER)
             printf("#%f\n", data[sp]);
@@ -376,7 +388,7 @@ int main()
 {
     int s, o;
     sp = 0;
-    char test[] = "$a $1 `502 [ #2 #3 ] #100 #200 `200 #-45.44 [ 'hello' ]";
+    char test[] = "$a $1 [ #2 #3 ] #100 #200 + #-45.44 [ 'hello' ]";
     prepare_dictionary();
 //    parse_bootstrap();
     s = request_slice();
