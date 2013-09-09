@@ -85,6 +85,18 @@ void stack_swap()
 }
 
 
+double tos_type()
+{
+    return types[sp - 1];
+}
+
+
+double nos_type()
+{
+    return types[sp - 2];
+}
+
+
 /*  Load and run bootstrap  */
 
 void read_line(FILE *file, char *line_buffer)
@@ -168,9 +180,26 @@ void interpret(int slice)
                 offset = 1024;
                 break;
             case BC_ADD:
-                a = stack_pop();
-                b = stack_pop();
-                stack_push(b + a, TYPE_NUMBER);
+                if (tos_type() == TYPE_NUMBER && nos_type() == TYPE_NUMBER)
+                {
+                    a = stack_pop();
+                    b = stack_pop();
+                    stack_push(b + a, TYPE_NUMBER);
+                }
+                else if (tos_type() == TYPE_STRING && nos_type() == TYPE_STRING)
+                {
+                    a = stack_pop();
+                    b = stack_pop();
+                    stack_push(0, TYPE_NUMBER);
+                    printf("WARNING: string concatenation not supported yet\n");
+                }
+                else
+                {
+                    printf("BC_ADD only works for NUMBER and STRING types\n");
+                    a = stack_pop();
+                    b = stack_pop();
+                    offset = 1024;
+                }
                 break;
             case BC_SUBTRACT:
                 a = stack_pop();
@@ -191,6 +220,10 @@ void interpret(int slice)
                 stack_swap();
                 break;
             case BC_STACK_DROP:
+                stack_pop();
+                break;
+            case BC_STACK_NIP:
+                stack_swap();
                 stack_pop();
                 break;
         }
