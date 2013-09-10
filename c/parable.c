@@ -235,10 +235,24 @@ void interpret(int slice)
                     types[sp - 1] = TYPE_NUMBER;
                 break;
             case BC_TYPE_S:
-                if (tos_type() == TYPE_NUMBER)
+                a = tos_type();
+                if (a == TYPE_NUMBER)
                 {
                     sprintf(output, "%f", stack_pop());
                     stack_push(string_to_slice(output), TYPE_STRING);
+                }
+                if (a == TYPE_CHARACTER)
+                {
+                    output[0] = (char) stack_pop();
+                    output[1] = '\0';
+                    stack_push(string_to_slice(output), TYPE_STRING);
+                }
+                if (a == TYPE_FUNCTION)
+                {
+                    types[sp - 1] = TYPE_STRING;
+                }
+                if (a == TYPE_FLAG)
+                {
                 }
                 break;
             case BC_TYPE_C:
