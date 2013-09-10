@@ -378,8 +378,54 @@ void interpret(int slice)
                     stack_push(0, TYPE_FLAG);
                 break;
             case BC_COMPARE_EQ:
+                a = tos_type();
+                b = stack_pop();
+                x = tos_type();
+                y = stack_pop();
+                if (a == TYPE_STRING && x == TYPE_STRING)
+                {
+                    if (strcmp(slice_to_string(b), slice_to_string(y)) == 0)
+                        stack_push(-1, TYPE_FLAG);
+                    else
+                        stack_push(0, TYPE_FLAG);
+                }
+                else if (a == x)
+                {
+                    if (b == y)
+                        stack_push(-1, TYPE_FLAG);
+                    else
+                        stack_push(0, TYPE_FLAG);
+                }
+                else
+                {
+                    offset = 1024;
+                    printf("ERROR: types do not match\n");
+                }
                 break;
             case BC_COMPARE_NEQ:
+                a = tos_type();
+                b = stack_pop();
+                x = tos_type();
+                y = stack_pop();
+                if (a == TYPE_STRING && x == TYPE_STRING)
+                {
+                    if (strcmp(slice_to_string(b), slice_to_string(y)) != 0)
+                        stack_push(-1, TYPE_FLAG);
+                    else
+                        stack_push(0, TYPE_FLAG);
+                }
+                else if (a == x)
+                {
+                    if (b != y)
+                        stack_push(-1, TYPE_FLAG);
+                    else
+                        stack_push(0, TYPE_FLAG);
+                }
+                else
+                {
+                    offset = 1024;
+                    printf("ERROR: types do not match\n");
+                }
                 break;
             case BC_FLOW_IF:
                 break;
