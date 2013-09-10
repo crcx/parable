@@ -297,12 +297,36 @@ void interpret(int slice)
             case BC_BITWISE_XOR:
                 break;
             case BC_COMPARE_LT:
+                a = stack_pop();
+                b = stack_pop();
+                if (b < a)
+                    stack_push(-1, TYPE_FLAG);
+                else
+                    stack_push(0, TYPE_FLAG);
                 break;
             case BC_COMPARE_GT:
+                a = stack_pop();
+                b = stack_pop();
+                if (b > a)
+                    stack_push(-1, TYPE_FLAG);
+                else
+                    stack_push(0, TYPE_FLAG);
                 break;
             case BC_COMPARE_LTEQ:
+                a = stack_pop();
+                b = stack_pop();
+                if (b <= a)
+                    stack_push(-1, TYPE_FLAG);
+                else
+                    stack_push(0, TYPE_FLAG);
                 break;
             case BC_COMPARE_GTEQ:
+                a = stack_pop();
+                b = stack_pop();
+                if (b >= a)
+                    stack_push(-1, TYPE_FLAG);
+                else
+                    stack_push(0, TYPE_FLAG);
                 break;
             case BC_COMPARE_EQ:
                 break;
