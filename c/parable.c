@@ -434,6 +434,13 @@ void interpret(int slice)
             case BC_FLOW_UNTIL:
                 break;
             case BC_FLOW_TIMES:
+                a = stack_pop();
+                b = stack_pop();
+                while (b > 0)
+                {
+                    interpret(a);
+                    b--;
+                }
                 break;
             case BC_FLOW_CALL:
                 offset++;

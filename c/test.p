@@ -9,3 +9,5 @@ true :s
 #1 #1 =
 'hello' 'world' =
 'hello' 'hello' =
+
+#10 [ #1 ] repeat
