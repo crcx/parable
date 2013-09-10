@@ -194,6 +194,9 @@ void interpret(int slice)
 {
     int a, b, c, x, y, z;
     int offset = 0;
+    char reform[1024];
+    double scratch;
+
     while (offset < 1024)
     {
         switch ((int) slices[slice][offset])
@@ -218,6 +221,17 @@ void interpret(int slice)
                 offset++;
                 break;
             case BC_TYPE_N:
+                a = tos_type();
+                if (a == TYPE_STRING)
+                {
+                    b = stack_pop();
+                    memset(reform, '\0', 1024);
+                    memcpy(reform, slice_to_string(b), strlen(slice_to_string(b)));
+                    scratch = (double) atof(reform);
+                    stack_push(scratch, TYPE_NUMBER);
+                }
+                else
+                    types[sp - 1] = TYPE_NUMBER;
                 break;
             case BC_TYPE_S:
                 break;
