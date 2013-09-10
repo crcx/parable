@@ -196,6 +196,7 @@ void interpret(int slice)
     int offset = 0;
     char reform[1024];
     double scratch;
+    char *output = malloc(1024);
 
     while (offset < 1024)
     {
@@ -234,6 +235,11 @@ void interpret(int slice)
                     types[sp - 1] = TYPE_NUMBER;
                 break;
             case BC_TYPE_S:
+                if (tos_type() == TYPE_NUMBER)
+                {
+                    sprintf(output, "%f", stack_pop());
+                    stack_push(string_to_slice(output), TYPE_STRING);
+                }
                 break;
             case BC_TYPE_C:
                 break;
