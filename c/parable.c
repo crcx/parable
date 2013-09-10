@@ -226,8 +226,22 @@ void interpret(int slice)
             case BC_TYPE_F:
                 break;
             case BC_TYPE_FLAG:
+                a = tos_type();
+                if (a == TYPE_STRING)
+                {
+                    b = stack_pop();
+                    if (strcmp(slice_to_string(b), "true") == 0)
+                        stack_push(-1, TYPE_FLAG);
+                    else if (strcmp(slice_to_string(b), "false") == 0)
+                        stack_push(0, TYPE_FLAG);
+                    else
+                        stack_push(1, TYPE_FLAG);
+                }
+                else
+                    types[sp - 1] = TYPE_FLAG;
                 break;
             case BC_GET_TYPE:
+                stack_push(tos_type(), TYPE_NUMBER);
                 break;
             case BC_ADD:
                 if (tos_type() == TYPE_NUMBER && nos_type() == TYPE_NUMBER)
@@ -550,6 +564,15 @@ void dump_stack()
             printf("#%f\n", data[sp]);
         if (types[sp] == TYPE_FUNCTION)
             printf("&%f\n", data[sp]);
+        if (types[sp] == TYPE_FLAG)
+        {
+            if (data[sp] == -1)
+                printf("true\n");
+            else if (data[sp] == 0)
+                printf("false\n");
+            else
+                printf("malformed flag\n");
+        }
         if (types[sp] == TYPE_STRING)
         {
             printf("'%s'\n", slice_to_string(data[sp]));
