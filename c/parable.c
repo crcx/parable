@@ -56,10 +56,12 @@ double fetch(int s, int o)
     return slices[s][o];
 }
 
+
 void store(double v, int s, int o)
 {
     slices[s][o] = v;
 }
+
 
 char *slice_to_string(int s)
 {
@@ -73,6 +75,7 @@ char *slice_to_string(int s)
     }
     return string;
 }
+
 
 int string_to_slice(char *string)
 {
@@ -165,13 +168,13 @@ void read_line(FILE *file, char *line_buffer)
 }
 
 
-void parse_bootstrap()
+void parse_bootstrap(char *fname)
 {
     char source[64000];
 
     FILE *fp;
 
-    fp = fopen("bootstrap.p", "r");
+    fp = fopen(fname, "r");
     if (fp == NULL)
         return;
 
@@ -301,7 +304,7 @@ void interpret(int slice)
                 break;
             case BC_FLOW_CALL:
                 offset++;
-                interpret((int)slices[slice][offset]);
+                interpret((int) fetch(slice, offset));
                 break;
             case BC_FLOW_CALL_F:
                 interpret(stack_pop());
@@ -320,12 +323,21 @@ void interpret(int slice)
             case BC_MEM_COPY:
                 break;
             case BC_MEM_FETCH:
+                a = stack_pop();
+                b = stack_pop();
+                stack_push(fetch(b, a), TYPE_NUMBER);
                 break;
             case BC_MEM_STORE:
+                a = stack_pop();
+                b = stack_pop();
+                c = stack_pop();
+                store(c, b, a);
                 break;
             case BC_MEM_REQUEST:
+                stack_push(request_slice(), TYPE_FUNCTION);
                 break;
             case BC_MEM_RELEASE:
+                release_slice(stack_pop());
                 break;
             case BC_MEM_COLLECT:
                 break;
@@ -346,13 +358,15 @@ void interpret(int slice)
                 stack_pop();
                 break;
             case BC_STACK_DEPTH:
+                stack_push(sp, TYPE_NUMBER);
                 break;
             case BC_STACK_CLEAR:
+                sp = 0;
                 break;
             case BC_QUOTE_NAME:
                 a = stack_pop();
                 b = stack_pop();
-                add_definition(slice_to_string(a), b);
+                add_definition(slice_to_string(a), (int) b);
                 break;
             case BC_STRING_SEEK:
                 break;
@@ -407,7 +421,7 @@ int lookup_definition(char *name)
     {
         n--;
         if (strcmp(names[n], name) == 0)
-            slice = n;
+            slice = pointers[n];
     }
     return slice;
 }
@@ -443,6 +457,7 @@ int compile(char *source, int s)
             case '\'':
                 if (token[strlen(token) - 1] == '\'')
                 {
+                    memset(reform, '\0', 1024);
                     memcpy(reform, &token[1], strlen(token) - 2);
                     reform[strlen(token) - 2] = '\0';
                     o = compile_cell(BC_PUSH_S, s, o);
@@ -454,6 +469,7 @@ int compile(char *source, int s)
             case '"':
                 if (token[strlen(token) - 1] == '"')
                 {
+                    memset(reform, '\0', 1024);
                     memcpy(reform, &token[1], strlen(token) - 2);
                     reform[strlen(token) - 2] = '\0';
                     o = compile_cell(BC_PUSH_COMMENT, s, o);
@@ -463,6 +479,7 @@ int compile(char *source, int s)
                     printf("multi token comment parser not implemented\n");
                 break;
             case '#':
+                memset(reform, '\0', 1024);
                 memcpy(reform, &token[1], strlen(token));
                 scratch = (double) atof(reform);
                 o = compile_cell(BC_PUSH_N, s, o);
@@ -470,6 +487,7 @@ int compile(char *source, int s)
                 break;
             case '&':
                 /* TODO: named pointers */
+                memset(reform, '\0', 1024);
                 memcpy(reform, &token[1], strlen(token));
                 scratch = (double) atof(reform);
                 o = compile_cell(BC_PUSH_F, s, o);
@@ -481,6 +499,7 @@ int compile(char *source, int s)
                 o = compile_cell(scratch, s, o);
                 break;
             case '`':
+                memset(reform, '\0', 1024);
                 memcpy(reform, &token[1], strlen(token));
                 scratch = (double) atof(reform);
                 o = compile_cell(scratch, s, o);
@@ -541,26 +560,19 @@ void dump_stack()
 int main()
 {
     int s, o;
+    char name[] = "+";
     sp = 0;
-    char test[] = "$a $1 [ #2 #3 ] #100 #200 + #-45.44 [ 'hello' ] 'test'";
     prepare_dictionary();
-    parse_bootstrap();
-    s = request_slice();
-    compile(test, s);
-    interpret(s);
-    s = request_slice();
-    o = 0;
-    o = compile_cell(98, s, o);
-    o = compile_cell(99, s, o);
-    o = compile_cell(100, s, o);
-    o = compile_cell(0, s, o);
-    stack_push(s, TYPE_STRING);
+    parse_bootstrap("bootstrap.p");
+    parse_bootstrap("test.p");
     dump_stack();
+/*
     while (namep > 0)
     {
         namep--;
-        printf("%s ", names[namep]);
+        printf("%s-%i  ", names[namep], pointers[namep]);
     }
     printf("\n");
+*/
     return 0;
 }
