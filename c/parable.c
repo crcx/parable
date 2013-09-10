@@ -253,6 +253,13 @@ void interpret(int slice)
                 }
                 if (a == TYPE_FLAG)
                 {
+                    b = stack_pop();
+                    if (b == -1)
+                        stack_push(string_to_slice("true"), TYPE_STRING);
+                    else if (b == 0)
+                        stack_push(string_to_slice("false"), TYPE_STRING);
+                    else
+                        stack_push(string_to_slice("malformed flag"), TYPE_STRING);
                 }
                 break;
             case BC_TYPE_C:
