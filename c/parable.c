@@ -13,6 +13,9 @@
 int compile(char *, int);
 int request_slice();
 void release_slice(int);
+void copy_slice(int, int);
+void mem_collect();
+
 void interpret(int slice);
 
 void stack_push(double, double);
@@ -52,7 +55,6 @@ void release_slice(int slice)
     slice_map[slice] = 0;
 }
 
-
 double fetch(int s, int o)
 {
     return slices[s][o];
@@ -64,6 +66,16 @@ void store(double v, int s, int o)
     slices[s][o] = v;
 }
 
+void copy_slice(int source, int dest)
+{
+    int i = 0;
+    for (i = 0; i < 1024; i++)
+        store(fetch(source, i), dest, i);
+}
+
+void mem_collect()
+{
+}
 
 char *slice_to_string(int s)
 {
@@ -543,6 +555,9 @@ void interpret(int slice)
                 offset = 1024;
                 break;
             case BC_MEM_COPY:
+                a = stack_pop();
+                b = stack_pop();
+                copy_slice(b, a);
                 break;
             case BC_MEM_FETCH:
                 a = stack_pop();
