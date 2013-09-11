@@ -258,7 +258,7 @@ void interpret(int slice)
     char reform[1024];
     double scratch;
     char *output = malloc(1024);
-    char *foo, *bar;
+    char *foo, *bar, *baz;
 
     while (offset < 1024)
     {
@@ -648,6 +648,13 @@ void interpret(int slice)
                 break;
             case BC_STRING_SEEK:
                 // TODO: BC_STRING_SEEK
+                foo = slice_to_string(stack_pop());
+                bar = slice_to_string(stack_pop());
+                baz = strstr(bar, foo);
+                if (baz != NULL)
+                    stack_push(abs(bar - baz), TYPE_NUMBER);
+                else
+                    stack_push(-1, TYPE_NUMBER);
                 break;
             case BC_STRING_SUBSTR:
                 a = stack_pop();
