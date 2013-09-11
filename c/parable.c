@@ -75,7 +75,9 @@ void copy_slice(int source, int dest)
 
 void mem_collect()
 {
-    // TODO
+    // TODO: implement memory scanner and garbage collection
+    // TODO: routines. this is only necessary for programs with
+    // TODO: long runtimes. (e.g., nothing in my current task set)
 }
 
 char *slice_to_string(int s)
@@ -644,10 +646,10 @@ void interpret(int slice)
                 add_definition(slice_to_string(a), (int) b);
                 break;
             case BC_STRING_SEEK:
-                // TODO
+                // TODO: BC_STRING_SEEK
                 break;
             case BC_STRING_SUBSTR:
-                // TODO
+                // TODO: BC_STRING_SUBSTR
                 break;
             case BC_STRING_NUMERIC:
                 foo = slice_to_string(stack_pop());
@@ -690,7 +692,8 @@ void interpret(int slice)
                 stack_push((double) strlen(slice_to_string(a)), TYPE_NUMBER);
                 break;
             case BC_REPORT_ERROR:
-                // TODO
+                // TODO: implement error gathering as a whole. For now this
+                // TODO: will work.
                 stack_pop();
                 break;
         }
