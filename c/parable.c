@@ -363,10 +363,9 @@ void interpret(int slice)
                 }
                 else if (tos_type() == TYPE_STRING && nos_type() == TYPE_STRING)
                 {
-                    a = stack_pop();
-                    b = stack_pop();
-                    stack_push(0, TYPE_NUMBER);
-                    printf("WARNING: string concatenation not supported yet\n");
+                    foo = slice_to_string(stack_pop());
+                    bar = slice_to_string(stack_pop());
+                    stack_push(string_to_slice(strcat(bar, foo)), TYPE_STRING);
                 }
                 else
                 {
