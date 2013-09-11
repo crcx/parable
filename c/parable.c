@@ -75,6 +75,7 @@ void copy_slice(int source, int dest)
 
 void mem_collect()
 {
+    // TODO
 }
 
 char *slice_to_string(int s)
@@ -249,7 +250,7 @@ void parse_bootstrap(char *fname)
 
 void interpret(int slice)
 {
-    int a, b, c, x, y, z;
+    int a, b, c, q, m, x, y, z;
     int offset = 0;
     char reform[1024];
     double scratch;
@@ -559,8 +560,30 @@ void interpret(int slice)
                 stack_push(c, b);
                 break;
             case BC_FLOW_BI:
+                a = stack_pop();
+                b = stack_pop();
+                stack_dup();
+                x = tos_type();
+                y = stack_pop();
+                interpret(b);
+                stack_push(y, x);
+                interpret(a);
                 break;
             case BC_FLOW_TRI:
+                a = stack_pop();
+                b = stack_pop();
+                c = stack_pop();
+                stack_dup();
+                x = tos_type();
+                y = stack_pop();
+                stack_dup();
+                m = tos_type();
+                q = stack_pop();
+                interpret(c);
+                stack_push(q, m);
+                interpret(b);
+                stack_push(y, x);
+                interpret(a);
                 break;
             case BC_FLOW_RETURN:
                 offset = 1024;
@@ -588,6 +611,7 @@ void interpret(int slice)
                 release_slice(stack_pop());
                 break;
             case BC_MEM_COLLECT:
+                mem_collect();
                 break;
             case BC_STACK_DUP:
                 stack_dup();
@@ -620,18 +644,26 @@ void interpret(int slice)
                 add_definition(slice_to_string(a), (int) b);
                 break;
             case BC_STRING_SEEK:
+                // TODO
                 break;
             case BC_STRING_SUBSTR:
+                // TODO
                 break;
             case BC_STRING_NUMERIC:
+                // TODO
                 break;
             case BC_TO_LOWER:
+                // TODO
                 break;
             case BC_TO_UPPER:
+                // TODO
                 break;
             case BC_LENGTH:
+                // TODO
                 break;
             case BC_REPORT_ERROR:
+                // TODO
+                stack_pop();
                 break;
         }
         offset++;
@@ -648,9 +680,16 @@ int namep;
 
 void add_definition(char *name, int slice)
 {
-    strcpy(names[namep], name);
-    pointers[namep] = slice;
-    namep++;
+    if (lookup_definition(name) == -1)
+    {
+        strcpy(names[namep], name);
+        pointers[namep] = slice;
+        namep++;
+    }
+    else
+    {
+        copy_slice(slice, lookup_definition(name));
+    }
 }
 
 

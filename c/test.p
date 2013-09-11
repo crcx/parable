@@ -1,11 +1,4 @@
-#1 $a tuck
+[ ] 'fib' define
+[ dup #1 > [ [ #1 - fib ] sip #2 - fib + ] if-true ] 'fib' define
 
-[ #3 = ] '3?' define
-
-#1 3? [ '1=3' ] [ '1<>3' ] if
-#2 3? [ '2=3' ] [ '2<>3' ] if
-#3 3? [ '3=3' ] [ '3<>3' ] if
-
-
-#1 #2 [ #3 + ] dip
-
+#20 fib
