@@ -318,6 +318,7 @@ void interpret(int slice)
                 types[sp - 1] = TYPE_CHARACTER;
                 break;
             case BC_TYPE_F:
+                types[sp - 1] = TYPE_FUNCTION;
                 break;
             case BC_TYPE_FLAG:
                 a = tos_type();
@@ -488,6 +489,13 @@ void interpret(int slice)
                 }
                 break;
             case BC_FLOW_IF:
+                a = stack_pop();
+                b = stack_pop();
+                c = stack_pop();
+                if (c == -1)
+                    interpret(b);
+                else
+                    interpret(a);
                 break;
             case BC_FLOW_WHILE:
                 break;
