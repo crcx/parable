@@ -346,10 +346,19 @@ void interpret(int slice)
                     stack_push((float) ((int) b >> (int) a), TYPE_NUMBER);
                 break;
             case BC_BITWISE_AND:
+                a = stack_pop();
+                b = stack_pop();
+                stack_push((float) ((int) b & (int) a), TYPE_NUMBER);
                 break;
             case BC_BITWISE_OR:
+                a = stack_pop();
+                b = stack_pop();
+                stack_push((float) ((int) b | (int) a), TYPE_NUMBER);
                 break;
             case BC_BITWISE_XOR:
+                a = stack_pop();
+                b = stack_pop();
+                stack_push((float) ((int) b ^ (int) a), TYPE_NUMBER);
                 break;
             case BC_COMPARE_LT:
                 a = stack_pop();
