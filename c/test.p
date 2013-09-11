@@ -3,3 +3,5 @@
 
 #20 fib
 'hello' length
+$a to-uppercase
+'heLLo123q' to-uppercase

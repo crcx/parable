@@ -653,10 +653,32 @@ void interpret(int slice)
                 // TODO
                 break;
             case BC_TO_LOWER:
-                // TODO
+                a = tos_type();
+                if (a == TYPE_STRING)
+                {
+                    foo = slice_to_string(stack_pop());
+                    for(z = 0; foo[z]; z++)
+                        foo[z] = tolower(foo[z]);
+                    stack_push(string_to_slice(foo), TYPE_STRING);
+                }
+                else if (a == TYPE_CHARACTER)
+                {
+                    data[sp - 1] = (float) tolower((char) data[sp - 1]);
+                }
                 break;
             case BC_TO_UPPER:
-                // TODO
+                a = tos_type();
+                if (a == TYPE_STRING)
+                {
+                    foo = slice_to_string(stack_pop());
+                    for(z = 0; foo[z]; z++)
+                        foo[z] = toupper(foo[z]);
+                    stack_push(string_to_slice(foo), TYPE_STRING);
+                }
+                else if (a == TYPE_CHARACTER)
+                {
+                    data[sp - 1] = (float) toupper((char) data[sp - 1]);
+                }
                 break;
             case BC_LENGTH:
                 a = stack_pop();
