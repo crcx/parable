@@ -498,8 +498,22 @@ void interpret(int slice)
                     interpret(a);
                 break;
             case BC_FLOW_WHILE:
+                a = stack_pop();
+                b = -1;
+                while (b == -1)
+                {
+                    interpret(a);
+                    b = stack_pop();
+                }
                 break;
             case BC_FLOW_UNTIL:
+                a = stack_pop();
+                b = 0;
+                while (b == 0)
+                {
+                    interpret(a);
+                    b = stack_pop();
+                }
                 break;
             case BC_FLOW_TIMES:
                 a = stack_pop();
