@@ -786,6 +786,7 @@ int compile(char *source, int s)
     int nest_o[1024];
     int np = 0;
     int current = s;
+    int i;
 
     for (token = strtok_r(source, " ", &state); token != NULL; token = strtok_r(NULL, " ", &state))
     {
@@ -802,8 +803,27 @@ int compile(char *source, int s)
                     o = compile_cell((double) string_to_slice(reform), s, o);
                 }
                 else
-                    printf("multi token string parser not implemented\n");
-                // TODO: multi token string parsing
+                {
+                    memset(reform, '\0', 1024);
+                    memcpy(reform, &token[1], strlen(token) - 1);
+
+                    i = 0;
+                    while (i == 0)
+                    {
+                        strcat(reform, " ");
+                        token = strtok_r(NULL, " ", &state);
+                        if (token[strlen(token) - 1] == '\'' || token == NULL)
+                        {
+                            i = 1;
+                            token[strlen(token) - 1] = '\0';
+                            strcat(reform, token);
+                        }
+                        else
+                            strcat(reform, token);
+                    }
+                    o = compile_cell(BC_PUSH_S, s, o);
+                    o = compile_cell((double) string_to_slice(reform), s, o);
+                }
                 break;
             case '"':
                 if (token[strlen(token) - 1] == '"')
@@ -815,8 +835,27 @@ int compile(char *source, int s)
                     o = compile_cell((double) string_to_slice(reform), s, o);
                 }
                 else
-                    printf("multi token comment parser not implemented\n");
-                // TODO: multi token comment parsing
+                {
+                    memset(reform, '\0', 1024);
+                    memcpy(reform, &token[1], strlen(token) - 1);
+
+                    i = 0;
+                    while (i == 0)
+                    {
+                        strcat(reform, " ");
+                        token = strtok_r(NULL, " ", &state);
+                        if (token[strlen(token) - 1] == '"' || token == NULL)
+                        {
+                            i = 1;
+                            token[strlen(token) - 1] = '\0';
+                            strcat(reform, token);
+                        }
+                        else
+                            strcat(reform, token);
+                    }
+                    o = compile_cell(BC_PUSH_COMMENT, s, o);
+                    o = compile_cell((double) string_to_slice(reform), s, o);
+                }
                 break;
             case '#':
                 memset(reform, '\0', 1024);
