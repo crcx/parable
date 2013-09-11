@@ -255,7 +255,7 @@ void interpret(int slice)
     char reform[1024];
     double scratch;
     char *output = malloc(1024);
-    char *foo;
+    char *foo, *bar;
 
     while (offset < 1024)
     {
@@ -650,7 +650,12 @@ void interpret(int slice)
                 // TODO
                 break;
             case BC_STRING_NUMERIC:
-                // TODO
+                foo = slice_to_string(stack_pop());
+                a = strtod(foo, &bar);
+                if (bar == foo)
+                    stack_push(0, TYPE_FLAG);
+                else
+                    stack_push(-1, TYPE_FLAG);
                 break;
             case BC_TO_LOWER:
                 a = tos_type();

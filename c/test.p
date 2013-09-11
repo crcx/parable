@@ -5,3 +5,8 @@
 'hello' length
 $a to-uppercase
 'heLLo123q' to-uppercase
+
+'123' numeric?
+'apple' numeric?
+'-123.45' numeric?
+
