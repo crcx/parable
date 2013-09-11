@@ -17,6 +17,7 @@ void interpret(int slice);
 
 void stack_push(double, double);
 double stack_pop();
+double tos_type();
 void stack_swap();
 void stack_dup();
 void stack_over();
@@ -128,6 +129,16 @@ void stack_swap()
 
 void stack_dup()
 {
+    double v = tos_type();
+    if (v == TYPE_STRING)
+    {
+        v = data[sp - 1];
+        stack_push(string_to_slice(slice_to_string(v)), TYPE_STRING);
+    }
+    else
+    {
+        stack_push(data[sp - 1], v);
+    }
 }
 
 void stack_over()

@@ -1,13 +1,5 @@
-#1 #2 +
-#4 *
-#98 :c
-'hello' :c
-'h' :c :s
-true :s
+#1 dup
+$a dup
+'hello' dup
+true dup
 
-#1 #2 =
-#1 #1 =
-'hello' 'world' =
-'hello' 'hello' =
-
-#10 [ #1 ] repeat
