@@ -18,6 +18,7 @@ void interpret(int slice);
 void stack_push(double, double);
 double stack_pop();
 void stack_swap();
+void stack_dup();
 void stack_over();
 void stack_tuck();
 double stack_depth();
@@ -125,6 +126,17 @@ void stack_swap()
     types[sp - 1] = yt;
 }
 
+void stack_dup()
+{
+}
+
+void stack_over()
+{
+}
+
+void stack_tuck()
+{
+}
 
 double tos_type()
 {
@@ -497,6 +509,7 @@ void interpret(int slice)
             case BC_MEM_COLLECT:
                 break;
             case BC_STACK_DUP:
+                stack_dup();
                 break;
             case BC_STACK_DROP:
                 stack_pop();
@@ -505,8 +518,10 @@ void interpret(int slice)
                 stack_swap();
                 break;
             case BC_STACK_OVER:
+                stack_over();
                 break;
             case BC_STACK_TUCK:
+                stack_tuck();
                 break;
             case BC_STACK_NIP:
                 stack_swap();
