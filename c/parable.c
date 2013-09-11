@@ -647,7 +647,6 @@ void interpret(int slice)
                 add_definition(slice_to_string(a), (int) b);
                 break;
             case BC_STRING_SEEK:
-                // TODO: BC_STRING_SEEK
                 foo = slice_to_string(stack_pop());
                 bar = slice_to_string(stack_pop());
                 baz = strstr(bar, foo);
@@ -916,13 +915,5 @@ int main()
     parse_bootstrap("bootstrap.p");
     parse_bootstrap("test.p");
     dump_stack();
-/*
-    while (namep > 0)
-    {
-        namep--;
-        printf("%s-%i  ", names[namep], pointers[namep]);
-    }
-    printf("\n");
-*/
     return 0;
 }
