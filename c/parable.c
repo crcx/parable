@@ -253,6 +253,7 @@ void parse_bootstrap(char *fname)
 void interpret(int slice)
 {
     int a, b, c, q, m, x, y, z;
+    int i, j, k;
     int offset = 0;
     char reform[1024];
     double scratch;
@@ -649,7 +650,17 @@ void interpret(int slice)
                 // TODO: BC_STRING_SEEK
                 break;
             case BC_STRING_SUBSTR:
-                // TODO: BC_STRING_SUBSTR
+                a = stack_pop();
+                b = stack_pop();
+                foo = slice_to_string(stack_pop());
+                j = 0;
+                for (i = b; i < a; i++)
+                {
+                    output[j] = foo[i];
+                    j++;
+                }
+                output[j] = '\0';
+                stack_push(string_to_slice(output), TYPE_STRING);
                 break;
             case BC_STRING_NUMERIC:
                 foo = slice_to_string(stack_pop());
