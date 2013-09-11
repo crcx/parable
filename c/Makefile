@@ -1,3 +1,6 @@
+CC = gcc
+FLAGS = -g
+
 default:
 	rm -f parable
-	gcc -g parable.c -o parable -lm
+	$(CC) $(FLAGS) parable.c -o parable -lm
