@@ -786,6 +786,7 @@ int compile(char *source, int s)
                 }
                 else
                     printf("multi token string parser not implemented\n");
+                // TODO: multi token string parsing
                 break;
             case '"':
                 if (token[strlen(token) - 1] == '"')
@@ -798,6 +799,7 @@ int compile(char *source, int s)
                 }
                 else
                     printf("multi token comment parser not implemented\n");
+                // TODO: multi token comment parsing
                 break;
             case '#':
                 memset(reform, '\0', 1024);
@@ -807,7 +809,7 @@ int compile(char *source, int s)
                 o = compile_cell(scratch, s, o);
                 break;
             case '&':
-                /* TODO: named pointers */
+                // TODO: named pointers
                 memset(reform, '\0', 1024);
                 memcpy(reform, &token[1], strlen(token));
                 scratch = (double) atof(reform);
