@@ -1,5 +1,1 @@
-#1 dup
-$a dup
-'hello' dup
-true dup
-
+#1 $a tuck

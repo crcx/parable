@@ -143,10 +143,32 @@ void stack_dup()
 
 void stack_over()
 {
+    double v = types[sp - 2];
+    if (v == TYPE_STRING)
+    {
+        v = data[sp - 2];
+        stack_push(string_to_slice(slice_to_string(v)), TYPE_STRING);
+    }
+    else
+    {
+        stack_push(data[sp - 2], v);
+    }
 }
 
 void stack_tuck()
 {
+    double v = tos_type();
+    if (v == TYPE_STRING)
+    {
+        v = data[sp - 1];
+        stack_swap();
+        stack_push(string_to_slice(slice_to_string(v)), TYPE_STRING);
+    }
+    else
+    {
+        stack_swap();
+        stack_push(data[sp - 2], v);
+    }
 }
 
 double tos_type()
