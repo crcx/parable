@@ -544,6 +544,11 @@ void interpret(int slice)
                 interpret(stack_pop());
                 break;
             case BC_FLOW_DIP:
+                a = stack_pop();
+                b = tos_type();
+                c = stack_pop();
+                interpret(a);
+                stack_push(c, b);
                 break;
             case BC_FLOW_SIP:
                 break;
