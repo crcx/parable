@@ -659,7 +659,8 @@ void interpret(int slice)
                 // TODO
                 break;
             case BC_LENGTH:
-                // TODO
+                a = stack_pop();
+                stack_push((double) strlen(slice_to_string(a)), TYPE_NUMBER);
                 break;
             case BC_REPORT_ERROR:
                 // TODO
