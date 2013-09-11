@@ -338,6 +338,12 @@ void interpret(int slice)
                 stack_push(floor(stack_pop()), TYPE_NUMBER);
                 break;
             case BC_BITWISE_SHIFT:
+                a = stack_pop();
+                b = stack_pop();
+                if (a < 0)
+                    stack_push((float) ((int) b << (int) a), TYPE_NUMBER);
+                else
+                    stack_push((float) ((int) b >> (int) a), TYPE_NUMBER);
                 break;
             case BC_BITWISE_AND:
                 break;
