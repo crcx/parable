@@ -786,6 +786,7 @@ int compile(char *source, int s)
     int np = 0;
     int current = s;
     int i;
+    char *foo, *bar;
 
     for (token = strtok_r(source, " ", &state); token != NULL; token = strtok_r(NULL, " ", &state))
     {
@@ -867,9 +868,18 @@ int compile(char *source, int s)
                 // TODO: named pointers
                 memset(reform, '\0', 1024);
                 memcpy(reform, &token[1], strlen(token));
-                scratch = (double) atof(reform);
-                o = compile_cell(BC_PUSH_F, s, o);
-                o = compile_cell(scratch, s, o);
+                if (lookup_definition(reform) != -1)
+                {
+                    scratch = lookup_definition(reform);
+                    o = compile_cell(BC_PUSH_F, s, o);
+                    o = compile_cell(scratch, s, o);
+                }
+                else
+                {
+                    scratch = (double) atof(reform);
+                    o = compile_cell(BC_PUSH_F, s, o);
+                    o = compile_cell(scratch, s, o);
+                }
                 break;
             case '$':
                 scratch = (double) token[1];

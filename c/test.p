@@ -1,13 +1,8 @@
-"This code parses a UPS Type 1Z tracking number and returns the subsections"
-"in a readable format."
+"a really crappy pseudo-random number generator"
+'seed' variable
+#12345 &seed !
+[ #36969 &seed @ #65535 and * &seed @ #16 shift + &seed ! #18000 &seed @ #65535 and * &seed @ #16 shift + &seed ! &seed @ #-16 shift &seed @ + ] 'random' define
 
-"See http://osiris.978.org/~alex/ups.html for a list of service codes."
-
-[ [ #0 #2 substring '1Z' = ] sip swap ] 'valid?' define
-[ [ #2 #8 substring 'Account: ' swap + ] sip ] 'account' define
-[ [ #8 #10 substring 'Service code: ' swap + ] sip ] 'service-code' define
-[ [ #10 #17 substring 'Package ID: ' swap + ] sip ] 'package-id' define
-[ #17 fetch :c :s 'Checksum: ' swap + ] 'checksum' define
-[ valid? [ account service-code package-id checksum ] [ drop 'invalid tracking number' ] if ] 'parse-ups' define
-
-'1Z2203480342495730' parse-ups
+'ATCG' 'dna' define
+[ [ &dna random #4 rem fetch :c :s ] repeat ] 'build-dna-sequence' define
+#10 build-dna-sequence depth #1 - [ + ] repeat
