@@ -396,7 +396,7 @@ void interpret(int slice)
                 }
                 else
                 {
-                    printf("BC_ADD only works for NUMBER and STRING types\n");
+                    report_error("BC_ADD only works for NUMBER and STRING types\n");
                     a = stack_pop();
                     b = stack_pop();
                     offset = SLICE_LEN;
@@ -502,7 +502,7 @@ void interpret(int slice)
                 else
                 {
                     offset = SLICE_LEN;
-                    printf("ERROR: types do not match\n");
+                    report_error("ERROR: types do not match\n");
                 }
                 break;
             case BC_COMPARE_NEQ:
@@ -527,7 +527,7 @@ void interpret(int slice)
                 else
                 {
                     offset = SLICE_LEN;
-                    printf("ERROR: types do not match\n");
+                    report_error("ERROR: types do not match\n");
                 }
                 break;
             case BC_FLOW_IF:
@@ -960,29 +960,32 @@ int compile(char *source, int s)
 
 void dump_stack()
 {
-    while (sp > 0)
+    int x = 0;
+    while (x < sp)
     {
-        printf("%i: ", sp);
-        sp--;
-        if (types[sp] == TYPE_CHARACTER)
-            printf("$%c\n", (char)data[sp]);
-        if (types[sp] == TYPE_NUMBER)
-            printf("#%f\n", data[sp]);
-        if (types[sp] == TYPE_FUNCTION)
-            printf("&%f\n", data[sp]);
-        if (types[sp] == TYPE_FLAG)
+        if ((sp - 1) == x)
+            printf("TOS");
+        printf("\t%i\t", x);
+        if (types[x] == TYPE_CHARACTER)
+            printf("$%c\n", (char)data[x]);
+        if (types[x] == TYPE_NUMBER)
+            printf("#%f\n", data[x]);
+        if (types[x] == TYPE_FUNCTION)
+            printf("&%f\n", data[x]);
+        if (types[x] == TYPE_FLAG)
         {
-            if (data[sp] == -1)
+            if (data[x] == -1)
                 printf("true\n");
-            else if (data[sp] == 0)
+            else if (data[x] == 0)
                 printf("false\n");
             else
                 printf("malformed flag\n");
         }
-        if (types[sp] == TYPE_STRING)
+        if (types[x] == TYPE_STRING)
         {
-            printf("'%s'\n", slice_to_string(data[sp]));
+            printf("'%s'\n", slice_to_string(data[x]));
         }
+        x++;
     }
 }
 

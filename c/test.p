@@ -1,8 +1,6 @@
-"a really crappy pseudo-random number generator"
-'seed' variable
-#12345 &seed !
-[ #36969 &seed @ #65535 and * &seed @ #16 shift + &seed ! #18000 &seed @ #65535 and * &seed @ #16 shift + &seed ! &seed @ #-16 shift &seed @ + ] 'random' define
+[ dup-pair < [ swap ] if-true ] 'sort-pair' define
+[ ] 'perform-sort' define
+[ sort-pair depth #2 > [ [ perform-sort ] dip ] if-true ] 'perform-sort' define
+[ depth [ perform-sort ] repeat ] 'sort' define
 
-'ATCG' 'dna' define
-[ [ &dna random #4 rem fetch :c :s ] repeat ] 'build-dna-sequence' define
-#10 build-dna-sequence depth #1 - [ + ] repeat
+#3 #33 #22 #333 #5 sort
