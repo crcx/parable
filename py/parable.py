@@ -22,7 +22,7 @@ SLICE_LEN = 1000
 
 TYPE_NUMBER = 100
 TYPE_STRING = 200
-TYPE_CHARACTER= 300
+TYPE_CHARACTER = 300
 TYPE_FUNCTION = 400
 TYPE_FLAG = 500
 
@@ -87,11 +87,11 @@ BC_STACK_CLEAR = 507
 BC_QUOTE_NAME = 600
 BC_STRING_SEEK = 700
 BC_STRING_SUBSTR = 701
-BC_STRING_NUMERIC= 702
+BC_STRING_NUMERIC = 702
 BC_TO_LOWER = 800
 BC_TO_UPPER = 801
 BC_LENGTH = 802
-BC_REPORT_ERROR = 900
+BC_report = 900
 
 
 #
@@ -116,6 +116,7 @@ def is_number(s):
 
 errors = []
 
+
 def clear_errors():
     """remove all errors from the error log"""
     global errors
@@ -125,7 +126,7 @@ def clear_errors():
         i += 1
 
 
-def report_error(text):
+def report(text):
     """report an error"""
     global errors
     errors.append(text)
@@ -136,7 +137,7 @@ def check_depth(cells):
     """False otherwise. If False, reports an underflow error."""
     global stack
     if len(stack) < cells:
-        report_error('Stack underflow: ' + str(cells) + ' values required')
+        report('Stack underflow: ' + str(cells) + ' values required')
         return False
     else:
         return True
@@ -210,7 +211,7 @@ def interpret(slice):
                     stack_push(string_to_slice(b + a), TYPE_STRING)
                 else:
                     offset = SLICE_LEN
-                    report_error('BC_ADD only works with NUMBER and STRING types')
+                    report('BC_ADD only works with NUMBER and STRING')
             else:
                 offset = SLICE_LEN
         elif opcode == BC_SUBTRACT:
@@ -290,7 +291,7 @@ def interpret(slice):
                         stack_push(0, TYPE_FLAG)
                 else:
                     offset = SLICE_LEN
-                    report_error('BC_COMPARE_LT only recognizes NUMBER types')
+                    report('BC_COMPARE_LT only recognizes NUMBER types')
             else:
                 offset = SLICE_LEN
         elif opcode == BC_COMPARE_GT:
@@ -306,7 +307,7 @@ def interpret(slice):
                         stack_push(0, TYPE_FLAG)
                 else:
                     offset = SLICE_LEN
-                    report_error('BC_COMPARE_LT only recognizes NUMBER types')
+                    report('BC_COMPARE_LT only recognizes NUMBER types')
             else:
                 offset = SLICE_LEN
         elif opcode == BC_COMPARE_LTEQ:
@@ -322,7 +323,7 @@ def interpret(slice):
                         stack_push(0, TYPE_FLAG)
                 else:
                     offset = SLICE_LEN
-                    report_error('BC_COMPARE_LTEQ only recognizes NUMBER types')
+                    report('BC_COMPARE_LTEQ only recognizes NUMBER')
             else:
                 offset = SLICE_LEN
         elif opcode == BC_COMPARE_GTEQ:
@@ -338,7 +339,7 @@ def interpret(slice):
                         stack_push(0, TYPE_FLAG)
                 else:
                     offset = SLICE_LEN
-                    report_error('BC_COMPARE_GTEQ only recognizes NUMBER types')
+                    report('BC_COMPARE_GTEQ only recognizes NUMBER')
             else:
                 offset = SLICE_LEN
         elif opcode == BC_COMPARE_EQ:
@@ -359,7 +360,7 @@ def interpret(slice):
                         stack_push(0, TYPE_FLAG)
                 else:
                     offset = SLICE_LEN
-                    report_error('BC_COMPARE_EQ requires matched types')
+                    report('BC_COMPARE_EQ requires matched types')
             else:
                 offset = SLICE_LEN
         elif opcode == BC_COMPARE_NEQ:
@@ -380,7 +381,7 @@ def interpret(slice):
                         stack_push(0, TYPE_FLAG)
                 else:
                     offset = SLICE_LEN
-                    report_error('BC_COMPARE_NEQ requires matched types')
+                    report('BC_COMPARE_NEQ requires matched types')
             else:
                 offset = SLICE_LEN
         elif opcode == BC_FLOW_IF:
@@ -398,7 +399,7 @@ def interpret(slice):
             if check_depth(1):
                 quote = stack_pop()
                 a = -1
-                while a== -1:
+                while a == -1:
                     interpret(quote)
                     a = stack_pop()
             else:
@@ -451,14 +452,14 @@ def interpret(slice):
                 offset = SLICE_LEN
         elif opcode == BC_FLOW_BI:
             if check_depth(3):
-               a = stack_pop()
-               b = stack_pop()
-               stack_dup()
-               x = stack_type()
-               y = stack_pop()
-               interpret(b)
-               stack_push(y, x)
-               interpret(a)
+                a = stack_pop()
+                b = stack_pop()
+                stack_dup()
+                x = stack_type()
+                y = stack_pop()
+                interpret(b)
+                stack_push(y, x)
+                interpret(a)
             else:
                 offset = SLICE_LEN
         elif opcode == BC_FLOW_TRI:
@@ -591,7 +592,7 @@ def interpret(slice):
                     b = a.upper()
                     stack_push(ord(b[0]), TYPE_CHARACTER)
                 else:
-                    report_error('ERROR: BC_TO_UPPER requires TYPE_STRING or TYPE_CHARACTER')
+                    report('ERROR: BC_TO_UPPER requires STRING or CHARACTER')
             else:
                 offset = SLICE_LEN
         elif opcode == BC_TO_LOWER:
@@ -606,7 +607,7 @@ def interpret(slice):
                     b = a.lower()
                     stack_push(ord(b[0]), TYPE_CHARACTER)
                 else:
-                    report_error('ERROR: BC_TO_LOWER requires TYPE_STRING or TYPE_CHARACTER')
+                    report('ERROR: BC_TO_LOWER requires STRING or CHARACTER')
             else:
                 offset = SLICE_LEN
         elif opcode == BC_LENGTH:
@@ -619,11 +620,11 @@ def interpret(slice):
                     stack_push(0, TYPE_NUMBER)
             else:
                 offset = SLICE_LEN
-        elif opcode == BC_REPORT_ERROR:
+        elif opcode == BC_report:
             if check_depth(1):
                 if stack_type() == TYPE_STRING:
                     a = slice_to_string(stack_tos())
-                    report_error(a)
+                    report(a)
             offset = SLICE_LEN
         offset += 1
 
@@ -798,6 +799,7 @@ def stack_change_type(type):
 dictionary_names = []
 dictionary_slices = []
 
+
 def in_dictionary(s):
     global dictionary_names, dictionary_slices
     return s in dictionary_names
@@ -807,20 +809,20 @@ def lookup_pointer(name):
     global dictionary_names, dictionary_slices
     name = name.lower()
     if in_dictionary(name) == False:
-      return -1
+        return -1
     else:
-      return dictionary_slices[dictionary_names.index(name)]
+        return dictionary_slices[dictionary_names.index(name)]
 
 
 def add_definition(name, slice):
     global dictionary_names, dictionary_slices
     name = name.lower()
     if in_dictionary(name) == False:
-      dictionary_names.append(name)
-      dictionary_slices.append(slice)
+        dictionary_names.append(name)
+        dictionary_slices.append(slice)
     else:
-      target = dictionary_slices[dictionary_names.index(name)]
-      copy_slice(slice, target)
+        target = dictionary_slices[dictionary_names.index(name)]
+        copy_slice(slice, target)
     return dictionary_names.index(name)
 
 
@@ -1066,7 +1068,7 @@ def compile(str, slice):
                     store(lookup_pointer(tokens[i][1:]), slice, offset)
                 else:
                     store(0, slice, offset)
-                    report_error('Unable to map ' + tokens[i] + ' to a pointer')
+                    report('Unable to map ' + tokens[i] + ' to a pointer')
             offset += 1
         elif tokens[i].startswith("#"):
             store(BC_PUSH_N, slice, offset)
@@ -1075,7 +1077,7 @@ def compile(str, slice):
                 store(float(tokens[i][1:]), slice, offset)
             else:
                 store(0, slice, offset)
-                report_error("# prefix expects a valid NUMBER, received " + tokens[i])
+                report("# prefix expects a NUMBER, received " + tokens[i])
             offset += 1
         elif tokens[i].startswith("`"):
             store(float(tokens[i][1:]), slice, offset)
@@ -1101,7 +1103,7 @@ def compile(str, slice):
                 store(lookup_pointer(tokens[i]), slice, offset)
                 offset += 1
             else:
-                report_error('Unable to find ' + tokens[i] + ' in dictionary')
+                report('Unable to find ' + tokens[i] + ' in dictionary')
         i += 1
         store(BC_FLOW_RETURN, slice, offset)
     return slice
