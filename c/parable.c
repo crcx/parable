@@ -996,6 +996,8 @@ int main(int argc, char **argv)
     parse_bootstrap("bootstrap.p");
     if (argc > 1)
         parse_bootstrap(argv[1]);
+    else
+        printf("parable\n(c) 2013, charles childers\n\nTry:\n  parable filename\n");
     dump_stack();
     if (strlen(errors) > 0)
         printf("Error Log:\n%s\n", errors);
