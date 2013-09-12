@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <ctype.h>
 
 #include "bytecodes.h"
 #include "types.h"
@@ -27,6 +28,7 @@ void stack_over();
 void stack_tuck();
 double stack_depth();
 void add_definition(char *name, int slice);
+int lookup_definition(char *name);
 
 
 /*  Memory Manager  */
@@ -253,7 +255,7 @@ void parse_bootstrap(char *fname)
 void interpret(int slice)
 {
     int a, b, c, q, m, x, y, z;
-    int i, j, k;
+    int i, j;
     int offset = 0;
     char reform[1024];
     double scratch;
@@ -786,7 +788,6 @@ int compile(char *source, int s)
     int np = 0;
     int current = s;
     int i;
-    char *foo, *bar;
 
     for (token = strtok_r(source, " ", &state); token != NULL; token = strtok_r(NULL, " ", &state))
     {
@@ -956,8 +957,6 @@ void dump_stack()
 
 int main()
 {
-    int s, o;
-    char name[] = "+";
     sp = 0;
     prepare_dictionary();
     parse_bootstrap("bootstrap.p");
