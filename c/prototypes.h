@@ -1,3 +1,6 @@
+void prepare_error_reporting();
+void report_error(char *string);
+void clear_errors();
 int request_slice();
 void release_slice(int slice);
 double fetch(int s, int o);

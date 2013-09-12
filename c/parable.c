@@ -20,6 +20,26 @@
 #define STRING_LEN 1024
 #define NEST_LIMIT  128
 
+/*  Error Reporting */
+char *errors;
+
+void prepare_error_reporting()
+{
+    errors = malloc(8192);
+    memset(errors, '\0', 8192);
+}
+
+void report_error(char *string)
+{
+    strcat(errors, string);
+}
+
+void clear_errors()
+{
+    memset(errors, '\0', 8192);
+}
+
+
 /*  Memory Manager  */
 
 double slices[MAX_SLICES][SLICE_LEN];
@@ -376,7 +396,7 @@ void interpret(int slice)
                 }
                 else
                 {
-                    printf("BC_ADD only works for NUMBER and STRING types\n");
+                    report_error("BC_ADD only works for NUMBER and STRING types\n");
                     a = stack_pop();
                     b = stack_pop();
                     offset = SLICE_LEN;
@@ -482,7 +502,7 @@ void interpret(int slice)
                 else
                 {
                     offset = SLICE_LEN;
-                    printf("ERROR: types do not match\n");
+                    report_error("ERROR: types do not match\n");
                 }
                 break;
             case BC_COMPARE_NEQ:
@@ -507,7 +527,7 @@ void interpret(int slice)
                 else
                 {
                     offset = SLICE_LEN;
-                    printf("ERROR: types do not match\n");
+                    report_error("ERROR: types do not match\n");
                 }
                 break;
             case BC_FLOW_IF:
@@ -719,9 +739,8 @@ void interpret(int slice)
                 stack_push((double) strlen(slice_to_string(a)), TYPE_NUMBER);
                 break;
             case BC_REPORT_ERROR:
-                // TODO: implement error gathering as a whole. For now this
-                // TODO: will work.
-                stack_pop();
+                p = slice_to_string(stack_pop());
+                report_error(p);
                 break;
         }
         offset++;
@@ -835,8 +854,7 @@ int compile(char *source, int s)
                     o = compile_cell((double) string_to_slice(reform), s, o);
                 }
                 break;
-            case '"':
-                if (token[strlen(token) - 1] == '"')
+            case '"':                if (token[strlen(token) - 1] == '"')
                 {
                     memset(reform, '\0', STRING_LEN);
                     memcpy(reform, &token[1], strlen(token) - 2);
@@ -924,7 +942,11 @@ int compile(char *source, int s)
                     o = compile_cell(lookup_definition(token), s, o);
                 }
                 else
-                    printf("function %s not found\n", token);
+                {
+                    report_error("function not found: ");
+                    report_error(token);
+                    report_error("\n");
+                }
                 break;
         }
     }
@@ -937,38 +959,47 @@ int compile(char *source, int s)
 
 void dump_stack()
 {
-    while (sp > 0)
+    int x = 0;
+    while (x < sp)
     {
-        printf("%i: ", sp);
-        sp--;
-        if (types[sp] == TYPE_CHARACTER)
-            printf("$%c\n", (char)data[sp]);
-        if (types[sp] == TYPE_NUMBER)
-            printf("#%f\n", data[sp]);
-        if (types[sp] == TYPE_FUNCTION)
-            printf("&%f\n", data[sp]);
-        if (types[sp] == TYPE_FLAG)
+        if ((sp - 1) == x)
+            printf("TOS");
+        printf("\t%i\t", x);
+        if (types[x] == TYPE_CHARACTER)
+            printf("$%c\n", (char)data[x]);
+        if (types[x] == TYPE_NUMBER)
+            printf("#%f\n", data[x]);
+        if (types[x] == TYPE_FUNCTION)
+            printf("&%f\n", data[x]);
+        if (types[x] == TYPE_FLAG)
         {
-            if (data[sp] == -1)
+            if (data[x] == -1)
                 printf("true\n");
-            else if (data[sp] == 0)
+            else if (data[x] == 0)
                 printf("false\n");
             else
                 printf("malformed flag\n");
         }
-        if (types[sp] == TYPE_STRING)
+        if (types[x] == TYPE_STRING)
         {
-            printf("'%s'\n", slice_to_string(data[sp]));
+            printf("'%s'\n", slice_to_string(data[x]));
         }
+        x++;
     }
 }
 
-int main()
+int main(int argc, char **argv)
 {
     sp = 0;
     prepare_dictionary();
+    prepare_error_reporting();
     parse_bootstrap("bootstrap.p");
-    parse_bootstrap("test.p");
+    if (argc > 1)
+        parse_bootstrap(argv[1]);
+    else
+        printf("parable\n(c) 2013, charles childers\n\nTry:\n  parable filename\n");
     dump_stack();
+    if (strlen(errors) > 0)
+        printf("Error Log:\n%s\n", errors);
     return 0;
 }
