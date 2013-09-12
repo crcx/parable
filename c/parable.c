@@ -8,27 +8,9 @@
 #include <math.h>
 #include <ctype.h>
 
+#include "prototypes.h"
 #include "bytecodes.h"
 #include "types.h"
-
-int compile(char *, int);
-int request_slice();
-void release_slice(int);
-void copy_slice(int, int);
-void mem_collect();
-
-void interpret(int slice);
-
-void stack_push(double, double);
-double stack_pop();
-double tos_type();
-void stack_swap();
-void stack_dup();
-void stack_over();
-void stack_tuck();
-double stack_depth();
-void add_definition(char *name, int slice);
-int lookup_definition(char *name);
 
 
 /*  Memory Manager  */
