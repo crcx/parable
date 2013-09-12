@@ -44,27 +44,27 @@ from parable import *
 # Configuration
 #
 
-COLOR_PROMPT     = 'bright green'
+COLOR_PROMPT = 'bright green'
 COLOR_STACK_LINE = 'bright green'
-COLOR_STACK_N    = 'bright cyan'
-COLOR_STACK_S    = 'white'
-COLOR_STACK_F    = 'yellow'
-COLOR_STACK_C    = 'bright green'
+COLOR_STACK_N = 'bright cyan'
+COLOR_STACK_S = 'white'
+COLOR_STACK_F = 'yellow'
+COLOR_STACK_C = 'bright green'
 COLOR_STACK_FLAG = 'bright gray'
-COLOR_ERROR      = 'bright purple'
-COLOR_BAR        = 'red'
+COLOR_ERROR = 'bright purple'
+COLOR_BAR = 'red'
 
 
 colorCodes = {
-    'black':    '0;30',     'bright gray':  '0;37',
-    'blue':     '0;34',     'white':        '1;37',
-    'green':    '0;32',     'bright blue':  '1;34',
-    'cyan':     '0;36',     'bright green': '1;32',
-    'red':      '0;31',     'bright cyan':  '1;36',
-    'purple':   '0;35',     'bright red':   '1;31',
-    'yellow':   '0;33',     'bright purple':'1;35',
-    'dark gray':'1;30',     'bright yellow':'1;33',
-    'normal':   '0'
+    'black': '0;30', 'bright gray': '0;37',
+    'blue': '0;34', 'white': '1;37',
+    'green': '0;32', 'bright blue': '1;34',
+    'cyan': '0;36', 'bright green': '1;32',
+    'red': '0;31', 'bright cyan': '1;36',
+    'purple': '0;35', 'bright red': '1;31',
+    'yellow': '0;33', 'bright purple': '1;35',
+    'dark gray': '1;30', 'bright yellow': '1;33',
+    'normal': '0'
 }
 
 
@@ -76,14 +76,19 @@ def write(text, color):
 def getTerminalSize():
     import os
     env = os.environ
+
     def ioctl_GWINSZ(fd):
         try:
-            import fcntl, termios, struct, os
+            import fcntl
+            import termios
+            import struct
+            import os
             cr = struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ,
         '1234'))
         except:
             return
         return cr
+
     cr = ioctl_GWINSZ(0) or ioctl_GWINSZ(1) or ioctl_GWINSZ(2)
     if not cr:
         try:
@@ -124,7 +129,7 @@ def edit_session():
     """export the source code for the current session to a file, launch the"""
     """$EDITOR on it, and then load/parse the resulting file"""
     export_source('scratch')
-    EDITOR = os.environ.get('EDITOR','vim')
+    EDITOR = os.environ.get('EDITOR', 'vim')
     call([EDITOR, "scratch"])
     revert()
     f = open('scratch').readlines()
@@ -160,7 +165,8 @@ def display_stack():
         elif types[i] == TYPE_FUNCTION:
             write("\t&" + str(stack[i]), COLOR_STACK_F)
             if pointer_to_name(stack[i]) != "":
-                write("\n\t\tpointer to: " + pointer_to_name(stack[i]), 'normal')
+                write("\n\t\tpointer to: ", 'normal')
+                write(pointer_to_name(stack[i]), 'normal')
                 l += 1
         elif types[i] == TYPE_FLAG:
             if stack[i] == -1:
@@ -210,8 +216,6 @@ def load_file(file):
             interpret(s)
 
 
-
-
 if __name__ == '__main__':
     (width, height) = getTerminalSize()
     prepare_slices()
@@ -251,4 +255,3 @@ if __name__ == '__main__':
                 counter = 0
 
         sys.stdout.flush()
-

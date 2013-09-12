@@ -10,6 +10,7 @@
 import sys
 from parable import *
 
+
 def display_stack():
     global stack, types
     i = 0
@@ -29,7 +30,8 @@ def display_stack():
         elif types[i] == TYPE_FUNCTION:
             sys.stdout.write("\t&" + str(stack[i]))
             if pointer_to_name(stack[i]) != "":
-                sys.stdout.write("\n\t\tpointer to: " + pointer_to_name(stack[i]))
+                sys.stdout.write("\n\t\tpointer to: ")
+                sys.stdout.write(pointer_to_name(stack[i]))
         elif types[i] == TYPE_FLAG:
             if stack[i] == -1:
                 sys.stdout.write("\ttrue")
