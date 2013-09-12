@@ -135,11 +135,14 @@ void stack_swap()
 
 void stack_dup()
 {
+    char *p;
     double v = tos_type();
     if (v == TYPE_STRING)
     {
         v = data[sp - 1];
-        stack_push(string_to_slice(slice_to_string(v)), TYPE_STRING);
+        p = slice_to_string(v);
+        stack_push(string_to_slice(p), TYPE_STRING);
+        free(p);
     }
     else
     {
@@ -149,11 +152,14 @@ void stack_dup()
 
 void stack_over()
 {
+    char *p;
     double v = types[sp - 2];
     if (v == TYPE_STRING)
     {
         v = data[sp - 2];
-        stack_push(string_to_slice(slice_to_string(v)), TYPE_STRING);
+        p = slice_to_string(v);
+        stack_push(string_to_slice(p), TYPE_STRING);
+        free(p);
     }
     else
     {
@@ -163,12 +169,15 @@ void stack_over()
 
 void stack_tuck()
 {
+    char *p;
     double v = tos_type();
     if (v == TYPE_STRING)
     {
         v = data[sp - 1];
         stack_swap();
-        stack_push(string_to_slice(slice_to_string(v)), TYPE_STRING);
+        p = slice_to_string(v);
+        stack_push(string_to_slice(p), TYPE_STRING);
+        free(p);
     }
     else
     {
@@ -248,8 +257,9 @@ void interpret(int slice)
     int offset = 0;
     char reform[STRING_LEN];
     double scratch;
-    char *output = malloc(STRING_LEN);
+    char *output;
     char *foo, *bar, *baz;
+    char *p;
 
     while (offset < SLICE_LEN)
     {
@@ -280,7 +290,9 @@ void interpret(int slice)
                 {
                     b = stack_pop();
                     memset(reform, '\0', STRING_LEN);
-                    memcpy(reform, slice_to_string(b), strlen(slice_to_string(b)));
+                    p = slice_to_string(b);
+                    memcpy(reform, p, strlen(slice_to_string(b)));
+                    free(p);
                     scratch = (double) atof(reform);
                     stack_push(scratch, TYPE_NUMBER);
                 }
@@ -291,14 +303,18 @@ void interpret(int slice)
                 a = tos_type();
                 if (a == TYPE_NUMBER)
                 {
+                    output = malloc(STRING_LEN);
                     sprintf(output, "%f", stack_pop());
                     stack_push(string_to_slice(output), TYPE_STRING);
+                    free(output);
                 }
                 if (a == TYPE_CHARACTER)
                 {
+                    output = malloc(STRING_LEN);
                     output[0] = (char) stack_pop();
                     output[1] = '\0';
                     stack_push(string_to_slice(output), TYPE_STRING);
+                    free(output);
                 }
                 if (a == TYPE_FUNCTION)
                 {
@@ -644,8 +660,11 @@ void interpret(int slice)
                     stack_push(abs(bar - baz), TYPE_NUMBER);
                 else
                     stack_push(-1, TYPE_NUMBER);
+                free(foo);
+                free(bar);
                 break;
             case BC_STRING_SUBSTR:
+                output = malloc(STRING_LEN);
                 a = stack_pop();
                 b = stack_pop();
                 foo = slice_to_string(stack_pop());
@@ -657,6 +676,7 @@ void interpret(int slice)
                 }
                 output[j] = '\0';
                 stack_push(string_to_slice(output), TYPE_STRING);
+                free(output);
                 break;
             case BC_STRING_NUMERIC:
                 foo = slice_to_string(stack_pop());
