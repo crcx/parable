@@ -739,9 +739,8 @@ void interpret(int slice)
                 stack_push((double) strlen(slice_to_string(a)), TYPE_NUMBER);
                 break;
             case BC_REPORT_ERROR:
-                // TODO: implement error gathering as a whole. For now this
-                // TODO: will work.
-                stack_pop();
+                p = slice_to_string(stack_pop());
+                report_error(p);
                 break;
         }
         offset++;
