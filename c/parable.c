@@ -6,33 +6,24 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <ctype.h>
 
+#include "prototypes.h"
 #include "bytecodes.h"
 #include "types.h"
 
-int compile(char *, int);
-int request_slice();
-void release_slice(int);
-void copy_slice(int, int);
-void mem_collect();
+/*  Configuration  */
 
-void interpret(int slice);
-
-void stack_push(double, double);
-double stack_pop();
-double tos_type();
-void stack_swap();
-void stack_dup();
-void stack_over();
-void stack_tuck();
-double stack_depth();
-void add_definition(char *name, int slice);
-
+#define MAX_SLICES 10000
+#define SLICE_LEN  1024
+#define MAX_NAMES  4096
+#define STRING_LEN 1024
+#define NEST_LIMIT  128
 
 /*  Memory Manager  */
 
-double slices[10000][1024];
-int slice_map[10000];
+double slices[MAX_SLICES][SLICE_LEN];
+int slice_map[MAX_SLICES];
 
 int request_slice()
 {
@@ -69,7 +60,7 @@ void store(double v, int s, int o)
 void copy_slice(int source, int dest)
 {
     int i = 0;
-    for (i = 0; i < 1024; i++)
+    for (i = 0; i < SLICE_LEN; i++)
         store(fetch(source, i), dest, i);
 }
 
@@ -82,7 +73,7 @@ void mem_collect()
 
 char *slice_to_string(int s)
 {
-    char *string = malloc(1024);
+    char *string = malloc(STRING_LEN);
     int o = 0;
 
     while (fetch(s, o) != 0)
@@ -144,11 +135,14 @@ void stack_swap()
 
 void stack_dup()
 {
+    char *p;
     double v = tos_type();
     if (v == TYPE_STRING)
     {
         v = data[sp - 1];
-        stack_push(string_to_slice(slice_to_string(v)), TYPE_STRING);
+        p = slice_to_string(v);
+        stack_push(string_to_slice(p), TYPE_STRING);
+        free(p);
     }
     else
     {
@@ -158,11 +152,14 @@ void stack_dup()
 
 void stack_over()
 {
+    char *p;
     double v = types[sp - 2];
     if (v == TYPE_STRING)
     {
         v = data[sp - 2];
-        stack_push(string_to_slice(slice_to_string(v)), TYPE_STRING);
+        p = slice_to_string(v);
+        stack_push(string_to_slice(p), TYPE_STRING);
+        free(p);
     }
     else
     {
@@ -172,12 +169,15 @@ void stack_over()
 
 void stack_tuck()
 {
+    char *p;
     double v = tos_type();
     if (v == TYPE_STRING)
     {
         v = data[sp - 1];
         stack_swap();
-        stack_push(string_to_slice(slice_to_string(v)), TYPE_STRING);
+        p = slice_to_string(v);
+        stack_push(string_to_slice(p), TYPE_STRING);
+        free(p);
     }
     else
     {
@@ -253,14 +253,15 @@ void parse_bootstrap(char *fname)
 void interpret(int slice)
 {
     int a, b, c, q, m, x, y, z;
-    int i, j, k;
+    int i, j;
     int offset = 0;
-    char reform[1024];
+    char reform[STRING_LEN];
     double scratch;
-    char *output = malloc(1024);
+    char *output;
     char *foo, *bar, *baz;
+    char *p;
 
-    while (offset < 1024)
+    while (offset < SLICE_LEN)
     {
         switch ((int) slices[slice][offset])
         {
@@ -288,8 +289,10 @@ void interpret(int slice)
                 if (a == TYPE_STRING)
                 {
                     b = stack_pop();
-                    memset(reform, '\0', 1024);
-                    memcpy(reform, slice_to_string(b), strlen(slice_to_string(b)));
+                    memset(reform, '\0', STRING_LEN);
+                    p = slice_to_string(b);
+                    memcpy(reform, p, strlen(slice_to_string(b)));
+                    free(p);
                     scratch = (double) atof(reform);
                     stack_push(scratch, TYPE_NUMBER);
                 }
@@ -300,14 +303,18 @@ void interpret(int slice)
                 a = tos_type();
                 if (a == TYPE_NUMBER)
                 {
+                    output = malloc(STRING_LEN);
                     sprintf(output, "%f", stack_pop());
                     stack_push(string_to_slice(output), TYPE_STRING);
+                    free(output);
                 }
                 if (a == TYPE_CHARACTER)
                 {
+                    output = malloc(STRING_LEN);
                     output[0] = (char) stack_pop();
                     output[1] = '\0';
                     stack_push(string_to_slice(output), TYPE_STRING);
+                    free(output);
                 }
                 if (a == TYPE_FUNCTION)
                 {
@@ -372,7 +379,7 @@ void interpret(int slice)
                     printf("BC_ADD only works for NUMBER and STRING types\n");
                     a = stack_pop();
                     b = stack_pop();
-                    offset = 1024;
+                    offset = SLICE_LEN;
                 }
                 break;
             case BC_SUBTRACT:
@@ -474,7 +481,7 @@ void interpret(int slice)
                 }
                 else
                 {
-                    offset = 1024;
+                    offset = SLICE_LEN;
                     printf("ERROR: types do not match\n");
                 }
                 break;
@@ -499,7 +506,7 @@ void interpret(int slice)
                 }
                 else
                 {
-                    offset = 1024;
+                    offset = SLICE_LEN;
                     printf("ERROR: types do not match\n");
                 }
                 break;
@@ -588,7 +595,7 @@ void interpret(int slice)
                 interpret(a);
                 break;
             case BC_FLOW_RETURN:
-                offset = 1024;
+                offset = SLICE_LEN;
                 break;
             case BC_MEM_COPY:
                 a = stack_pop();
@@ -653,8 +660,11 @@ void interpret(int slice)
                     stack_push(abs(bar - baz), TYPE_NUMBER);
                 else
                     stack_push(-1, TYPE_NUMBER);
+                free(foo);
+                free(bar);
                 break;
             case BC_STRING_SUBSTR:
+                output = malloc(STRING_LEN);
                 a = stack_pop();
                 b = stack_pop();
                 foo = slice_to_string(stack_pop());
@@ -666,6 +676,7 @@ void interpret(int slice)
                 }
                 output[j] = '\0';
                 stack_push(string_to_slice(output), TYPE_STRING);
+                free(output);
                 break;
             case BC_STRING_NUMERIC:
                 foo = slice_to_string(stack_pop());
@@ -721,8 +732,8 @@ void interpret(int slice)
 
 
 /*  Dictionary  */
-char names[10000][1024];
-int pointers[10000];
+char names[MAX_NAMES][STRING_LEN];
+int pointers[MAX_NAMES];
 int namep;
 
 void add_definition(char *name, int slice)
@@ -778,15 +789,14 @@ int compile(char *source, int s)
     char *token;
     char *state;
     char prefix;
-    char reform[1024];
+    char reform[STRING_LEN];
     double scratch;
     int o = 0;
-    int nest[1024];
-    int nest_o[1024];
+    int nest[NEST_LIMIT];
+    int nest_o[NEST_LIMIT];
     int np = 0;
     int current = s;
     int i;
-    char *foo, *bar;
 
     for (token = strtok_r(source, " ", &state); token != NULL; token = strtok_r(NULL, " ", &state))
     {
@@ -796,7 +806,7 @@ int compile(char *source, int s)
             case '\'':
                 if (token[strlen(token) - 1] == '\'')
                 {
-                    memset(reform, '\0', 1024);
+                    memset(reform, '\0', STRING_LEN);
                     memcpy(reform, &token[1], strlen(token) - 2);
                     reform[strlen(token) - 2] = '\0';
                     o = compile_cell(BC_PUSH_S, s, o);
@@ -804,7 +814,7 @@ int compile(char *source, int s)
                 }
                 else
                 {
-                    memset(reform, '\0', 1024);
+                    memset(reform, '\0', STRING_LEN);
                     memcpy(reform, &token[1], strlen(token) - 1);
 
                     i = 0;
@@ -828,7 +838,7 @@ int compile(char *source, int s)
             case '"':
                 if (token[strlen(token) - 1] == '"')
                 {
-                    memset(reform, '\0', 1024);
+                    memset(reform, '\0', STRING_LEN);
                     memcpy(reform, &token[1], strlen(token) - 2);
                     reform[strlen(token) - 2] = '\0';
                     o = compile_cell(BC_PUSH_COMMENT, s, o);
@@ -836,7 +846,7 @@ int compile(char *source, int s)
                 }
                 else
                 {
-                    memset(reform, '\0', 1024);
+                    memset(reform, '\0', STRING_LEN);
                     memcpy(reform, &token[1], strlen(token) - 1);
 
                     i = 0;
@@ -858,15 +868,14 @@ int compile(char *source, int s)
                 }
                 break;
             case '#':
-                memset(reform, '\0', 1024);
+                memset(reform, '\0', STRING_LEN);
                 memcpy(reform, &token[1], strlen(token));
                 scratch = (double) atof(reform);
                 o = compile_cell(BC_PUSH_N, s, o);
                 o = compile_cell(scratch, s, o);
                 break;
             case '&':
-                // TODO: named pointers
-                memset(reform, '\0', 1024);
+                memset(reform, '\0', STRING_LEN);
                 memcpy(reform, &token[1], strlen(token));
                 if (lookup_definition(reform) != -1)
                 {
@@ -887,7 +896,7 @@ int compile(char *source, int s)
                 o = compile_cell(scratch, s, o);
                 break;
             case '`':
-                memset(reform, '\0', 1024);
+                memset(reform, '\0', STRING_LEN);
                 memcpy(reform, &token[1], strlen(token));
                 scratch = (double) atof(reform);
                 o = compile_cell(scratch, s, o);
@@ -956,8 +965,6 @@ void dump_stack()
 
 int main()
 {
-    int s, o;
-    char name[] = "+";
     sp = 0;
     prepare_dictionary();
     parse_bootstrap("bootstrap.p");

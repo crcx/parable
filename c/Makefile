@@ -1,5 +1,5 @@
 CC = gcc
-FLAGS = -g
+FLAGS = -g -Wall
 
 default:
 	rm -f parable
