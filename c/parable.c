@@ -20,6 +20,26 @@
 #define STRING_LEN 1024
 #define NEST_LIMIT  128
 
+/*  Error Reporting */
+char *errors;
+
+void prepare_error_reporting()
+{
+    errors = malloc(8192);
+    memset(errors, '\0', 8192);
+}
+
+void report_error(char *string)
+{
+    strcat(errors, string);
+}
+
+void clear_errors()
+{
+    memset(errors, '\0', 8192);
+}
+
+
 /*  Memory Manager  */
 
 double slices[MAX_SLICES][SLICE_LEN];
@@ -835,8 +855,7 @@ int compile(char *source, int s)
                     o = compile_cell((double) string_to_slice(reform), s, o);
                 }
                 break;
-            case '"':
-                if (token[strlen(token) - 1] == '"')
+            case '"':                if (token[strlen(token) - 1] == '"')
                 {
                     memset(reform, '\0', STRING_LEN);
                     memcpy(reform, &token[1], strlen(token) - 2);
@@ -924,7 +943,11 @@ int compile(char *source, int s)
                     o = compile_cell(lookup_definition(token), s, o);
                 }
                 else
-                    printf("function %s not found\n", token);
+                {
+                    report_error("function not found: ");
+                    report_error(token);
+                    report_error("\n");
+                }
                 break;
         }
     }
@@ -967,8 +990,11 @@ int main()
 {
     sp = 0;
     prepare_dictionary();
+    prepare_error_reporting();
     parse_bootstrap("bootstrap.p");
     parse_bootstrap("test.p");
     dump_stack();
+    if (strlen(errors) > 0)
+        printf("Error Log:\n%s\n", errors);
     return 0;
 }
