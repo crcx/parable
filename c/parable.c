@@ -988,13 +988,14 @@ void dump_stack()
     }
 }
 
-int main()
+int main(int argc, char **argv)
 {
     sp = 0;
     prepare_dictionary();
     prepare_error_reporting();
     parse_bootstrap("bootstrap.p");
-    parse_bootstrap("test.p");
+    if (argc > 1)
+        parse_bootstrap(argv[1]);
     dump_stack();
     if (strlen(errors) > 0)
         printf("Error Log:\n%s\n", errors);
