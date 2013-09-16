@@ -218,56 +218,6 @@ double nos_type()
 }
 
 
-/*  Load and run bootstrap  */
-
-void read_line(FILE *file, char *line_buffer)
-{
-    if (file == NULL)
-    {
-        printf("Error: file pointer is null.");
-        exit(1);
-    }
-
-    if (line_buffer == NULL)
-    {
-        printf("Error allocating memory for line buffer.");
-        exit(1);
-    }
-
-    char ch = getc(file);
-    int count = 0;
-
-    while ((ch != '\n') && (ch != EOF))
-    {
-        line_buffer[count] = ch;
-        count++;
-        ch = getc(file);
-    }
-
-    line_buffer[count] = '\0';
-}
-
-
-void parse_bootstrap(char *fname)
-{
-    char source[64000];
-
-    FILE *fp;
-
-    fp = fopen(fname, "r");
-    if (fp == NULL)
-        return;
-
-    while (!feof(fp))
-    {
-        read_line(fp, source);
-        interpret(compile(source, request_slice()));
-    }
-
-    fclose(fp);
-}
-
-
 /*  Byte Code Interpreter  */
 
 void interpret(int slice)
@@ -356,7 +306,7 @@ void interpret(int slice)
                 if (a == TYPE_STRING)
                 {
                     foo = slice_to_string(stack_pop());
-                    stack_push((float) foo[0], TYPE_CHARACTER);
+                    stack_push((double) foo[0], TYPE_CHARACTER);
                 }
                 types[sp - 1] = TYPE_CHARACTER;
                 break;
@@ -429,24 +379,24 @@ void interpret(int slice)
                 a = stack_pop();
                 b = stack_pop();
                 if (a < 0)
-                    stack_push((float) ((int) b << (int) a), TYPE_NUMBER);
+                    stack_push((double) ((int) b << (int) a), TYPE_NUMBER);
                 else
-                    stack_push((float) ((int) b >> (int) a), TYPE_NUMBER);
+                    stack_push((double) ((int) b >> (int) a), TYPE_NUMBER);
                 break;
             case BC_BITWISE_AND:
                 a = stack_pop();
                 b = stack_pop();
-                stack_push((float) ((int) b & (int) a), TYPE_NUMBER);
+                stack_push((double) ((int) b & (int) a), TYPE_NUMBER);
                 break;
             case BC_BITWISE_OR:
                 a = stack_pop();
                 b = stack_pop();
-                stack_push((float) ((int) b | (int) a), TYPE_NUMBER);
+                stack_push((double) ((int) b | (int) a), TYPE_NUMBER);
                 break;
             case BC_BITWISE_XOR:
                 a = stack_pop();
                 b = stack_pop();
-                stack_push((float) ((int) b ^ (int) a), TYPE_NUMBER);
+                stack_push((double) ((int) b ^ (int) a), TYPE_NUMBER);
                 break;
             case BC_COMPARE_LT:
                 a = stack_pop();
@@ -717,7 +667,7 @@ void interpret(int slice)
                 }
                 else if (a == TYPE_CHARACTER)
                 {
-                    data[sp - 1] = (float) tolower((char) data[sp - 1]);
+                    data[sp - 1] = (double) tolower((char) data[sp - 1]);
                 }
                 break;
             case BC_TO_UPPER:
@@ -731,7 +681,7 @@ void interpret(int slice)
                 }
                 else if (a == TYPE_CHARACTER)
                 {
-                    data[sp - 1] = (float) toupper((char) data[sp - 1]);
+                    data[sp - 1] = (double) toupper((char) data[sp - 1]);
                 }
                 break;
             case BC_LENGTH:
@@ -951,55 +901,4 @@ int compile(char *source, int s)
         }
     }
     return s;
-}
-
-
-
-/*  main() - to be moved to a separate file later  */
-
-void dump_stack()
-{
-    int x = 0;
-    while (x < sp)
-    {
-        if ((sp - 1) == x)
-            printf("TOS");
-        printf("\t%i\t", x);
-        if (types[x] == TYPE_CHARACTER)
-            printf("$%c\n", (char)data[x]);
-        if (types[x] == TYPE_NUMBER)
-            printf("#%f\n", data[x]);
-        if (types[x] == TYPE_FUNCTION)
-            printf("&%f\n", data[x]);
-        if (types[x] == TYPE_FLAG)
-        {
-            if (data[x] == -1)
-                printf("true\n");
-            else if (data[x] == 0)
-                printf("false\n");
-            else
-                printf("malformed flag\n");
-        }
-        if (types[x] == TYPE_STRING)
-        {
-            printf("'%s'\n", slice_to_string(data[x]));
-        }
-        x++;
-    }
-}
-
-int main(int argc, char **argv)
-{
-    sp = 0;
-    prepare_dictionary();
-    prepare_error_reporting();
-    parse_bootstrap("bootstrap.p");
-    if (argc > 1)
-        parse_bootstrap(argv[1]);
-    else
-        printf("parable\n(c) 2013, charles childers\n\nTry:\n  parable filename\n");
-    dump_stack();
-    if (strlen(errors) > 0)
-        printf("Error Log:\n%s\n", errors);
-    return 0;
 }
