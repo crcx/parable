@@ -11,14 +11,7 @@
 #include "prototypes.h"
 #include "bytecodes.h"
 #include "types.h"
-
-/*  Configuration  */
-
-#define MAX_SLICES 10000
-#define SLICE_LEN  1024
-#define MAX_NAMES  4096
-#define STRING_LEN 1024
-#define NEST_LIMIT  128
+#include "config.h"
 
 /*  Error Reporting */
 char *errors;
@@ -121,8 +114,8 @@ int string_to_slice(char *string)
 
 /*  Data Stack  */
 
-double data[64000];
-double types[64000];
+double data[STACK_DEPTH];
+double types[STACK_DEPTH];
 int sp;
 
 void stack_push(double value, double type)

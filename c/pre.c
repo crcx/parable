@@ -8,12 +8,13 @@
 #include <math.h>
 #include <ctype.h>
 
+#include "config.h"
 #include "prototypes.h"
 #include "types.h"
 
 extern char *errors;
-extern double data[64000];
-extern double types[64000];
+extern double data[STACK_DEPTH];
+extern double types[STACK_DEPTH];
 extern int sp;
 
 /*  Load and run bootstrap  */
