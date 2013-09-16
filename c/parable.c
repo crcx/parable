@@ -372,7 +372,7 @@ void interpret(int slice)
                 a = stack_pop();
                 b = stack_pop();
                 if (a < 0)
-                    stack_push((double) ((int) b << (int) a), TYPE_NUMBER);
+                    stack_push((double) ((int) b << (int) abs(a)), TYPE_NUMBER);
                 else
                     stack_push((double) ((int) b >> (int) a), TYPE_NUMBER);
                 break;
