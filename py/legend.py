@@ -119,28 +119,28 @@ def revert():
     prepare_dictionary()
 
 
-def export_source(name):
-    """export the source code for the current session to a file"""
-    with open(name, "w") as session:
-        session.write(generate_source())
+# def export_source(name):
+#     """export the source code for the current session to a file"""
+#     with open(name, "w") as session:
+#         session.write(generate_source())
 
 
-def edit_session():
-    """export the source code for the current session to a file, launch the"""
-    """$EDITOR on it, and then load/parse the resulting file"""
-    export_source('scratch')
-    EDITOR = os.environ.get('EDITOR', 'vim')
-    call([EDITOR, "scratch"])
-    revert()
-    f = open('scratch').readlines()
-    for line in f:
-        if len(line) > 1:
-            s = compile(line, request_slice())
-            interpret(s)
-    try:
-        os.remove('scratch')
-    except OSError:
-        pass
+# def edit_session():
+#     """export the source code for the current session to a file, launch the"""
+#     """$EDITOR on it, and then load/parse the resulting file"""
+#     export_source('scratch')
+#     EDITOR = os.environ.get('EDITOR', 'vim')
+#     call([EDITOR, "scratch"])
+#     revert()
+#     f = open('scratch').readlines()
+#     for line in f:
+#         if len(line) > 1:
+#             s = compile(line, request_slice())
+#             interpret(s)
+#     try:
+#         os.remove('scratch')
+#     except OSError:
+#         pass
 
 
 def display_stack():
@@ -234,10 +234,10 @@ if __name__ == '__main__':
 
         if cmd == ':q' or cmd == ':quit':
             exit()
-        elif cmd == ':w' or cmd == ':write':
-            export_source('session')
-        elif cmd == ':e' or cmd == ':edit':
-            edit_session()
+#         elif cmd == ':w' or cmd == ':write':
+#             export_source('session')
+#         elif cmd == ':e' or cmd == ':edit':
+#             edit_session()
         elif cmd == ':r' or cmd == ':restart':
             revert()
             parse_bootstrap()

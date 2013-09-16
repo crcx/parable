@@ -1,4 +1,4 @@
-CC = gcc
+CC = clang
 FLAGS = -g -Wall
 
 default:
