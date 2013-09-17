@@ -112,5 +112,6 @@ int main(int argc, char **argv)
     dump_stack();
     if (strlen(errors) > 0)
         printf("Error Log:\n%s\n", errors);
+    end_error_reporting();
     return 0;
 }

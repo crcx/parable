@@ -32,6 +32,10 @@ void clear_errors()
     memset(errors, '\0', 8192);
 }
 
+void end_error_reporting()
+{
+    free(errors);
+}
 
 /*  Memory Manager  */
 

@@ -1,6 +1,7 @@
 void prepare_error_reporting();
 void report_error(char *string);
 void clear_errors();
+void end_error_reporting();
 int request_slice();
 void release_slice(int slice);
 double fetch(int s, int o);
@@ -25,5 +26,3 @@ void prepare_dictionary();
 int lookup_definition(char *name);
 int compile_cell(double value, int slice, int offset);
 int compile(char *source, int s);
-void dump_stack();
-int main();
