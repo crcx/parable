@@ -70,6 +70,8 @@ void parse_bootstrap(char *fname)
 void dump_stack()
 {
     int x = 0;
+    char p[STRING_LEN];
+
     while (x < sp)
     {
         if ((sp - 1) == x)
@@ -92,7 +94,8 @@ void dump_stack()
         }
         if (types[x] == TYPE_STRING)
         {
-            printf("'%s'\n", slice_to_string(data[x]));
+            slice_to_string(data[x], p);
+            printf("'%s'\n", p);
         }
         x++;
     }

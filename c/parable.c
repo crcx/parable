@@ -88,9 +88,8 @@ void mem_collect()
     // TODO: long runtimes. (e.g., nothing in my current task set)
 }
 
-char *slice_to_string(int s)
+char *slice_to_string(int s, char *string)
 {
-    char *string = malloc(STRING_LEN);
     int o = 0;
 
     while (fetch(s, o) != 0)
@@ -98,6 +97,7 @@ char *slice_to_string(int s)
         string[o] = (char) fetch(s, o);
         o++;
     }
+    string[o] = '\0';
     return string;
 }
 
@@ -157,9 +157,8 @@ void stack_dup()
     if (v == TYPE_STRING)
     {
         v = data[sp - 1];
-        p = slice_to_string(v);
+        slice_to_string(v, p);
         stack_push(string_to_slice(p), TYPE_STRING);
-        free(p);
     }
     else
     {
@@ -174,9 +173,8 @@ void stack_over()
     if (v == TYPE_STRING)
     {
         v = data[sp - 2];
-        p = slice_to_string(v);
+        slice_to_string(v, p);
         stack_push(string_to_slice(p), TYPE_STRING);
-        free(p);
     }
     else
     {
@@ -192,9 +190,8 @@ void stack_tuck()
     {
         v = data[sp - 1];
         stack_swap();
-        p = slice_to_string(v);
+        slice_to_string(v, p);
         stack_push(string_to_slice(p), TYPE_STRING);
-        free(p);
     }
     else
     {
@@ -225,8 +222,11 @@ void interpret(int slice)
     char reform[STRING_LEN];
     double scratch;
     char *output;
-    char *foo, *bar, *baz;
-    char *p;
+
+    char foo[STRING_LEN];
+    char bar[STRING_LEN];
+    char baz[STRING_LEN];
+    char p[STRING_LEN];
 
     while (offset < SLICE_LEN)
     {
@@ -257,9 +257,8 @@ void interpret(int slice)
                 {
                     b = stack_pop();
                     memset(reform, '\0', STRING_LEN);
-                    p = slice_to_string(b);
-                    memcpy(reform, p, strlen(slice_to_string(b)));
-                    free(p);
+                    slice_to_string(b, p);
+                    memcpy(reform, p, strlen(p));
                     scratch = (double) atof(reform);
                     stack_push(scratch, TYPE_NUMBER);
                 }
@@ -302,7 +301,7 @@ void interpret(int slice)
                 a = tos_type();
                 if (a == TYPE_STRING)
                 {
-                    foo = slice_to_string(stack_pop());
+                    slice_to_string(stack_pop(), foo);
                     stack_push((double) foo[0], TYPE_CHARACTER);
                 }
                 types[sp - 1] = TYPE_CHARACTER;
@@ -315,9 +314,10 @@ void interpret(int slice)
                 if (a == TYPE_STRING)
                 {
                     b = stack_pop();
-                    if (strcmp(slice_to_string(b), "true") == 0)
+                    slice_to_string(b, p);
+                    if (strcmp(p, "true") == 0)
                         stack_push(-1, TYPE_FLAG);
-                    else if (strcmp(slice_to_string(b), "false") == 0)
+                    else if (strcmp(p, "false") == 0)
                         stack_push(0, TYPE_FLAG);
                     else
                         stack_push(1, TYPE_FLAG);
@@ -337,8 +337,8 @@ void interpret(int slice)
                 }
                 else if (tos_type() == TYPE_STRING && nos_type() == TYPE_STRING)
                 {
-                    foo = slice_to_string(stack_pop());
-                    bar = slice_to_string(stack_pop());
+                    slice_to_string(stack_pop(), foo);
+                    slice_to_string(stack_pop(), bar);
                     stack_push(string_to_slice(strcat(bar, foo)), TYPE_STRING);
                 }
                 else
@@ -434,7 +434,9 @@ void interpret(int slice)
                 y = stack_pop();
                 if (a == TYPE_STRING && x == TYPE_STRING)
                 {
-                    if (strcmp(slice_to_string(b), slice_to_string(y)) == 0)
+                    slice_to_string(b, foo);
+                    slice_to_string(y, bar);
+                    if (strcmp(foo, bar) == 0)
                         stack_push(-1, TYPE_FLAG);
                     else
                         stack_push(0, TYPE_FLAG);
@@ -459,7 +461,9 @@ void interpret(int slice)
                 y = stack_pop();
                 if (a == TYPE_STRING && x == TYPE_STRING)
                 {
-                    if (strcmp(slice_to_string(b), slice_to_string(y)) != 0)
+                    slice_to_string(b, foo);
+                    slice_to_string(y, bar);
+                    if (strcmp(foo, bar) != 0)
                         stack_push(-1, TYPE_FLAG);
                     else
                         stack_push(0, TYPE_FLAG);
@@ -617,24 +621,23 @@ void interpret(int slice)
             case BC_QUOTE_NAME:
                 a = stack_pop();
                 b = stack_pop();
-                add_definition(slice_to_string(a), (int) b);
+                slice_to_string(a, p);
+                add_definition(p, (int) b);
                 break;
             case BC_STRING_SEEK:
-                foo = slice_to_string(stack_pop());
-                bar = slice_to_string(stack_pop());
-                baz = strstr(bar, foo);
-                if (baz != NULL)
+                slice_to_string(stack_pop(), foo);
+                slice_to_string(stack_pop(), bar);
+                output = strstr(bar, foo);
+                if (output != NULL)
                     stack_push(abs(bar - baz), TYPE_NUMBER);
                 else
                     stack_push(-1, TYPE_NUMBER);
-                free(foo);
-                free(bar);
                 break;
             case BC_STRING_SUBSTR:
                 output = malloc(STRING_LEN);
                 a = stack_pop();
                 b = stack_pop();
-                foo = slice_to_string(stack_pop());
+                slice_to_string(stack_pop(), foo);
                 j = 0;
                 for (i = b; i < a; i++)
                 {
@@ -645,9 +648,9 @@ void interpret(int slice)
                 stack_push(string_to_slice(output), TYPE_STRING);
                 break;
             case BC_STRING_NUMERIC:
-                foo = slice_to_string(stack_pop());
-                a = strtod(foo, &bar);
-                if (bar == foo)
+                slice_to_string(stack_pop(), foo);
+                a = strtod(foo, &output);
+                if (output == foo)
                     stack_push(0, TYPE_FLAG);
                 else
                     stack_push(-1, TYPE_FLAG);
@@ -656,7 +659,7 @@ void interpret(int slice)
                 a = tos_type();
                 if (a == TYPE_STRING)
                 {
-                    foo = slice_to_string(stack_pop());
+                    slice_to_string(stack_pop(), foo);
                     for(z = 0; foo[z]; z++)
                         foo[z] = tolower(foo[z]);
                     stack_push(string_to_slice(foo), TYPE_STRING);
@@ -670,7 +673,7 @@ void interpret(int slice)
                 a = tos_type();
                 if (a == TYPE_STRING)
                 {
-                    foo = slice_to_string(stack_pop());
+                    slice_to_string(stack_pop(), foo);
                     for(z = 0; foo[z]; z++)
                         foo[z] = toupper(foo[z]);
                     stack_push(string_to_slice(foo), TYPE_STRING);
@@ -682,10 +685,11 @@ void interpret(int slice)
                 break;
             case BC_LENGTH:
                 a = stack_pop();
-                stack_push((double) strlen(slice_to_string(a)), TYPE_NUMBER);
+                slice_to_string(a, p);
+                stack_push((double) strlen(p), TYPE_NUMBER);
                 break;
             case BC_REPORT_ERROR:
-                p = slice_to_string(stack_pop());
+                slice_to_string(stack_pop(), p);
                 report_error(p);
                 break;
         }

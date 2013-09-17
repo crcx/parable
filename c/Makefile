@@ -1,5 +1,5 @@
 CC = clang
-FLAGS = -O3 -s -Wall -c
+FLAGS = -O3 -g -Wall -c
 
 default: clean
 	$(CC) $(FLAGS) parable.c -o parable.o

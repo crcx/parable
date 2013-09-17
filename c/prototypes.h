@@ -8,7 +8,7 @@ double fetch(int s, int o);
 void store(double v, int s, int o);
 void copy_slice(int source, int dest);
 void mem_collect();
-char *slice_to_string(int s);
+char *slice_to_string(int s, char *string);
 int string_to_slice(char *string);
 void stack_push(double value, double type);
 double stack_pop();
