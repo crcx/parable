@@ -1128,3 +1128,13 @@ def prepare_dictionary():
     store(BC_QUOTE_NAME, s, 0)
     store(BC_FLOW_RETURN, s, 1)
     add_definition('define', s)
+
+
+def pointer_to_name(ptr):
+    """given a parable pointer, return the corresponding name, or"""
+    """an empty string"""
+    global dictionary_names, dictionary_slices
+    s = ""
+    if ptr in dictionary_slices:
+        s = dictionary_names[dictionary_slices.index(ptr)]
+    return s
