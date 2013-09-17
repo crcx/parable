@@ -643,7 +643,6 @@ void interpret(int slice)
                 }
                 output[j] = '\0';
                 stack_push(string_to_slice(output), TYPE_STRING);
-                free(output);
                 break;
             case BC_STRING_NUMERIC:
                 foo = slice_to_string(stack_pop());
