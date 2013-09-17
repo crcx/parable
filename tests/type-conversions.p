@@ -1,6 +1,6 @@
 'these should be strings'
 #3 :s
-#-4.501
+#-4.501 :s
 $z :s
 true :s
 'hello, world!'
