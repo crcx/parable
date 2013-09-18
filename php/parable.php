@@ -1443,6 +1443,7 @@ function stack_change_type($type)
 
 function parse_bootstrap($lines)
 {
+    global $errors;
     foreach ($lines as $src)
     {
         if (strlen(trim($src)) > 0)
@@ -1451,9 +1452,9 @@ function parse_bootstrap($lines)
             interpret($s);
         }
 
-        foreach ($errors as $err)
+        foreach ($errors as $msg)
         {
-            echo "<tt>$err</tt><br>";
+            echo "<tt>$msg</tt><br>";
         }
         $errors = array();
     }
