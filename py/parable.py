@@ -1064,6 +1064,34 @@ def compile_bytecode(bytecode, slice, offset):
     return offset
 
 
+def compile_function_call(name, slice, offset):
+    if lookup_pointer(name) != -1:
+        store(BC_FLOW_CALL, slice, offset)
+        offset += 1
+        store(lookup_pointer(name), slice, offset)
+        offset += 1
+    else:
+        report('Unable to find ' + name + ' in dictionary')
+    return offset
+
+
+def parse_string(tokens, i, count, delimiter):
+    s = ""
+    if (tokens[i].endswith(delimiter) and tokens[i] != delimiter):
+        s = tokens[i]
+    else:
+        j = i + 1
+        s = tokens[i]
+        while j < count:
+            s += " "
+            s += tokens[j]
+            if (tokens[j].endswith(delimiter)):
+                i = j
+                j = count
+            j += 1
+    return i, s
+
+
 def compile(str, slice):
     nest = []
     cleaned = ' '.join(str.split())
@@ -1074,32 +1102,10 @@ def compile(str, slice):
     while i < count:
         s = ""
         if (tokens[i].startswith('"') or tokens[i] == '"'):
-            if (tokens[i].endswith('"') and tokens[i] != '"'):
-                s = tokens[i]
-            else:
-                j = i + 1
-                s = tokens[i]
-                while j < count:
-                    s += " "
-                    s += tokens[j]
-                    if (tokens[j].endswith('"')):
-                        i = j
-                        j = count
-                    j += 1
+            i, s = parse_string(tokens, i, count, '"')
             offset = compile_comment(s[1:-1], slice, offset)
         elif (tokens[i].startswith('\'') or tokens[i] == '\''):
-            if (tokens[i].endswith('\'') and tokens[i] != '\''):
-                s = tokens[i]
-            else:
-                j = i + 1
-                s = tokens[i]
-                while j < count:
-                    s += " "
-                    s += tokens[j]
-                    if (tokens[j].endswith('\'')):
-                        i = j
-                        j = count
-                    j += 1
+            i, s = parse_string(tokens, i, count, '\'')
             offset = compile_string(s[1:-1], slice, offset)
         elif tokens[i].startswith("$"):
             offset = compile_character(ord(tokens[i][1:]), slice, offset)
@@ -1124,13 +1130,7 @@ def compile(str, slice):
             store(old, slice, offset)
             offset += 1
         else:
-            if lookup_pointer(tokens[i]) != -1:
-                store(BC_FLOW_CALL, slice, offset)
-                offset += 1
-                store(lookup_pointer(tokens[i]), slice, offset)
-                offset += 1
-            else:
-                report('Unable to find ' + tokens[i] + ' in dictionary')
+            offset = compile_function_call(tokens[i], slice, offset)
         i += 1
         store(BC_FLOW_RETURN, slice, offset)
     return slice
