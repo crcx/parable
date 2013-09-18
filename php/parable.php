@@ -1,40 +1,6 @@
 <?
 /* parable
  * Copyright (c) 2013, Charles Childers
- *
- *              ===============================================================
- * 2013-05-29   start of compiler, dictionary, and memory manager
- *
- * 2013-05-30   begin stubs for bytecode interpreter
- *              string_to_slice(), slice_to_string() implemented
- *              proper parsing of strings, comments
- *              begin work on stack support
- *              error reporting code added
- *
- * 2013-05-31   begin implementing bytecode interpreter
- *
- * 2013-06-03   allow for redefinitions
- *
- * 2013-06-09   fix redefinitions (bug in copy_slice)
- *              fix BC_COMPARE_LT
- *
- * 2013-06-10   fix upper/lowercase
- *              fix missing some missing $ symbols
- *
- * 2013-06-26   better use of globals, some redundancies cleaned up
- *              more bug fixes
- *
- * 2013-07-03   fix a typo (append_push should have been array_push)
- *              add stack_clear()
- *              fix & prefix
- *
- * 2013-07-06   fixed bugs in BC_FLOW_BI and BC_FLOW_TRI causing
- *              types to be lost
- *
- * 2013-07-08   fix BC_LENGTH
- *
- * 2013-07-09   fix BC_SEEK
- *              ===============================================================
  */
 
 
@@ -154,16 +120,14 @@ function report_error($text)
 
 function check_depth($cells)
 {
-    global $errors, $stack;
+    global $stack;
     if (count($stack) < $cells)
     {
         report_error('Stack underflow: ' . $cells . ' values required.');
         return FALSE;
     }
     else
-    {
         return TRUE;
-    }
 }
 
 
@@ -200,19 +164,19 @@ function request_slice()
 
 function release_slice($s)
 {
-    global $p_slices, $p_map, $MAX_SLICES;
+    global $p_map;
     $p_map[$s] = 0;
 }
 
 function store($v, $s, $o)
 {
-    global $p_slices, $p_map, $MAX_SLICES;
+    global $p_slices;
     $p_slices[$s][$o] = $v;
 }
 
 function fetch($s, $o)
 {
-    global $p_slices, $p_map, $MAX_SLICES;
+    global $p_slices;
     return $p_slices[$s][$o];
 }
 
