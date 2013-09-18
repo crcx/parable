@@ -179,6 +179,57 @@ function fetch($s, $o)
     return $p_slices[$s][$o];
 }
 
+
+function compile_comment($string, $slice, $offset)
+{
+    global $BC_PUSH_COMMENT;
+    return $offset;
+}
+
+
+function compile_string($string, $slice, $offset)
+{
+    global $BC_PUSH_S;
+    return $offset;
+}
+
+
+function compile_pointer($name, $slice, $offset)
+{
+    global $BC_PUSH_F;
+    return $offset;
+}
+
+
+function compile_number($number, $slice, $offset)
+{
+    global $BC_PUSH_N;
+    store($BC_PUSH_N, $slice, $offset);
+    $offset += 1;
+    store(floatval($number), $slice, $offset);
+    $offset += 1;
+    return $offset;
+}
+
+
+function compile_character($character, $slice, $offset)
+{
+    global $BC_PUSH_C;
+    store($BC_PUSH_C, $slice, $offset);
+    $offset += 1;
+    store($character, $slice, $offset);
+    $offset += 1;
+    return $offset;
+}
+
+
+function compile_function_call($name, $slice, $offset)
+{
+    global $BC_FLOW_CALL;
+    return $offset;
+}
+
+
 function compile($str, $slice)
 {
     global $dictionary_map;
@@ -195,17 +246,11 @@ function compile($str, $slice)
     {
         if (startsWith($tokens[$i], "#"))
         {
-            store($BC_PUSH_N, $slice, $offset);
-            $offset += 1;
-            store(floatval(substr($tokens[$i], 1)), $slice, $offset);
-            $offset += 1;
+            $offset = compile_number(substr($tokens[$i], 1), $slice, $offset);
         }
         elseif (startsWith($tokens[$i], "$"))
         {
-            store($BC_PUSH_C, $slice, $offset);
-            $offset += 1;
-            store(ord(substr($tokens[$i], 1)), $slice, $offset);
-            $offset += 1;
+            $offset = compile_character(ord(substr($tokens[$i], 1)), $slice, $offset);
         }
         elseif (startsWith($tokens[$i], "`"))
         {
