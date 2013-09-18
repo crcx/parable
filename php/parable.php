@@ -147,14 +147,13 @@ function prepare_memory()
 
 function request_slice()
 {
-    global $p_slices, $p_map, $MAX_SLICES;
+    global $p_map, $MAX_SLICES;
     $i = 0;
     while ($i < $MAX_SLICES)
     {
         if ($p_map[$i] == 0)
         {
             $p_map[$i] = 1;
-            $s = $i;
             return $i;
         }
         $i += 1;
@@ -182,23 +181,9 @@ function fetch($s, $o)
 
 function compile($str, $slice)
 {
-    global $MAX_SLICES, $SLICE_LEN;
-    global $stack, $types;
-    global $dictionary_names, $dictionary_map;
-    global $p_slices, $p_map;
-    global $TYPE_NUMBER, $TYPE_STRING, $TYPE_CHARACTER, $TYPE_FUNCTION, $TYPE_FLAG;
+    global $dictionary_map;
     global $BC_PUSH_N, $BC_PUSH_S, $BC_PUSH_C, $BC_PUSH_F, $BC_PUSH_COMMENT;
-    global $BC_TYPE_N, $BC_TYPE_S, $BC_TYPE_C, $BC_TYPE_F, $BC_TYPE_FLAG;
-    global $BC_GET_TYPE, $BC_ADD, $BC_SUBTRACT, $BC_MULTIPLY, $BC_DIVIDE;
-    global $BC_REMAINDER, $BC_FLOOR, $BC_BITWISE_SHIFT, $BC_BITWISE_AND, $BC_BITWISE_OR;
-    global $BC_BITWISE_XOR, $BC_COMPARE_LT, $BC_COMPARE_GT, $BC_COMPARE_LTEQ, $BC_COMPARE_GTEQ;
-    global $BC_COMPARE_EQ, $BC_COMPARE_NEQ, $BC_FLOW_IF, $BC_FLOW_WHILE, $BC_FLOW_UNTIL;
-    global $BC_FLOW_TIMES, $BC_FLOW_CALL, $BC_FLOW_CALL_F, $BC_FLOW_DIP, $BC_FLOW_SIP;
-    global $BC_FLOW_BI, $BC_FLOW_TRI, $BC_FLOW_RETURN, $BC_MEM_COPY, $BC_MEM_FETCH;
-    global $BC_MEM_STORE, $BC_MEM_REQUEST, $BC_MEM_RELEASE, $BC_MEM_COLLECT, $BC_STACK_DUP;
-    global $BC_STACK_DROP, $BC_STACK_SWAP, $BC_STACK_OVER, $BC_STACK_TUCK, $BC_STACK_NIP;
-    global $BC_STACK_DEPTH, $BC_STACK_CLEAR, $BC_QUOTE_NAME, $BC_STRING_SEEK, $BC_STRING_SUBSTR;
-    global $BC_STRING_NUMERIC, $BC_TO_LOWER, $BC_TO_UPPER, $BC_LENGTH, $BC_REPORT_ERROR;
+    global $BC_FLOW_RETURN, $BC_FLOW_CALL;
 
     $tokens = explode(' ', trim($str));
     $l = count($tokens);
@@ -343,7 +328,6 @@ function compile($str, $slice)
 
 function prepare_dictionary()
 {
-    global $dictionary_names, $dictionary_map;
     $s = request_slice();
     compile("`600", $s);
     add_definition('define', $s);
@@ -352,7 +336,7 @@ function prepare_dictionary()
 
 function lookup_pointer($name)
 {
-    global $dictionary_names, $dictionary_map;
+    global $dictionary_names;
     $s = -1;
     foreach ($dictionary_names as $key => $value)
         if ($value == $name)
@@ -376,10 +360,8 @@ function add_definition($name, $s)
 
 function interpret($slice)
 {
-    global $MAX_SLICES, $SLICE_LEN;
-    global $stack, $types;
-    global $dictionary_names, $dictionary_map;
-    global $p_slices, $p_map;
+    global $SLICE_LEN;
+    global $stack;
     global $TYPE_NUMBER, $TYPE_STRING, $TYPE_CHARACTER, $TYPE_FUNCTION, $TYPE_FLAG;
     global $BC_PUSH_N, $BC_PUSH_S, $BC_PUSH_C, $BC_PUSH_F, $BC_PUSH_COMMENT;
     global $BC_TYPE_N, $BC_TYPE_S, $BC_TYPE_C, $BC_TYPE_F, $BC_TYPE_FLAG;
@@ -1225,7 +1207,7 @@ function stack_swap()
 
 function stack_dup()
 {
-    global $TYPE_NUMBER, $TYPE_STRING, $TYPE_CHARACTER, $TYPE_FUNCTION, $TYPE_FLAG;
+    global $TYPE_STRING;
 
     $at = stack_type();
     $av = stack_pop();
@@ -1243,8 +1225,7 @@ function stack_dup()
 
 function stack_over()
 {
-    global $TYPE_NUMBER, $TYPE_STRING, $TYPE_CHARACTER, $TYPE_FUNCTION, $TYPE_FLAG;
-
+    global $TYPE_STRING;
     $at = stack_type();
     $av = stack_pop();
     $bt = stack_type();
@@ -1284,7 +1265,7 @@ function copy_slice($source, $dest)
 function stack_change_type($type)
 {
     global $TYPE_NUMBER, $TYPE_STRING, $TYPE_CHARACTER, $TYPE_FUNCTION, $TYPE_FLAG;
-    global $types, $stack;
+    global $types;
 
     if ($type == $TYPE_NUMBER)
     {
