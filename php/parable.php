@@ -602,10 +602,10 @@ function interpret($slice)
             {
                 $a = stack_pop();
                 $b = stack_pop();
-                if ($b < 0)
-                    stack_push($b << $a ,$TYPE_NUMBER);
+                if ($a < 0)
+                    stack_push($b << abs($a), $TYPE_NUMBER);
                 else
-                    stack_push($b >> $a,$TYPE_NUMBER);
+                    stack_push($b >> $a, $TYPE_NUMBER);
             }
             else
                 $offset = $SLICE_LEN;
