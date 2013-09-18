@@ -1006,6 +1006,64 @@ def collect_unused_slices():
 # inlined. This hurts performance, but makes the implementation much simpler.
 #
 
+
+def compile_string(string, slice, offset):
+    store(BC_PUSH_S, slice, offset)
+    offset += 1
+    store(string_to_slice(string), slice, offset)
+    offset += 1
+    return offset
+
+
+def compile_comment(string, slice, offset):
+    store(BC_PUSH_COMMENT, slice, offset)
+    offset += 1
+    store(string_to_slice(string), slice, offset)
+    offset += 1
+    return offset
+
+
+def compile_character(character, slice, offset):
+    store(BC_PUSH_C, slice, offset)
+    offset += 1
+    store(character, slice, offset)
+    offset += 1
+    return offset
+
+
+def compile_pointer(name, slice, offset):
+    store(BC_PUSH_F, slice, offset)
+    offset += 1
+    if is_number(name):
+        store(float(name), slice, offset)
+    else:
+        if lookup_pointer(name) != -1:
+            store(lookup_pointer(name), slice, offset)
+        else:
+            store(0, slice, offset)
+            report('Unable to map ' + name + ' to a pointer')
+    offset += 1
+    return offset
+
+
+def compile_number(number, slice, offset):
+    store(BC_PUSH_N, slice, offset)
+    offset += 1
+    if is_number(number):
+        store(float(number), slice, offset)
+    else:
+        store(0, slice, offset)
+        report("# prefix expects a NUMBER, received " + number)
+    offset += 1
+    return offset
+
+
+def compile_bytecode(bytecode, slice, offset):
+    store(float(bytecode), slice, offset)
+    offset += 1
+    return offset
+
+
 def compile(str, slice):
     nest = []
     cleaned = ' '.join(str.split())
@@ -1028,11 +1086,7 @@ def compile(str, slice):
                         i = j
                         j = count
                     j += 1
-            store(BC_PUSH_COMMENT, slice, offset)
-            offset += 1
-            s = s[1:-1]
-            store(string_to_slice(s), slice, offset)
-            offset += 1
+            offset = compile_comment(s[1:-1], slice, offset)
         elif (tokens[i].startswith('\'') or tokens[i] == '\''):
             if (tokens[i].endswith('\'') and tokens[i] != '\''):
                 s = tokens[i]
@@ -1046,40 +1100,15 @@ def compile(str, slice):
                         i = j
                         j = count
                     j += 1
-            store(BC_PUSH_S, slice, offset)
-            offset += 1
-            s = s[1:-1]
-            store(string_to_slice(s), slice, offset)
-            offset += 1
+            offset = compile_string(s[1:-1], slice, offset)
         elif tokens[i].startswith("$"):
-            store(BC_PUSH_C, slice, offset)
-            offset += 1
-            store(ord(tokens[i][1:]), slice, offset)
-            offset += 1
+            offset = compile_character(ord(tokens[i][1:]), slice, offset)
         elif tokens[i].startswith("&"):
-            store(BC_PUSH_F, slice, offset)
-            offset += 1
-            if is_number(tokens[i][1:]):
-                store(float(tokens[i][1:]), slice, offset)
-            else:
-                if lookup_pointer(tokens[i][1:]) != -1:
-                    store(lookup_pointer(tokens[i][1:]), slice, offset)
-                else:
-                    store(0, slice, offset)
-                    report('Unable to map ' + tokens[i] + ' to a pointer')
-            offset += 1
+            offset = compile_pointer(tokens[i][1:], slice, offset)
         elif tokens[i].startswith("#"):
-            store(BC_PUSH_N, slice, offset)
-            offset += 1
-            if is_number(tokens[i][1:]):
-                store(float(tokens[i][1:]), slice, offset)
-            else:
-                store(0, slice, offset)
-                report("# prefix expects a NUMBER, received " + tokens[i])
-            offset += 1
+            offset = compile_number(tokens[i][1:], slice, offset)
         elif tokens[i].startswith("`"):
-            store(float(tokens[i][1:]), slice, offset)
-            offset += 1
+            offset = compile_bytecode(tokens[i][1:], slice, offset)
         elif tokens[i] == "[":
             nest.append(slice)
             nest.append(offset)
