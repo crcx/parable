@@ -232,9 +232,7 @@ function compile($str, $slice)
             store($BC_PUSH_F, $slice, $offset);
             $offset += 1;
             if (is_numeric(substr($tokens[$i], 1)))
-            {
                 store(intval(substr($tokens[$i], 1)), $slice, $offset);
-            }
             else
             {
                 if (lookup_pointer(substr($tokens[$i], 1)) == -1)
@@ -243,9 +241,7 @@ function compile($str, $slice)
                     store(0, $slice, $offset);
                 }
                 else
-                {
                     store($dictionary_map[lookup_pointer(substr($tokens[$i], 1))], $slice, $offset);
-                }
             }
             $offset += 1;
         }
@@ -253,9 +249,7 @@ function compile($str, $slice)
         {
             $s = "";
             if (endsWith($tokens[$i], "'"))
-            {
                 $s = $tokens[$i];
-            }
             else
             {
                 $j = $i + 1;
@@ -283,9 +277,7 @@ function compile($str, $slice)
         {
             $s = "";
             if (endsWith($tokens[$i], "\""))
-            {
                 $s = $tokens[$i];
-            }
             else
             {
                 $j = $i + 1;
@@ -333,9 +325,7 @@ function compile($str, $slice)
         else
         {
             if (lookup_pointer($tokens[$i]) == -1)
-            {
                 report_error("ERROR: name '". $tokens[$i] ."' not found!");
-            }
             else
             {
                 store($BC_FLOW_CALL, $slice, $offset);
@@ -365,10 +355,8 @@ function lookup_pointer($name)
     global $dictionary_names, $dictionary_map;
     $s = -1;
     foreach ($dictionary_names as $key => $value)
-    {
         if ($value == $name)
             $s = $key;
-    }
     return $s;
 }
 
@@ -382,9 +370,7 @@ function add_definition($name, $s)
         array_push($dictionary_map, $s);
     }
     else
-    {
         copy_slice($s, $dictionary_map[lookup_pointer($name)]);
-    }
 }
 
 
@@ -906,9 +892,7 @@ function interpret($slice)
                 $offset = $SLICE_LEN;
         }
         elseif ($opcode == $BC_FLOW_RETURN)
-        {
             $offset = $SLICE_LEN;
-        }
         elseif ($opcode == $BC_MEM_COPY)
         {
             if (check_depth(2))
@@ -944,9 +928,7 @@ function interpret($slice)
                 $offset = $SLICE_LEN;
         }
         elseif ($opcode == $BC_MEM_REQUEST)
-        {
             stack_push(request_slice(), $TYPE_FUNCTION);
-        }
         elseif ($opcode == $BC_MEM_RELEASE)
         {
             if (check_depth(1))
@@ -1004,13 +986,9 @@ function interpret($slice)
                 $offset = $SLICE_LEN;
         }
         elseif ($opcode == $BC_STACK_DEPTH)
-        {
             stack_push(count($stack), $TYPE_NUMBER);
-        }
         elseif ($opcode == $BC_STACK_CLEAR)
-        {
             stack_clear();
-        }
         elseif ($opcode == $BC_QUOTE_NAME)
         {
             if (check_depth(2))
@@ -1145,9 +1123,8 @@ function interpret($slice)
             $offset = $SLICE_LEN;
         }
         else
-        {
             $offset = $SLICE_LEN;
-        }
+
         $offset += 1;
     }
 }
@@ -1187,7 +1164,7 @@ function slice_to_string($slice)
 
 function stack_clear()
 {
-    global $stack, $types;
+    global $stack;
     $i = count($stack);
     while ($i > 0)
     {
@@ -1260,9 +1237,7 @@ function stack_dup()
         stack_push($s, $at);
     }
     else
-    {
         stack_push($av, $at);
-    }
 }
 
 
@@ -1283,9 +1258,7 @@ function stack_over()
         stack_push($s, $bt);
     }
     else
-    {
         stack_push($bv, $bt);
-    }
 }
 
 function stack_tuck()
@@ -1320,13 +1293,9 @@ function stack_change_type($type)
             $a = stack_pop();
 
             if (is_numeric(slice_to_string($a)))
-            {
                 stack_push(floatval(slice_to_string($a)), $TYPE_NUMBER);
-            }
             else
-            {
                 stack_push(0, $TYPE_NUMBER);
-            }
         }
         else
         {
@@ -1399,9 +1368,7 @@ function stack_change_type($type)
         }
     }
     else
-    {
         return;
-    }
 }
 
 
@@ -1417,9 +1384,8 @@ function parse_bootstrap($lines)
         }
 
         foreach ($errors as $msg)
-        {
             echo "<tt>$msg</tt><br>";
-        }
+
         $errors = array();
     }
 }
