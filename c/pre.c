@@ -105,16 +105,23 @@ void dump_stack()
 int main(int argc, char **argv)
 {
     sp = 0;
+    int i = 1;
     prepare_dictionary();
     prepare_error_reporting();
     parse_bootstrap("bootstrap.p");
     if (argc > 1)
-        parse_bootstrap(argv[1]);
+    {
+        while (i <= argc)
+        {
+            parse_bootstrap(argv[i++]);
+            if (strlen(errors) > 0)
+                printf("Error Log:\n%s\n", errors);
+            clear_errors();
+        }
+    }
     else
         printf("parable\n(c) 2013, charles childers\n\nTry:\n  %s filename\n", argv[0]);
     dump_stack();
-    if (strlen(errors) > 0)
-        printf("Error Log:\n%s\n", errors);
     end_error_reporting();
     return 0;
 }
