@@ -180,23 +180,25 @@ function fetch($s, $o)
 }
 
 
-function compile_comment($string, $slice, $offset)
-{
-    global $BC_PUSH_COMMENT;
-    return $offset;
-}
-
-
-function compile_string($string, $slice, $offset)
-{
-    global $BC_PUSH_S;
-    return $offset;
-}
-
-
 function compile_pointer($name, $slice, $offset)
 {
     global $BC_PUSH_F;
+    global $dictionary_map;
+    store($BC_PUSH_F, $slice, $offset);
+    $offset += 1;
+    if (is_numeric($name))
+        store(intval($name), $slice, $offset);
+    else
+    {
+        if (lookup_pointer($name) == -1)
+        {
+            report_error("ERROR: unable to map '". $name ."' to a slice!");
+            store(0, $slice, $offset);
+        }
+        else
+            store($dictionary_map[lookup_pointer($name)], $slice, $offset);
+    }
+    $offset += 1;
     return $offset;
 }
 
@@ -231,18 +233,48 @@ function compile_bytecode($bytecode, $slice, $offset)
 }
 
 
-function compile_function_call($name, $slice, $offset)
+function compile_string($str, $slice, $offset)
+{
+    global $BC_PUSH_S;
+    store($BC_PUSH_S, $slice, $offset);
+    $offset += 1;
+    store($str, $slice, $offset);
+    $offset += 1;
+    return $offset;
+}
+
+
+function compile_comment($str, $slice, $offset)
+{
+    global $BC_PUSH_COMMENT;
+    store($BC_PUSH_COMMENT, $slice, $offset);
+    $offset += 1;
+    store($str, $slice, $offset);
+    $offset += 1;
+    return $offset;
+}
+
+
+function compile_function_call($str, $slice, $offset)
 {
     global $BC_FLOW_CALL;
+    global $dictionary_map;
+    if (lookup_pointer($str) == -1)
+        report_error("ERROR: name '". $str ."' not found!");
+    else
+    {
+        store($BC_FLOW_CALL, $slice, $offset);
+        $offset += 1;
+        store($dictionary_map[lookup_pointer($str)], $slice, $offset);
+        $offset += 1;
+    }
     return $offset;
 }
 
 
 function compile($str, $slice)
 {
-    global $dictionary_map;
-    global $BC_PUSH_N, $BC_PUSH_S, $BC_PUSH_C, $BC_PUSH_F, $BC_PUSH_COMMENT;
-    global $BC_FLOW_RETURN, $BC_FLOW_CALL;
+    global $BC_PUSH_F, $BC_FLOW_RETURN;
 
     $tokens = explode(' ', trim($str));
     $l = count($tokens);
@@ -253,35 +285,13 @@ function compile($str, $slice)
     while ($i < $l)
     {
         if (startsWith($tokens[$i], "#"))
-        {
             $offset = compile_number(substr($tokens[$i], 1), $slice, $offset);
-        }
         elseif (startsWith($tokens[$i], "$"))
-        {
             $offset = compile_character(ord(substr($tokens[$i], 1)), $slice, $offset);
-        }
         elseif (startsWith($tokens[$i], "`"))
-        {
             $offset = compile_bytecode(substr($tokens[$i], 1), $slice, $offset);
-        }
         elseif (startsWith($tokens[$i], "&"))
-        {
-            store($BC_PUSH_F, $slice, $offset);
-            $offset += 1;
-            if (is_numeric(substr($tokens[$i], 1)))
-                store(intval(substr($tokens[$i], 1)), $slice, $offset);
-            else
-            {
-                if (lookup_pointer(substr($tokens[$i], 1)) == -1)
-                {
-                    report_error("ERROR: unable to map '". substr($tokens[$i], 1) ."' to a slice!");
-                    store(0, $slice, $offset);
-                }
-                else
-                    store($dictionary_map[lookup_pointer(substr($tokens[$i], 1))], $slice, $offset);
-            }
-            $offset += 1;
-        }
+            $offset = compile_pointer(substr($tokens[$i], 1), $slice, $offset);
         elseif (startsWith($tokens[$i], "'"))
         {
             $s = "";
@@ -304,11 +314,7 @@ function compile($str, $slice)
                 }
             }
             $s = substr($s, 1, strlen($s) - 2);
-            $z = string_to_slice($s);
-            store($BC_PUSH_S, $slice, $offset);
-            $offset += 1;
-            store($z, $slice, $offset);
-            $offset += 1;
+            $offset = compile_string(string_to_slice($s), $slice, $offset);
         }
         elseif (startsWith($tokens[$i], "\""))
         {
@@ -332,11 +338,7 @@ function compile($str, $slice)
                 }
             }
             $s = substr($s, 1, strlen($s) - 2);
-            $z = string_to_slice($s);
-            store($BC_PUSH_COMMENT, $slice, $offset);
-            $offset += 1;
-            store($z, $slice, $offset);
-            $offset += 1;
+            $offset = compile_comment(string_to_slice($s), $slice, $offset);
         }
         elseif ($tokens[$i] == "[")
         {
@@ -356,20 +358,10 @@ function compile($str, $slice)
             store($old, $slice, $offset);
             $offset += 1;
         }
-        elseif ($tokens[$i] == "")
-        {
-        }
         else
         {
-            if (lookup_pointer($tokens[$i]) == -1)
-                report_error("ERROR: name '". $tokens[$i] ."' not found!");
-            else
-            {
-                store($BC_FLOW_CALL, $slice, $offset);
-                $offset += 1;
-                store($dictionary_map[lookup_pointer($tokens[$i])], $slice, $offset);
-                $offset += 1;
-            }
+            if ($tokens[$i] != "")
+                $offset = compile_function_call($tokens[$i], $slice, $offset);
         }
         $i += 1;
     }
