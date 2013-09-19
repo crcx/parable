@@ -1407,11 +1407,6 @@ function parse_bootstrap($lines)
             $s = compile($src, request_slice());
             interpret($s);
         }
-
-        foreach ($errors as $msg)
-            echo "<tt>$msg</tt><br>";
-
-        $errors = array();
     }
 }
 
