@@ -150,5 +150,10 @@
 [ &*array:filter* ! over array-length [ over array-pop &*array:filter* @ invoke ] repeat nip ] 'array-reduce' define
 [ request [ copy ] sip &*array:source* ! [ #0 &*array:source* @ array-length [ &*array:source* @ over array-fetch swap #1 + ] repeat drop ] array-from-quote ] 'array-reverse' define
 
+"routines for rendering an array into a string"
+[ "array  --  string"  'numeric-array: ' [ :s '#' swap + + #32 :c :s + ] array-reduce ] 'numeric-array-to-string' define
+[ "array  --  string"  'character-array: ' [ :c :s '$' swap + + #32 :c :s + ] array-reduce ] 'character-array-to-string' define
+[ "array  --  string"  'string-array: ' [ :p :s  $' :s swap + $' :s + + #32 :c :s + ] array-reduce ] 'string-array-to-string' define
+
 "more stuff"
 [ [ [ new-slice length [ #1 - ] sip [ dup-pair fetch slice-store #1 - ] repeat drop-pair #0 slice-store &*slice-current* @ :p :s ] preserve-slice ] if-string ] 'reverse' define
