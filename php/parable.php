@@ -1399,7 +1399,6 @@ function stack_change_type($type)
 
 function parse_bootstrap($lines)
 {
-    global $errors;
     foreach ($lines as $src)
     {
         if (strlen(trim($src)) > 0)

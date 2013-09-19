@@ -1006,6 +1006,10 @@ def collect_unused_slices():
 # inlined. This hurts performance, but makes the implementation much simpler.
 #
 
+# The compile_ functions take a parameter, a slice, and the current offset
+# in that slice. They lay down the appropriate byte codes for the type of
+# item they are compiling. When done, they return the new offset.
+
 
 def compile_string(string, slice, offset):
     store(BC_PUSH_S, slice, offset)
