@@ -223,6 +223,14 @@ function compile_character($character, $slice, $offset)
 }
 
 
+function compile_bytecode($bytecode, $slice, $offset)
+{
+    store(floatval($bytecode), $slice, $offset);
+    $offset += 1;
+    return $offset;
+}
+
+
 function compile_function_call($name, $slice, $offset)
 {
     global $BC_FLOW_CALL;
@@ -254,8 +262,7 @@ function compile($str, $slice)
         }
         elseif (startsWith($tokens[$i], "`"))
         {
-            store(floatval(substr($tokens[$i], 1)), $slice, $offset);
-            $offset += 1;
+            $offset = compile_bytecode(substr($tokens[$i], 1), $slice, $offset);
         }
         elseif (startsWith($tokens[$i], "&"))
         {
