@@ -105,6 +105,10 @@
 [ [ $0 $9 between? ] if-character ] 'digit?' define
 [ to-lowercase :s 'abcdefghijklmnopqrstuvwxyz1234567890' swap find [ false ] [ true ] if ] 'alphanumeric?' define
 [ to-lowercase :s 'aeiou' swap find [ false ] [ true ] if ] 'vowel?' define
+[ :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ length ] dip swap substring ] 'trim-left' define
+[ ] 'trim-right' define
+[ :s length dup-pair #1 - fetch nip #32 = [ length #1 - #0 swap substring trim-right ] if-true ] 'trim-right' define
+[ trim-left trim-right ] 'trim' define
 
 "Helpful Math"
 [ dup negative? [ #-1 * ] if-true ] 'abs' define
