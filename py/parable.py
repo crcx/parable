@@ -910,7 +910,7 @@ def slice_to_string(slice):
     i = 0
     while i < SLICE_LEN:
         if fetch(slice, i) != 0:
-            s.append(chr(fetch(slice, i)))
+            s.append(chr(int(fetch(slice, i))))
         else:
             i = SLICE_LEN
         i += 1
