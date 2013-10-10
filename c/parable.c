@@ -152,7 +152,8 @@ void stack_swap()
 
 void stack_dup()
 {
-    char *p;
+    char s[STRING_LEN];
+    char *p = s;
     double v = tos_type();
     if (v == TYPE_STRING)
     {
@@ -168,7 +169,8 @@ void stack_dup()
 
 void stack_over()
 {
-    char *p;
+    char s[STRING_LEN];
+    char *p = s;
     double v = types[sp - 2];
     if (v == TYPE_STRING)
     {
@@ -184,7 +186,8 @@ void stack_over()
 
 void stack_tuck()
 {
-    char *p;
+    char s[STRING_LEN];
+    char *p = s;
     double v = tos_type();
     if (v == TYPE_STRING)
     {

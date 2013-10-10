@@ -80,9 +80,9 @@ void dump_stack()
         if (types[x] == TYPE_CHARACTER)
             printf("$%c\n", (char)data[x]);
         if (types[x] == TYPE_NUMBER)
-            printf("#%f\n", data[x]);
+            printf("#%G\n", data[x]);
         if (types[x] == TYPE_FUNCTION)
-            printf("&%f\n", data[x]);
+            printf("&%G\n", data[x]);
         if (types[x] == TYPE_FLAG)
         {
             if (data[x] == -1)
