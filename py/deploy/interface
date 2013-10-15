@@ -1,4 +1,4 @@
-import sys
+import sys, os
 
 def display_stack():
     global stack, types
@@ -59,6 +59,14 @@ if __name__ == '__main__':
     parse_bootstrap(bootstrap)
     collect_unused_slices()
 
-    load_file(sys.argv[1])
+    if len(sys.argv) < 2:
+        sys.exit('Usage: %s filename(s)' % sys.argv[0])
+
+    for source in sys.argv:
+        if not os.path.exists(source):
+            sys.exit('ERROR: source file "%s" was not found!' % source)
+        if source != sys.argv[0]:
+            load_file(source)
+
     display()
     sys.stdout.flush()
