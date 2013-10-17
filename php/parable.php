@@ -566,7 +566,7 @@ function interpret($slice)
             if (check_depth(2))
             {
                 $a = stack_pop();
-                $a = float($a);
+                $a = floatval($a);
                 stack_push(floor($a), $TYPE_NUMBER);
             }
             else
