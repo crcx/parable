@@ -45,16 +45,26 @@ int slice_map[MAX_SLICES];
 int request_slice()
 {
     int offset = 0;
-    while (offset < 10000)
+    int slice = -1;
+    int i = 0;
+    while (offset < 10000 && slice == -1)
     {
         if (slice_map[offset] == 0)
         {
             slice_map[offset] = 1;
-            return offset;
+            slice = offset;
         }
         offset++;
     }
-    return -1;
+    if (slice != -1)
+    {
+        while (i < SLICE_LEN)
+        {
+            store(0, slice, i);
+            i++;
+        }
+    }
+    return slice;
 }
 
 
