@@ -1,17 +1,6 @@
-#!/usr/bin/env python
+import sys, os
 
-# Copyright (c) 2013, Charles Childers
-#
-# pre is the "parable runtime", a quick tool for running a parable
-# program and displaying the results.
-# ===================================================================
-
-# Dependencies
-import sys
-from parable import *
-
-
-def display_stack():
+def display_stack(verbose):
     global stack, types
     i = 0
     while i < len(stack):
@@ -26,12 +15,13 @@ def display_stack():
             sys.stdout.write("\t$" + str(chr(stack[i])))
         elif types[i] == TYPE_STRING:
             sys.stdout.write("\t'" + slice_to_string(stack[i]) + "'")
-            sys.stdout.write("\n\t\tstored at: " + str(stack[i]))
+            if verbose == True:
+                sys.stdout.write("\n\t\tstored at: " + str(stack[i]))
         elif types[i] == TYPE_FUNCTION:
             sys.stdout.write("\t&" + str(stack[i]))
-            if pointer_to_name(stack[i]) != "":
-                sys.stdout.write("\n\t\tpointer to: ")
-                sys.stdout.write(pointer_to_name(stack[i]))
+            if verbose == True:
+                if pointer_to_name(stack[i]) != "":
+                    sys.stdout.write("\n\t\tpointer to: " + pointer_to_name(stack[i]))
         elif types[i] == TYPE_FLAG:
             if stack[i] == -1:
                 sys.stdout.write("\ttrue")
@@ -51,7 +41,7 @@ def display_errors():
 
 
 def display():
-    display_stack()
+    display_stack(False)
     display_errors()
     clear_errors()
 
@@ -68,7 +58,7 @@ def load_file(file):
 if __name__ == '__main__':
     prepare_slices()
     prepare_dictionary()
-    parse_bootstrap(open('bootstrap.p').readlines())
+    parse_bootstrap(bootstrap)
     collect_unused_slices()
 
     if len(sys.argv) < 2:
