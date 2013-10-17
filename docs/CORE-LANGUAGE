@@ -205,19 +205,54 @@ longer in use.
 
 ### dup
 
+Duplicate the top value on the stack. If the top value is a string, this
+will create a copy of the string.
+
+        value  --  value value
+
 ### drop
+
+Remove the top value from the stack.
+
+        value  --
 
 ### swap
 
+Exchange the positions of the top two values on the stack.
+
+        value:0 value:1  --  value:1 value:0
+
 ### over
+
+Place a copy of the second item on the stack on the top of the stack. If
+the second value is a string, creates a copy of the string.
+
+        value:0 value:1  --  value:0 value:1 value:0
 
 ### tuck
 
+Place a copy of the top item on the stack under the second item on the stack.
+If the top value is a string, creates a copy of the string.
+
+        value:0 value:1  --  value:1 value:0 value:1
+
 ### nip
+
+Remove the second item on the stack.
+
+        value:0 value:1  --  value:1
 
 ### depth
 
+Return a number representing the number of items on the stack.
+
+        ...  --  ... number
+
 ### reset
+
+Remove all items from the stack.
+
+        ...  --
 
 ### find
 
@@ -227,35 +262,88 @@ longer in use.
 
 ### to-lowercase
 
+        character  --  character
+        string  --  string
+
 ### to-uppercase
+
+        character  --  character
+        string  --  string
 
 ### length
 
+
 ### report-error
+
+Push the string on the top of the stack to the error queue.
+
+        string  --
 
 ### NUMBER
 
+Return a constant representing numeric values.
+
+        --  number
+
 ### STRING
+
+Return a constant representing string values.
+
+        --  number
 
 ### CHARACTER
 
+Return a constant representing character values.
+
+        --  number
+
 ### POINTER
+
+Return a constant representing pointer values.
+
+        --  number
 
 ### FLAG
 
+Return a constant representing flag values.
+
+        --  number
+
 ### dup-pair
+
+Duplicate the top two items on the stack. If the values are strings, this
+creates a copy of the strings.
+
+        value:0 value:1  --  value:0 value:1 value:0 value:1
 
 ### drop-pair
 
+Drop the top two items from the stack.
+
+        value:0 value:1  --
+
 ### true
 
+Return a true flag.
+
+        --  flag
+
 ### false
+
+Return a false stack.
+
+        --  flag
 
 ### if-true
 
 ### if-false
 
-### between
+### between?
+
+Return **true** if value:0 is between value:start and value:end (inclusive),
+or **false** otherwise.
+
+        value:0 value:start value:end  --  flag
 
 ### true?
 
@@ -287,13 +375,25 @@ longer in use.
 
 ### @
 
+Fetch a value from the first offset in a slice.
+
+        pointer  --  value
+
 ### !
+
+Store a value into the first offset of a slice.
+
+        value pointer  --
 
 ### increment
 
 ### decrement
 
 ### variable
+
+Allocate a new slice and attach the specified name to it.
+
+        string  --
 
 ### preserve
 
