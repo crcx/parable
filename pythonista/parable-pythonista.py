@@ -68,6 +68,7 @@ bootstrap.append(""" [ [ ] if ] 'if-true' define """)
 bootstrap.append(""" [ [ ] swap if ] 'if-false' define """)
 bootstrap.append(""" [ dup-pair > [ swap ] if-true [ over ] dip <= [ >= ] dip and :f ] 'between?' define """)
 bootstrap.append(""" [ #0 <> ] 'true?' define """)
+bootstrap.append(""" [ #0 = ] 'false?' define """)
 bootstrap.append(""" [ #2 rem #0 = ] 'even?' define """)
 bootstrap.append(""" [ #2 rem #0 <> ] 'odd?' define """)
 bootstrap.append(""" [ #0 < ] 'negative?' define """)
@@ -98,6 +99,10 @@ bootstrap.append(""" [ [ [ uppercase? ] [ lowercase? ] bi or :f ] if-character ]
 bootstrap.append(""" [ [ $0 $9 between? ] if-character ] 'digit?' define """)
 bootstrap.append(""" [ to-lowercase :s 'abcdefghijklmnopqrstuvwxyz1234567890' swap find [ false ] [ true ] if ] 'alphanumeric?' define """)
 bootstrap.append(""" [ to-lowercase :s 'aeiou' swap find [ false ] [ true ] if ] 'vowel?' define """)
+bootstrap.append(""" [ :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ length ] dip swap substring ] 'trim-left' define """)
+bootstrap.append(""" [ ] 'trim-right' define """)
+bootstrap.append(""" [ :s length dup-pair #1 - fetch nip #32 = [ length #1 - #0 swap substring trim-right ] if-true ] 'trim-right' define """)
+bootstrap.append(""" [ trim-left trim-right ] 'trim' define """)
 bootstrap.append(""" "Helpful Math" """)
 bootstrap.append(""" [ dup negative? [ #-1 * ] if-true ] 'abs' define """)
 bootstrap.append(""" [ dup-pair < [ drop ] [ nip ] if ] 'min' define """)
@@ -138,6 +143,10 @@ bootstrap.append(""" [ #0 &*array:results* ! &*array:filter* ! [ &*array:source*
 bootstrap.append(""" [ dup-pair [ array-length ] bi@ = [ dup array-length true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define """)
 bootstrap.append(""" [ &*array:filter* ! over array-length [ over array-pop &*array:filter* @ invoke ] repeat nip ] 'array-reduce' define """)
 bootstrap.append(""" [ request [ copy ] sip &*array:source* ! [ #0 &*array:source* @ array-length [ &*array:source* @ over array-fetch swap #1 + ] repeat drop ] array-from-quote ] 'array-reverse' define """)
+bootstrap.append(""" "routines for rendering an array into a string" """)
+bootstrap.append(""" [ "array  --  string"  'numeric-array: ' [ :s '#' swap + + #32 :c :s + ] array-reduce ] 'numeric-array-to-string' define """)
+bootstrap.append(""" [ "array  --  string"  'character-array: ' [ :c :s '$' swap + + #32 :c :s + ] array-reduce ] 'character-array-to-string' define """)
+bootstrap.append(""" [ "array  --  string"  'string-array: ' [ :p :s  $' :s swap + $' :s + + #32 :c :s + ] array-reduce ] 'string-array-to-string' define """)
 bootstrap.append(""" "more stuff" """)
 bootstrap.append(""" [ [ [ new-slice length [ #1 - ] sip [ dup-pair fetch slice-store #1 - ] repeat drop-pair #0 slice-store &*slice-current* @ :p :s ] preserve-slice ] if-string ] 'reverse' define """)
 # parable
@@ -164,7 +173,7 @@ SLICE_LEN = 1000
 
 TYPE_NUMBER = 100
 TYPE_STRING = 200
-TYPE_CHARACTER= 300
+TYPE_CHARACTER = 300
 TYPE_FUNCTION = 400
 TYPE_FLAG = 500
 
@@ -229,11 +238,11 @@ BC_STACK_CLEAR = 507
 BC_QUOTE_NAME = 600
 BC_STRING_SEEK = 700
 BC_STRING_SUBSTR = 701
-BC_STRING_NUMERIC= 702
+BC_STRING_NUMERIC = 702
 BC_TO_LOWER = 800
 BC_TO_UPPER = 801
 BC_LENGTH = 802
-BC_REPORT_ERROR = 900
+BC_report = 900
 
 
 #
@@ -258,6 +267,7 @@ def is_number(s):
 
 errors = []
 
+
 def clear_errors():
     """remove all errors from the error log"""
     global errors
@@ -267,18 +277,18 @@ def clear_errors():
         i += 1
 
 
-def report_error(text):
+def report(text):
     """report an error"""
     global errors
     errors.append(text)
 
 
 def check_depth(cells):
-    """returns True if the stac has at least cells number of items, or"""
+    """returns True if the stack has at least *cells* number of items, or"""
     """False otherwise. If False, reports an underflow error."""
     global stack
     if len(stack) < cells:
-        report_error('Stack underflow: ' + str(cells) + ' values required')
+        report('Stack underflow: ' + str(cells) + ' values required')
         return False
     else:
         return True
@@ -352,7 +362,7 @@ def interpret(slice):
                     stack_push(string_to_slice(b + a), TYPE_STRING)
                 else:
                     offset = SLICE_LEN
-                    report_error('BC_ADD only works with NUMBER and STRING types')
+                    report('BC_ADD only works with NUMBER and STRING')
             else:
                 offset = SLICE_LEN
         elif opcode == BC_SUBTRACT:
@@ -432,7 +442,7 @@ def interpret(slice):
                         stack_push(0, TYPE_FLAG)
                 else:
                     offset = SLICE_LEN
-                    report_error('BC_COMPARE_LT only recognizes NUMBER types')
+                    report('BC_COMPARE_LT only recognizes NUMBER types')
             else:
                 offset = SLICE_LEN
         elif opcode == BC_COMPARE_GT:
@@ -448,7 +458,7 @@ def interpret(slice):
                         stack_push(0, TYPE_FLAG)
                 else:
                     offset = SLICE_LEN
-                    report_error('BC_COMPARE_LT only recognizes NUMBER types')
+                    report('BC_COMPARE_LT only recognizes NUMBER types')
             else:
                 offset = SLICE_LEN
         elif opcode == BC_COMPARE_LTEQ:
@@ -464,7 +474,7 @@ def interpret(slice):
                         stack_push(0, TYPE_FLAG)
                 else:
                     offset = SLICE_LEN
-                    report_error('BC_COMPARE_LTEQ only recognizes NUMBER types')
+                    report('BC_COMPARE_LTEQ only recognizes NUMBER')
             else:
                 offset = SLICE_LEN
         elif opcode == BC_COMPARE_GTEQ:
@@ -480,7 +490,7 @@ def interpret(slice):
                         stack_push(0, TYPE_FLAG)
                 else:
                     offset = SLICE_LEN
-                    report_error('BC_COMPARE_GTEQ only recognizes NUMBER types')
+                    report('BC_COMPARE_GTEQ only recognizes NUMBER')
             else:
                 offset = SLICE_LEN
         elif opcode == BC_COMPARE_EQ:
@@ -501,7 +511,7 @@ def interpret(slice):
                         stack_push(0, TYPE_FLAG)
                 else:
                     offset = SLICE_LEN
-                    report_error('BC_COMPARE_EQ requires matched types')
+                    report('BC_COMPARE_EQ requires matched types')
             else:
                 offset = SLICE_LEN
         elif opcode == BC_COMPARE_NEQ:
@@ -522,7 +532,7 @@ def interpret(slice):
                         stack_push(0, TYPE_FLAG)
                 else:
                     offset = SLICE_LEN
-                    report_error('BC_COMPARE_NEQ requires matched types')
+                    report('BC_COMPARE_NEQ requires matched types')
             else:
                 offset = SLICE_LEN
         elif opcode == BC_FLOW_IF:
@@ -540,7 +550,7 @@ def interpret(slice):
             if check_depth(1):
                 quote = stack_pop()
                 a = -1
-                while a== -1:
+                while a == -1:
                     interpret(quote)
                     a = stack_pop()
             else:
@@ -593,14 +603,14 @@ def interpret(slice):
                 offset = SLICE_LEN
         elif opcode == BC_FLOW_BI:
             if check_depth(3):
-               a = stack_pop()
-               b = stack_pop()
-               stack_dup()
-               x = stack_type()
-               y = stack_pop()
-               interpret(b)
-               stack_push(y, x)
-               interpret(a)
+                a = stack_pop()
+                b = stack_pop()
+                stack_dup()
+                x = stack_type()
+                y = stack_pop()
+                interpret(b)
+                stack_push(y, x)
+                interpret(a)
             else:
                 offset = SLICE_LEN
         elif opcode == BC_FLOW_TRI:
@@ -733,7 +743,7 @@ def interpret(slice):
                     b = a.upper()
                     stack_push(ord(b[0]), TYPE_CHARACTER)
                 else:
-                    report_error('ERROR: BC_TO_UPPER requires TYPE_STRING or TYPE_CHARACTER')
+                    report('ERROR: BC_TO_UPPER requires STRING or CHARACTER')
             else:
                 offset = SLICE_LEN
         elif opcode == BC_TO_LOWER:
@@ -748,7 +758,7 @@ def interpret(slice):
                     b = a.lower()
                     stack_push(ord(b[0]), TYPE_CHARACTER)
                 else:
-                    report_error('ERROR: BC_TO_LOWER requires TYPE_STRING or TYPE_CHARACTER')
+                    report('ERROR: BC_TO_LOWER requires STRING or CHARACTER')
             else:
                 offset = SLICE_LEN
         elif opcode == BC_LENGTH:
@@ -761,11 +771,11 @@ def interpret(slice):
                     stack_push(0, TYPE_NUMBER)
             else:
                 offset = SLICE_LEN
-        elif opcode == BC_REPORT_ERROR:
+        elif opcode == BC_report:
             if check_depth(1):
                 if stack_type() == TYPE_STRING:
                     a = slice_to_string(stack_tos())
-                    report_error(a)
+                    report(a)
             offset = SLICE_LEN
         offset += 1
 
@@ -940,6 +950,7 @@ def stack_change_type(type):
 dictionary_names = []
 dictionary_slices = []
 
+
 def in_dictionary(s):
     global dictionary_names, dictionary_slices
     return s in dictionary_names
@@ -949,20 +960,20 @@ def lookup_pointer(name):
     global dictionary_names, dictionary_slices
     name = name.lower()
     if in_dictionary(name) == False:
-      return -1
+        return -1
     else:
-      return dictionary_slices[dictionary_names.index(name)]
+        return dictionary_slices[dictionary_names.index(name)]
 
 
 def add_definition(name, slice):
     global dictionary_names, dictionary_slices
     name = name.lower()
     if in_dictionary(name) == False:
-      dictionary_names.append(name)
-      dictionary_slices.append(slice)
+        dictionary_names.append(name)
+        dictionary_slices.append(slice)
     else:
-      target = dictionary_slices[dictionary_names.index(name)]
-      copy_slice(slice, target)
+        target = dictionary_slices[dictionary_names.index(name)]
+        copy_slice(slice, target)
     return dictionary_names.index(name)
 
 
@@ -1050,7 +1061,7 @@ def slice_to_string(slice):
     i = 0
     while i < SLICE_LEN:
         if fetch(slice, i) != 0:
-            s.append(chr(fetch(slice, i)))
+            s.append(chr(int(fetch(slice, i))))
         else:
             i = SLICE_LEN
         i += 1
@@ -1143,10 +1154,98 @@ def collect_unused_slices():
 # than being compiled.
 #
 # bytecodes get wrapped into named functions. At this point they are not
-# inlined. (This hurts performance, but makes decompilation much simpler).
-# a recompiler could be added to decompile/recompile an optimized definition
-# before running.
+# inlined. This hurts performance, but makes the implementation much simpler.
 #
+
+# The compile_ functions take a parameter, a slice, and the current offset
+# in that slice. They lay down the appropriate byte codes for the type of
+# item they are compiling. When done, they return the new offset.
+
+
+def compile_string(string, slice, offset):
+    store(BC_PUSH_S, slice, offset)
+    offset += 1
+    store(string_to_slice(string), slice, offset)
+    offset += 1
+    return offset
+
+
+def compile_comment(string, slice, offset):
+    store(BC_PUSH_COMMENT, slice, offset)
+    offset += 1
+    store(string_to_slice(string), slice, offset)
+    offset += 1
+    return offset
+
+
+def compile_character(character, slice, offset):
+    store(BC_PUSH_C, slice, offset)
+    offset += 1
+    store(character, slice, offset)
+    offset += 1
+    return offset
+
+
+def compile_pointer(name, slice, offset):
+    store(BC_PUSH_F, slice, offset)
+    offset += 1
+    if is_number(name):
+        store(float(name), slice, offset)
+    else:
+        if lookup_pointer(name) != -1:
+            store(lookup_pointer(name), slice, offset)
+        else:
+            store(0, slice, offset)
+            report('Unable to map ' + name + ' to a pointer')
+    offset += 1
+    return offset
+
+
+def compile_number(number, slice, offset):
+    store(BC_PUSH_N, slice, offset)
+    offset += 1
+    if is_number(number):
+        store(float(number), slice, offset)
+    else:
+        store(0, slice, offset)
+        report("# prefix expects a NUMBER, received " + number)
+    offset += 1
+    return offset
+
+
+def compile_bytecode(bytecode, slice, offset):
+    store(float(bytecode), slice, offset)
+    offset += 1
+    return offset
+
+
+def compile_function_call(name, slice, offset):
+    if lookup_pointer(name) != -1:
+        store(BC_FLOW_CALL, slice, offset)
+        offset += 1
+        store(lookup_pointer(name), slice, offset)
+        offset += 1
+    else:
+        report('Unable to find ' + name + ' in dictionary')
+    return offset
+
+
+def parse_string(tokens, i, count, delimiter):
+    s = ""
+    if (tokens[i].endswith(delimiter) and tokens[i] != delimiter):
+        s = tokens[i]
+    else:
+        j = i + 1
+        s = tokens[i]
+        while j < count:
+            s += " "
+            s += tokens[j]
+            if (tokens[j].endswith(delimiter)):
+                i = j
+                j = count
+            j += 1
+    return i, s
+
 
 def compile(str, slice):
     nest = []
@@ -1158,66 +1257,19 @@ def compile(str, slice):
     while i < count:
         s = ""
         if (tokens[i].startswith('"') or tokens[i] == '"'):
-            if (tokens[i].endswith('"') and tokens[i] != '"'):
-                s = tokens[i]
-            else:
-                j = i + 1
-                s = tokens[i]
-                while j < count:
-                    s += " "
-                    s += tokens[j]
-                    if (tokens[j].endswith('"')):
-                        i = j
-                        j = count
-                    j += 1
-            store(BC_PUSH_COMMENT, slice, offset)
-            offset += 1
-            s = s[1:-1]
-            store(string_to_slice(s), slice, offset)
-            offset += 1
+            i, s = parse_string(tokens, i, count, '"')
+            offset = compile_comment(s[1:-1], slice, offset)
         elif (tokens[i].startswith('\'') or tokens[i] == '\''):
-            if (tokens[i].endswith('\'') and tokens[i] != '\''):
-                s = tokens[i]
-            else:
-                j = i + 1
-                s = tokens[i]
-                while j < count:
-                    s += " "
-                    s += tokens[j]
-                    if (tokens[j].endswith('\'')):
-                        i = j
-                        j = count
-                    j += 1
-            store(BC_PUSH_S, slice, offset)
-            offset += 1
-            s = s[1:-1]
-            store(string_to_slice(s), slice, offset)
-            offset += 1
+            i, s = parse_string(tokens, i, count, '\'')
+            offset = compile_string(s[1:-1], slice, offset)
         elif tokens[i].startswith("$"):
-            store(BC_PUSH_C, slice, offset)
-            offset += 1
-            store(ord(tokens[i][1:]), slice, offset)
-            offset += 1
+            offset = compile_character(ord(tokens[i][1:]), slice, offset)
         elif tokens[i].startswith("&"):
-            store(BC_PUSH_F, slice, offset)
-            offset += 1
-            if is_number(tokens[i][1:]):
-                store(float(tokens[i][1:]), slice, offset)
-            else:
-                store(lookup_pointer(tokens[i][1:]), slice, offset)
-            offset += 1
+            offset = compile_pointer(tokens[i][1:], slice, offset)
         elif tokens[i].startswith("#"):
-            store(BC_PUSH_N, slice, offset)
-            offset += 1
-            if is_number(tokens[i][1:]):
-                store(float(tokens[i][1:]), slice, offset)
-            else:
-                store(0, slice, offset)
-                report_error("# prefix expects a valid NUMBER, received " + tokens[i])
-            offset += 1
+            offset = compile_number(tokens[i][1:], slice, offset)
         elif tokens[i].startswith("`"):
-            store(float(tokens[i][1:]), slice, offset)
-            offset += 1
+            offset = compile_bytecode(tokens[i][1:], slice, offset)
         elif tokens[i] == "[":
             nest.append(slice)
             nest.append(offset)
@@ -1233,13 +1285,7 @@ def compile(str, slice):
             store(old, slice, offset)
             offset += 1
         else:
-            if lookup_pointer(tokens[i]) != -1:
-                store(BC_FLOW_CALL, slice, offset)
-                offset += 1
-                store(lookup_pointer(tokens[i]), slice, offset)
-                offset += 1
-            else:
-                report_error('Unable to find ' + tokens[i] + ' in dictionary')
+            offset = compile_function_call(tokens[i], slice, offset)
         i += 1
         store(BC_FLOW_RETURN, slice, offset)
     return slice
@@ -1268,13 +1314,6 @@ def prepare_dictionary():
     add_definition('define', s)
 
 
-#
-# a decompiler
-# since the compiler only uses a small subset of the byte codes, it is
-# pretty easy to generate a (mostly) accurate representation of the
-# original source.
-#
-
 def pointer_to_name(ptr):
     """given a parable pointer, return the corresponding name, or"""
     """an empty string"""
@@ -1283,68 +1322,6 @@ def pointer_to_name(ptr):
     if ptr in dictionary_slices:
         s = dictionary_names[dictionary_slices.index(ptr)]
     return s
-
-
-def deconstruct(slice):
-    """return a string containing the source code for a given slice"""
-    global SLICE_LEN
-    i = 0
-    s = '[ '
-    while i < SLICE_LEN:
-        o = fetch(slice, i)
-        if o == BC_PUSH_N:
-            i += 1
-            o = fetch(slice, i)
-            s += '#' + str(o)
-        elif o == BC_PUSH_C:
-            i += 1
-            o = fetch(slice, i)
-            s += '$' + str(chr(o))
-        elif o == BC_PUSH_S:
-            i += 1
-            o = fetch(slice, i)
-            s += "'" + slice_to_string(o) + "'"
-        elif o == BC_PUSH_COMMENT:
-            i += 1
-            o = fetch(slice, i)
-            s += '"' + slice_to_string(o) + '"'
-        elif o == BC_PUSH_F:
-            i += 1
-            o = fetch(slice, i)
-            x = pointer_to_name(o)
-            if len(x) == 0:
-                s += deconstruct(o)
-            else:
-                s += '&' + x
-        elif o == BC_FLOW_CALL:
-            i += 1
-            o = fetch(slice, i)
-            x = pointer_to_name(o)
-            if len(x) == 0:
-                s += '&' + str(o) + ' invoke'
-            else:
-                s += x
-        elif o == BC_FLOW_RETURN:
-            i = SLICE_LEN
-        else:
-            s += '`' + str(o)
-        s += ' '
-        i += 1
-    s += ']'
-    return s
-
-
-def generate_source():
-    """return a string containing full source code for all named slices and"""
-    """their dependencies"""
-    global dictionary_names, dictionary_slices
-    src = ""
-    for s in dictionary_slices:
-        src += deconstruct(s)
-        src += " '" + pointer_to_name(s)
-        src += "' define\n"
-    return src + "\n"
-
 # This implements a pretty minimal user interface for parable. It
 # allows code (or a couple of commands) to be typed in, compiled,
 # and run.
