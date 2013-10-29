@@ -70,6 +70,7 @@
 [ [ ] swap if ] 'if-false' define
 [ dup-pair > [ swap ] if-true [ over ] dip <= [ >= ] dip and :f ] 'between?' define
 [ #0 <> ] 'true?' define
+[ #0 = ] 'false?' define
 [ #2 rem #0 = ] 'even?' define
 [ #2 rem #0 <> ] 'odd?' define
 [ #0 < ] 'negative?' define
@@ -104,6 +105,10 @@
 [ [ $0 $9 between? ] if-character ] 'digit?' define
 [ to-lowercase :s 'abcdefghijklmnopqrstuvwxyz1234567890' swap find [ false ] [ true ] if ] 'alphanumeric?' define
 [ to-lowercase :s 'aeiou' swap find [ false ] [ true ] if ] 'vowel?' define
+[ :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ length ] dip swap substring ] 'trim-left' define
+[ ] 'trim-right' define
+[ :s length dup-pair #1 - fetch nip #32 = [ length #1 - #0 swap substring trim-right ] if-true ] 'trim-right' define
+[ trim-left trim-right ] 'trim' define
 
 "Helpful Math"
 [ dup negative? [ #-1 * ] if-true ] 'abs' define
@@ -148,6 +153,11 @@
 [ dup-pair [ array-length ] bi@ = [ dup array-length true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define
 [ &*array:filter* ! over array-length [ over array-pop &*array:filter* @ invoke ] repeat nip ] 'array-reduce' define
 [ request [ copy ] sip &*array:source* ! [ #0 &*array:source* @ array-length [ &*array:source* @ over array-fetch swap #1 + ] repeat drop ] array-from-quote ] 'array-reverse' define
+
+"routines for rendering an array into a string"
+[ "array  --  string"  'numeric-array: ' [ :s '#' swap + + #32 :c :s + ] array-reduce ] 'numeric-array-to-string' define
+[ "array  --  string"  'character-array: ' [ :c :s '$' swap + + #32 :c :s + ] array-reduce ] 'character-array-to-string' define
+[ "array  --  string"  'string-array: ' [ :p :s  $' :s swap + $' :s + + #32 :c :s + ] array-reduce ] 'string-array-to-string' define
 
 "more stuff"
 [ [ [ new-slice length [ #1 - ] sip [ dup-pair fetch slice-store #1 - ] repeat drop-pair #0 slice-store &*slice-current* @ :p :s ] preserve-slice ] if-string ] 'reverse' define

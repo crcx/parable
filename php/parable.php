@@ -1,40 +1,6 @@
 <?
 /* parable
  * Copyright (c) 2013, Charles Childers
- *
- *              ===============================================================
- * 2013-05-29   start of compiler, dictionary, and memory manager
- *
- * 2013-05-30   begin stubs for bytecode interpreter
- *              string_to_slice(), slice_to_string() implemented
- *              proper parsing of strings, comments
- *              begin work on stack support
- *              error reporting code added
- *
- * 2013-05-31   begin implementing bytecode interpreter
- *
- * 2013-06-03   allow for redefinitions
- *
- * 2013-06-09   fix redefinitions (bug in copy_slice)
- *              fix BC_COMPARE_LT
- *
- * 2013-06-10   fix upper/lowercase
- *              fix missing some missing $ symbols
- *
- * 2013-06-26   better use of globals, some redundancies cleaned up
- *              more bug fixes
- *
- * 2013-07-03   fix a typo (append_push should have been array_push)
- *              add stack_clear()
- *              fix & prefix
- *
- * 2013-07-06   fixed bugs in BC_FLOW_BI and BC_FLOW_TRI causing
- *              types to be lost
- *
- * 2013-07-08   fix BC_LENGTH
- *
- * 2013-07-09   fix BC_SEEK
- *              ===============================================================
  */
 
 
@@ -154,16 +120,14 @@ function report_error($text)
 
 function check_depth($cells)
 {
-    global $errors, $stack;
+    global $stack;
     if (count($stack) < $cells)
     {
         report_error('Stack underflow: ' . $cells . ' values required.');
         return FALSE;
     }
     else
-    {
         return TRUE;
-    }
 }
 
 
@@ -183,14 +147,13 @@ function prepare_memory()
 
 function request_slice()
 {
-    global $p_slices, $p_map, $MAX_SLICES;
+    global $p_map, $MAX_SLICES;
     $i = 0;
     while ($i < $MAX_SLICES)
     {
         if ($p_map[$i] == 0)
         {
             $p_map[$i] = 1;
-            $s = $i;
             return $i;
         }
         $i += 1;
@@ -200,41 +163,118 @@ function request_slice()
 
 function release_slice($s)
 {
-    global $p_slices, $p_map, $MAX_SLICES;
+    global $p_map;
     $p_map[$s] = 0;
 }
 
 function store($v, $s, $o)
 {
-    global $p_slices, $p_map, $MAX_SLICES;
+    global $p_slices;
     $p_slices[$s][$o] = $v;
 }
 
 function fetch($s, $o)
 {
-    global $p_slices, $p_map, $MAX_SLICES;
+    global $p_slices;
     return $p_slices[$s][$o];
 }
 
+
+function compile_pointer($name, $slice, $offset)
+{
+    global $BC_PUSH_F;
+    global $dictionary_map;
+    store($BC_PUSH_F, $slice, $offset);
+    $offset += 1;
+    if (is_numeric($name))
+        store(intval($name), $slice, $offset);
+    else
+    {
+        if (lookup_pointer($name) == -1)
+        {
+            report_error("ERROR: unable to map '". $name ."' to a slice!");
+            store(0, $slice, $offset);
+        }
+        else
+            store($dictionary_map[lookup_pointer($name)], $slice, $offset);
+    }
+    $offset += 1;
+    return $offset;
+}
+
+
+function compile_number($number, $slice, $offset)
+{
+    global $BC_PUSH_N;
+    store($BC_PUSH_N, $slice, $offset);
+    $offset += 1;
+    store(floatval($number), $slice, $offset);
+    $offset += 1;
+    return $offset;
+}
+
+
+function compile_character($character, $slice, $offset)
+{
+    global $BC_PUSH_C;
+    store($BC_PUSH_C, $slice, $offset);
+    $offset += 1;
+    store($character, $slice, $offset);
+    $offset += 1;
+    return $offset;
+}
+
+
+function compile_bytecode($bytecode, $slice, $offset)
+{
+    store(floatval($bytecode), $slice, $offset);
+    $offset += 1;
+    return $offset;
+}
+
+
+function compile_string($str, $slice, $offset)
+{
+    global $BC_PUSH_S;
+    store($BC_PUSH_S, $slice, $offset);
+    $offset += 1;
+    store($str, $slice, $offset);
+    $offset += 1;
+    return $offset;
+}
+
+
+function compile_comment($str, $slice, $offset)
+{
+    global $BC_PUSH_COMMENT;
+    store($BC_PUSH_COMMENT, $slice, $offset);
+    $offset += 1;
+    store($str, $slice, $offset);
+    $offset += 1;
+    return $offset;
+}
+
+
+function compile_function_call($str, $slice, $offset)
+{
+    global $BC_FLOW_CALL;
+    global $dictionary_map;
+    if (lookup_pointer($str) == -1)
+        report_error("ERROR: name '". $str ."' not found!");
+    else
+    {
+        store($BC_FLOW_CALL, $slice, $offset);
+        $offset += 1;
+        store($dictionary_map[lookup_pointer($str)], $slice, $offset);
+        $offset += 1;
+    }
+    return $offset;
+}
+
+
 function compile($str, $slice)
 {
-    global $MAX_SLICES, $SLICE_LEN;
-    global $stack, $types;
-    global $dictionary_names, $dictionary_map;
-    global $p_slices, $p_map;
-    global $TYPE_NUMBER, $TYPE_STRING, $TYPE_CHARACTER, $TYPE_FUNCTION, $TYPE_FLAG;
-    global $BC_PUSH_N, $BC_PUSH_S, $BC_PUSH_C, $BC_PUSH_F, $BC_PUSH_COMMENT;
-    global $BC_TYPE_N, $BC_TYPE_S, $BC_TYPE_C, $BC_TYPE_F, $BC_TYPE_FLAG;
-    global $BC_GET_TYPE, $BC_ADD, $BC_SUBTRACT, $BC_MULTIPLY, $BC_DIVIDE;
-    global $BC_REMAINDER, $BC_FLOOR, $BC_BITWISE_SHIFT, $BC_BITWISE_AND, $BC_BITWISE_OR;
-    global $BC_BITWISE_XOR, $BC_COMPARE_LT, $BC_COMPARE_GT, $BC_COMPARE_LTEQ, $BC_COMPARE_GTEQ;
-    global $BC_COMPARE_EQ, $BC_COMPARE_NEQ, $BC_FLOW_IF, $BC_FLOW_WHILE, $BC_FLOW_UNTIL;
-    global $BC_FLOW_TIMES, $BC_FLOW_CALL, $BC_FLOW_CALL_F, $BC_FLOW_DIP, $BC_FLOW_SIP;
-    global $BC_FLOW_BI, $BC_FLOW_TRI, $BC_FLOW_RETURN, $BC_MEM_COPY, $BC_MEM_FETCH;
-    global $BC_MEM_STORE, $BC_MEM_REQUEST, $BC_MEM_RELEASE, $BC_MEM_COLLECT, $BC_STACK_DUP;
-    global $BC_STACK_DROP, $BC_STACK_SWAP, $BC_STACK_OVER, $BC_STACK_TUCK, $BC_STACK_NIP;
-    global $BC_STACK_DEPTH, $BC_STACK_CLEAR, $BC_QUOTE_NAME, $BC_STRING_SEEK, $BC_STRING_SUBSTR;
-    global $BC_STRING_NUMERIC, $BC_TO_LOWER, $BC_TO_UPPER, $BC_LENGTH, $BC_REPORT_ERROR;
+    global $BC_PUSH_F, $BC_FLOW_RETURN;
 
     $tokens = explode(' ', trim($str));
     $l = count($tokens);
@@ -245,45 +285,18 @@ function compile($str, $slice)
     while ($i < $l)
     {
         if (startsWith($tokens[$i], "#"))
-        {
-            store($BC_PUSH_N, $slice, $offset);
-            $offset += 1;
-            store(floatval(substr($tokens[$i], 1)), $slice, $offset);
-            $offset += 1;
-        }
+            $offset = compile_number(substr($tokens[$i], 1), $slice, $offset);
         elseif (startsWith($tokens[$i], "$"))
-        {
-            store($BC_PUSH_C, $slice, $offset);
-            $offset += 1;
-            store(ord(substr($tokens[$i], 1)), $slice, $offset);
-            $offset += 1;
-        }
+            $offset = compile_character(ord(substr($tokens[$i], 1)), $slice, $offset);
         elseif (startsWith($tokens[$i], "`"))
-        {
-            store(floatval(substr($tokens[$i], 1)), $slice, $offset);
-            $offset += 1;
-        }
+            $offset = compile_bytecode(substr($tokens[$i], 1), $slice, $offset);
         elseif (startsWith($tokens[$i], "&"))
-        {
-            store($BC_PUSH_F, $slice, $offset);
-            $offset += 1;
-            if (lookup_pointer(substr($tokens[$i], 1)) == -1)
-            {
-                store(intval(substr($tokens[$i], 1)), $slice, $offset);
-            }
-            else
-            {
-                store($dictionary_map[lookup_pointer(substr($tokens[$i], 1))], $slice, $offset);
-            }
-            $offset += 1;
-        }
+            $offset = compile_pointer(substr($tokens[$i], 1), $slice, $offset);
         elseif (startsWith($tokens[$i], "'"))
         {
             $s = "";
             if (endsWith($tokens[$i], "'"))
-            {
                 $s = $tokens[$i];
-            }
             else
             {
                 $j = $i + 1;
@@ -301,19 +314,13 @@ function compile($str, $slice)
                 }
             }
             $s = substr($s, 1, strlen($s) - 2);
-            $z = string_to_slice($s);
-            store($BC_PUSH_S, $slice, $offset);
-            $offset += 1;
-            store($z, $slice, $offset);
-            $offset += 1;
+            $offset = compile_string(string_to_slice($s), $slice, $offset);
         }
         elseif (startsWith($tokens[$i], "\""))
         {
             $s = "";
             if (endsWith($tokens[$i], "\""))
-            {
                 $s = $tokens[$i];
-            }
             else
             {
                 $j = $i + 1;
@@ -331,11 +338,7 @@ function compile($str, $slice)
                 }
             }
             $s = substr($s, 1, strlen($s) - 2);
-            $z = string_to_slice($s);
-            store($BC_PUSH_COMMENT, $slice, $offset);
-            $offset += 1;
-            store($z, $slice, $offset);
-            $offset += 1;
+            $offset = compile_comment(string_to_slice($s), $slice, $offset);
         }
         elseif ($tokens[$i] == "[")
         {
@@ -355,22 +358,10 @@ function compile($str, $slice)
             store($old, $slice, $offset);
             $offset += 1;
         }
-        elseif ($tokens[$i] == "")
-        {
-        }
         else
         {
-            if (lookup_pointer($tokens[$i]) == -1)
-            {
-                report_error("ERROR: name '". $tokens[$i] ."' not found!");
-            }
-            else
-            {
-                store($BC_FLOW_CALL, $slice, $offset);
-                $offset += 1;
-                store($dictionary_map[lookup_pointer($tokens[$i])], $slice, $offset);
-                $offset += 1;
-            }
+            if ($tokens[$i] != "")
+                $offset = compile_function_call($tokens[$i], $slice, $offset);
         }
         $i += 1;
     }
@@ -381,7 +372,6 @@ function compile($str, $slice)
 
 function prepare_dictionary()
 {
-    global $dictionary_names, $dictionary_map;
     $s = request_slice();
     compile("`600", $s);
     add_definition('define', $s);
@@ -390,13 +380,11 @@ function prepare_dictionary()
 
 function lookup_pointer($name)
 {
-    global $dictionary_names, $dictionary_map;
+    global $dictionary_names;
     $s = -1;
     foreach ($dictionary_names as $key => $value)
-    {
         if ($value == $name)
             $s = $key;
-    }
     return $s;
 }
 
@@ -410,18 +398,14 @@ function add_definition($name, $s)
         array_push($dictionary_map, $s);
     }
     else
-    {
         copy_slice($s, $dictionary_map[lookup_pointer($name)]);
-    }
 }
 
 
 function interpret($slice)
 {
-    global $MAX_SLICES, $SLICE_LEN;
-    global $stack, $types;
-    global $dictionary_names, $dictionary_map;
-    global $p_slices, $p_map;
+    global $SLICE_LEN;
+    global $stack;
     global $TYPE_NUMBER, $TYPE_STRING, $TYPE_CHARACTER, $TYPE_FUNCTION, $TYPE_FLAG;
     global $BC_PUSH_N, $BC_PUSH_S, $BC_PUSH_C, $BC_PUSH_F, $BC_PUSH_COMMENT;
     global $BC_TYPE_N, $BC_TYPE_S, $BC_TYPE_C, $BC_TYPE_F, $BC_TYPE_FLAG;
@@ -582,7 +566,7 @@ function interpret($slice)
             if (check_depth(2))
             {
                 $a = stack_pop();
-                $a = float($a);
+                $a = floatval($a);
                 stack_push(floor($a), $TYPE_NUMBER);
             }
             else
@@ -594,10 +578,10 @@ function interpret($slice)
             {
                 $a = stack_pop();
                 $b = stack_pop();
-                if ($b < 0)
-                    stack_push($b << $a ,$TYPE_NUMBER);
+                if ($a < 0)
+                    stack_push($b << abs($a), $TYPE_NUMBER);
                 else
-                    stack_push($b >> $a,$TYPE_NUMBER);
+                    stack_push($b >> $a, $TYPE_NUMBER);
             }
             else
                 $offset = $SLICE_LEN;
@@ -934,9 +918,7 @@ function interpret($slice)
                 $offset = $SLICE_LEN;
         }
         elseif ($opcode == $BC_FLOW_RETURN)
-        {
             $offset = $SLICE_LEN;
-        }
         elseif ($opcode == $BC_MEM_COPY)
         {
             if (check_depth(2))
@@ -972,9 +954,7 @@ function interpret($slice)
                 $offset = $SLICE_LEN;
         }
         elseif ($opcode == $BC_MEM_REQUEST)
-        {
             stack_push(request_slice(), $TYPE_FUNCTION);
-        }
         elseif ($opcode == $BC_MEM_RELEASE)
         {
             if (check_depth(1))
@@ -1032,13 +1012,9 @@ function interpret($slice)
                 $offset = $SLICE_LEN;
         }
         elseif ($opcode == $BC_STACK_DEPTH)
-        {
             stack_push(count($stack), $TYPE_NUMBER);
-        }
         elseif ($opcode == $BC_STACK_CLEAR)
-        {
             stack_clear();
-        }
         elseif ($opcode == $BC_QUOTE_NAME)
         {
             if (check_depth(2))
@@ -1173,9 +1149,8 @@ function interpret($slice)
             $offset = $SLICE_LEN;
         }
         else
-        {
             $offset = $SLICE_LEN;
-        }
+
         $offset += 1;
     }
 }
@@ -1215,7 +1190,7 @@ function slice_to_string($slice)
 
 function stack_clear()
 {
-    global $stack, $types;
+    global $stack;
     $i = count($stack);
     while ($i > 0)
     {
@@ -1276,7 +1251,7 @@ function stack_swap()
 
 function stack_dup()
 {
-    global $TYPE_NUMBER, $TYPE_STRING, $TYPE_CHARACTER, $TYPE_FUNCTION, $TYPE_FLAG;
+    global $TYPE_STRING;
 
     $at = stack_type();
     $av = stack_pop();
@@ -1288,16 +1263,13 @@ function stack_dup()
         stack_push($s, $at);
     }
     else
-    {
         stack_push($av, $at);
-    }
 }
 
 
 function stack_over()
 {
-    global $TYPE_NUMBER, $TYPE_STRING, $TYPE_CHARACTER, $TYPE_FUNCTION, $TYPE_FLAG;
-
+    global $TYPE_STRING;
     $at = stack_type();
     $av = stack_pop();
     $bt = stack_type();
@@ -1311,9 +1283,7 @@ function stack_over()
         stack_push($s, $bt);
     }
     else
-    {
         stack_push($bv, $bt);
-    }
 }
 
 function stack_tuck()
@@ -1339,7 +1309,7 @@ function copy_slice($source, $dest)
 function stack_change_type($type)
 {
     global $TYPE_NUMBER, $TYPE_STRING, $TYPE_CHARACTER, $TYPE_FUNCTION, $TYPE_FLAG;
-    global $types, $stack;
+    global $types;
 
     if ($type == $TYPE_NUMBER)
     {
@@ -1348,13 +1318,9 @@ function stack_change_type($type)
             $a = stack_pop();
 
             if (is_numeric(slice_to_string($a)))
-            {
                 stack_push(floatval(slice_to_string($a)), $TYPE_NUMBER);
-            }
             else
-            {
                 stack_push(0, $TYPE_NUMBER);
-            }
         }
         else
         {
@@ -1427,30 +1393,23 @@ function stack_change_type($type)
         }
     }
     else
-    {
         return;
-    }
 }
 
 
+function parse_bootstrap($lines)
+{
+    foreach ($lines as $src)
+    {
+        if (strlen(trim($src)) > 0)
+        {
+            $s = compile($src, request_slice());
+            interpret($s);
+        }
+    }
+}
 
 prepare_memory();
 prepare_dictionary();
-$bootstrap = file('bootstrap.p');
-
-foreach ($bootstrap as $src)
-{
-    if (strlen(trim($src)) > 0)
-    {
-        $s = compile($src, request_slice());
-        interpret($s);
-    }
-
-    foreach ($errors as $err)
-    {
-        echo "<tt>$err</tt><br>";
-    }
-    $errors = array();
-
-}
+parse_bootstrap(file('bootstrap.p'));
 ?>

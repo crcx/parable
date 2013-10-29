@@ -1,10 +1,79 @@
+# Overview
+
 Parable: a concatenative, stack-oriented programming language designed
 to be clean, consistent, and easily adaptable for use within larger
 applications.
 
 ----
 
-Files:
+# Getting Started
+
+## C
+
+### Prerequisites
+
+- A C compiler
+
+  Tested with GCC, TCC, and CLANG
+
+- make
+
+### Setup
+
+    make
+
+Copy the **parable** binary and **parable.p** to a directory.
+
+## Python
+
+### Prerequisites
+
+- A Python implementation
+
+Parable has been used under Python2, Python3, PyPy, and Jython.
+
+### Setup
+
+#### Interactive Use (listener)
+
+- Copy:
+
+    bootstrap.p  parable.py  listener.py
+
+#### Interactive Use (legend)
+
+- Copy
+
+    bootstrap.p  parable.py  legend.py
+
+#### Non-interactive (pre)
+
+    cd py/deploy
+    make
+
+Copy the created **pre.py** somewhere in your path as **pre**. Then:
+
+    pre filename
+
+## PHP
+
+### Prerequisites
+
+- A web server with PHP support
+
+### Setup
+
+- Copy these files from the **php** directory to a directory on your server:
+
+    bootstrap.p  parable.php  punga.php
+
+- Symlink **punga.php** to **index.php**
+
+You can now access the Punga interface from your browser.
+
+----
+
+# Files
 
  - README
 
@@ -13,6 +82,10 @@ Files:
  - LICENSE
 
    Legal stuff (copyright notice, usage terms, disclaimer of warranty, etc)
+
+ - c/*
+
+   The C implementation.
 
  - py/*
 
@@ -31,6 +104,8 @@ Files:
    Small sample programs
 
 ----
+
+# Historical Repositories
 
 Older source history can be found in the following repositories:
 

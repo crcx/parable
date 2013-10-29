@@ -4,12 +4,13 @@
 
 import sys
 import cgi
-import cgitb; cgitb.enable()  # for troubleshooting
-
+import cgitb
 import signal
+from parable import *
+
+cgitb.enable()  # for troubleshooting
 signal.alarm(60)
 
-from parable import *
 
 def dump_stack():
     """display the stack"""
@@ -26,11 +27,15 @@ def dump_stack():
         elif types[i] == TYPE_CHARACTER:
             sys.stdout.write("</td><td>$" + str(chr(stack[i])) + "</td></tr>")
         elif types[i] == TYPE_STRING:
-            sys.stdout.write("</td><td>'" + slice_to_string(stack[i]) +"'" + "<br><span style='color: #D3D3D3;'>Stored at: " + str(stack[i]) + "</span></td></tr>")
+            sys.stdout.write("</td><td>'" + slice_to_string(stack[i]))
+            sys.stdout.write("'" + "<br><span style='color: #D3D3D3;'>Stored ")
+            sys.stdout.write("at: " + str(stack[i]) + "</span></td></tr>")
         elif types[i] == TYPE_FUNCTION:
             sys.stdout.write("</td><td>&" + str(stack[i]))
             if pointer_to_name(stack[i]) != "":
-                sys.stdout.write("<br><span style='color: #D3D3D3;'>Pointer to: " + pointer_to_name(stack[i]) + "</span>");
+                sys.stdout.write("<br><span style='color: #D3D3D3;'>Pointer ")
+                sys.stdout.write("to: " + pointer_to_name(stack[i]))
+                sys.stdout.write("</span>")
             sys.stdout.write("</td></tr>")
         elif types[i] == TYPE_FLAG:
             if stack[i] == -1:
@@ -40,9 +45,11 @@ def dump_stack():
             else:
                 sys.stdout.write("</td><td>malformed flag" + "</td></tr>")
         else:
-            sys.stdout.write("</td><td>unmatched type on stack!" + "</td></tr>")
+            sys.stdout.write("</td><td>unmatched type on stack!")
+            sys.stdout.write("</td></tr>")
         i += 1
     sys.stdout.write("</table>")
+
 
 def dump_errors():
     global errors
@@ -55,6 +62,7 @@ def dump_errors():
             i += 1
         sys.stdout.write("</div>")
 
+
 def dump_dict():
     """display named items"""
     l = ''
@@ -62,7 +70,6 @@ def dump_dict():
         l = l + w + ' '
     sys.stdout.write(l)
     sys.stdout.write("\n")
-
 
 
 sys.stdout.write("Content-type: text/html\n\n")
@@ -101,7 +108,8 @@ print """
     <div class="span6">
       <form name='editor' id='editor' action='punga.py' method='post'>
 """
-sys.stdout.write("<textarea rows='12' class='span6' name='code' placeholder='enter your code here'>")
+sys.stdout.write("<textarea rows='12' class='span6' name='code' ")
+sys.stdout.write("placeholder='enter your code here'>")
 form = cgi.FieldStorage()
 message = form.getvalue("code", " ")
 sys.stdout.write(message)
@@ -133,9 +141,6 @@ for line in f:
 
 dump_stack()
 
-# from vmstat import *
-# print "<p>Used " + str(vm_slices_used()) + " of " + str(MAX_SLICES) + " slices.</p>"
-
 print """
       &nbsp;
     </div>
@@ -143,7 +148,8 @@ print """
 
   <div class="row"><div class="span12">&nbsp;</div></div>
 
-  <div class="row"><div class="span12"><a href="http://forthworks.com/parable">Parable</a><br>
+  <div class="row"><div class="span12">
+    <a href="http://forthworks.com/parable">Parable</a><br>
     &copy; 2012-2013, <a href="http://forthworks.com">Charles Childers</a>
   </div></div>
 </div>

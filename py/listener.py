@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Copyright (c) 2013  Charles Childers
 #
 # This implements a pretty minimal user interface for parable. It
