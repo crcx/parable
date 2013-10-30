@@ -56,12 +56,35 @@ def dump_dict():
     sys.stdout.write("\n")
 
 
+def display_value():
+    global stack, types
+    i = len(stack) - 1
+    if types[i] == TYPE_NUMBER:
+        sys.stdout.write(str(stack[i]))
+    elif types[i] == TYPE_CHARACTER:
+        sys.stdout.write(str(chr(stack[i])))
+    elif types[i] == TYPE_STRING:
+        sys.stdout.write(slice_to_string(stack[i]))
+    elif types[i] == TYPE_FUNCTION:
+        sys.stdout.write('&' + str(stack[i]))
+    elif types[i] == TYPE_FLAG:
+        if stack[i] == -1:
+            sys.stdout.write("true")
+        elif stack[i] == 0:
+            sys.stdout.write("false")
+        else:
+            sys.stdout.write("malformed flag")
+
+
 def opcodes(slice, offset, opcode):
     if opcode == 1000:
+        display_value()
+        stack_pop()
+    elif opcode == 1010:
         dump_stack()
-    elif opcode == 1001:
+    elif opcode == 1020:
         exit()
-    elif opcode == 1002:
+    elif opcode == 1030:
         dump_dict()
 
     return offset
@@ -76,21 +99,19 @@ if __name__ == '__main__':
     prepare_dictionary()
     parse_bootstrap(open('bootstrap.p').readlines())
 
+    interpret(compile("[ `1000 ] '.' define", request_slice()))
+    interpret(compile("[ `1010 ] 'show-stack' define", request_slice()))
+    interpret(compile("[ `1020 ] 'bye' define", request_slice()))
+    interpret(compile("[ `1030 ] 'show-named' define", request_slice()))
+
     while 1 == 1:
         sys.stdout.write("\nok ")
         sys.stdout.flush()
 
         src = sys.stdin.readline()
 
-        if ' '.join(src.split()) == 'bye':
-            exit()
-        elif ' '.join(src.split()) == 'words':
-            dump_dict()
-        elif ' '.join(src.split()) == '.s':
-            dump_stack()
-        else:
-            if len(src) > 1:
-                interpret(compile(src, request_slice()), opcodes)
+        if len(src) > 1:
+            interpret(compile(src, request_slice()), opcodes)
 
         for e in errors:
             sys.stdout.write(e)
