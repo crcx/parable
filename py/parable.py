@@ -5,7 +5,7 @@
 #
 # Dependencies
 #
-
+import sys
 from math import floor
 
 #
@@ -91,7 +91,7 @@ BC_STRING_NUMERIC = 702
 BC_TO_LOWER = 800
 BC_TO_UPPER = 801
 BC_LENGTH = 802
-BC_report = 900
+BC_REPORT = 900
 
 
 #
@@ -147,7 +147,7 @@ def check_depth(cells):
 # Byte code interpreter
 #
 
-def interpret(slice):
+def interpret(slice, more=None):
     """Interpret the byte codes contained in a slice."""
     global SLICE_LEN
     offset = 0
@@ -390,9 +390,9 @@ def interpret(slice):
                 b = stack_pop()
                 c = stack_pop()
                 if c == -1:
-                    interpret(b)
+                    interpret(b, more)
                 else:
-                    interpret(a)
+                    interpret(a, more)
             else:
                 offset = SLICE_LEN
         elif opcode == BC_FLOW_WHILE:
@@ -400,7 +400,7 @@ def interpret(slice):
                 quote = stack_pop()
                 a = -1
                 while a == -1:
-                    interpret(quote)
+                    interpret(quote, more)
                     a = stack_pop()
             else:
                 offset = SLICE_LEN
@@ -409,7 +409,7 @@ def interpret(slice):
                 quote = stack_pop()
                 a = 0
                 while a == 0:
-                    interpret(quote)
+                    interpret(quote, more)
                     a = stack_pop()
             else:
                 offset = SLICE_LEN
@@ -418,17 +418,17 @@ def interpret(slice):
                 quote = stack_pop()
                 count = stack_pop()
                 while count > 0:
-                    interpret(quote)
+                    interpret(quote, more)
                     count -= 1
             else:
                 offset = SLICE_LEN
         elif opcode == BC_FLOW_CALL:
             offset += 1
-            interpret(int(fetch(slice, offset)))
+            interpret(int(fetch(slice, offset)), more)
         elif opcode == BC_FLOW_CALL_F:
             if check_depth(1):
                 a = stack_pop()
-                interpret(a)
+                interpret(a, more)
             else:
                 offset = SLICE_LEN
         elif opcode == BC_FLOW_DIP:
@@ -436,7 +436,7 @@ def interpret(slice):
                 quote = stack_pop()
                 vtype = stack_type()
                 value = stack_pop()
-                interpret(quote)
+                interpret(quote, more)
                 stack_push(value, vtype)
             else:
                 offset = SLICE_LEN
@@ -446,7 +446,7 @@ def interpret(slice):
                 stack_dup()
                 vtype = stack_type()
                 value = stack_pop()
-                interpret(quote)
+                interpret(quote, more)
                 stack_push(value, vtype)
             else:
                 offset = SLICE_LEN
@@ -457,9 +457,9 @@ def interpret(slice):
                 stack_dup()
                 x = stack_type()
                 y = stack_pop()
-                interpret(b)
+                interpret(b, more)
                 stack_push(y, x)
-                interpret(a)
+                interpret(a, more)
             else:
                 offset = SLICE_LEN
         elif opcode == BC_FLOW_TRI:
@@ -473,11 +473,11 @@ def interpret(slice):
                 stack_dup()
                 m = stack_type()
                 q = stack_pop()
-                interpret(c)
+                interpret(c, more)
                 stack_push(q, m)
-                interpret(b)
+                interpret(b, more)
                 stack_push(y, x)
-                interpret(a)
+                interpret(a, more)
             else:
                 offset = SLICE_LEN
         elif opcode == BC_FLOW_RETURN:
@@ -620,12 +620,15 @@ def interpret(slice):
                     stack_push(0, TYPE_NUMBER)
             else:
                 offset = SLICE_LEN
-        elif opcode == BC_report:
+        elif opcode == BC_REPORT:
             if check_depth(1):
                 if stack_type() == TYPE_STRING:
                     a = slice_to_string(stack_tos())
                     report(a)
             offset = SLICE_LEN
+        if more is not None:
+            offset = more(slice, offset, opcode)
+
         offset += 1
 
 

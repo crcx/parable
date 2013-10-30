@@ -56,6 +56,17 @@ def dump_dict():
     sys.stdout.write("\n")
 
 
+def opcodes(slice, offset, opcode):
+    if opcode == 1000:
+        dump_stack()
+    elif opcode == 1001:
+        exit()
+    elif opcode == 1002:
+        dump_dict()
+
+    return offset
+
+
 
 if __name__ == '__main__':
     sys.stdout.write("parable (listener 2013-05-24)\n")
@@ -79,7 +90,7 @@ if __name__ == '__main__':
             dump_stack()
         else:
             if len(src) > 1:
-                interpret(compile(src, request_slice()))
+                interpret(compile(src, request_slice()), opcodes)
 
         for e in errors:
             sys.stdout.write(e)
