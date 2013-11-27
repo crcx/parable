@@ -535,7 +535,7 @@ void interpret(int slice)
                 interpret((int) fetch(slice, offset));
                 break;
             case BC_FLOW_CALL_F:
-                interpret(stack_pop());
+                interpret((int) stack_pop());
                 break;
             case BC_FLOW_DIP:
                 a = stack_pop();
@@ -817,7 +817,8 @@ int compile(char *source, int s)
                     o = compile_cell((double) string_to_slice(reform), s, o);
                 }
                 break;
-            case '"':                if (token[strlen(token) - 1] == '"')
+            case '"':
+                if (token[strlen(token) - 1] == '"')
                 {
                     memset(reform, '\0', STRING_LEN);
                     memcpy(reform, &token[1], strlen(token) - 2);
@@ -882,33 +883,38 @@ int compile(char *source, int s)
                 scratch = (double) atof(reform);
                 o = compile_cell(scratch, s, o);
                 break;
-            case '[':
-                nest[np] = s;
-                nest_o[np] = o;
-                s = request_slice();
-                o = 0;
-                np++;
-                break;
-            case ']':
-                o = compile_cell(BC_FLOW_RETURN, s, o);
-                current = s;
-                np--;
-                s = nest[np];
-                o = nest_o[np];
-                o = compile_cell(BC_PUSH_F, s, o);
-                o = compile_cell(current, s, o);
-                break;
             default:
-                if (lookup_definition(token) != -1)
+                if (strcmp(token, "[") == 0)
                 {
-                    o = compile_cell(BC_FLOW_CALL, s, o);
-                    o = compile_cell(lookup_definition(token), s, o);
+                    nest[np] = s;
+                    nest_o[np] = o;
+                    s = request_slice();
+                    o = 0;
+                    np++;
+                }
+                else if (strcmp(token, "]") == 0)
+                {
+                    o = compile_cell(BC_FLOW_RETURN, s, o);
+                    current = s;
+                    np--;
+                    s = nest[np];
+                    o = nest_o[np];
+                    o = compile_cell(BC_PUSH_F, s, o);
+                    o = compile_cell(current, s, o);
                 }
                 else
                 {
-                    report_error("function not found: ");
-                    report_error(token);
-                    report_error("\n");
+                    if (lookup_definition(token) != -1)
+                    {
+                        o = compile_cell(BC_FLOW_CALL, s, o);
+                        o = compile_cell(lookup_definition(token), s, o);
+                    }
+                    else
+                    {
+                        report_error("function not found: ");
+                        report_error(token);
+                        report_error("\n");
+                    }
                 }
                 break;
         }
