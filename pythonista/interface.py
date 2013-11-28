@@ -1,99 +1,74 @@
-# This implements a pretty minimal user interface for parable. It
-# allows code (or a couple of commands) to be typed in, compiled,
-# and run.
-#
-# Commands recognized are:
-#
-# :stack  display the stack
-# :defined  display all named elements
-# :quit  exit listener
-#
+#!/usr/bin/env python
 
-import console
+import os
 import sys
+from parable import *
+from scene import *
 
-def dump_stack():
-    """display the stack"""
-    global stack
-    i = 0
-    while i < len(stack):
-        console.set_color(0, 0, 0)
-        print "\t" + str(i),
-        if types[i] == TYPE_NUMBER:
-            console.set_color(141/255.0, 182/255.0, 205/255.0)
-            print "\t#" + str(stack[i])
-        elif types[i] == TYPE_CHARACTER:
-            console.set_color(139/255.0, 168/255.0, 112/255.0)
-            print "\t$" + str(chr(stack[i]))
-        elif types[i] == TYPE_STRING:
-            console.set_color(140/255.0, 120/255.0, 83/255.0)
-            print "\t'" + slice_to_string(stack[i]) +"'"
-            console.set_color(0, 0, 0)
-            print "\t\tstored at: " + str(stack[i])
-        elif types[i] == TYPE_FUNCTION:
-            console.set_color(143/255.0, 143/255.0, 188/255.0)
-            print "\t&" + str(stack[i])
-            if pointer_to_name(stack[i]) != "":
-                console.set_color(0, 0, 0)
-                print "\t\tpointer to: " + pointer_to_name(stack[i])
-        elif types[i] == TYPE_FLAG:
-            console.set_color(142/255.0, 35/255.0, 107/255.0)
-            if stack[i] == -1:
-                print "\ttrue"
-            elif stack[i] == 0:
-                print "\tfalse"
-            else:
-                print "\tmalformed flag"
+
+current_x = 0
+current_y = 0
+
+def opcodes(slice, offset, opcode):
+    global MAX_SLICE, p_slices, p_map
+    global dictionary_names, dictionary_slices
+    global types, stack
+    global current_x, current_y
+    global TYPE_NUMBER
+    if opcode == 2000:
+        stack_push(current_x, TYPE_NUMBER)
+        stack_push(current_y, TYPE_NUMBER)
+    if opcode == 2001:
+        b = stack_pop()
+        g = stack_pop()
+        r = stack_pop()
+        fill(r, g, b)
+    if opcode == 2002:
+        h = stack_pop()
+        w = stack_pop()
+        y = stack_pop()
+        x = stack_pop()
+        ellipse(x, y, w, h)
+    if opcode == 2003:
+        b = stack_pop()
+        g = stack_pop()
+        r = stack_pop()
+        background(r, g, b)
+    return offset
+
+
+
+m = 0
+class MyScene (Scene):
+    def setup(self):
+        prepare_slices()
+        prepare_dictionary()
+        parse_bootstrap(open('bootstrap.p').readlines())
+        parse_bootstrap(open('sketch.p').readlines())
+
+    def draw(self):
+        global m
+        if m == 0:
+            m = 1
+            interpret(lookup_pointer('draw'), opcodes)
+            m = 0
         else:
-            print "unmatched type on stack!"
-        i += 1
+            pass
+
+    def touch_began(self, touch):
+        global current_x, current_y
+        current_x = touch.location.x
+        current_y = touch.location.y
+
+    def touch_moved(self, touch):
+        global current_x, current_y
+        current_x = touch.location.x
+        current_y = touch.location.y
+
+    def touch_ended(self, touch):
+        global current_x, current_y
+        current_x = 0
+        current_y = 0
 
 
-def interface():
-    global bootstrap
-    global errors
-
-    prepare_slices()
-    prepare_dictionary()
-    parse_bootstrap(bootstrap)
-    collect_unused_slices()
-
-    console.clear()
-
-    completed = 0
-    counter = 0
-
-    while completed == 0:
-
-        console.clear()
-
-        dump_stack()
-
-        for e in errors:
-            console.set_color(214/255.0, 111/255.0, 98/255.0)
-            print e
-
-        clear_errors()
-
-        console.set_color(0, 0, 0)
-
-        src = sys.stdin.readline()
-
-        if ' '.join(src.split()) == ':quit':
-            completed = 1
-        else:
-            if len(src) > 0:
-                interpret(compile(src, request_slice()))
-
-        counter += 1
-        if counter > 100:
-            if len(stack) == 0:
-                collect_unused_slices()
-                counter = 0
-
-
-#
-# begin execution
-#
-
-interface()
+run(MyScene())
