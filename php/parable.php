@@ -1129,7 +1129,6 @@ function interpret($slice)
                 }
                 else
                 {
-                    stack_drop();
                     stack_push(0, $TYPE_NUMBER);
                 }
             }

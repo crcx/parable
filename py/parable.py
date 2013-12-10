@@ -616,7 +616,6 @@ def interpret(slice, more=None):
                     a = slice_to_string(stack_tos())
                     stack_push(len(a), TYPE_NUMBER)
                 else:
-                    stack_drop()
                     stack_push(0, TYPE_NUMBER)
             else:
                 offset = SLICE_LEN
