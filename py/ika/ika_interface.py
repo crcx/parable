@@ -99,6 +99,12 @@ def opcodes(slice, offset, opcode):
         name = slice_to_string(stack_pop())
         if os.path.exists(name):
             os.remove(name)
+    elif opcode == 2008:
+        name = slice_to_string(stack_pop())
+        if os.path.exists(name):
+            stack_push(-1, TYPE_FLAG)
+        else:
+            stack_push(0, TYPE_FLAG)
     elif opcode == 3000:
         stack_push(len(sys.argv) - 2, TYPE_NUMBER)
     elif opcode == 3001:
