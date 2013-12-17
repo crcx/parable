@@ -85,6 +85,9 @@
 "combinators"
 [ [ dip ] dip invoke ] 'bi*' define
 [ dup bi* ] 'bi@' define
+[ [ [ swap [ dip ] dip ] dip dip ] dip invoke ] 'tri*' define
+[ [ [ swap &dip dip ] dip dip ] dip invoke ] 'tri*' define
+[ dup dup tri* ] 'tri@' define
 
 "variables"
 [ #0 fetch ] '@' define

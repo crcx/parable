@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# Copyright (c)2012-2013, Charles Childers
+
 # parable
 # Copyright (c) 2012, 2013, Charles Childers
 # ==========================================
@@ -1173,3 +1176,326 @@ def pointer_to_name(ptr):
     if ptr in dictionary_slices:
         s = dictionary_names[dictionary_slices.index(ptr)]
     return s
+
+bootstrap = []
+# core language functions
+bootstrap.append(""" "Primitives" """)
+bootstrap.append(""" [ `110 ] ':n' define """)
+bootstrap.append(""" [ `111 ] ':s' define """)
+bootstrap.append(""" [ `112 ] ':c' define """)
+bootstrap.append(""" [ `113 ] ':p' define """)
+bootstrap.append(""" [ `114 ] ':f' define """)
+bootstrap.append(""" [ `120 ] 'type?' define """)
+bootstrap.append(""" [ `200 ] '+' define """)
+bootstrap.append(""" [ `201 ] '-' define """)
+bootstrap.append(""" [ `202 ] '*' define """)
+bootstrap.append(""" [ `203 ] '/' define """)
+bootstrap.append(""" [ `204 ] 'rem' define """)
+bootstrap.append(""" [ `205 ] 'floor' define """)
+bootstrap.append(""" [ `210 ] 'shift' define """)
+bootstrap.append(""" [ `211 ] 'and' define """)
+bootstrap.append(""" [ `212 ] 'or' define """)
+bootstrap.append(""" [ `213 ] 'xor' define """)
+bootstrap.append(""" [ `220 ] '<' define """)
+bootstrap.append(""" [ `221 ] '>' define """)
+bootstrap.append(""" [ `222 ] '<=' define """)
+bootstrap.append(""" [ `223 ] '>=' define """)
+bootstrap.append(""" [ `224 ] '=' define """)
+bootstrap.append(""" [ `225 ] '<>' define """)
+bootstrap.append(""" [ `300 ] 'if' define """)
+bootstrap.append(""" [ `301 ] 'while-true' define """)
+bootstrap.append(""" [ `302 ] 'while-false' define """)
+bootstrap.append(""" [ `303 ] 'repeat' define """)
+bootstrap.append(""" [ `305 ] 'invoke' define """)
+bootstrap.append(""" [ `306 ] 'dip' define """)
+bootstrap.append(""" [ `307 ] 'sip' define """)
+bootstrap.append(""" [ `308 ] 'bi' define """)
+bootstrap.append(""" [ `309 ] 'tri' define """)
+bootstrap.append(""" [ `400 ] 'copy' define """)
+bootstrap.append(""" [ `401 ] 'fetch' define """)
+bootstrap.append(""" [ `402 ] 'store' define """)
+bootstrap.append(""" [ `403 ] 'request' define """)
+bootstrap.append(""" [ `404 ] 'release' define """)
+bootstrap.append(""" [ `405 ] 'collect-garbage' define """)
+bootstrap.append(""" [ `500 ] 'dup' define """)
+bootstrap.append(""" [ `501 ] 'drop' define """)
+bootstrap.append(""" [ `502 ] 'swap' define """)
+bootstrap.append(""" [ `503 ] 'over' define """)
+bootstrap.append(""" [ `504 ] 'tuck' define """)
+bootstrap.append(""" [ `505 ] 'nip' define """)
+bootstrap.append(""" [ `506 ] 'depth' define """)
+bootstrap.append(""" [ `507 ] 'reset' define """)
+bootstrap.append(""" [ `700 ] 'find' define """)
+bootstrap.append(""" [ `701 ] 'substring' define """)
+bootstrap.append(""" [ `702 ] 'numeric?' define """)
+bootstrap.append(""" [ `800 ] 'to-lowercase' define """)
+bootstrap.append(""" [ `801 ] 'to-uppercase' define """)
+bootstrap.append(""" [ `802 ] 'length' define """)
+bootstrap.append(""" [ `900 ] 'report-error' define """)
+bootstrap.append(""" "Constants for data types recognized by Parable's VM" """)
+bootstrap.append(""" [ #100 ] 'NUMBER' define """)
+bootstrap.append(""" [ #200 ] 'STRING' define """)
+bootstrap.append(""" [ #300 ] 'CHARACTER' define """)
+bootstrap.append(""" [ #400 ] 'POINTER' define """)
+bootstrap.append(""" [ #500 ] 'FLAG' define """)
+bootstrap.append(""" "Stack Flow" """)
+bootstrap.append(""" [ over over ] 'dup-pair' define """)
+bootstrap.append(""" [ drop drop ] 'drop-pair' define """)
+bootstrap.append(""" "Conditionals" """)
+bootstrap.append(""" [ #-1 :f ] 'true' define """)
+bootstrap.append(""" [ #0 :f ] 'false' define """)
+bootstrap.append(""" [ [ ] if ] 'if-true' define """)
+bootstrap.append(""" [ [ ] swap if ] 'if-false' define """)
+bootstrap.append(""" [ dup-pair > [ swap ] if-true [ over ] dip <= [ >= ] dip and :f ] 'between?' define """)
+bootstrap.append(""" [ #0 <> ] 'true?' define """)
+bootstrap.append(""" [ #0 = ] 'false?' define """)
+bootstrap.append(""" [ #2 rem #0 = ] 'even?' define """)
+bootstrap.append(""" [ #2 rem #0 <> ] 'odd?' define """)
+bootstrap.append(""" [ #0 < ] 'negative?' define """)
+bootstrap.append(""" [ #0 >= ] 'positive?' define """)
+bootstrap.append(""" [ #0 = ] 'zero?' define """)
+bootstrap.append(""" [ [ type? CHARACTER = ] dip if-true ] 'if-character' define """)
+bootstrap.append(""" [ [ type? STRING = ] dip if-true ] 'if-string' define """)
+bootstrap.append(""" [ [ type? NUMBER = ] dip if-true ] 'if-number' define """)
+bootstrap.append(""" [ [ type? POINTER = ] dip if-true ] 'if-pointer' define """)
+bootstrap.append(""" [ [ type? FLAG = ] dip if-true ] 'if-flag' define """)
+bootstrap.append(""" "combinators" """)
+bootstrap.append(""" [ [ dip ] dip invoke ] 'bi*' define """)
+bootstrap.append(""" [ dup bi* ] 'bi@' define """)
+bootstrap.append(""" [ [ [ swap [ dip ] dip ] dip dip ] dip invoke ] 'tri*' define """)
+bootstrap.append(""" [ [ [ swap &dip dip ] dip dip ] dip invoke ] 'tri*' define """)
+bootstrap.append(""" [ dup dup tri* ] 'tri@' define """)
+bootstrap.append(""" "variables" """)
+bootstrap.append(""" [ #0 fetch ] '@' define """)
+bootstrap.append(""" [ #0 store ] '!' define """)
+bootstrap.append(""" [ [ @ #1 + ] sip ! ] 'increment' define """)
+bootstrap.append(""" [ [ @ #1 - ] sip ! ] 'decrement' define """)
+bootstrap.append(""" [ request swap define ] 'variable' define """)
+bootstrap.append(""" [ swap request dup-pair copy swap [ [ invoke ] dip ] dip copy ] 'preserve' define """)
+bootstrap.append(""" "numeric ranges" """)
+bootstrap.append(""" [ dup-pair < [ [ [ dup #1 + ] dip dup-pair = ] while-false ] [ [ [ dup #1 - ] dip dup-pair = ] while-false ] if drop ] 'expand-range' define """)
+bootstrap.append(""" [ #1 - [ + ] repeat ] 'sum-range' define """)
+bootstrap.append(""" "String and Character" """)
+bootstrap.append(""" [ dup to-lowercase = ] 'lowercase?' define """)
+bootstrap.append(""" [ dup to-uppercase = ] 'uppercase?' define """)
+bootstrap.append(""" [ [ [ uppercase? ] [ lowercase? ] bi or :f ] if-character ] 'letter?' define """)
+bootstrap.append(""" [ [ $0 $9 between? ] if-character ] 'digit?' define """)
+bootstrap.append(""" [ to-lowercase :s 'abcdefghijklmnopqrstuvwxyz1234567890' swap find [ false ] [ true ] if ] 'alphanumeric?' define """)
+bootstrap.append(""" [ to-lowercase :s 'aeiou' swap find [ false ] [ true ] if ] 'vowel?' define """)
+bootstrap.append(""" [ :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ length ] dip swap substring ] 'trim-left' define """)
+bootstrap.append(""" [ ] 'trim-right' define """)
+bootstrap.append(""" [ :s length dup-pair #1 - fetch nip #32 = [ length #1 - #0 swap substring trim-right ] if-true ] 'trim-right' define """)
+bootstrap.append(""" [ trim-left trim-right ] 'trim' define """)
+bootstrap.append(""" "Helpful Math" """)
+bootstrap.append(""" [ dup negative? [ #-1 * ] if-true ] 'abs' define """)
+bootstrap.append(""" [ dup-pair < [ drop ] [ nip ] if ] 'min' define """)
+bootstrap.append(""" [ dup-pair < [ nip ] [ drop ] if ] 'max' define """)
+bootstrap.append(""" "Misc" """)
+bootstrap.append(""" [ depth [ invoke ] dip depth swap - ] 'invoke-count-items' define """)
+bootstrap.append(""" [ [ drop ] repeat ] 'drop-multiple' define """)
+bootstrap.append(""" "Sliced Memory Access" """)
+bootstrap.append(""" '*slice-current*' variable """)
+bootstrap.append(""" '*slice-offset*' variable """)
+bootstrap.append(""" [ &*slice-current* @ &*slice-offset* @ ] 'slice-position' define """)
+bootstrap.append(""" [ &*slice-offset* increment ] 'slice-advance' define """)
+bootstrap.append(""" [ &*slice-offset* decrement ] 'slice-retreat' define """)
+bootstrap.append(""" [ slice-position store ] 'slice-store-current' define """)
+bootstrap.append(""" [ slice-position fetch ] 'slice-fetch-current' define """)
+bootstrap.append(""" [ slice-position store slice-advance ] 'slice-store' define """)
+bootstrap.append(""" [ slice-position fetch slice-advance ] 'slice-fetch' define """)
+bootstrap.append(""" [ slice-retreat slice-position store ] 'slice-store-retreat' define """)
+bootstrap.append(""" [ slice-retreat slice-position fetch ] 'slice-fetch-retreat' define """)
+bootstrap.append(""" [ &*slice-current* ! #0 &*slice-offset* ! ] 'slice-set' define """)
+bootstrap.append(""" [ [ slice-store ] repeat ] 'slice-store-items' define """)
+bootstrap.append(""" [ request slice-set ] 'new-slice' define """)
+bootstrap.append(""" [ &*slice-current* @ [ &*slice-offset* @ [ invoke ] dip &*slice-offset* ! ] dip &*slice-current* ! ] 'preserve-slice' define """)
+bootstrap.append(""" "arrays" """)
+bootstrap.append(""" '*array:filter*' variable """)
+bootstrap.append(""" '*array:source*' variable """)
+bootstrap.append(""" '*array:results*' variable """)
+bootstrap.append(""" [ [ new-slice invoke-count-items dup slice-store slice-store-items &*slice-current* @ ] preserve-slice ] 'array-from-quote' define """)
+bootstrap.append(""" [ @ ] 'array-length' define """)
+bootstrap.append(""" [ #1 + fetch ] 'array-fetch' define """)
+bootstrap.append(""" [ #1 + store ] 'array-store' define """)
+bootstrap.append(""" [ swap [ swap slice-set #0 slice-fetch [ over slice-fetch = or ] repeat ] preserve-slice nip :f ] 'array-contains?' define """)
+bootstrap.append(""" [ swap [ swap slice-set #0 slice-fetch [ over slice-fetch [ :p :s ] bi@ = or ] repeat ] preserve-slice nip :f ] 'array-contains-string?' define """)
+bootstrap.append(""" [ [ dup array-length #1 + store ] sip [ @ #1 + ] sip ! ] 'array-push' define """)
+bootstrap.append(""" [ [ dup array-length fetch ] sip [ @ #1 - ] sip ! ] 'array-pop' define """)
+bootstrap.append(""" [ #0 &*array:results* ! &*array:filter* ! [ &*array:source* ! ] [ array-length ] bi [ &*array:source* @ array-pop dup &*array:filter* @ invoke [ &*array:results* array-push ] [ drop ] if ] repeat &*array:results* request [ copy ] sip ] 'array-filter' define """)
+bootstrap.append(""" [ #0 &*array:results* ! &*array:filter* ! [ &*array:source* ! ] [ array-length ] bi [ &*array:source* @ array-pop &*array:filter* @ invoke &*array:results* array-push ] repeat &*array:results* request [ copy ] sip ] 'array-map' define """)
+bootstrap.append(""" [ dup-pair [ array-length ] bi@ = [ dup array-length true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define """)
+bootstrap.append(""" [ &*array:filter* ! over array-length [ over array-pop &*array:filter* @ invoke ] repeat nip ] 'array-reduce' define """)
+bootstrap.append(""" [ request [ copy ] sip &*array:source* ! [ #0 &*array:source* @ array-length [ &*array:source* @ over array-fetch swap #1 + ] repeat drop ] array-from-quote ] 'array-reverse' define """)
+bootstrap.append(""" "routines for rendering an array into a string" """)
+bootstrap.append(""" [ "array  --  string"  'numeric-array: ' [ :s '#' swap + + #32 :c :s + ] array-reduce ] 'numeric-array-to-string' define """)
+bootstrap.append(""" [ "array  --  string"  'character-array: ' [ :c :s '$' swap + + #32 :c :s + ] array-reduce ] 'character-array-to-string' define """)
+bootstrap.append(""" [ "array  --  string"  'string-array: ' [ :p :s  $' :s swap + $' :s + + #32 :c :s + ] array-reduce ] 'string-array-to-string' define """)
+bootstrap.append(""" "more stuff" """)
+bootstrap.append(""" [ [ [ new-slice length [ #1 - ] sip [ dup-pair fetch slice-store #1 - ] repeat drop-pair #0 slice-store &*slice-current* @ :p :s ] preserve-slice ] if-string ] 'reverse' define """)
+# i/o functions
+bootstrap.append(""" [ "value -"  `1000 ] '.' define """)
+bootstrap.append(""" [ #10 :c . ] 'show:cr' define """)
+bootstrap.append(""" [ #32 :c . ] 'show:space' define """)
+bootstrap.append(""" "File Operations" """)
+bootstrap.append(""" [ "string:name string:mode - number:file-id"  `2000 ] 'open-file' define """)
+bootstrap.append(""" [ "number:file-id -"  `2001 ] 'close-file' define """)
+bootstrap.append(""" [ "number:file-id - character"  `2002 :c ] 'read-file' define """)
+bootstrap.append(""" [ "character number:file-id -"  `2003 ] 'write-file' define """)
+bootstrap.append(""" [ "number:file-id - number:position"  `2004 ] 'file-position' define """)
+bootstrap.append(""" [ "number:offset number:file-id -"  `2005 ] 'file-seek' define """)
+bootstrap.append(""" [ "number:file-id - number:length"  `2006 ] 'file-size' define """)
+bootstrap.append(""" [ "string:name -"  `2007 ] 'delete-file' define """)
+bootstrap.append(""" [ "string:name - string:contents"  [ new-slice 'r' open-file dup file-size [ [ read-file slice-store ] sip ] repeat close-file &*slice-current* @ :p :s ] preserve-slice ] 'slurp-file' define """)
+bootstrap.append(""" [ "string:name - flag"  `2008 ] 'file-exists?' define """)
+bootstrap.append(""" "Command Line Arguments" """)
+bootstrap.append(""" [ "- number"  `3000 ] 'arg-count' define """)
+bootstrap.append(""" [ "number - string"  `3001 ] 'get-arg' define """)
+
+import sys, os
+
+def dump_stack():
+    """display the stack"""
+    global stack
+    i = 0
+    while i < len(stack):
+        sys.stdout.write("\t" + str(i))
+        if types[i] == TYPE_NUMBER:
+            sys.stdout.write("\t#" + str(stack[i]))
+        elif types[i] == TYPE_CHARACTER:
+            sys.stdout.write("\t$" + str(chr(stack[i])))
+        elif types[i] == TYPE_STRING:
+            sys.stdout.write("\t'" + slice_to_string(stack[i]) +"'")
+        elif types[i] == TYPE_FUNCTION:
+            sys.stdout.write("\t&" + str(stack[i]))
+        elif types[i] == TYPE_FLAG:
+            if stack[i] == -1:
+                sys.stdout.write("true")
+            elif stack[i] == 0:
+                sys.stdout.write("false")
+            else:
+                sys.stdout.write("malformed flag")
+        else:
+            sys.stdout.write("unmatched type on stack!")
+        sys.stdout.write("\n")
+        i += 1
+
+
+def display_value():
+    global stack, types
+    i = len(stack) - 1
+    if types[i] == TYPE_NUMBER:
+        sys.stdout.write(str(stack[i]))
+    elif types[i] == TYPE_CHARACTER:
+        sys.stdout.write(str(chr(stack[i])))
+    elif types[i] == TYPE_STRING:
+        sys.stdout.write(slice_to_string(stack[i]))
+    elif types[i] == TYPE_FUNCTION:
+        sys.stdout.write('&' + str(stack[i]))
+    elif types[i] == TYPE_FLAG:
+        if stack[i] == -1:
+            sys.stdout.write("true")
+        elif stack[i] == 0:
+            sys.stdout.write("false")
+        else:
+            sys.stdout.write("malformed flag")
+
+
+def display_errors():
+    for e in errors:
+        sys.stdout.write("\n" + e)
+    clear_errors()
+
+files = []
+
+def opcodes(slice, offset, opcode):
+    global files, TYPE_NUMBER
+    if opcode == 1000:
+        display_value()
+        stack_pop()
+        sys.stdout.flush()
+    elif opcode == 2000:
+        slot = 0
+        i = 1
+        while i < 8:
+            if files[i] == 0:
+                slot = i
+            i = i + 1
+        mode = slice_to_string(stack_pop())
+        name = slice_to_string(stack_pop())
+        if slot != 0:
+            files[int(slot)] = open(name, mode)
+        stack_push(slot, TYPE_NUMBER)
+    elif opcode == 2001:
+        slot = int(stack_pop())
+        files[slot].close()
+        files[slot] = 0
+    elif opcode == 2002:
+        slot = int(stack_pop())
+        stack_push(ord(files[slot].read(1)), TYPE_NUMBER)
+    elif opcode == 2003:
+        slot = int(stack_pop())
+        files[slot].write(chr(int(stack_pop())))
+    elif opcode == 2004:
+        slot = int(stack_pop())
+        stack_push(files[slot].tell(), TYPE_NUMBER)
+    elif opcode == 2005:
+        slot = int(stack_pop())
+        pos = int(stack_pop())
+        stack_push(files[slot].seek(pos, 0), TYPE_NUMBER)
+    elif opcode == 2006:
+        slot = int(stack_pop())
+        at = files[slot].tell()
+        files[slot].seek(0, 2) # SEEK_END
+        stack_push(files[slot].tell(), TYPE_NUMBER)
+        files[slot].seek(at, 0) # SEEK_SET
+    elif opcode == 2007:
+        name = slice_to_string(stack_pop())
+        if os.path.exists(name):
+            os.remove(name)
+    elif opcode == 2008:
+        name = slice_to_string(stack_pop())
+        if os.path.exists(name):
+            stack_push(-1, TYPE_FLAG)
+        else:
+            stack_push(0, TYPE_FLAG)
+    elif opcode == 3000:
+        stack_push(len(sys.argv) - 2, TYPE_NUMBER)
+    elif opcode == 3001:
+        n = int(stack_pop())
+        stack_push(string_to_slice(sys.argv[n + 2]), TYPE_STRING)
+    return offset
+
+
+def load_file(file):
+    f = open(file).readlines()
+    for line in f:
+        if len(line) > 1:
+            if not line.startswith("#!"):
+                s = compile(line, request_slice())
+                interpret(s, opcodes)
+                display_errors()
+
+
+if __name__ == '__main__':
+    prepare_slices()
+    prepare_dictionary()
+    parse_bootstrap(bootstrap)
+    collect_unused_slices()
+
+    files.append(0)
+    files.append(0)
+    files.append(0)
+    files.append(0)
+    files.append(0)
+    files.append(0)
+    files.append(0)
+    files.append(0)
+
+    if len(sys.argv) < 2:
+        sys.exit('Usage: %s filename(s) [script arguments]' % sys.argv[0])
+
+    if not os.path.exists(sys.argv[1]):
+        sys.exit('ERROR: source file "%s" was not found!' % sys.argv[1])
+    load_file(sys.argv[1])
+    dump_stack()
+#    sys.stdout.write('\n')
