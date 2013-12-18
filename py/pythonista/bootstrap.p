@@ -106,6 +106,7 @@
 [ dup to-uppercase = ] 'uppercase?' define
 [ [ [ uppercase? ] [ lowercase? ] bi or :f ] if-character ] 'letter?' define
 [ [ $0 $9 between? ] if-character ] 'digit?' define
+[ :s '`~!@#$%^&*()'"<>,.:;[]{}\|-_=+' swap find [ false ] [ true ] if ] 'symbol?' define
 [ to-lowercase :s 'abcdefghijklmnopqrstuvwxyz1234567890' swap find [ false ] [ true ] if ] 'alphanumeric?' define
 [ to-lowercase :s 'aeiou' swap find [ false ] [ true ] if ] 'vowel?' define
 [ :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ length ] dip swap substring ] 'trim-left' define
@@ -158,9 +159,12 @@
 [ request [ copy ] sip &*array:source* ! [ #0 &*array:source* @ array-length [ &*array:source* @ over array-fetch swap #1 + ] repeat drop ] array-from-quote ] 'array-reverse' define
 
 "routines for rendering an array into a string"
-[ "array  --  string"  'numeric-array: ' [ :s '#' swap + + #32 :c :s + ] array-reduce ] 'numeric-array-to-string' define
-[ "array  --  string"  'character-array: ' [ :c :s '$' swap + + #32 :c :s + ] array-reduce ] 'character-array-to-string' define
-[ "array  --  string"  'string-array: ' [ :p :s  $' :s swap + $' :s + + #32 :c :s + ] array-reduce ] 'string-array-to-string' define
+'*array:conversions*' variable
+&*array:conversions* slice-set
+[ "array  --  string"  '' [ :s '#' swap + + #32 :c :s + ] array-reduce ] slice-store
+[ "array  --  string"  '' [ :p :s  $' :s swap + $' :s + + #32 :c :s + ] array-reduce ] slice-store
+[ "array  --  string"  '' [ :c :s '$' swap + + #32 :c :s + ] array-reduce ] slice-store
+[ "pointer:array number:type - string"  #100 / #1 - &*array:conversions* swap fetch :p invoke ] 'array-to-string' define
 
 "more stuff"
 [ [ [ new-slice length [ #1 - ] sip [ dup-pair fetch slice-store #1 - ] repeat drop-pair #0 slice-store &*slice-current* @ :p :s ] preserve-slice ] if-string ] 'reverse' define
