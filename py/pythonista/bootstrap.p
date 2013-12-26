@@ -101,6 +101,10 @@
 [ dup-pair < [ [ [ dup #1 + ] dip dup-pair = ] while-false ] [ [ [ dup #1 - ] dip dup-pair = ] while-false ] if drop ] 'expand-range' define
 [ #1 - [ + ] repeat ] 'sum-range' define
 
+"Misc"
+[ depth [ invoke ] dip depth swap - ] 'invoke-count-items' define
+[ [ drop ] repeat ] 'drop-multiple' define
+
 "String and Character"
 [ dup to-lowercase = ] 'lowercase?' define
 [ dup to-uppercase = ] 'uppercase?' define
@@ -114,15 +118,12 @@
 [ ] 'trim-right' define
 [ :s length dup-pair #1 - fetch nip #32 = [ length #1 - #0 swap substring trim-right ] if-true ] 'trim-right' define
 [ trim-left trim-right ] 'trim' define
+[ invoke-count-items #1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define
 
 "Helpful Math"
 [ dup negative? [ #-1 * ] if-true ] 'abs' define
 [ dup-pair < [ drop ] [ nip ] if ] 'min' define
 [ dup-pair < [ nip ] [ drop ] if ] 'max' define
-
-"Misc"
-[ depth [ invoke ] dip depth swap - ] 'invoke-count-items' define
-[ [ drop ] repeat ] 'drop-multiple' define
 
 "Sliced Memory Access"
 '*slice-current*' variable
