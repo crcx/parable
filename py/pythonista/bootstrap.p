@@ -108,6 +108,7 @@
 [ [ $0 $9 between? ] if-character ] 'digit?' define
 [ :s '`~!@#$%^&*()'"<>,.:;[]{}\|-_=+' swap find [ false ] [ true ] if ] 'symbol?' define
 [ to-lowercase :s 'abcdefghijklmnopqrstuvwxyz1234567890' swap find [ false ] [ true ] if ] 'alphanumeric?' define
+[ to-lowercase :s 'bcdfghjklmnpqrstvwxyz' swap find [ false ] [ true ] if ] 'consonant?' define
 [ to-lowercase :s 'aeiou' swap find [ false ] [ true ] if ] 'vowel?' define
 [ :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ length ] dip swap substring ] 'trim-left' define
 [ ] 'trim-right' define
