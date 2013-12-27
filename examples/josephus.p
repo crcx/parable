@@ -5,7 +5,11 @@
 "quite agree with the whole 'we should all kill ourselves' idea, figured out"
 "the perfect way to avoid death: be the last man standing."
 
-[ ] 'josephus' define
-[ dup #1 <> [ dup #1 - josephus #2 + swap rem #1 + ] if-true ] 'josephus' define
-#40 josephus
+[ #40 ] 'SOLDIERS' define
+[ #3 ] 'VICTIM' define
 
+[ ] '(josephus)' define
+[ "r i" swap VICTIM + over rem swap #1 + dup SOLDIERS > [ (josephus) ] if-false ] '(josephus)' define
+[ #0 #1 (josephus) drop #1 + ] 'josephus' define
+
+[ 'The number of the last man standing out of ' SOLDIERS ', killing each ' VICTIM ' is ' josephus ] build-string
