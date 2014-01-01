@@ -1,5 +1,5 @@
 # parable
-# copyright (c) 2012 - 2013, charles childers
+# copyright (c) 2012 - 2014, charles childers
 #
 
 MAX_SLICES = 64000
@@ -312,7 +312,42 @@ slice_to_string = (s) ->
 # interpret(slice)
 #
 
-interpret = (s) ->
+interpret = (slice) ->
+    offset = 0
+    while offset < SLICE_LEN
+        opcode = fetch slice, offset
+        if opcode == BC_PUSH_N
+            offset = offset + 1
+            value = fetch slice, offset
+            # TODO: push to stack
+            # stack_push value, TYPE_NUMBER
+        if opcode == BC_PUSH_S
+            offset = offset + 1
+            value = fetch slice, offset
+            # TODO: push to stack
+            # stack_push value, TYPE_STRING
+        if opcode == BC_PUSH_C
+            offset = offset + 1
+            value = fetch slice, offset
+            # TODO: push to stack
+            # stack_push value, TYPE_CHARACTER
+        if opcode == BC_PUSH_F
+            offset = offset + 1
+            value = fetch slice, offset
+            # TODO: push to stack
+            # stack_push value, TYPE_FUNCTION
+        if opcode == BC_PUSH_COMMENT
+            offset = offset + 1
+            value = fetch slice, offset
+
+        if opcode == BC_QUOTE_NAME
+            # TODO:
+            # value = stack_pop()
+            # quote = stack_pop()
+            name = slice_to_string value
+            add_definition name, quote
+
+        offset = offset + 1
     return 0
 
 
