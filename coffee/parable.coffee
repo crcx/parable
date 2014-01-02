@@ -131,7 +131,7 @@ request_slice = ->
         if p_map[i] == 0
             p_map[i] = 1
             return i
-        i += 1
+        i++
     return -1
 
 
@@ -150,15 +150,7 @@ copy_slice = (s, d) ->
     i = 0
     while i < SLICE_LEN
         store fetch(d, i), s, i
-        i += 1
-
-
-# string_to_slice(s)
-# convert a string into an slice. returns the newly allocated
-# slice
-
-string_to_slice = (s) ->
-    return request_slice()
+        i++
 
 
 # prepare_slices()
@@ -169,7 +161,7 @@ prepare_slices = ->
     while i < MAX_SLICES
         p_slices[i] = []
         p_map[i] = 0
-        i += 1
+        i++
 
 
 # store(value, slice, offset)
@@ -193,7 +185,7 @@ fetch = (s, o) ->
 # slice
 
 compile = (src, s) ->
-    console.log src + " (in slice #{s})"
+    # console.log src + " (in slice #{s})"
     src = src.replace(/(\r\n|\n|\r)/gm, " ")
     src = src.replace(/\s+/g, " ")
     src = src.split(" ")
@@ -213,28 +205,29 @@ compile = (src, s) ->
             offset = quotes.pop()
             slice = quotes.pop()
             store BC_PUSH_F, slice, offset
-            offset += 1
+            offset++
             store old, slice, offset
-            offset += 1
+            offset++
         else if src[i].startsWith '`'
+            # console.log 'compiling primitive ' + src[i] + ' into ' + slice + ':' + offset
             store parseInt(src[i][1 .. src.length]), slice, offset
-            offset += 1
+            offset++
         else if src[i].startsWith '#'
             store BC_PUSH_N, slice, offset
-            offset += 1
+            offset++
             store parseFloat(src[i][1 .. src.length]), slice, offset
-            offset += 1
+            offset++
         else if src[i].startsWith '$'
             store(BC_PUSH_C, slice, offset)
-            offset += 1
+            offset++
             store src[i][1 .. src.length].charCodeAt(0), slice, offset
-            offset += 1
+            offset++
         else if src[i].startsWith '&'
             console.log 'BC_PUSH_F ' + src[i]
             store(BC_PUSH_F, slice, offset)
-            offset += 1
+            offset++
             store(src[i][1 .. src.length], slice, offset)
-            offset += 1
+            offset++
         else if src[i].startsWith "'"
             if src[i].endsWith "'"
                 s = src[i]
@@ -249,11 +242,11 @@ compile = (src, s) ->
                     else
                         s += " " + src[i]
             store BC_PUSH_S, slice, offset
-            offset += 1
+            offset++
             s = s[1 .. s.length - 2]
             m = string_to_slice(s)
             store m, slice, offset
-            offset += 1
+            offset++
         else if src[i].startsWith '"'
             if src[i].endsWith '"'
                 s = src[i]
@@ -268,22 +261,22 @@ compile = (src, s) ->
                     else
                         s += " " + src[i]
             store BC_PUSH_COMMENT, slice, offset
-            offset += 1
+            offset++
             s = s[1 .. s.length - 2]
             m = string_to_slice(s)
             store m, slice, offset
-            offset += 1
+            offset++
         else
             if lookup_pointer(src[i]) == -1
                 console.log 'UNHANDLED TOKEN: ' + src[i]
             else
                 store BC_FLOW_CALL, slice, offset
-                offset += 1
+                offset++
                 store lookup_pointer(src[i]), slice, offset
-                offset += 1
-        i += 1
+                offset++
+        i++
     store BC_FLOW_RETURN, slice, offset
-    return s
+    slice
 
 
 #
@@ -314,15 +307,33 @@ lookup_pointer = (name) ->
       if dictionary_names[index].toLowerCase() == name
         found = index
         index = dictionary_names.length
-      index = index + 1
+      index++
     found
 
 
-# slice_to_string(slice)
-#
+string_to_slice = (str) ->
+    slice = request_slice()
+    i = 0
+    while i < str.length
+      if str.charCodeAt(i) == '\n'
+        store 92, slice, i
+        i = i + 1
+        store 110, slice, i
+      else
+        store str.charCodeAt(i), slice, i
+      i = i + 1
+    store 0, slice, i
+    slice
 
-slice_to_string = (s) ->
-    return s
+
+slice_to_string = (slice) ->
+    s = ""
+    o = 0
+    while fetch(slice, o) != 0
+      s = s + String.fromCharCode fetch(slice, o)
+      o = o + 1
+    s.replace /\\n/g, '\n'
+    s
 
 
 # interpret(slice)
@@ -332,34 +343,41 @@ interpret = (slice) ->
     offset = 0
     while offset < SLICE_LEN
         opcode = fetch slice, offset
+        # console.log slice + ':' + offset + ':' + opcode + ':' + fetch(slice, offset + 1)
         if opcode == BC_PUSH_N
-            offset = offset + 1
+            offset++
             value = fetch slice, offset
             stack_push value, TYPE_NUMBER
         if opcode == BC_PUSH_S
-            offset = offset + 1
+            offset++
             value = fetch slice, offset
             stack_push value, TYPE_STRING
         if opcode == BC_PUSH_C
-            offset = offset + 1
+            offset++
             value = fetch slice, offset
             stack_push value, TYPE_CHARACTER
         if opcode == BC_PUSH_F
-            offset = offset + 1
+            offset++
             value = fetch slice, offset
             stack_push value, TYPE_FUNCTION
         if opcode == BC_PUSH_COMMENT
-            offset = offset + 1
+            offset++
             value = fetch slice, offset
 
+        if opcode == BC_FLOW_CALL
+            offset++
+            target = fetch slice, offset
+            interpret target
+        if opcode == BC_FLOW_RETURN
+            offset = SLICE_LEN
+
         if opcode == BC_QUOTE_NAME
-            # TODO:
-            # value = stack_pop()
-            # quote = stack_pop()
+            value = stack_pop()
+            quote = stack_pop()
             name = slice_to_string value
             add_definition name, quote
 
-        offset = offset + 1
+        offset++
     return 0
 
 
@@ -369,10 +387,17 @@ array = fs.readFileSync('bootstrap.p').toString().split("\n")
 
 prepare_slices()
 
-request_slice()
-compile "`600", 0
-add_definition('define', 0)
+s = request_slice()
+store BC_QUOTE_NAME, s, 0
+store BC_FLOW_RETURN, s, 1
+add_definition('define', s)
 
 for i in array
     if i.length > 0
-        compile i, request_slice()
+        s = request_slice()
+        compile i, s
+        interpret s
+
+console.log dictionary_names
+console.log stack
+console.log sp
