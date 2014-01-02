@@ -111,6 +111,18 @@ stack_pop = ->
     sp--
     stack[sp]
 
+stack_depth = ->
+    stack_push sp, TYPE_NUMBER
+
+stack_swap = ->
+    sp--
+    ta = stack[sp]
+    va = types[sp]
+    sp--
+    tb = stack[sp]
+    vb = types[sp]
+    stack_push ta, va
+    stack_push tb, vb
 
 # p_slices contains an array of slices
 #
@@ -209,8 +221,7 @@ compile = (src, s) ->
             store old, slice, offset
             offset++
         else if src[i].startsWith '`'
-            # console.log 'compiling primitive ' + src[i] + ' into ' + slice + ':' + offset
-            store parseInt(src[i][1 .. src.length]), slice, offset
+            store parseFloat(src[i][1 .. src.length]), slice, offset
             offset++
         else if src[i].startsWith '#'
             store BC_PUSH_N, slice, offset
@@ -308,7 +319,7 @@ lookup_pointer = (name) ->
         found = index
         index = dictionary_names.length
       index++
-    found
+    dictionary_slices[found]
 
 
 string_to_slice = (str) ->
@@ -343,7 +354,7 @@ interpret = (slice) ->
     offset = 0
     while offset < SLICE_LEN
         opcode = fetch slice, offset
-        # console.log slice + ':' + offset + ':' + opcode + ':' + fetch(slice, offset + 1)
+#        console.log slice + ':' + offset + ':' + opcode + ':' + fetch(slice, offset + 1)
         if opcode == BC_PUSH_N
             offset++
             value = fetch slice, offset
@@ -363,6 +374,26 @@ interpret = (slice) ->
         if opcode == BC_PUSH_COMMENT
             offset++
             value = fetch slice, offset
+
+        if opcode == BC_STACK_DUP
+             todo = 0
+        if opcode == BC_STACK_DROP
+             todo = 0
+        if opcode == BC_STACK_SWAP
+            console.log 'stack-swap'
+            stack_swap()
+        if opcode == BC_STACK_OVER
+             todo = 0
+        if opcode == BC_STACK_TUCK
+             todo = 0
+        if opcode == BC_STACK_NIP
+             todo = 0
+        if opcode == BC_STACK_DEPTH
+            console.log 'stack-depth'
+            stack_depth()
+        if opcode == BC_STACK_CLEAR
+             todo = 0
+
 
         if opcode == BC_FLOW_CALL
             offset++
