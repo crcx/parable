@@ -96,6 +96,22 @@ if (typeof String::trim != 'function')
     this.replace(/^\s+|\s+$/g, '')
 
 
+# stack implementation
+
+stack = []
+types = []
+sp = 0
+
+stack_push = (v, t) ->
+    stack[sp] = v
+    types[sp] = t
+    sp++
+
+stack_pop = ->
+    sp--
+    stack[sp]
+
+
 # p_slices contains an array of slices
 #
 # p_map is an array that indicates which arrays in p_slices
@@ -319,23 +335,19 @@ interpret = (slice) ->
         if opcode == BC_PUSH_N
             offset = offset + 1
             value = fetch slice, offset
-            # TODO: push to stack
-            # stack_push value, TYPE_NUMBER
+            stack_push value, TYPE_NUMBER
         if opcode == BC_PUSH_S
             offset = offset + 1
             value = fetch slice, offset
-            # TODO: push to stack
-            # stack_push value, TYPE_STRING
+            stack_push value, TYPE_STRING
         if opcode == BC_PUSH_C
             offset = offset + 1
             value = fetch slice, offset
-            # TODO: push to stack
-            # stack_push value, TYPE_CHARACTER
+            stack_push value, TYPE_CHARACTER
         if opcode == BC_PUSH_F
             offset = offset + 1
             value = fetch slice, offset
-            # TODO: push to stack
-            # stack_push value, TYPE_FUNCTION
+            stack_push value, TYPE_FUNCTION
         if opcode == BC_PUSH_COMMENT
             offset = offset + 1
             value = fetch slice, offset
