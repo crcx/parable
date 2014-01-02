@@ -374,25 +374,34 @@ interpret = (slice) ->
         if opcode == BC_PUSH_COMMENT
             offset++
             value = fetch slice, offset
-
+        if opcode == BC_TYPE_N
+            todo = 0
+        if opcode == BC_TYPE_S
+            todo = 0
+        if opcode == BC_TYPE_C
+            todo = 0
+        if opcode == BC_TYPE_F
+            todo = 0
+        if opcode == BC_TYPE_FLAG
+            todo = 0
+        if opcode == BC_GET_TYPE
+            todo = 0
         if opcode == BC_STACK_DUP
-             todo = 0
+            todo = 0
         if opcode == BC_STACK_DROP
-             todo = 0
+            stack_drop()
         if opcode == BC_STACK_SWAP
-            console.log 'stack-swap'
             stack_swap()
         if opcode == BC_STACK_OVER
-             todo = 0
+            todo = 0
         if opcode == BC_STACK_TUCK
-             todo = 0
+            todo = 0
         if opcode == BC_STACK_NIP
-             todo = 0
+            todo = 0
         if opcode == BC_STACK_DEPTH
-            console.log 'stack-depth'
             stack_depth()
         if opcode == BC_STACK_CLEAR
-             todo = 0
+            todo = 0
 
 
         if opcode == BC_FLOW_CALL
@@ -425,10 +434,8 @@ add_definition('define', s)
 
 for i in array
     if i.length > 0
-        s = request_slice()
-        compile i, s
-        interpret s
+        interpret compile i, request_slice()
 
-console.log dictionary_names
+# console.log dictionary_names
 console.log stack
 console.log sp
