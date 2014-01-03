@@ -694,7 +694,9 @@ interpret = (slice) ->
             name = slice_to_string value
             add_definition name, quote
         if opcode == BC_STRING_SEEK
-            todo = 0
+            a = slice_to_string stack_pop()
+            b = slice_to_string stack_pop()
+            stack_push b.indexOf(a), TYPE_NUMBER
         if opcode == BC_STRING_SUBSTR
             len = stack_pop()
             start = stack_pop()
