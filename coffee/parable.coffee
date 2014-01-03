@@ -185,7 +185,7 @@ stack_convert_type = (type) ->
     else if type == TYPE_CHARACTER
         if types[sp - 1] == TYPE_STRING
             s = slice_to_string stack_pop()
-            stack_push ord(s[0]), TYPE_CHARACTER
+            stack_push s.charCodeAt(0), TYPE_CHARACTER
         else
             s = stack_pop()
             stack_push parseFloat(s), TYPE_CHARACTER
