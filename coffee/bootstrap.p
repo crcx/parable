@@ -52,8 +52,4 @@
 [ `802 ] 'length' define
 [ `900 ] 'report-error' define
 
-#1 #2 #3 over
-#4 #1 -
-#21 #5 rem
-#21 #5 / floor
-
+#10 [ #1 ] repeat

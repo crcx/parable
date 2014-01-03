@@ -499,11 +499,22 @@ interpret = (slice) ->
             else
                 interpret qf
         if opcode == BC_FLOW_WHILE
-            todo = 0
+            qt = stack_pop()
+            f  = -1
+            while f == -1
+                interpret qt
+                f = stack_pop()
         if opcode == BC_FLOW_UNTIL
-            todo = 0
+            qt = stack_pop()
+            f  = 0
+            while f == 0
+                interpret qt
+                f = stack_pop()
         if opcode == BC_FLOW_TIMES
-            todo = 0
+            qt = stack_pop()
+            f  = stack_pop()
+            while f-- > 0
+                interpret qt
         if opcode == BC_FLOW_CALL
             offset++
             target = fetch slice, offset
