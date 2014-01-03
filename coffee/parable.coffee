@@ -385,11 +385,77 @@ interpret = (slice) ->
         if opcode == BC_TYPE_FLAG
             todo = 0
         if opcode == BC_GET_TYPE
+            stack_push types[sp], TYPE_NUMBER
+        if opcode == BC_ADD
+            todo = 0
+        if opcode == BC_SUBTRACT
+            todo = 0
+        if opcode == BC_MULTIPLY
+            todo = 0
+        if opcode == BC_DIVIDE
+            todo = 0
+        if opcode == BC_REMAINDER
+            todo = 0
+        if opcode == BC_FLOOR
+            todo = 0
+        if opcode == BC_BITWISE_SHIFT
+            todo = 0
+        if opcode == BC_BITWISE_AND
+            todo = 0
+        if opcode == BC_BITWISE_OR
+            todo = 0
+        if opcode == BC_BITWISE_XOR
+            todo = 0
+        if opcode == BC_COMPARE_LT
+            todo = 0
+        if opcode == BC_COMPARE_GT
+            todo = 0
+        if opcode == BC_COMPARE_LTEQ
+            todo = 0
+        if opcode == BC_COMPARE_GTEQ
+            todo = 0
+        if opcode == BC_COMPARE_EQ
+            todo = 0
+        if opcode == BC_COMPARE_NEQ
+            todo = 0
+        if opcode == BC_FLOW_IF
+            todo = 0
+        if opcode == BC_FLOW_WHILE
+            todo = 0
+        if opcode == BC_FLOW_UNTIL
+            todo = 0
+        if opcode == BC_FLOW_TIMES
+            todo = 0
+        if opcode == BC_FLOW_CALL
+            offset++
+            target = fetch slice, offset
+            interpret target
+        if opcode == BC_FLOW_CALL_F
+            todo = 0
+        if opcode == BC_FLOW_DIP
+            todo = 0
+        if opcode == BC_FLOW_SIP
+            todo = 0
+        if opcode == BC_FLOW_BI
+            todo = 0
+        if opcode == BC_FLOW_TRI
+            todo = 0
+        if opcode == BC_FLOW_RETURN
+            offset = SLICE_LEN
+        if opcode == BC_MEM_COPY
+            todo = 0
+        if opcode == BC_MEM_FETCH
+            todo = 0
+        if opcode == BC_MEM_STORE
+            todo = 0
+        if opcode == BC_MEM_REQUEST
+            todo = 0
+        if opcode == BC_MEM_COLLECT
             todo = 0
         if opcode == BC_STACK_DUP
             todo = 0
         if opcode == BC_STACK_DROP
-            stack_drop()
+            stack_pop()
         if opcode == BC_STACK_SWAP
             stack_swap()
         if opcode == BC_STACK_OVER
@@ -397,25 +463,31 @@ interpret = (slice) ->
         if opcode == BC_STACK_TUCK
             todo = 0
         if opcode == BC_STACK_NIP
-            todo = 0
+            stack_swap()
+            stack_pop()
         if opcode == BC_STACK_DEPTH
             stack_depth()
         if opcode == BC_STACK_CLEAR
-            todo = 0
-
-
-        if opcode == BC_FLOW_CALL
-            offset++
-            target = fetch slice, offset
-            interpret target
-        if opcode == BC_FLOW_RETURN
-            offset = SLICE_LEN
-
+            sp = 0
         if opcode == BC_QUOTE_NAME
             value = stack_pop()
             quote = stack_pop()
             name = slice_to_string value
             add_definition name, quote
+        if opcode == BC_STRING_SEEK
+            todo = 0
+        if opcode == BC_STRING_SUBSTR
+            todo = 0
+        if opcode == BC_STRING_NUMERIC
+            todo = 0
+        if opcode == BC_TO_LOWER
+            todo = 0
+        if opcode == BC_TO_UPPER
+            todo = 0
+        if opcode == BC_LENGTH
+            todo = 0
+        if opcode == BC_REPORT_ERROR
+            todo = 0
 
         offset++
     return 0
