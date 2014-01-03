@@ -671,16 +671,20 @@ interpret = (slice) ->
 
 # =============================================================
 
-fs = require 'fs'
-array = fs.readFileSync('bootstrap.p').toString().split("\n")
-
 prepare_slices()
-
 s = request_slice()
 store BC_QUOTE_NAME, s, 0
 store BC_FLOW_RETURN, s, 1
 add_definition('define', s)
 
+fs = require 'fs'
+
+array = fs.readFileSync('bootstrap.p').toString().split("\n")
+for i in array
+    if i.length > 0
+        interpret compile i, request_slice()
+
+array = fs.readFileSync('test.p').toString().split("\n")
 for i in array
     if i.length > 0
         interpret compile i, request_slice()
