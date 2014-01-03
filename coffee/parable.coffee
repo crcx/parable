@@ -485,7 +485,6 @@ interpret = (slice) ->
                 stack_push string_to_slice(vb + va), TYPE_STRING
             else
                 stack_push vb + va, TYPE_NUMBER
-            todo = 0
         if opcode == BC_SUBTRACT
             a = stack_pop()
             b = stack_pop()
@@ -552,9 +551,29 @@ interpret = (slice) ->
             else
                 stack_push 0, TYPE_FLAG
         if opcode == BC_COMPARE_EQ
-            todo = 0
+            ta = types[sp - 1]
+            tb = types[sp - 2]
+            va = stack_pop()
+            vb = stack_pop()
+            if ta == tb && ta == TYPE_STRING
+                va = slice_to_string va
+                vb = slice_to_string vb
+            if va == vb
+                stack_push -1, TYPE_NUMBER
+            else
+                stack_push 0, TYPE_NUMBER
         if opcode == BC_COMPARE_NEQ
-            todo = 0
+            ta = types[sp - 1]
+            tb = types[sp - 2]
+            va = stack_pop()
+            vb = stack_pop()
+            if ta == tb && ta == TYPE_STRING
+                va = slice_to_string va
+                vb = slice_to_string vb
+            if va != vb
+                stack_push -1, TYPE_NUMBER
+            else
+                stack_push 0, TYPE_NUMBER
         if opcode == BC_FLOW_IF
             qt = stack_pop()
             qf = stack_pop()
@@ -630,7 +649,10 @@ interpret = (slice) ->
             b = stack_pop()   # slice
             stack_push fetch( b, a), TYPE_NUMBER
         if opcode == BC_MEM_STORE
-            todo = 0
+            a = stack_pop()   # offset
+            b = stack_pop()   # slice
+            c = stack_pop()   # value
+            store c, b, a
         if opcode == BC_MEM_REQUEST
             stack_push request_slice(), TYPE_FUNCTION
         if opcode == BC_MEM_RELEASE
@@ -671,9 +693,21 @@ interpret = (slice) ->
             else
                 stack_push 0, TYPE_FLAG
         if opcode == BC_TO_LOWER
-            todo = 0
+            if types[sp - 1] == TYPE_STRING
+                a = slice_to_string stack_pop()
+                stack_push string_to_slice(a.toLowerCase()), TYPE_STRING
+            if types[sp - 1] == TYPE_CHARACTER
+                a = String.fromCharCode stack_pop()
+                b = a.toLowerCase()
+                stack_push b.charCodeAt(0), TYPE_CHARACTER
         if opcode == BC_TO_UPPER
-            todo = 0
+            if types[sp - 1] == TYPE_STRING
+                a = slice_to_string stack_pop()
+                stack_push string_to_slice(a.toUpperCase()), TYPE_STRING
+            if types[sp - 1] == TYPE_CHARACTER
+                a = String.fromCharCode stack_pop()
+                b = a.toUpperCase()
+                stack_push b.charCodeAt(0), TYPE_CHARACTER
         if opcode == BC_LENGTH
             f = slice_to_string stack[sp - 1]
             stack_push f.length, TYPE_NUMBER
