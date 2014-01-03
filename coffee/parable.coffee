@@ -12,12 +12,14 @@
 
 
 # =============================================================
+# Configuration
 
-MAX_SLICES = 64000
-SLICE_LEN = 1000
+MAX_SLICES = 64000     # The maximum number of slices
+SLICE_LEN = 1000       # The maximum length of a slice
 
 
 # =============================================================
+# Add some new functionality to String object
 
 if (typeof String::startsWith != 'function')
   String::startsWith = (str) ->
@@ -31,11 +33,9 @@ if (typeof String::trim != 'function')
   String::trim = ->
     this.replace(/^\s+|\s+$/g, '')
 
-# =============================================================
 
-#
+# =============================================================
 # Constants for data types
-#
 
 TYPE_NUMBER = 100
 TYPE_STRING = 200
@@ -44,9 +44,8 @@ TYPE_FUNCTION = 400
 TYPE_FLAG = 500
 
 
-#
+# =============================================================
 # Constants for byte codes
-#
 
 BC_PUSH_N = 100
 BC_PUSH_S = 101
@@ -110,26 +109,41 @@ BC_LENGTH = 802
 BC_REPORT_ERROR = 900
 
 
-
-
+# =============================================================
 # stack implementation
+#
+# notes:
+# - TOS is at [sp - 1]
+# - NOS is at [sp - 2]
 
-stack = []
-types = []
-sp = 0
+stack = []     # Array; holds stack values
+types = []     # Array; holds type constants for values
+sp = 0         # Stack Pointer
 
+
+# stack_push(value, type)
+# Push a value with the specified type to the stack.
 stack_push = (v, t) ->
     stack[sp] = v
     types[sp] = t
     sp++
 
+
+# stack_pop()
+# Remove (and return) a value on the stack.
 stack_pop = ->
     sp--
     stack[sp]
 
+
+# stack_depth()
+# Push the current number of items on the stack to the stack.
 stack_depth = ->
     stack_push sp, TYPE_NUMBER
 
+
+# stack_swap()
+# Exchange the positions of TOS and NOS.
 stack_swap = ->
     sp--
     ta = stack[sp]
@@ -140,6 +154,11 @@ stack_swap = ->
     stack_push ta, va
     stack_push tb, vb
 
+
+# stack_dup()
+# Duplicate the top value on the stack. If top value is of
+# TYPE_STRING it makes a copy of the string as opposed to
+# a copy of the pointer.
 stack_dup = ->
     if types[sp] == TYPE_STRING
         tb = stack[sp - 1]
@@ -151,11 +170,17 @@ stack_dup = ->
         vb = types[sp - 1]
         stack_push tb, vb
 
+
+# stack_over()
+#
 stack_over = ->
     ta = stack[sp - 2]
     va = types[sp - 2]
     stack_push ta, va
 
+
+# stack_tuck()
+#
 stack_tuck = ->
     stack_dup()
     ta = stack[sp - 1]
@@ -164,6 +189,9 @@ stack_tuck = ->
     stack_swap()
     stack_push ta, va
 
+
+# stack_convert_type(type)
+#
 stack_convert_type = (type) ->
     if type == TYPE_NUMBER
         if types[sp - 1] == TYPE_STRING
@@ -218,17 +246,21 @@ stack_convert_type = (type) ->
         return
 
 
-# p_slices contains an array of slices
+# =============================================================
+# memory regions
 #
-# p_map is an array that indicates which arrays in p_slices
-# are being used.
+# notes:
+# - p_map[sliceid] == 1 for allocated, 0 for unused
 
-p_slices = []
-p_map = []
+
+p_slices = []        # array of slices
+p_map = []           # array indicating which slices in the
+                     # p_slices are in use
 
 
 # copy_slice(source, dest)
-
+# Copy the contents of the source slice into the destination
+# slice.
 copy_slice = (source, dest) ->
     i = 0
     while i < SLICE_LEN
@@ -239,7 +271,6 @@ copy_slice = (source, dest) ->
 # request_slice()
 # returns a new slice identifier and marks the returned slice
 # as being used
-
 request_slice = ->
     i = 0
     while i < MAX_SLICES
@@ -252,14 +283,12 @@ request_slice = ->
 
 # release_slice(identifier)
 # marks a slice as no longer in use
-
 release_slice = (s) ->
     p_map[s] = 0
 
 
 # prepare_slices()
 # fill the p_slices with arrays and zero out the p_map
-
 prepare_slices = ->
     i = 0
     while i < MAX_SLICES
@@ -271,7 +300,6 @@ prepare_slices = ->
 # store(value, slice, offset)
 # store the specified value into the specified offset of the
 # specified slice
-
 store = (v, s, o) ->
     p_slices[s][o] = v
 
@@ -279,15 +307,16 @@ store = (v, s, o) ->
 # fetch(slice, offset)
 # retrieve a stored value from the specified offset of the
 # specified slice
-
 fetch = (s, o) ->
     return p_slices[s][o]
 
 
+# =============================================================
+# compiler
+
 # compile(source, slice)
 # parse and compile the code in *source* into the specified
 # slice
-
 compile = (src, s) ->
     # console.log src + " (in slice #{s})"
     src = src.replace(/(\r\n|\n|\r)/gm, " ")
@@ -384,17 +413,17 @@ compile = (src, s) ->
     slice
 
 
-#
-#
-#
+# =============================================================
+# dictionary
 
 dictionary_names = []
 dictionary_slices = []
 
 
 # add_definition(name, slice)
-#
-
+# Add a name for a given slice to the dictionary. If the name
+# is already present, replaces its definition with the code in
+# the new slice.
 add_definition = (name, ptr) ->
     if lookup_pointer(name) == -1
         dictionary_names.push(name)
@@ -405,8 +434,8 @@ add_definition = (name, ptr) ->
 
 
 # lookup_pointer(name)
-#
-
+# Returns a pointer to the slice corresponding to name. If no
+# match is found, returns -1
 lookup_pointer = (name) ->
     index = 0
     found = -1
@@ -421,6 +450,18 @@ lookup_pointer = (name) ->
     else
         return dictionary_slices[found]
 
+
+# prepare_dictionary()
+# Sets up an initial dictionary so that the 'define' function
+# is available for bootstrap purposes.
+prepare_dictionary = ->
+    s = request_slice()
+    store BC_QUOTE_NAME, s, 0
+    store BC_FLOW_RETURN, s, 1
+    add_definition('define', s)
+
+
+# =============================================================
 
 string_to_slice = (str) ->
     slice = request_slice()
@@ -447,10 +488,10 @@ slice_to_string = (slice) ->
     s
 
 # =============================================================
+# byte code interpreter
 
 # interpret(slice)
-#
-
+# Interprets the byte codes in a specified slice.
 interpret = (slice) ->
     offset = 0
     while offset < SLICE_LEN
@@ -739,12 +780,10 @@ interpret = (slice) ->
 
 
 # =============================================================
+# this should all be moved to a separate file sometime...
 
 prepare_slices()
-s = request_slice()
-store BC_QUOTE_NAME, s, 0
-store BC_FLOW_RETURN, s, 1
-add_definition('define', s)
+prepare_dictionary()
 
 fs = require 'fs'
 
@@ -758,7 +797,6 @@ for i in array
     if i.length > 0
         interpret compile i.trim(), request_slice()
 
-# console.log dictionary_names
 if sp > 0
     console.log stack[0 .. (sp - 1)]
     console.log types[0 .. (sp - 1)]
