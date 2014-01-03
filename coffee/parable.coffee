@@ -751,12 +751,12 @@ fs = require 'fs'
 array = fs.readFileSync('bootstrap.p').toString().split("\n")
 for i in array
     if i.length > 0
-        interpret compile i, request_slice()
+        interpret compile i.trim(), request_slice()
 
 array = fs.readFileSync('test.p').toString().split("\n")
 for i in array
     if i.length > 0
-        interpret compile i, request_slice()
+        interpret compile i.trim(), request_slice()
 
 # console.log dictionary_names
 if sp > 0
