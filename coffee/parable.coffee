@@ -693,4 +693,20 @@ for i in array
 if sp > 0
     console.log stack[0 .. (sp - 1)]
     console.log types[0 .. (sp - 1)]
+    i = sp
+    while i > 0
+        i = i - 1
+        if types[i] == TYPE_STRING
+            console.log i, "'" + slice_to_string(stack[i]) + "'"
+        else if types[i] == TYPE_CHARACTER
+            console.log i, '$' + String.fromCharCode stack[i]
+        else if types[i] == TYPE_FLAG
+            if stack[i] == -1
+                console.log i, 'flag: true'
+            else if stack[i] == 0
+                console.log i, 'flag: false'
+            else
+                console.log i, 'flag: malformed'
+        else
+            console.log i, stack[i]
 console.log sp
