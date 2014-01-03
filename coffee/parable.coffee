@@ -439,15 +439,25 @@ interpret = (slice) ->
             stack_push (b % a), TYPE_NUMBER
         if opcode == BC_FLOOR
             stack_push Math.floor(stack_pop()), TYPE_NUMBER
-            todo = 0
         if opcode == BC_BITWISE_SHIFT
-            todo = 0
+            a = stack_pop()
+            b = stack_pop()
+            if a < 0
+                stack_push b << a
+            else
+                stack_push b >>= a
         if opcode == BC_BITWISE_AND
-            todo = 0
+            a = stack_pop()
+            b = stack_pop()
+            stack_push a & b
         if opcode == BC_BITWISE_OR
-            todo = 0
+            a = stack_pop()
+            b = stack_pop()
+            stack_push a | b
         if opcode == BC_BITWISE_XOR
-            todo = 0
+            a = stack_pop()
+            b = stack_pop()
+            stack_push a ^ b
         if opcode == BC_COMPARE_LT
             todo = 0
         if opcode == BC_COMPARE_GT
