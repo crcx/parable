@@ -4,8 +4,6 @@
 
 # Known issues/remaining to-do:
 #
-# - finish remaining byte codes (BC_MEM_COLLECT)
-# - garbage collector
 # - source is poorly commented at this point
 
 
@@ -17,7 +15,7 @@ SLICE_LEN = 1000       # The maximum length of a slice
 
 
 # =============================================================
-# Add some new functionality to String object
+# Add some new functionality to String and Array objects
 
 if (typeof String::startsWith != 'function')
   String::startsWith = (str) ->
@@ -30,6 +28,11 @@ if (typeof String::endsWith != 'function')
 if (typeof String::trim != 'function')
   String::trim = ->
     this.replace(/^\s+|\s+$/g, '')
+
+Array::unique = ->
+  output = {}
+  output[@[key]] = @[key] for key in [0...@length]
+  value for key, value of output
 
 
 # =============================================================
@@ -203,7 +206,6 @@ stack_convert_type = (type) ->
             types[sp - 1] = TYPE_NUMBER
     else if type == TYPE_STRING
         if types[sp - 1] == TYPE_NUMBER
-            console.log stack[sp - 1]
             stack_push string_to_slice(stack_pop().toString()), TYPE_STRING
         else if types[sp - 1] == TYPE_CHARACTER
             stack_push string_to_slice(String.fromCharCode(stack_pop())), TYPE_STRING
@@ -308,6 +310,42 @@ store = (v, s, o) ->
 fetch = (s, o) ->
     return p_slices[s][o]
 
+
+# =============================================================
+# garbage collector
+
+find_references = (s) ->
+    ptrs = []
+    i = 0
+    while i < SLICE_LEN
+        if fetch(s, i) >= 0
+            ptrs.push fetch s, i
+        i++
+    ptrs
+
+
+seek_all_references = ->
+    maybe = []
+    deps = []
+    refs = []
+    for s in dictionary_slices
+        maybe.push s
+        deps.push find_references s
+    for s in maybe.sort()
+        if p_map[s] == 1
+            refs.push s
+    refs
+
+
+collect_unused_slices = ->
+    map = []
+    refs = seek_all_references().sort()
+    i = 0
+    while i < MAX_SLICES
+        if p_map[i] == 1
+            if refs.indexOf(i) == -1
+                release_slice i
+        i++
 
 # =============================================================
 # compiler
@@ -711,7 +749,7 @@ interpret = (slice) ->
         if opcode == BC_MEM_RELEASE
             release_slice stack_pop()
         if opcode == BC_MEM_COLLECT
-            todo = 0
+            collect_unused_slices()
         if opcode == BC_STACK_DUP
             stack_dup()
         if opcode == BC_STACK_DROP
