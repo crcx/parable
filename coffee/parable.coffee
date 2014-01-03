@@ -136,11 +136,17 @@ stack_dup = ->
         stack_push tb, vb
 
 stack_over = ->
-    todo = 0
+    ta = stack[sp - 2]
+    va = types[sp - 2]
+    stack_push ta, va
 
 stack_tuck = ->
-    todo = 0
-
+    stack_dup()
+    ta = stack[sp - 1]
+    va = types[sp - 1]
+    stack_pop()
+    stack_swap()
+    stack_push ta, va
 
 # p_slices contains an array of slices
 #
