@@ -52,4 +52,4 @@
 [ `802 ] 'length' define
 [ `900 ] 'report-error' define
 
-#10 [ #1 ] repeat
+#10 [ #1 - ] sip

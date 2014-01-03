@@ -529,7 +529,12 @@ interpret = (slice) ->
             interpret target
             stack_push vd, vt
         if opcode == BC_FLOW_SIP
-            todo = 0
+            target = stack_pop()
+            stack_dup()
+            vt = types[sp - 1]
+            vd = stack_pop()
+            interpret target
+            stack_push vd, vt
         if opcode == BC_FLOW_BI
             todo = 0
         if opcode == BC_FLOW_TRI
@@ -585,7 +590,7 @@ interpret = (slice) ->
         if opcode == BC_LENGTH
             todo = 0
         if opcode == BC_REPORT_ERROR
-            todo = 0
+            console.log slice_to_string stack_pop()
 
         offset++
     return 0
