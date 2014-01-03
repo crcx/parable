@@ -1,7 +1,3 @@
-   'thebirdman'
-$a $b
-#1
-#-3
-&100
-collect-garbage
-
+'apple' variable
+#100 &apple !
+&apple @
