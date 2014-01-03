@@ -5,7 +5,6 @@
 # Known issues/remaining to-do:
 #
 # - finish remaining byte codes (BC_MEM_COLLECT, BC_STRING_SEEK)
-# - allow for redefinitions to occur
 # - organize initialization code into separate routines
 # - finish routines to render final stack
 # - garbage collector
@@ -397,8 +396,11 @@ dictionary_slices = []
 #
 
 add_definition = (name, ptr) ->
-    dictionary_names.push(name)
-    dictionary_slices.push(ptr)
+    if lookup_pointer(name) == -1
+        dictionary_names.push(name)
+        dictionary_slices.push(ptr)
+    else
+        copy_slice ptr, lookup_pointer name
     return 0
 
 
