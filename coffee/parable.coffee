@@ -491,7 +491,13 @@ interpret = (slice) ->
         if opcode == BC_COMPARE_NEQ
             todo = 0
         if opcode == BC_FLOW_IF
-            todo = 0
+            qt = stack_pop()
+            qf = stack_pop()
+            f  = stack_pop()
+            if f == -1
+                interpret qt
+            else
+                interpret qf
         if opcode == BC_FLOW_WHILE
             todo = 0
         if opcode == BC_FLOW_UNTIL
