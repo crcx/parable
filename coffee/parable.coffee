@@ -395,7 +395,9 @@ interpret = (slice) ->
             b = stack_pop()
             stack_push b * a, TYPE_NUMBER
         if opcode == BC_DIVIDE
-            todo = 0
+            a = stack_pop()
+            b = stack_pop()
+            stack_push (b / a), TYPE_NUMBER
         if opcode == BC_REMAINDER
             todo = 0
         if opcode == BC_FLOOR
