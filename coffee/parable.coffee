@@ -686,6 +686,7 @@ for i in array
         interpret compile i, request_slice()
 
 # console.log dictionary_names
-console.log stack[0 .. (sp - 1)]
-console.log types[0 .. (sp - 1)]
+if sp > 0
+    console.log stack[0 .. (sp - 1)]
+    console.log types[0 .. (sp - 1)]
 console.log sp

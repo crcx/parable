@@ -52,11 +52,74 @@
 [ `802 ] 'length' define
 [ `900 ] 'report-error' define
 
-#1
-#20
-#300
-'4000' :n
-'hello' :c
-$h dup
-#104 :c
+"Constants for data types recognized by Parable's VM"
+[ #100 ] 'NUMBER' define
+[ #200 ] 'STRING' define
+[ #300 ] 'CHARACTER' define
+[ #400 ] 'POINTER' define
+[ #500 ] 'FLAG' define
 
+"Stack Flow"
+[ over over ] 'dup-pair' define
+[ drop drop ] 'drop-pair' define
+
+"Conditionals"
+[ #-1 :f ] 'true' define
+[ #0 :f ] 'false' define
+[ [ ] if ] 'if-true' define
+[ [ ] swap if ] 'if-false' define
+[ dup-pair > [ swap ] if-true [ over ] dip <= [ >= ] dip and :f ] 'between?' define
+[ #0 <> ] 'true?' define
+[ #0 = ] 'false?' define
+[ #2 rem #0 = ] 'even?' define
+[ #2 rem #0 <> ] 'odd?' define
+[ #0 < ] 'negative?' define
+[ #0 >= ] 'positive?' define
+[ #0 = ] 'zero?' define
+[ [ type? CHARACTER = ] dip if-true ] 'if-character' define
+[ [ type? STRING = ] dip if-true ] 'if-string' define
+[ [ type? NUMBER = ] dip if-true ] 'if-number' define
+[ [ type? POINTER = ] dip if-true ] 'if-pointer' define
+[ [ type? FLAG = ] dip if-true ] 'if-flag' define
+
+"combinators"
+[ [ dip ] dip invoke ] 'bi*' define
+[ dup bi* ] 'bi@' define
+[ [ [ swap [ dip ] dip ] dip dip ] dip invoke ] 'tri*' define
+[ dup dup tri* ] 'tri@' define
+
+"variables"
+[ #0 fetch ] '@' define
+[ #0 store ] '!' define
+[ [ @ #1 + ] sip ! ] 'increment' define
+[ [ @ #1 - ] sip ! ] 'decrement' define
+[ request swap define ] 'variable' define
+[ swap request dup-pair copy swap [ [ invoke ] dip ] dip copy ] 'preserve' define
+
+"numeric ranges"
+[ dup-pair < [ [ [ dup #1 + ] dip dup-pair = ] while-false ] [ [ [ dup #1 - ] dip dup-pair = ] while-false ] if drop ] 'expand-range' define
+[ #1 - [ + ] repeat ] 'sum-range' define
+
+"Misc"
+[ depth [ invoke ] dip depth swap - ] 'invoke-count-items' define
+[ [ drop ] repeat ] 'drop-multiple' define
+
+"String and Character"
+[ dup to-lowercase = ] 'lowercase?' define
+[ dup to-uppercase = ] 'uppercase?' define
+[ [ [ uppercase? ] [ lowercase? ] bi or :f ] if-character ] 'letter?' define
+[ [ $0 $9 between? ] if-character ] 'digit?' define
+[ :s '`~!@#$%^&*()'"<>,.:;[]{}\|-_=+' swap find [ false ] [ true ] if ] 'symbol?' define
+[ to-lowercase :s 'abcdefghijklmnopqrstuvwxyz1234567890' swap find [ false ] [ true ] if ] 'alphanumeric?' define
+[ to-lowercase :s 'bcdfghjklmnpqrstvwxyz' swap find [ false ] [ true ] if ] 'consonant?' define
+[ to-lowercase :s 'aeiou' swap find [ false ] [ true ] if ] 'vowel?' define
+[ :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ length ] dip swap substring ] 'trim-left' define
+[ ] 'trim-right' define
+[ :s length dup-pair #1 - fetch nip #32 = [ length #1 - #0 swap substring trim-right ] if-true ] 'trim-right' define
+[ trim-left trim-right ] 'trim' define
+[ invoke-count-items #1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define
+
+"Helpful Math"
+[ dup negative? [ #-1 * ] if-true ] 'abs' define
+[ dup-pair < [ drop ] [ nip ] if ] 'min' define
+[ dup-pair < [ nip ] [ drop ] if ] 'max' define
