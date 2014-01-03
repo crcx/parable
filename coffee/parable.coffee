@@ -148,6 +148,15 @@ stack_tuck = ->
     stack_swap()
     stack_push ta, va
 
+#
+# TODO: this is one of the larger functions (apart from
+#       the compiler and interpreter)
+#
+
+stack_type_convert = (type) ->
+    todo = 0
+
+
 # p_slices contains an array of slices
 #
 # p_map is an array that indicates which arrays in p_slices
@@ -399,21 +408,23 @@ interpret = (slice) ->
             offset++
             value = fetch slice, offset
         if opcode == BC_TYPE_N
-            todo = 0
+            stack_convert_type TYPE_NUMBER
         if opcode == BC_TYPE_S
-            todo = 0
+            stack_convert_type TYPE_STRING
         if opcode == BC_TYPE_C
-            todo = 0
+            stack_convert_type TYPE_CHARACTER
         if opcode == BC_TYPE_F
-            todo = 0
+            stack_convert_type TYPE_FUNCTION
         if opcode == BC_TYPE_FLAG
-            todo = 0
+            stack_convert_type TYPE_FLAG
         if opcode == BC_GET_TYPE
             stack_push types[sp - 1], TYPE_NUMBER
         if opcode == BC_ADD
             todo = 0
         if opcode == BC_SUBTRACT
-            todo = 0
+            a = stack_pop()
+            b = stack_pop()
+            stack_push b - a, TYPE_NUMBER
         if opcode == BC_MULTIPLY
             a = stack_pop()
             b = stack_pop()
@@ -423,8 +434,11 @@ interpret = (slice) ->
             b = stack_pop()
             stack_push (b / a), TYPE_NUMBER
         if opcode == BC_REMAINDER
-            todo = 0
+            a = stack_pop()
+            b = stack_pop()
+            stack_push (b % a), TYPE_NUMBER
         if opcode == BC_FLOOR
+            stack_push Math.floor(stack_pop()), TYPE_NUMBER
             todo = 0
         if opcode == BC_BITWISE_SHIFT
             todo = 0
