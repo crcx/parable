@@ -54,3 +54,6 @@
 
 #10 [ #1 - ] sip
 'hello' length
+'123' numeric?
+'abc' numeric?
+

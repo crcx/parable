@@ -599,7 +599,12 @@ interpret = (slice) ->
         if opcode == BC_STRING_SUBSTR
             todo = 0
         if opcode == BC_STRING_NUMERIC
-            todo = 0
+            s = stack_pop()
+            s = slice_to_string s
+            if !isNaN(parseFloat(s, 10)) && isFinite(s)
+                stack_push -1, TYPE_FLAG
+            else
+                stack_push 0, TYPE_FLAG
         if opcode == BC_TO_LOWER
             todo = 0
         if opcode == BC_TO_UPPER
