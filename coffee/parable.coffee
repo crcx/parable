@@ -168,11 +168,6 @@ stack_tuck = ->
     stack_swap()
     stack_push ta, va
 
-#
-# TODO: this is one of the larger functions (apart from
-#       the compiler and interpreter)
-#
-
 stack_convert_type = (type) ->
     if type == TYPE_NUMBER
         if types[sp - 1] == TYPE_STRING

@@ -86,6 +86,7 @@
 [ [ dip ] dip invoke ] 'bi*' define
 [ dup bi* ] 'bi@' define
 [ [ [ swap [ dip ] dip ] dip dip ] dip invoke ] 'tri*' define
+[ [ [ swap &dip dip ] dip dip ] dip invoke ] 'tri*' define
 [ dup dup tri* ] 'tri@' define
 
 "variables"
@@ -141,3 +142,31 @@
 [ request slice-set ] 'new-slice' define
 [ &*slice-current* @ [ &*slice-offset* @ [ invoke ] dip &*slice-offset* ! ] dip &*slice-current* ! ] 'preserve-slice' define
 
+"arrays"
+'*array:filter*' variable
+'*array:source*' variable
+'*array:results*' variable
+[ [ new-slice invoke-count-items dup slice-store slice-store-items &*slice-current* @ ] preserve-slice ] 'array-from-quote' define
+[ @ ] 'array-length' define
+[ #1 + fetch ] 'array-fetch' define
+[ #1 + store ] 'array-store' define
+[ swap [ swap slice-set #0 slice-fetch [ over slice-fetch = or ] repeat ] preserve-slice nip :f ] 'array-contains?' define
+[ swap [ swap slice-set #0 slice-fetch [ over slice-fetch [ :p :s ] bi@ = or ] repeat ] preserve-slice nip :f ] 'array-contains-string?' define
+[ [ dup array-length #1 + store ] sip [ @ #1 + ] sip ! ] 'array-push' define
+[ [ dup array-length fetch ] sip [ @ #1 - ] sip ! ] 'array-pop' define
+[ #0 &*array:results* ! &*array:filter* ! [ &*array:source* ! ] [ array-length ] bi [ &*array:source* @ array-pop dup &*array:filter* @ invoke [ &*array:results* array-push ] [ drop ] if ] repeat &*array:results* request [ copy ] sip ] 'array-filter' define
+[ #0 &*array:results* ! &*array:filter* ! [ &*array:source* ! ] [ array-length ] bi [ &*array:source* @ array-pop &*array:filter* @ invoke &*array:results* array-push ] repeat &*array:results* request [ copy ] sip ] 'array-map' define
+[ dup-pair [ array-length ] bi@ = [ dup array-length true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define
+[ &*array:filter* ! over array-length [ over array-pop &*array:filter* @ invoke ] repeat nip ] 'array-reduce' define
+[ request [ copy ] sip &*array:source* ! [ #0 &*array:source* @ array-length [ &*array:source* @ over array-fetch swap #1 + ] repeat drop ] array-from-quote ] 'array-reverse' define
+
+"routines for rendering an array into a string"
+'*array:conversions*' variable
+&*array:conversions* slice-set
+[ "array  --  string"  '' [ :s '#' swap + + #32 :c :s + ] array-reduce ] slice-store
+[ "array  --  string"  '' [ :p :s  $' :s swap + $' :s + + #32 :c :s + ] array-reduce ] slice-store
+[ "array  --  string"  '' [ :c :s '$' swap + + #32 :c :s + ] array-reduce ] slice-store
+[ "pointer:array number:type - string"  #100 / #1 - &*array:conversions* swap fetch :p invoke ] 'array-to-string' define
+
+"more stuff"
+[ [ [ new-slice length [ #1 - ] sip [ dup-pair fetch slice-store #1 - ] repeat drop-pair #0 slice-store &*slice-current* @ :p :s ] preserve-slice ] if-string ] 'reverse' define
