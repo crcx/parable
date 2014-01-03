@@ -153,8 +153,57 @@ stack_tuck = ->
 #       the compiler and interpreter)
 #
 
-stack_type_convert = (type) ->
-    todo = 0
+stack_convert_type = (type) ->
+    if type == TYPE_NUMBER
+        if types[sp - 1] == TYPE_STRING
+            if is_number slice_to_string stack_tos()
+                stack_push parseFloat(slice_to_string stack_pop()), TYPE_NUMBER
+            else
+                stack_pop()
+                stack_push 0, TYPE_NUMBER
+        else
+            types[sp - 1] = TYPE_NUMBER
+    else if type == TYPE_STRING
+        if types[sp - 1] == TYPE_NUMBER
+            console.log stack[sp - 1]
+            stack_push string_to_slice(stack_pop().toString()), TYPE_STRING
+        else if types[sp - 1] == TYPE_CHARACTER
+            stack_push string_to_slice(''.join(chr(stack_pop()))), TYPE_STRING
+        else if types[sp - 1] == TYPE_FLAG
+            s = stack_pop()
+            if s == -1
+                stack_push string_to_slice('true'), TYPE_STRING
+            else if s == 0
+                stack_push string_to_slice('false'), TYPE_STRING
+            else
+                stack_push string_to_slice('malformed flag'), TYPE_STRING
+        else if types[sp - 1] == TYPE_FUNCTION
+            types[sp - 1] = TYPE_STRING
+        else
+            return 0
+    else if type == TYPE_CHARACTER
+        if types[sp - 1] == TYPE_STRING
+            s = slice_to_string stack_pop()
+            stack_push ord(s[0]), TYPE_CHARACTER
+        else
+            s = stack_pop()
+            stack_push parseFloat(s), TYPE_CHARACTER
+    else if type == TYPE_FUNCTION
+        types[sp - 1] = TYPE_FUNCTION
+    else if type == TYPE_FLAG
+        if types[sp - 1] == TYPE_STRING
+            s = slice_to_string stack_pop()
+            if s == 'true'
+                stack_push -1, TYPE_FLAG
+            else if s == 'false'
+                stack_push 0, TYPE_FLAG
+            else
+                stack_push 1, TYPE_FLAG
+        else
+            s = stack_pop()
+            stack_push s, TYPE_FLAG
+    else
+        return
 
 
 # p_slices contains an array of slices
@@ -254,23 +303,23 @@ compile = (src, s) ->
             store old, slice, offset
             offset++
         else if src[i].startsWith '`'
-            store parseFloat(src[i][1 .. src.length]), slice, offset
+            store parseFloat(src[i].substring(1)), slice, offset
             offset++
         else if src[i].startsWith '#'
             store BC_PUSH_N, slice, offset
             offset++
-            store parseFloat(src[i][1 .. src.length]), slice, offset
+            store parseFloat(src[i].substring(1)), slice, offset
             offset++
         else if src[i].startsWith '$'
             store(BC_PUSH_C, slice, offset)
             offset++
-            store src[i][1 .. src.length].charCodeAt(0), slice, offset
+            store src[i].substring(1).charCodeAt(0), slice, offset
             offset++
         else if src[i].startsWith '&'
             console.log 'BC_PUSH_F ' + src[i]
             store(BC_PUSH_F, slice, offset)
             offset++
-            store(src[i][1 .. src.length], slice, offset)
+            store(src[i].substring(1), slice, offset)
             offset++
         else if src[i].startsWith "'"
             if src[i].endsWith "'"
@@ -379,6 +428,7 @@ slice_to_string = (slice) ->
     s.replace /\\n/g, '\n'
     s
 
+# =============================================================
 
 # interpret(slice)
 #
@@ -387,7 +437,6 @@ interpret = (slice) ->
     offset = 0
     while offset < SLICE_LEN
         opcode = fetch slice, offset
-#        console.log slice + ':' + offset + ':' + opcode + ':' + fetch(slice, offset + 1)
         if opcode == BC_PUSH_N
             offset++
             value = fetch slice, offset
@@ -513,7 +562,7 @@ interpret = (slice) ->
         if opcode == BC_FLOW_TIMES
             qt = stack_pop()
             f  = stack_pop()
-            while f-- > 0
+            while (f--) > 0
                 interpret qt
         if opcode == BC_FLOW_CALL
             offset++
@@ -619,6 +668,7 @@ interpret = (slice) ->
     return 0
 
 
+# =============================================================
 
 fs = require 'fs'
 array = fs.readFileSync('bootstrap.p').toString().split("\n")
@@ -636,4 +686,6 @@ for i in array
 
 # console.log dictionary_names
 console.log stack[0 .. (sp - 1)]
+console.log types[0 .. (sp - 1)]
 console.log sp
+console.log slice_to_string stack[sp - 1]

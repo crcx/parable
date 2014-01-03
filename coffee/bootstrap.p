@@ -52,8 +52,7 @@
 [ `802 ] 'length' define
 [ `900 ] 'report-error' define
 
-#10 [ #1 - ] sip
-'hello' length
-'123' numeric?
-'abc' numeric?
-
+#1
+#20
+#300
+#4000 :s
