@@ -18,3 +18,7 @@
 
     &*slice-current* @ :p :s
     'thebirdman'
+$a $b
+#1
+#-3
+&100

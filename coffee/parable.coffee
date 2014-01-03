@@ -4,9 +4,7 @@
 
 # Known issues/remaining to-do:
 #
-# - finish remaining byte codes (BC_MEM_COLLECT, BC_STRING_SEEK)
-# - organize initialization code into separate routines
-# - finish routines to render final stack
+# - finish remaining byte codes (BC_MEM_COLLECT)
 # - garbage collector
 # - source is poorly commented at this point
 
@@ -780,40 +778,53 @@ interpret = (slice) ->
 
 
 # =============================================================
+# final helper functions
+
+# prepare()
+# setup memory and initial dictionary
+prepare = ->
+    prepare_slices()
+    prepare_dictionary()
+
+
+# compile_source(array)
+# compile the source in each line of an array
+compile_source = (array) ->
+    for i in array
+        if i.length > 0
+            interpret compile i.trim(), request_slice()
+
+
+# =============================================================
 # this should all be moved to a separate file sometime...
 
-prepare_slices()
-prepare_dictionary()
-
-fs = require 'fs'
-
-array = fs.readFileSync('bootstrap.p').toString().split("\n")
-for i in array
-    if i.length > 0
-        interpret compile i.trim(), request_slice()
-
-array = fs.readFileSync('test.p').toString().split("\n")
-for i in array
-    if i.length > 0
-        interpret compile i.trim(), request_slice()
-
-if sp > 0
-    console.log stack[0 .. (sp - 1)]
-    console.log types[0 .. (sp - 1)]
+display_stack = ->
+    if sp <= 0
+        return
     i = sp
     while i > 0
         i = i - 1
         if types[i] == TYPE_STRING
-            console.log i, "'" + slice_to_string(stack[i]) + "'"
+            console.log "%d:\t'%s'", i, slice_to_string(stack[i])
         else if types[i] == TYPE_CHARACTER
-            console.log i, '$' + String.fromCharCode stack[i]
+            console.log "%d:\t$%s", i, String.fromCharCode stack[i]
         else if types[i] == TYPE_FLAG
             if stack[i] == -1
-                console.log i, 'flag: true'
+                console.log "%d\t%s", i, 'true'
             else if stack[i] == 0
-                console.log i, 'flag: false'
+                console.log "%d\t%s", i, 'false'
             else
-                console.log i, 'flag: malformed'
+                console.log "%d\t%s", i, 'malformed flag'
+        else if types[i] == TYPE_NUMBER
+            console.log "%d\t#%d", i, stack[i]
+        else if types[i] == TYPE_FUNCTION
+            console.log "%d\t&%d", i, stack[i]
         else
-            console.log i, stack[i]
-console.log sp
+            console.log "%d\tUnknown type: %d", i, stack[i]
+
+
+fs = require 'fs'
+prepare()
+compile_source(fs.readFileSync('bootstrap.p').toString().split("\n"))
+compile_source(fs.readFileSync('test.p').toString().split("\n"))
+display_stack()
