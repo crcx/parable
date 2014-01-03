@@ -454,7 +454,9 @@ interpret = (slice) ->
         if opcode == BC_MEM_STORE
             todo = 0
         if opcode == BC_MEM_REQUEST
-            todo = 0
+            stack_push request_slice(), TYPE_FUNCTION
+        if opcode == BC_MEM_RELEASE
+            release_slice stack_pop()
         if opcode == BC_MEM_COLLECT
             todo = 0
         if opcode == BC_STACK_DUP
