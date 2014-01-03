@@ -536,9 +536,26 @@ interpret = (slice) ->
             interpret target
             stack_push vd, vt
         if opcode == BC_FLOW_BI
-            todo = 0
+            q1 = stack_pop()
+            q2 = stack_pop()
+            stack_dup()
+            vt = types[sp - 1]
+            vd = stack_pop()
+            interpret q2
+            stack_push vd, vt
+            interpret q1
         if opcode == BC_FLOW_TRI
-            todo = 0
+            q1 = stack_pop()
+            q2 = stack_pop()
+            q3 = stack_pop()
+            stack_dup()
+            vt = types[sp - 1]
+            vd = stack_pop()
+            interpret q3
+            stack_push vd, vt
+            interpret q2
+            stack_push vd, vt
+            interpret q1
         if opcode == BC_FLOW_RETURN
             offset = SLICE_LEN
         if opcode == BC_MEM_COPY
