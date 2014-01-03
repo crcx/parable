@@ -391,7 +391,9 @@ interpret = (slice) ->
         if opcode == BC_SUBTRACT
             todo = 0
         if opcode == BC_MULTIPLY
-            todo = 0
+            a = stack_pop()
+            b = stack_pop()
+            stack_push b * a, TYPE_NUMBER
         if opcode == BC_DIVIDE
             todo = 0
         if opcode == BC_REMAINDER
@@ -450,7 +452,9 @@ interpret = (slice) ->
         if opcode == BC_MEM_COPY
             todo = 0
         if opcode == BC_MEM_FETCH
-            todo = 0
+            a = stack_pop()   # offset
+            b = stack_pop()   # slice
+            stack_push fetch( b, a), TYPE_NUMBER
         if opcode == BC_MEM_STORE
             todo = 0
         if opcode == BC_MEM_REQUEST
