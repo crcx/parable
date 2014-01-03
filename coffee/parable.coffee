@@ -231,6 +231,15 @@ p_slices = []
 p_map = []
 
 
+# copy_slice(source, dest)
+
+copy_slice = (source, dest) ->
+    i = 0
+    while i < SLICE_LEN
+        v = fetch source, i
+        store v, dest, i
+        i++
+
 # request_slice()
 # returns a new slice identifier and marks the returned slice
 # as being used
@@ -250,17 +259,6 @@ request_slice = ->
 
 release_slice = (s) ->
     p_map[s] = 0
-
-
-# copy_slice(source, dest)
-# copies the contents of the source slice into the destination
-# slice
-
-copy_slice = (s, d) ->
-    i = 0
-    while i < SLICE_LEN
-        store fetch(d, i), s, i
-        i++
 
 
 # prepare_slices()
@@ -445,7 +443,7 @@ slice_to_string = (slice) ->
     o = 0
     while fetch(slice, o) != 0
       s = s + String.fromCharCode fetch(slice, o)
-      o = o + 1
+      o++
     s.replace /\\n/g, '\n'
     s
 
@@ -658,7 +656,9 @@ interpret = (slice) ->
         if opcode == BC_FLOW_RETURN
             offset = SLICE_LEN
         if opcode == BC_MEM_COPY
-            todo = 0
+            dest = stack_pop()
+            source = stack_pop()
+            copy_slice source, dest
         if opcode == BC_MEM_FETCH
             a = stack_pop()   # offset
             b = stack_pop()   # slice
