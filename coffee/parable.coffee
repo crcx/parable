@@ -522,7 +522,7 @@ interpret = (slice) ->
             a = stack_pop()
             b = stack_pop()
             if a < 0
-                stack_push b << a, TYPE_NUMBER
+                stack_push b << Math.abs(a), TYPE_NUMBER
             else
                 stack_push b >>= a, TYPE_NUMBER
         if opcode == BC_BITWISE_AND
