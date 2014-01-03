@@ -431,9 +431,14 @@ interpret = (slice) ->
             target = fetch slice, offset
             interpret target
         if opcode == BC_FLOW_CALL_F
-            todo = 0
+            target = stack_pop()
+            interpret target
         if opcode == BC_FLOW_DIP
-            todo = 0
+            target = stack_pop()
+            vt = types[sp]
+            vd = stack_pop()
+            interpret target
+            stack_push vd, vt
         if opcode == BC_FLOW_SIP
             todo = 0
         if opcode == BC_FLOW_BI
