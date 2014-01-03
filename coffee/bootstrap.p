@@ -53,3 +53,4 @@
 [ `900 ] 'report-error' define
 
 #10 [ #1 - ] sip
+'hello' length

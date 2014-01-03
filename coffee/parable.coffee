@@ -605,7 +605,8 @@ interpret = (slice) ->
         if opcode == BC_TO_UPPER
             todo = 0
         if opcode == BC_LENGTH
-            todo = 0
+            f = slice_to_string stack[sp - 1]
+            stack_push f.length, TYPE_NUMBER
         if opcode == BC_REPORT_ERROR
             console.log slice_to_string stack_pop()
 
