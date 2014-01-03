@@ -4,13 +4,10 @@
 
 # Known issues/remaining to-do:
 #
-# - memory copy routine
-# - finish stack_convert_type()
-# - finish remaining byte codes
+# - finish remaining byte codes (BC_MEM_COLLECT, BC_STRING_SEEK)
 # - allow for redefinitions to occur
 # - organize initialization code into separate routines
 # - finish routines to render final stack
-# - full bootstrap.p does not compile/run properly yet
 # - garbage collector
 # - source is poorly commented at this point
 
