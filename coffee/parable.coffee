@@ -443,29 +443,49 @@ interpret = (slice) ->
             a = stack_pop()
             b = stack_pop()
             if a < 0
-                stack_push b << a
+                stack_push b << a, TYPE_NUMBER
             else
-                stack_push b >>= a
+                stack_push b >>= a, TYPE_NUMBER
         if opcode == BC_BITWISE_AND
             a = stack_pop()
             b = stack_pop()
-            stack_push a & b
+            stack_push a & b, TYPE_NUMBER
         if opcode == BC_BITWISE_OR
             a = stack_pop()
             b = stack_pop()
-            stack_push a | b
+            stack_push a | b, TYPE_NUMBER
         if opcode == BC_BITWISE_XOR
             a = stack_pop()
             b = stack_pop()
-            stack_push a ^ b
+            stack_push a ^ b, TYPE_NUMBER
         if opcode == BC_COMPARE_LT
-            todo = 0
+            a = stack_pop()
+            b = stack_pop()
+            if b < a
+                stack_push -1, TYPE_FLAG
+            else
+                stack_push 0, TYPE_FLAG
         if opcode == BC_COMPARE_GT
-            todo = 0
+            a = stack_pop()
+            b = stack_pop()
+            if b > a
+                stack_push -1, TYPE_FLAG
+            else
+                stack_push 0, TYPE_FLAG
         if opcode == BC_COMPARE_LTEQ
-            todo = 0
+            a = stack_pop()
+            b = stack_pop()
+            if b == a || b < a
+                stack_push -1, TYPE_FLAG
+            else
+                stack_push 0, TYPE_FLAG
         if opcode == BC_COMPARE_GTEQ
-            todo = 0
+            a = stack_pop()
+            b = stack_pop()
+            if b == a || b > a
+                stack_push -1, TYPE_FLAG
+            else
+                stack_push 0, TYPE_FLAG
         if opcode == BC_COMPARE_EQ
             todo = 0
         if opcode == BC_COMPARE_NEQ
