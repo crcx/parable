@@ -1,10 +1,41 @@
 # parable
 # copyright (c) 2012 - 2014, charles childers
+# =============================================================
+
+# Known issues/remaining to-do:
 #
+# - memory copy routine
+# - finish stack_convert_type()
+# - finish remaining byte codes
+# - allow for redefinitions to occur
+# - organize initialization code into separate routines
+# - finish routines to render final stack
+# - full bootstrap.p does not compile/run properly yet
+# - garbage collector
+# - source is poorly commented at this point
+
+
+# =============================================================
 
 MAX_SLICES = 64000
 SLICE_LEN = 1000
 
+
+# =============================================================
+
+if (typeof String::startsWith != 'function')
+  String::startsWith = (str) ->
+    return this.slice(0, str.length) == str
+
+if (typeof String::endsWith != 'function')
+  String::endsWith = (str) ->
+    return this.slice(-str.length) == str
+
+if (typeof String::trim != 'function')
+  String::trim = ->
+    this.replace(/^\s+|\s+$/g, '')
+
+# =============================================================
 
 #
 # Constants for data types
@@ -83,17 +114,6 @@ BC_LENGTH = 802
 BC_REPORT_ERROR = 900
 
 
-if (typeof String::startsWith != 'function')
-  String::startsWith = (str) ->
-    return this.slice(0, str.length) == str
-
-if (typeof String::endsWith != 'function')
-  String::endsWith = (str) ->
-    return this.slice(-str.length) == str
-
-if (typeof String::trim != 'function')
-  String::trim = ->
-    this.replace(/^\s+|\s+$/g, '')
 
 
 # stack implementation
@@ -684,7 +704,11 @@ interpret = (slice) ->
         if opcode == BC_STRING_SEEK
             todo = 0
         if opcode == BC_STRING_SUBSTR
-            todo = 0
+            len = stack_pop()
+            start = stack_pop()
+            s0 = slice_to_string stack_pop()
+            s1 = s0.substr start, len
+            stack_push string_to_slice(s1), TYPE_STRING
         if opcode == BC_STRING_NUMERIC
             s = stack_pop()
             s = slice_to_string s
