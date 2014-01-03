@@ -317,10 +317,12 @@ compile = (src, s) ->
             store src[i].substring(1).charCodeAt(0), slice, offset
             offset++
         else if src[i].startsWith '&'
-            console.log 'BC_PUSH_F ' + src[i]
             store(BC_PUSH_F, slice, offset)
             offset++
-            store(src[i].substring(1), slice, offset)
+            if lookup_pointer(src[i].substring(1)) == -1
+                store parseFloat(src[i].substring(1)), slice, offset
+            else
+                store lookup_pointer(src[i].substring(1)), slice, offset
             offset++
         else if src[i].startsWith "'"
             if src[i].endsWith "'"
@@ -402,7 +404,10 @@ lookup_pointer = (name) ->
         found = index
         index = dictionary_names.length
       index++
-    dictionary_slices[found]
+    if found == -1
+        return -1
+    else
+        return dictionary_slices[found]
 
 
 string_to_slice = (str) ->

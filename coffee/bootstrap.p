@@ -123,3 +123,21 @@
 [ dup negative? [ #-1 * ] if-true ] 'abs' define
 [ dup-pair < [ drop ] [ nip ] if ] 'min' define
 [ dup-pair < [ nip ] [ drop ] if ] 'max' define
+
+"Sliced Memory Access"
+'*slice-current*' variable
+'*slice-offset*' variable
+[ &*slice-current* @ &*slice-offset* @ ] 'slice-position' define
+[ &*slice-offset* increment ] 'slice-advance' define
+[ &*slice-offset* decrement ] 'slice-retreat' define
+[ slice-position store ] 'slice-store-current' define
+[ slice-position fetch ] 'slice-fetch-current' define
+[ slice-position store slice-advance ] 'slice-store' define
+[ slice-position fetch slice-advance ] 'slice-fetch' define
+[ slice-retreat slice-position store ] 'slice-store-retreat' define
+[ slice-retreat slice-position fetch ] 'slice-fetch-retreat' define
+[ &*slice-current* ! #0 &*slice-offset* ! ] 'slice-set' define
+[ [ slice-store ] repeat ] 'slice-store-items' define
+[ request slice-set ] 'new-slice' define
+[ &*slice-current* @ [ &*slice-offset* @ [ invoke ] dip &*slice-offset* ! ] dip &*slice-current* ! ] 'preserve-slice' define
+
