@@ -184,7 +184,7 @@ stack_convert_type = (type) ->
             console.log stack[sp - 1]
             stack_push string_to_slice(stack_pop().toString()), TYPE_STRING
         else if types[sp - 1] == TYPE_CHARACTER
-            stack_push string_to_slice('' + chr(stack_pop())), TYPE_STRING
+            stack_push string_to_slice(String.fromCharCode(stack_pop())), TYPE_STRING
         else if types[sp - 1] == TYPE_FLAG
             s = stack_pop()
             if s == -1
