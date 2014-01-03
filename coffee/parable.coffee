@@ -565,28 +565,28 @@ interpret = (slice) ->
             tb = types[sp - 2]
             va = stack_pop()
             vb = stack_pop()
-            if ta == tb && ta == TYPE_STRING
+            if (ta == TYPE_STRING) && (tb == TYPE_STRING)
                 va = slice_to_string va
                 vb = slice_to_string vb
             if va == vb
-                stack_push -1, TYPE_NUMBER
+                stack_push -1, TYPE_FLAG
             else
-                stack_push 0, TYPE_NUMBER
+                stack_push 0, TYPE_FLAG
         if opcode == BC_COMPARE_NEQ
             ta = types[sp - 1]
             tb = types[sp - 2]
             va = stack_pop()
             vb = stack_pop()
-            if ta == tb && ta == TYPE_STRING
+            if (ta == TYPE_STRING) && (tb == TYPE_STRING)
                 va = slice_to_string va
                 vb = slice_to_string vb
             if va != vb
-                stack_push -1, TYPE_NUMBER
+                stack_push -1, TYPE_FLAG
             else
-                stack_push 0, TYPE_NUMBER
+                stack_push 0, TYPE_FLAG
         if opcode == BC_FLOW_IF
-            qt = stack_pop()
             qf = stack_pop()
+            qt = stack_pop()
             f  = stack_pop()
             if f == -1
                 interpret qt
