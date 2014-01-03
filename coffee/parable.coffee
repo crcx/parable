@@ -124,6 +124,24 @@ stack_swap = ->
     stack_push ta, va
     stack_push tb, vb
 
+stack_dup = ->
+    if types[sp] == TYPE_STRING
+        tb = stack[sp]
+        ta = slice_to_string tb
+        tb = string_to_slice ta
+        stack_push tb, TYPE_STRING
+    else
+        tb = stack[sp]
+        vb = types[sp]
+        stack_push tb, vb
+
+stack_over = ->
+    todo = 0
+
+stack_tuck = ->
+    todo = 0
+
+
 # p_slices contains an array of slices
 #
 # p_map is an array that indicates which arrays in p_slices
@@ -466,15 +484,15 @@ interpret = (slice) ->
         if opcode == BC_MEM_COLLECT
             todo = 0
         if opcode == BC_STACK_DUP
-            todo = 0
+            stack_dup()
         if opcode == BC_STACK_DROP
             stack_pop()
         if opcode == BC_STACK_SWAP
             stack_swap()
         if opcode == BC_STACK_OVER
-            todo = 0
+            stack_over()
         if opcode == BC_STACK_TUCK
-            todo = 0
+            stack_tuck()
         if opcode == BC_STACK_NIP
             stack_swap()
             stack_pop()
