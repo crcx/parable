@@ -156,7 +156,8 @@ stack_tuck = ->
 stack_convert_type = (type) ->
     if type == TYPE_NUMBER
         if types[sp - 1] == TYPE_STRING
-            if is_number slice_to_string stack_tos()
+            s = slice_to_string stack[sp - 1]
+            if !isNaN(parseFloat(s, 10)) && isFinite(s)
                 stack_push parseFloat(slice_to_string stack_pop()), TYPE_NUMBER
             else
                 stack_pop()
@@ -168,7 +169,7 @@ stack_convert_type = (type) ->
             console.log stack[sp - 1]
             stack_push string_to_slice(stack_pop().toString()), TYPE_STRING
         else if types[sp - 1] == TYPE_CHARACTER
-            stack_push string_to_slice(''.join(chr(stack_pop()))), TYPE_STRING
+            stack_push string_to_slice('' + chr(stack_pop())), TYPE_STRING
         else if types[sp - 1] == TYPE_FLAG
             s = stack_pop()
             if s == -1
@@ -688,4 +689,3 @@ for i in array
 console.log stack[0 .. (sp - 1)]
 console.log types[0 .. (sp - 1)]
 console.log sp
-console.log slice_to_string stack[sp - 1]
