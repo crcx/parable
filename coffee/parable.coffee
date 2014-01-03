@@ -475,6 +475,16 @@ interpret = (slice) ->
         if opcode == BC_GET_TYPE
             stack_push types[sp - 1], TYPE_NUMBER
         if opcode == BC_ADD
+            ta = types[sp - 1]
+            tb = types[sp - 2]
+            va = stack_pop()
+            vb = stack_pop()
+            if ta == tb && ta == TYPE_STRING
+                va = slice_to_string va
+                vb = slice_to_string vb
+                stack_push string_to_slice(vb + va), TYPE_STRING
+            else
+                stack_push vb + va, TYPE_NUMBER
             todo = 0
         if opcode == BC_SUBTRACT
             a = stack_pop()
