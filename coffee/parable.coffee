@@ -126,13 +126,13 @@ stack_swap = ->
 
 stack_dup = ->
     if types[sp] == TYPE_STRING
-        tb = stack[sp]
+        tb = stack[sp - 1]
         ta = slice_to_string tb
         tb = string_to_slice ta
         stack_push tb, TYPE_STRING
     else
-        tb = stack[sp]
-        vb = types[sp]
+        tb = stack[sp - 1]
+        vb = types[sp - 1]
         stack_push tb, vb
 
 stack_over = ->
@@ -403,7 +403,7 @@ interpret = (slice) ->
         if opcode == BC_TYPE_FLAG
             todo = 0
         if opcode == BC_GET_TYPE
-            stack_push types[sp], TYPE_NUMBER
+            stack_push types[sp - 1], TYPE_NUMBER
         if opcode == BC_ADD
             todo = 0
         if opcode == BC_SUBTRACT
@@ -457,7 +457,7 @@ interpret = (slice) ->
             interpret target
         if opcode == BC_FLOW_DIP
             target = stack_pop()
-            vt = types[sp]
+            vt = types[sp - 1]
             vd = stack_pop()
             interpret target
             stack_push vd, vt
@@ -540,5 +540,5 @@ for i in array
         interpret compile i, request_slice()
 
 # console.log dictionary_names
-console.log stack
+console.log stack[0 .. (sp - 1)]
 console.log sp

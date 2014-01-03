@@ -52,6 +52,6 @@
 [ `802 ] 'length' define
 [ `900 ] 'report-error' define
 
-#1 #2 #3 #4 [ #100 ] dip
+#1 #2 #3 * #4 [ #100 ] dip
 
 #21 #5 /
