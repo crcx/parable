@@ -111,6 +111,14 @@ BC_REPORT_ERROR = 900
 
 
 # =============================================================
+# error log
+log = []
+
+report_error = (text) ->
+    log.push text
+
+
+# =============================================================
 # stack implementation
 #
 # notes:
@@ -354,7 +362,6 @@ collect_unused_slices = ->
 # parse and compile the code in *source* into the specified
 # slice
 compile = (src, s) ->
-    # console.log src + " (in slice #{s})"
     src = src.replace(/(\r\n|\n|\r)/gm, " ")
     src = src.replace(/\s+/g, " ")
     src = src.split(" ")
@@ -438,7 +445,7 @@ compile = (src, s) ->
             offset++
         else
             if lookup_pointer(src[i]) == -1
-                console.log 'UNHANDLED TOKEN: ' + src[i]
+                report_error src[i] + ' not found in dictionary'
             else
                 store BC_FLOW_CALL, slice, offset
                 offset++
@@ -809,7 +816,7 @@ interpret = (slice) ->
             f = slice_to_string stack[sp - 1]
             stack_push f.length, TYPE_NUMBER
         if opcode == BC_REPORT_ERROR
-            console.log slice_to_string stack_pop()
+            report_error slice_to_string stack_pop()
 
         offset++
     return 0
