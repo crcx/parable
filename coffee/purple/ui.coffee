@@ -12,6 +12,9 @@ create_cell = (max, index, type, value) ->
     extra = ""
     if type == 'string'
         extra = "<br>Stored in &amp;#{stack[index - 1]}"
+    if type == 'pointer'
+        if pointer_to_name(parseInt(value.substr(5))) != ""
+            extra = "<br>Pointer to <em>#{pointer_to_name parseInt value.substr 5}</em>"
     if index == max
         "<td>#{value}<hr>Type: #{type}<br>Item #{index} of #{max}#{extra}<br>(<b>Top Of Stack</b>)</td>"
     else
@@ -43,7 +46,7 @@ display_stack = ->
         else if types[i] == TYPE_NUMBER
             s = s + create_cell sp, i, 'number', '#' + stack[i]
         else if types[i] == TYPE_FUNCTION
-            s = s + create_cell sp, i, 'number', '&amp;' + stack[i]
+            s = s + create_cell sp, i, 'pointer', '&amp;' + stack[i]
         else
             s = s + "<td>Unknown data type for value " + stack[i] + "<hr>#{i}</td>"
     s = s + "</tr></table>"
