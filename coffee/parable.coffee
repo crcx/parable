@@ -494,6 +494,19 @@ lookup_pointer = (name) ->
         return dictionary_slices[found]
 
 
+# pointer_to_name(ptr)
+# Returns a string containing the name corresponding to the
+# pointer, or an empty string if no match is found
+pointer_to_name = (ptr) ->
+    i = 0
+    s = ''
+    while i < dictionary_names.length
+        if dictionary_slices[i] == ptr
+            s = dictionary_names[i]
+        i++
+    s
+
+
 # prepare_dictionary()
 # Sets up an initial dictionary so that the 'define' function
 # is available for bootstrap purposes.
