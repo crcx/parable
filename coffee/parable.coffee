@@ -353,14 +353,13 @@ seek_all_references = ->
 # an allocated slice. frees anything that is allocated but not
 # referred to.
 collect_unused_slices = ->
-    map = []
     refs = seek_all_references().sort()
     i = 0
     while i < MAX_SLICES
-        if p_map[i] == 1
-            if refs.indexOf(i) == -1
-                release_slice i
+        if (p_map[i] == 1) && (refs.indexOf(i) == -1)
+            release_slice i
         i++
+
 
 # =============================================================
 # compiler
