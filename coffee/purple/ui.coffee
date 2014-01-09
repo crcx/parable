@@ -78,6 +78,7 @@ parable_compile_and_run = ->
 parable_empty_stack = ->
     sp = 0
     display_stack()
+    parable_update_stats()
     0
 
 

@@ -322,29 +322,36 @@ fetch = (s, o) ->
 # =============================================================
 # garbage collector
 
-find_references = (s) ->
-    ptrs = []
+# gather_references(slice)
+# return an array of all values contained in a given slice
+gather_references = (s) ->
+    refs = []
     i = 0
     while i < SLICE_LEN
-        if fetch(s, i) >= 0
-            ptrs.push fetch s, i
+        p = fetch s, i
+        if p >= 0
+            if refs.indexOf(p) == -1
+                refs.push p
         i++
-    ptrs
-
-
-seek_all_references = ->
-    maybe = []
-    deps = []
-    refs = []
-    for s in dictionary_slices
-        maybe.push s
-        deps.push find_references s
-    for s in maybe.sort()
-        if p_map[s] == 1
-            refs.push s
     refs
 
 
+# seek_all_references()
+# return an array of all identified possibly used slices
+seek_all_references = ->
+    maybe = []
+    for s in dictionary_slices
+        for k in gather_references s
+            if maybe.indexOf(k) == -1
+                maybe.push k
+    maybe
+
+
+# collect_garbage()
+# a conservative garbage collector
+# scans all named slices for values that might correspond to a
+# an allocated slice. frees anything that is allocated but not
+# referred to.
 collect_unused_slices = ->
     map = []
     refs = seek_all_references().sort()
