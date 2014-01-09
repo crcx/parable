@@ -333,6 +333,7 @@ gather_references = (s) ->
             if refs.indexOf(p) == -1
                 refs.push p
         i++
+    refs.push s
     refs
 
 
