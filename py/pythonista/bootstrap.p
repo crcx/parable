@@ -1,3 +1,6 @@
+"Standard Parable Bootstrap"
+"Copyright (c) 2012-2014, Charles Childers"
+
 "Primitives"
 [ `110 ] ':n' define
 [ `111 ] ':s' define
@@ -86,7 +89,6 @@
 [ [ dip ] dip invoke ] 'bi*' define
 [ dup bi* ] 'bi@' define
 [ [ [ swap [ dip ] dip ] dip dip ] dip invoke ] 'tri*' define
-[ [ [ swap &dip dip ] dip dip ] dip invoke ] 'tri*' define
 [ dup dup tri* ] 'tri@' define
 
 "variables"
