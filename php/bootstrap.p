@@ -92,11 +92,13 @@
 [ dup dup tri* ] 'tri@' define
 
 "variables"
+[ request swap define ] 'variable' define
+'*empty*' variable
+[ &*empty* swap copy ] 'zero-out' define
 [ #0 fetch ] '@' define
 [ #0 store ] '!' define
 [ [ @ #1 + ] sip ! ] 'increment' define
 [ [ @ #1 - ] sip ! ] 'decrement' define
-[ request swap define ] 'variable' define
 [ swap request dup-pair copy swap [ [ invoke ] dip ] dip copy ] 'preserve' define
 
 "numeric ranges"
@@ -139,7 +141,7 @@
 [ slice-position fetch slice-advance ] 'slice-fetch' define
 [ slice-retreat slice-position store ] 'slice-store-retreat' define
 [ slice-retreat slice-position fetch ] 'slice-fetch-retreat' define
-[ &*slice-current* ! #0 &*slice-offset* ! ] 'slice-set' define
+[ &*slice-current* ! &*slice-offset* zero-out ] 'slice-set' define
 [ [ slice-store ] repeat ] 'slice-store-items' define
 [ request slice-set ] 'new-slice' define
 [ &*slice-current* @ [ &*slice-offset* @ [ invoke ] dip &*slice-offset* ! ] dip &*slice-current* ! ] 'preserve-slice' define
@@ -156,8 +158,8 @@
 [ swap [ swap slice-set #0 slice-fetch [ over slice-fetch [ :p :s ] bi@ = or ] repeat ] preserve-slice nip :f ] 'array-contains-string?' define
 [ [ dup array-length #1 + store ] sip [ @ #1 + ] sip ! ] 'array-push' define
 [ [ dup array-length fetch ] sip [ @ #1 - ] sip ! ] 'array-pop' define
-[ #0 &*array:results* ! &*array:filter* ! [ &*array:source* ! ] [ array-length ] bi [ &*array:source* @ array-pop dup &*array:filter* @ invoke [ &*array:results* array-push ] [ drop ] if ] repeat &*array:results* request [ copy ] sip ] 'array-filter' define
-[ #0 &*array:results* ! &*array:filter* ! [ &*array:source* ! ] [ array-length ] bi [ &*array:source* @ array-pop &*array:filter* @ invoke &*array:results* array-push ] repeat &*array:results* request [ copy ] sip ] 'array-map' define
+[ &*array:results* zero-out &*array:filter* ! [ &*array:source* ! ] [ array-length ] bi [ &*array:source* @ array-pop dup &*array:filter* @ invoke [ &*array:results* array-push ] [ drop ] if ] repeat &*array:results* request [ copy ] sip ] 'array-filter' define
+[ &*array:results* zero-out &*array:filter* ! [ &*array:source* ! ] [ array-length ] bi [ &*array:source* @ array-pop &*array:filter* @ invoke &*array:results* array-push ] repeat &*array:results* request [ copy ] sip ] 'array-map' define
 [ dup-pair [ array-length ] bi@ = [ dup array-length true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define
 [ &*array:filter* ! over array-length [ over array-pop &*array:filter* @ invoke ] repeat nip ] 'array-reduce' define
 [ request [ copy ] sip &*array:source* ! [ #0 &*array:source* @ array-length [ &*array:source* @ over array-fetch swap #1 + ] repeat drop ] array-from-quote ] 'array-reverse' define
