@@ -11,6 +11,8 @@
 #    ( ... )            ->      "..."
 #    \ ...              ->      "..."
 #    ['] name           ->      &name
+#    2dup               ->      dup-pair
+#    2drop              ->      drop-pair
 #
 # Usage:
 #
@@ -60,6 +62,10 @@ def compile(str):
                 new = new + " " + tokens[i]
                 i += 1
             new = new + '"'
+        elif token == "2dup"
+            new = new + " dup-pair"
+        elif token == "2drop"
+            new = new + " drop-pair"
         else:
             new = new + " " + token
         i += 1
