@@ -14,6 +14,13 @@
 #    2over              ->      dup-pair
 #    2drop              ->      drop-pair
 #    times              ->      repeat
+#    variable name      ->      'name' variable
+#    'c                 ->      $c
+#    "..."              ->      '
+#    $FF                ->      #255
+#    mod                ->      rem
+#    @symbol            ->      &symbol @
+#    !symbol            ->      &symbol !
 #
 # Usage:
 #
@@ -31,10 +38,18 @@ def is_number(s):
         return False
 
 
-def compile(str):
+def is_hex_number(s):
+    try:
+        int('0x' + s, 0)
+        return True
+    except ValueError:
+        return False
+
+
+def compile(strx):
     new = ""
     names = []
-    cleaned = ' '.join(str.split())
+    cleaned = ' '.join(strx.split())
     tokens = cleaned.split(' ')
     count = len(tokens)
     i = 0
@@ -44,6 +59,9 @@ def compile(str):
             new = new + " [";
             i += 1
             names.append(tokens[i])
+        elif token == "variable":
+            new = new + " '" + tokens[i + 1] + "' variable"
+            i += 1
         elif token == ";":
             new = new + " ] '" + names.pop() + "' define"
         elif token == "[']":
@@ -56,11 +74,13 @@ def compile(str):
             new = new + '"'
         elif is_number(token):
             new = new + " #" + token
-        elif token == "2over"
+        elif token == "2over":
             new = new + " dup-pair"
-        elif token == "2drop"
+        elif token == "2drop":
             new = new + " drop-pair"
-        elif token == "times"
+        elif token == "mod":
+            new = new + " rem"
+        elif token == "times":
             new = new + " repeat"
         elif token == "\\":
             new = new + ' "'
@@ -69,6 +89,22 @@ def compile(str):
                 new = new + " " + tokens[i]
                 i += 1
             new = new + '"'
+        elif token.startswith("'"):
+            new = new + " $" + token[1:]
+        elif token.startswith("\""):
+            new = new + " '" + token[1:]
+        elif token.endswith("\""):
+            new = new + " " + token.rsplit("\"", 1)[0] + "'"
+        elif token.startswith("$"):
+            if is_hex_number(token[1:]):
+                x = int("0x" + token[1:], 0)
+                new = new + " #" + str(x)
+            else:
+                new = new + " " + token
+        elif token.startswith("@"):
+            new = new + " &" + token[1:] + " @"
+        elif token.startswith("!"):
+            new = new + " &" + token[1:] + " !"
         else:
             new = new + " " + token
         i += 1
