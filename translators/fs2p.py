@@ -62,9 +62,9 @@ def compile(str):
                 new = new + " " + tokens[i]
                 i += 1
             new = new + '"'
-        elif token == "2dup"
+        elif token == "2dup":
             new = new + " dup-pair"
-        elif token == "2drop"
+        elif token == "2drop":
             new = new + " drop-pair"
         else:
             new = new + " " + token
