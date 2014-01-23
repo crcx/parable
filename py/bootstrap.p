@@ -93,8 +93,7 @@
 
 "variables"
 [ request swap define ] 'variable' define
-'*empty*' variable
-[ &*empty* swap copy ] 'zero-out' define
+[ request swap copy ] 'zero-out' define
 [ #0 fetch ] '@' define
 [ #0 store ] '!' define
 [ [ @ #1 + ] sip ! ] 'increment' define
@@ -130,27 +129,27 @@
 [ dup-pair < [ nip ] [ drop ] if ] 'max' define
 
 "Sliced Memory Access"
-'*slice-current*' variable
-'*slice-offset*' variable
-[ &*slice-current* @ &*slice-offset* @ ] 'slice-position' define
-[ &*slice-offset* increment ] 'slice-advance' define
-[ &*slice-offset* decrement ] 'slice-retreat' define
+'*slice:current*' variable
+'*slice:offset*' variable
+[ &*slice:current* @ &*slice:offset* @ ] 'slice-position' define
+[ &*slice:offset* increment ] 'slice-advance' define
+[ &*slice:offset* decrement ] 'slice-retreat' define
 [ slice-position store ] 'slice-store-current' define
 [ slice-position fetch ] 'slice-fetch-current' define
 [ slice-position store slice-advance ] 'slice-store' define
 [ slice-position fetch slice-advance ] 'slice-fetch' define
 [ slice-retreat slice-position store ] 'slice-store-retreat' define
 [ slice-retreat slice-position fetch ] 'slice-fetch-retreat' define
-[ &*slice-current* ! &*slice-offset* zero-out ] 'slice-set' define
+[ &*slice:current* ! &*slice:offset* zero-out ] 'slice-set' define
 [ [ slice-store ] repeat ] 'slice-store-items' define
 [ request slice-set ] 'new-slice' define
-[ &*slice-current* @ [ &*slice-offset* @ [ invoke ] dip &*slice-offset* ! ] dip &*slice-current* ! ] 'preserve-slice' define
+[ &*slice:current* @ [ &*slice:offset* @ [ invoke ] dip &*slice:offset* ! ] dip &*slice:current* ! ] 'preserve-slice' define
 
 "arrays"
 '*array:filter*' variable
 '*array:source*' variable
 '*array:results*' variable
-[ [ new-slice invoke-count-items dup slice-store slice-store-items &*slice-current* @ ] preserve-slice ] 'array-from-quote' define
+[ [ new-slice invoke-count-items dup slice-store slice-store-items &*slice:current* @ ] preserve-slice ] 'array-from-quote' define
 [ @ ] 'array-length' define
 [ #1 + fetch ] 'array-fetch' define
 [ #1 + store ] 'array-store' define
@@ -173,4 +172,4 @@
 [ "pointer:array number:type - string"  #100 / #1 - &*array:conversions* swap fetch :p invoke ] 'array-to-string' define
 
 "more stuff"
-[ [ [ new-slice length [ #1 - ] sip [ dup-pair fetch slice-store #1 - ] repeat drop-pair #0 slice-store &*slice-current* @ :p :s ] preserve-slice ] if-string ] 'reverse' define
+[ [ [ new-slice length [ #1 - ] sip [ dup-pair fetch slice-store #1 - ] repeat drop-pair #0 slice-store &*slice:current* @ :p :s ] preserve-slice ] if-string ] 'reverse' define
