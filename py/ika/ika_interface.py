@@ -16,11 +16,11 @@ def dump_stack():
             sys.stdout.write("\t&" + str(stack[i]))
         elif types[i] == TYPE_FLAG:
             if stack[i] == -1:
-                sys.stdout.write("true")
+                sys.stdout.write("\ttrue")
             elif stack[i] == 0:
-                sys.stdout.write("false")
+                sys.stdout.write("\tfalse")
             else:
-                sys.stdout.write("malformed flag")
+                sys.stdout.write("\tmalformed flag")
         else:
             sys.stdout.write("unmatched type on stack!")
         sys.stdout.write("\n")

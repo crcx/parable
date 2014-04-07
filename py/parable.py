@@ -13,7 +13,7 @@ from math import floor
 #
 
 MAX_SLICES = 64000
-SLICE_LEN = 1000
+SLICE_LEN = 1024
 
 
 #

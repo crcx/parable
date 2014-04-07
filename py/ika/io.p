@@ -11,7 +11,7 @@
 [ "number:offset number:file-id -"  `2005 ] 'file-seek' define
 [ "number:file-id - number:length"  `2006 ] 'file-size' define
 [ "string:name -"  `2007 ] 'delete-file' define
-[ "string:name - string:contents"  [ new-slice 'r' open-file dup file-size [ [ read-file slice-store ] sip ] repeat close-file &*slice-current* @ :p :s ] preserve-slice ] 'slurp-file' define
+[ "string:name - string:contents"  [ new-slice 'r' open-file dup file-size [ [ read-file slice-store ] sip ] repeat close-file &*slice:current* @ :p :s ] preserve-slice ] 'slurp-file' define
 [ "string:name - flag"  `2008 ] 'file-exists?' define
 
 "Command Line Arguments"

@@ -66,12 +66,18 @@
 [ over over ] 'dup-pair' define
 [ drop drop ] 'drop-pair' define
 
+"combinators"
+[ [ dip ] dip invoke ] 'bi*' define
+[ dup bi* ] 'bi@' define
+[ [ [ swap [ dip ] dip ] dip dip ] dip invoke ] 'tri*' define
+[ dup dup tri* ] 'tri@' define
+
 "Conditionals"
 [ #-1 :f ] 'true' define
 [ #0 :f ] 'false' define
 [ [ ] if ] 'if-true' define
 [ [ ] swap if ] 'if-false' define
-[ dup-pair > [ swap ] if-true [ over ] dip <= [ >= ] dip and :f ] 'between?' define
+[ [ [ :n ] bi@ ] dip :n dup-pair > [ swap ] if-true [ over ] dip <= [ >= ] dip and :f ] 'between?' define
 [ #0 <> ] 'true?' define
 [ #0 = ] 'false?' define
 [ #2 rem #0 = ] 'even?' define
@@ -84,12 +90,6 @@
 [ [ type? NUMBER = ] dip if-true ] 'if-number' define
 [ [ type? POINTER = ] dip if-true ] 'if-pointer' define
 [ [ type? FLAG = ] dip if-true ] 'if-flag' define
-
-"combinators"
-[ [ dip ] dip invoke ] 'bi*' define
-[ dup bi* ] 'bi@' define
-[ [ [ swap [ dip ] dip ] dip dip ] dip invoke ] 'tri*' define
-[ dup dup tri* ] 'tri@' define
 
 "variables"
 [ request swap define ] 'variable' define
@@ -111,7 +111,7 @@
 "String and Character"
 [ dup to-lowercase = ] 'lowercase?' define
 [ dup to-uppercase = ] 'uppercase?' define
-[ [ [ uppercase? ] [ lowercase? ] bi or :f ] if-character ] 'letter?' define
+[ type? CHARACTER = [ to-lowercase $a $z between? ] [ false ] if ] 'letter?' define
 [ [ $0 $9 between? ] if-character ] 'digit?' define
 [ :s '`~!@#$%^&*()'"<>,.:;[]{}\|-_=+' swap find [ false ] [ true ] if ] 'symbol?' define
 [ to-lowercase :s 'abcdefghijklmnopqrstuvwxyz1234567890' swap find [ false ] [ true ] if ] 'alphanumeric?' define
