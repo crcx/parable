@@ -588,9 +588,10 @@ def interpret(slice, more=None):
                     a = slice_to_string(ptr).upper()
                     stack_push(string_to_slice(a), TYPE_STRING)
                 elif t == TYPE_CHARACTER:
-                    a = ''.join(chr(stack_pop()))
-                    b = a.upper()
-                    stack_push(ord(b[0]), TYPE_CHARACTER)
+                    a = stack_pop()
+                    b = ''.join(unichr(a))
+                    a = b.upper()
+                    stack_push(ord(a[0]), TYPE_CHARACTER)
                 else:
                     report('ERROR: BC_TO_UPPER requires STRING or CHARACTER')
             else:
@@ -603,9 +604,10 @@ def interpret(slice, more=None):
                     a = slice_to_string(ptr).lower()
                     stack_push(string_to_slice(a), TYPE_STRING)
                 elif t == TYPE_CHARACTER:
-                    a = ''.join(chr(stack_pop()))
-                    b = a.lower()
-                    stack_push(ord(b[0]), TYPE_CHARACTER)
+                    a = stack_pop()
+                    b = ''.join(unichr(a))
+                    a = b.lower()
+                    stack_push(ord(a[0]), TYPE_CHARACTER)
                 else:
                     report('ERROR: BC_TO_LOWER requires STRING or CHARACTER')
             else:
@@ -752,7 +754,7 @@ def stack_change_type(type):
         if stack_type() == TYPE_NUMBER:
             stack_push(string_to_slice(str(stack_pop())), TYPE_STRING)
         elif stack_type() == TYPE_CHARACTER:
-            stack_push(string_to_slice(''.join(chr(stack_pop()))), TYPE_STRING)
+            stack_push(string_to_slice(''.join(unichr(stack_pop()))), TYPE_STRING)
         elif stack_type() == TYPE_FLAG:
             s = stack_pop()
             if s == -1:
@@ -912,7 +914,7 @@ def slice_to_string(slice):
     i = 0
     while i < SLICE_LEN:
         if fetch(slice, i) != 0:
-            s.append(chr(int(fetch(slice, i))))
+            s.append(unichr(int(fetch(slice, i))))
         else:
             i = SLICE_LEN
         i += 1
