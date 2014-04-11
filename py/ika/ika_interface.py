@@ -5,15 +5,15 @@ def dump_stack():
     global stack
     i = 0
     while i < len(stack):
-        sys.stdout.write("\t" + str(i))
+        sys.stdout.write("\t" + unicode(i))
         if types[i] == TYPE_NUMBER:
-            sys.stdout.write("\t#" + str(stack[i]))
+            sys.stdout.write("\t#" + unicode(stack[i]))
         elif types[i] == TYPE_CHARACTER:
-            sys.stdout.write("\t$" + str(chr(stack[i])))
+            sys.stdout.write("\t$" + unicode(unichr(stack[i])))
         elif types[i] == TYPE_STRING:
-            sys.stdout.write("\t'" + slice_to_string(stack[i]) +"'")
+            sys.stdout.write(("\t'" + slice_to_string(stack[i]) +"'").encode('utf-8'))
         elif types[i] == TYPE_FUNCTION:
-            sys.stdout.write("\t&" + str(stack[i]))
+            sys.stdout.write("\t&" + unicode(stack[i]))
         elif types[i] == TYPE_FLAG:
             if stack[i] == -1:
                 sys.stdout.write("\ttrue")
@@ -31,13 +31,13 @@ def display_value():
     global stack, types
     i = len(stack) - 1
     if types[i] == TYPE_NUMBER:
-        sys.stdout.write(str(stack[i]))
+        sys.stdout.write(unicode(stack[i]))
     elif types[i] == TYPE_CHARACTER:
-        sys.stdout.write(str(chr(stack[i])))
+        sys.stdout.write(unicode(unichr(stack[i])))
     elif types[i] == TYPE_STRING:
         sys.stdout.write(slice_to_string(stack[i]))
     elif types[i] == TYPE_FUNCTION:
-        sys.stdout.write('&' + str(stack[i]))
+        sys.stdout.write('&' + unicode(stack[i]))
     elif types[i] == TYPE_FLAG:
         if stack[i] == -1:
             sys.stdout.write("true")
@@ -81,7 +81,7 @@ def opcodes(slice, offset, opcode):
         stack_push(ord(files[slot].read(1)), TYPE_NUMBER)
     elif opcode == 2003:
         slot = int(stack_pop())
-        files[slot].write(chr(int(stack_pop())))
+        files[slot].write(unichr(int(stack_pop())))
     elif opcode == 2004:
         slot = int(stack_pop())
         stack_push(files[slot].tell(), TYPE_NUMBER)

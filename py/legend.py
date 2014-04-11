@@ -70,7 +70,7 @@ colorCodes = {
 
 def write(text, color):
     """Write to stdout in color."""
-    sys.stdout.write("\033[" + colorCodes[color] + "m" + text + "\033[0m")
+    sys.stdout.write(("\033[" + colorCodes[color] + "m" + text + "\033[0m").encode('utf-8'))
 
 
 def getTerminalSize():
@@ -150,20 +150,20 @@ def display_stack():
     l = 1
     while i < len(stack):
         if i == len(stack) - 1:
-            write("TOS\t" + str(i), COLOR_STACK_LINE)
+            write("TOS\t" + unicode(i), COLOR_STACK_LINE)
         else:
-            write("\t" + str(i), COLOR_STACK_LINE)
+            write("\t" + unicode(i), COLOR_STACK_LINE)
 
         if types[i] == TYPE_NUMBER:
-            write("\t#" + str(stack[i]), COLOR_STACK_N)
+            write("\t#" + unicode(stack[i]), COLOR_STACK_N)
         elif types[i] == TYPE_CHARACTER:
-            write("\t$" + str(chr(stack[i])), COLOR_STACK_C)
+            write("\t$" + unicode(unichr(stack[i])), COLOR_STACK_C)
         elif types[i] == TYPE_STRING:
             write("\t'" + slice_to_string(stack[i]) + "'", COLOR_STACK_S)
-            write("\n\t\tstored at: " + str(stack[i]), 'normal')
+            write("\n\t\tstored at: " + unicode(stack[i]), 'normal')
             l += 1
         elif types[i] == TYPE_FUNCTION:
-            write("\t&" + str(stack[i]), COLOR_STACK_F)
+            write("\t&" + unicode(stack[i]), COLOR_STACK_F)
             if pointer_to_name(stack[i]) != "":
                 write("\n\t\tpointer to: ", 'normal')
                 write(pointer_to_name(stack[i]), 'normal')

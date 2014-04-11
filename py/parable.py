@@ -137,7 +137,7 @@ def check_depth(cells):
     """False otherwise. If False, reports an underflow error."""
     global stack
     if len(stack) < cells:
-        report('Stack underflow: ' + str(cells) + ' values required')
+        report('Stack underflow: ' + unicode(cells) + ' values required')
         return False
     else:
         return True
@@ -591,7 +591,7 @@ def interpret(slice, more=None):
                     a = stack_pop()
                     b = ''.join(unichr(a))
                     a = b.upper()
-                    stack_push(ord(a[0]), TYPE_CHARACTER)
+                    stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                 else:
                     report('ERROR: BC_TO_UPPER requires STRING or CHARACTER')
             else:
@@ -607,7 +607,7 @@ def interpret(slice, more=None):
                     a = stack_pop()
                     b = ''.join(unichr(a))
                     a = b.lower()
-                    stack_push(ord(a[0]), TYPE_CHARACTER)
+                    stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                 else:
                     report('ERROR: BC_TO_LOWER requires STRING or CHARACTER')
             else:
@@ -752,7 +752,7 @@ def stack_change_type(type):
             types.append(TYPE_NUMBER)
     elif type == TYPE_STRING:
         if stack_type() == TYPE_NUMBER:
-            stack_push(string_to_slice(str(stack_pop())), TYPE_STRING)
+            stack_push(string_to_slice(unicode(stack_pop())), TYPE_STRING)
         elif stack_type() == TYPE_CHARACTER:
             stack_push(string_to_slice(''.join(unichr(stack_pop()))), TYPE_STRING)
         elif stack_type() == TYPE_FLAG:
@@ -771,7 +771,7 @@ def stack_change_type(type):
     elif type == TYPE_CHARACTER:
         if stack_type() == TYPE_STRING:
             s = slice_to_string(stack_pop())
-            stack_push(ord(s[0]), TYPE_CHARACTER)
+            stack_push(ord(s[0].encode('utf-8')), TYPE_CHARACTER)
         else:
             s = stack_pop()
             stack_push(int(s), TYPE_CHARACTER)
@@ -901,7 +901,7 @@ def string_to_slice(string):
     s = request_slice()
     i = 0
     for char in list(string):
-        store(ord(char), s, i)
+        store(ord(char.encode('utf-8')), s, i)
         i += 1
     store(0, s, i)
     return s
@@ -1116,7 +1116,7 @@ def compile(str, slice):
             i, s = parse_string(tokens, i, count, '\'')
             offset = compile_string(s[1:-1], slice, offset)
         elif tokens[i].startswith("$"):
-            offset = compile_character(ord(tokens[i][1:]), slice, offset)
+            offset = compile_character(ord(tokens[i][1:].encode('utf-8')), slice, offset)
         elif tokens[i].startswith("&"):
             offset = compile_pointer(tokens[i][1:], slice, offset)
         elif tokens[i].startswith("#"):

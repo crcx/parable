@@ -5,20 +5,20 @@ def display_stack(verbose):
     i = 0
     while i < len(stack):
         if i == len(stack) - 1:
-            sys.stdout.write("TOS\t" + str(i))
+            sys.stdout.write("TOS\t" + unicode(i))
         else:
-            sys.stdout.write("\t" + str(i))
+            sys.stdout.write("\t" + unicode(i))
 
         if types[i] == TYPE_NUMBER:
-            sys.stdout.write("\t#" + str(stack[i]))
+            sys.stdout.write("\t#" + unicode(stack[i]))
         elif types[i] == TYPE_CHARACTER:
-            sys.stdout.write("\t$" + str(chr(stack[i])))
+            sys.stdout.write("\t$" + unicode(unichr(stack[i])))
         elif types[i] == TYPE_STRING:
-            sys.stdout.write("\t'" + slice_to_string(stack[i]) + "'")
+            sys.stdout.write(("\t'" + slice_to_string(stack[i]) + "'").encode('utf-8'))
             if verbose == True:
-                sys.stdout.write("\n\t\tstored at: " + str(stack[i]))
+                sys.stdout.write("\n\t\tstored at: " + unicode(stack[i]))
         elif types[i] == TYPE_FUNCTION:
-            sys.stdout.write("\t&" + str(stack[i]))
+            sys.stdout.write("\t&" + unicode(stack[i]))
             if verbose == True:
                 if pointer_to_name(stack[i]) != "":
                     sys.stdout.write("\n\t\tpointer to: " + pointer_to_name(stack[i]))
