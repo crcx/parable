@@ -402,7 +402,7 @@ function add_definition($name, $s)
 }
 
 
-function interpret($slice)
+function interpret($slice, $more = "")
 {
     global $SLICE_LEN;
     global $stack;
@@ -785,9 +785,9 @@ function interpret($slice)
                 $b = stack_pop();
                 $c = stack_pop();
                 if ($c == -1)
-                    interpret($b);
+                    interpret($b, $more);
                 else
-                    interpret($a);
+                    interpret($a, $more);
             }
             else
                 $offset = $SLICE_LEN;
@@ -800,7 +800,7 @@ function interpret($slice)
                 $a  = -1;
                 while ($a == -1)
                 {
-                    interpret($quote);
+                    interpret($quote, $more);
                     $a = stack_pop();
                 }
             }
@@ -815,7 +815,7 @@ function interpret($slice)
                 $a  = 0;
                 while ($a == 0)
                 {
-                    interpret($quote);
+                    interpret($quote, $more);
                     $a = stack_pop();
                 }
             }
@@ -830,7 +830,7 @@ function interpret($slice)
                 $count = stack_pop();
                 while ($count > 0)
                 {
-                    interpret($quote);
+                    interpret($quote, $more);
                     $count -= 1;
                 }
             }
@@ -840,14 +840,14 @@ function interpret($slice)
         elseif ($opcode == $BC_FLOW_CALL)
         {
             $offset += 1;
-            interpret(fetch($slice, $offset));
+            interpret(fetch($slice, $offset), $more);
         }
         elseif ($opcode == $BC_FLOW_CALL_F)
         {
             if (check_depth(1))
             {
                 $a = stack_pop();
-                interpret($a);
+                interpret($a, $more);
             }
             else
                 $offset = $SLICE_LEN;
@@ -859,7 +859,7 @@ function interpret($slice)
                 $quote = stack_pop();
                 $vtype = stack_type();
                 $value = stack_pop();
-                interpret($quote);
+                interpret($quote, $more);
                 stack_push($value, $vtype);
             }
             else
@@ -873,7 +873,7 @@ function interpret($slice)
                 stack_dup();
                 $vtype = stack_type();
                 $value = stack_pop();
-                interpret($quote);
+                interpret($quote, $more);
                 stack_push($value, $vtype);
             }
             else
@@ -888,9 +888,9 @@ function interpret($slice)
                stack_dup();
                $x = stack_type();
                $y = stack_pop();
-               interpret($b);
+               interpret($b, $more);
                stack_push($y, $x);
-               interpret($a);
+               interpret($a, $more);
             }
             else
                 $offset = $SLICE_LEN;
@@ -908,11 +908,11 @@ function interpret($slice)
                 stack_dup();
                 $m = stack_type();
                 $q = stack_pop();
-                interpret($c);
+                interpret($c, $more);
                 stack_push($q, $m);
-                interpret($b);
+                interpret($b, $more);
                 stack_push($y, $x);
-                interpret($a);
+                interpret($a, $more);
             }
             else
                 $offset = $SLICE_LEN;
@@ -1147,8 +1147,8 @@ function interpret($slice)
             }
             $offset = $SLICE_LEN;
         }
-        else
-            $offset = $SLICE_LEN;
+        if ($more != "")
+           $offset = $more($slice, $offset, $opcode);
 
         $offset += 1;
     }
