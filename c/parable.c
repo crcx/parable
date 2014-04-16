@@ -47,7 +47,7 @@ int request_slice()
     int offset = 0;
     int slice = -1;
     int i = 0;
-    while (offset < 10000 && slice == -1)
+    while (offset < MAX_SLICES && slice == -1)
     {
         if (slice_map[offset] == 0)
         {
