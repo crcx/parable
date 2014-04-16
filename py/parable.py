@@ -13,7 +13,7 @@ from math import floor
 #
 
 MAX_SLICES = 64000
-SLICE_LEN = 1024
+SLICE_LEN = 4096
 
 
 #
@@ -847,11 +847,7 @@ def request_slice():
     while i < MAX_SLICES:
         if p_map[i] == 0:
             p_map[i] = 1
-            p_slices[i] = []
-            j = 0
-            while j < SLICE_LEN:
-                p_slices[i].append(0)
-                j += 1
+            p_slices[i] = [0 for x in range(SLICE_LEN)]
             return i
         else:
             i += 1
@@ -877,11 +873,8 @@ def copy_slice(source, dest):
 def prepare_slices():
     """prepare the initial set of slices for use"""
     global p_slices, p_map, MAX_SLICES
-    i = 0
-    while i < MAX_SLICES:
-        p_map.append(0)
-        p_slices.append([])
-        i += 1
+    p_map = [0 for x in range(MAX_SLICES)]
+    p_slices = [0 for x in range(MAX_SLICES)]
 
 
 def fetch(slice, offset):
