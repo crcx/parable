@@ -6,6 +6,7 @@
 "ram         Ngaro memory"
 "opcodes     Opcode Table"
 "addresses   Address Stack"
+"output      Simulated Output Device"
 "-------------------------------------------------------------"
 "This implementation uses the Parable data stack and functions"
 "directly whenever possible."
@@ -15,9 +16,21 @@
 'ram' variable
 'opcodes' variable
 'addresses' variable
+'output' variable
 
 [ &ip @ #1 + &ip ! ] 'ip+' define
 [ &ram &ip @ fetch ] '[ip]' define
+
+[ &output @ :p :s ] 'display' define
+[ display swap + &output ! ] '+display' define
+'' &output !
+
+
+'ports' variable
+[ &ports swap fetch ] 'read-port' define
+[ &ports swap store ] 'write-port' define
+
+[ #2 read-port #1 = [ :c :s +display #0 #2 write-port ] if-true ] 'ngaro.devices' define
 
 [ ] 'ngaro.nop' define
 [ ip+ [ip] ] 'ngaro.lit' define
@@ -47,9 +60,9 @@
 [ dup #0 = [ drop ngaro.return ] if-true ] 'ngaro.zeroexit' define
 [ #1 + ] 'ngaro.inc' define
 [ #1 - ] 'ngaro.dec' define
-[ "stub" drop #0 ] 'ngaro.in' define
-[ "stub" drop-pair ] 'ngaro.out' define
-[ "stub" ] 'ngaro.wait' define
+[ read-port ] 'ngaro.in' define
+[ write-port ] 'ngaro.out' define
+[ ngaro.devices ] 'ngaro.wait' define
 [ &ip @ ngaro.push #1 - &ip ! ] 'ngaro.implicit.call' define
 
 "Build the dispatch table for the opcodes"
@@ -87,6 +100,6 @@
 &ngaro.wait     slice-store
 
 [ dup #0 #30 between? [ &opcodes swap fetch invoke ] [ ngaro.implicit.call ] if ip+ ] 'process-opcode' define
-[ #0 &ip ! [ [ip] process-opcode &ip @ #1000 <> ] while-true ] 'process-bytecode' define
+[ #0 &ip ! [ [ip] process-opcode &ip @ #1000 <> ] while-true display ] 'process-bytecode' define
 
 &ram slice-set
