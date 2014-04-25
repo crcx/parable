@@ -624,7 +624,7 @@ def interpret(slice, more=None):
         elif opcode == BC_REPORT:
             if check_depth(1):
                 if stack_type() == TYPE_STRING:
-                    a = slice_to_string(stack_tos())
+                    a = slice_to_string(stack_pop())
                     report(a)
             offset = SLICE_LEN
         if more is not None:

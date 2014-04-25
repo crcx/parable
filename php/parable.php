@@ -1141,7 +1141,7 @@ function interpret($slice, $more = "")
             {
                 if (stack_type() == $TYPE_STRING)
                 {
-                    $a = slice_to_string(stack_tos());
+                    $a = slice_to_string(stack_pop());
                     report_error($a);
                 }
             }
