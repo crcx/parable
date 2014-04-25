@@ -27,7 +27,7 @@
 [ &addresses array-push ] 'ngaro.push' define
 [ &addresses array-pop ] 'ngaro.pop' define
 [ ] 'ngaro.loop' define
-[ ip+ [ip] &ip ! ] 'ngaro.jump' define
+[ ip+ [ip] #1 - &ip ! ] 'ngaro.jump' define
 [ ngaro.pop &ip ! ] 'ngaro.return' define
 [ >  [ ngaro.jump ] [ ip+ ] if ] 'ngaro.jump.gt' define
 [ <  [ ngaro.jump ] [ ip+ ] if ] 'ngaro.jump.lt' define
@@ -50,7 +50,7 @@
 [ "stub" drop #0 ] 'ngaro.in' define
 [ "stub" drop-pair ] 'ngaro.out' define
 [ "stub" ] 'ngaro.wait' define
-[ &ip @ ngaro.push &ip ! ] 'ngaro.implicit.call' define
+[ &ip @ ngaro.push #1 - &ip ! ] 'ngaro.implicit.call' define
 
 "Build the dispatch table for the opcodes"
 &opcodes        slice-set
@@ -87,21 +87,6 @@
 &ngaro.wait     slice-store
 
 [ dup #0 #30 between? [ &opcodes swap fetch invoke ] [ ngaro.implicit.call ] if ip+ ] 'process-opcode' define
+[ #0 &ip ! [ [ip] process-opcode &ip @ #1000 <> ] while-true ] 'process-bytecode' define
 
 &ram slice-set
-#1 slice-store "LIT 2"
-#2 slice-store
-#1 slice-store "LIT 2"
-#2 slice-store
-#5 slice-store "PUSH"
-#1 slice-store "LIT 3"
-#3 slice-store
-#6 slice-store "POP"
-
-#1 slice-store "LIT 5"
-#5 slice-store
-#1 slice-store "LIT 2"
-#2 slice-store
-#19 slice-store "DIVMOD"
-
-#0 &ip ! [ [ip] process-opcode &ip @ #1000 <> ] while-true
