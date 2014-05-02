@@ -175,3 +175,12 @@
 [ "array  --  string"  '' [ :c :s '$' swap + + #32 :c :s + ] array-reduce ] slice-store
 [ "pointer:array number:type - string"  #100 / #1 - &*array:conversions* swap fetch :p invoke ] 'array-to-string' define
 
+"Conversion of strings to numbers"
+'*conversion:base*' variable
+[ :n #48 - &*conversion:base* @ #16 = [ dup #16 > [ #7 - ] if-true ] if-true ] 'conversion:to-digit' define
+[ [ swap &*conversion:base* @ * + ] dip ] 'conversion:accumulate' define
+[ &*conversion:base* ! #0 swap [ conversion:to-digit swap conversion:accumulate ] for-each-character ] 'convert-with-base' define
+[ #2 convert-with-base ] 'convert-from-binary' define
+[ #8 convert-with-base ] 'convert-from-octal' define
+[ #10 convert-with-base ] 'convert-from-decimal' define
+[ #16 convert-with-base ] 'convert-from-hexadecimal' define
