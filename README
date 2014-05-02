@@ -1,116 +1,37 @@
-# Overview
+## Overview
 
-Parable: a concatenative, stack-oriented programming language designed
+Parable is a concatenative, stack-oriented programming language designed
 to be clean, consistent, and easily adaptable for use within larger
 applications.
 
-----
+## Getting Started
 
-# Getting Started
+This repository contains implementations in Python, PHP, C, and CoffeeScript.
 
-## C
+### C
 
-### Prerequisites
+For the C implementation you will need **make** and a C compiler. It has been
+tested on Linux and OS X with GCC, TCC, and Clang compilers. Run *make* and
+a binary named **pre** should be created.
 
-- A C compiler
+### Python
 
-  Tested with GCC, TCC, and CLANG
+The Python implementation of Parable is the most complete and best tested. It
+has been used under Python 2, 3, Pythonista, PyPy, and Jython.
 
-- make
+There are a couple of options for using it. For running scripts, you will use
+**pre**. For interactive use, **legend.py** should be used. (Note: legend
+requires a terminal supporting ANSI escape sequences).
 
-### Setup
+### PHP
 
-    make
+A file named **pre.php** is in the php directory. This needs to be kept in a
+directory along with **parable.php** and **bootstrap.p**.
 
-Copy the **parable** binary and **parable.p** to a directory.
+## Using PRE
 
-## Python
+For most implementations, the primary way to use it is via *pre* (short for
+*Parable Runtime Environment*). This is an executable that will read in the
+source file(s) provided, run the code they contain, and then display the
+resulting stack.
 
-### Prerequisites
-
-- A Python implementation
-
-Parable has been used under Python2, Python3, PyPy, and Jython.
-
-### Setup
-
-#### Interactive Use (listener)
-
-- Copy:
-
-    bootstrap.p  parable.py  listener.py
-
-#### Interactive Use (legend)
-
-- Copy
-
-    bootstrap.p  parable.py  legend.py
-
-#### Non-interactive (pre)
-
-    cd py/deploy
-    make
-
-Copy the created **pre.py** somewhere in your path as **pre**. Then:
-
-    pre filename
-
-## PHP
-
-### Prerequisites
-
-- A web server with PHP support
-
-### Setup
-
-- Copy these files from the **php** directory to a directory on your server:
-
-    bootstrap.p  parable.php  punga.php
-
-- Symlink **punga.php** to **index.php**
-
-You can now access the Punga interface from your browser.
-
-----
-
-# Files
-
- - README
-
-   This file.
-
- - LICENSE
-
-   Legal stuff (copyright notice, usage terms, disclaimer of warranty, etc)
-
- - c/*
-
-   The C implementation.
-
- - py/*
-
-   The Python implementation.
-
- - php/*
-
-   The PHP implementation.
-
- - tests/*
-
-   Code to help with testing implementations
-
- - examples/*
-
-   Small sample programs
-
-----
-
-# Historical Repositories
-
-Older source history can be found in the following repositories:
-
-    lp:~crc-x/+junk/parable-py
-    lp:~crc-x/+junk/parable-php
-
-The sources from 8/26 were merged and committed into this repository
-on 8/27/2013.
