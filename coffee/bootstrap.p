@@ -65,8 +65,6 @@
 "Stack Flow"
 [ over over ] 'dup-pair' define
 [ drop drop ] 'drop-pair' define
-
-"combinators"
 [ [ dip ] dip invoke ] 'bi*' define
 [ dup bi* ] 'bi@' define
 [ [ [ swap [ dip ] dip ] dip dip ] dip invoke ] 'tri*' define
@@ -105,7 +103,7 @@
 [ #1 - [ + ] repeat ] 'sum-range' define
 
 "Misc"
-[ depth [ invoke ] dip depth swap - ] 'invoke-count-items' define
+[ depth [ invoke ] dip depth swap - ] 'invoke-and-count-items-returned' define
 [ [ drop ] repeat ] 'drop-multiple' define
 
 "String and Character"
@@ -121,7 +119,7 @@
 [ ] 'trim-right' define
 [ :s length dup-pair #1 - fetch nip #32 = [ length #1 - #0 swap substring trim-right ] if-true ] 'trim-right' define
 [ trim-left trim-right ] 'trim' define
-[ invoke-count-items #1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define
+[ invoke-and-count-items-returned #1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define
 
 "Helpful Math"
 [ dup negative? [ #-1 * ] if-true ] 'abs' define
@@ -153,7 +151,7 @@
 '*array:filter*' variable
 '*array:source*' variable
 '*array:results*' variable
-[ [ new-slice invoke-count-items dup slice-store slice-store-items &*slice:current* @ ] preserve-slice ] 'array-from-quote' define
+[ [ new-slice invoke-and-count-items-returned dup slice-store slice-store-items &*slice:current* @ ] preserve-slice ] 'array-from-quote' define
 [ @ ] 'array-length' define
 [ #1 + fetch ] 'array-fetch' define
 [ #1 + store ] 'array-store' define
