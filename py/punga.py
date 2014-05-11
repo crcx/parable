@@ -25,7 +25,7 @@ def dump_stack():
         if types[i] == TYPE_NUMBER:
             sys.stdout.write("</td><td>#" + str(stack[i]) + "</td></tr>")
         elif types[i] == TYPE_CHARACTER:
-            sys.stdout.write("</td><td>$" + unicode(unichr(stack[i])) + "</td></tr>")
+            sys.stdout.write("</td><td>$" + unicode(unichr(stack[i])).encode('utf-8') + "</td></tr>")
         elif types[i] == TYPE_STRING:
             sys.stdout.write("</td><td>'" + slice_to_string(stack[i]))
             sys.stdout.write("'" + "<br><span style='color: #D3D3D3;'>Stored ")
