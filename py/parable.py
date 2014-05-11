@@ -847,7 +847,7 @@ def request_slice():
     while i < MAX_SLICES:
         if p_map[i] == 0:
             p_map[i] = 1
-            p_slices[i] = [0 for x in range(SLICE_LEN)]
+            p_slices[i] = [0 for x in range(SLICE_LEN + 1)]
             return i
         else:
             i += 1
