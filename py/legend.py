@@ -119,30 +119,6 @@ def revert():
     prepare_dictionary()
 
 
-# def export_source(name):
-#     """export the source code for the current session to a file"""
-#     with open(name, "w") as session:
-#         session.write(generate_source())
-
-
-# def edit_session():
-#     """export the source code for the current session to a file, launch the"""
-#     """$EDITOR on it, and then load/parse the resulting file"""
-#     export_source('scratch')
-#     EDITOR = os.environ.get('EDITOR', 'vim')
-#     call([EDITOR, "scratch"])
-#     revert()
-#     f = open('scratch').readlines()
-#     for line in f:
-#         if len(line) > 1:
-#             s = compile(line, request_slice())
-#             interpret(s)
-#     try:
-#         os.remove('scratch')
-#     except OSError:
-#         pass
-
-
 def display_stack():
     """display the stack contents. returns the number of lines rendered"""
     global stack, types
@@ -192,18 +168,28 @@ def display_errors():
     return l
 
 
+def draw_separator(width):
+    c = 0
+    while c < width:
+        write("-", COLOR_BAR)
+        c += 1
+    return 1
+
+
+def clear_display():
+    sys.stdout.write("\x1b[2J")
+
+
 def display(height, width):
     """display the user interface"""
+    clear_display()
     l = display_stack()
     l += display_errors()
     clear_errors()
     while l < height - 1:
         sys.stdout.write("\n")
         l += 1
-    c = 0
-    while c < width:
-        write("-", COLOR_BAR)
-        c += 1
+    l += draw_separator(width)
     write("---> ", COLOR_PROMPT)
     sys.stdout.flush()
 
@@ -234,10 +220,6 @@ if __name__ == '__main__':
 
         if cmd == ':q' or cmd == ':quit':
             exit()
-#         elif cmd == ':w' or cmd == ':write':
-#             export_source('session')
-#         elif cmd == ':e' or cmd == ':edit':
-#             edit_session()
         elif cmd == ':r' or cmd == ':restart':
             revert()
             parse_bootstrap()
