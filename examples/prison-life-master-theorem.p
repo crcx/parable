@@ -66,8 +66,12 @@
     #3 #3 tap slice-store
     #0 slice-store
 
-    &*slice-current* @ :p :s
+    &*slice:current* @ :p :s
 
 "And now we have the final clue needed to solve the puzzle:"
 
     'thebirdman'
+
+"Another way to build the string:"
+
+    [ #4 #4 tap #2 #3 tap #1 #5 tap #1 #2 tap #2 #4 tap #4 #2 tap #1 #4 tap #3 #2 tap #1 #1 tap #3 #3 tap ] build-string
