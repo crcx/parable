@@ -151,7 +151,7 @@
 '*array:filter*' variable
 '*array:source*' variable
 '*array:results*' variable
-[ [ new-slice invoke-and-count-items-returned dup slice-store slice-store-items &*slice:current* @ ] preserve-slice ] 'array-from-quote' define
+[ [ new-slice invoke-and-count-items-returned dup slice-store slice-store-items &*slice:current* @ ] preserve-slice :p ] 'array-from-quote' define
 [ @ ] 'array-length' define
 [ #1 + fetch ] 'array-fetch' define
 [ #1 + store ] 'array-store' define
@@ -164,6 +164,7 @@
 [ dup-pair [ array-length ] bi@ = [ dup array-length true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define
 [ &*array:filter* ! over array-length [ over array-pop &*array:filter* @ invoke ] repeat nip ] 'array-reduce' define
 [ request [ copy ] sip &*array:source* ! [ #0 &*array:source* @ array-length [ &*array:source* @ over array-fetch swap #1 + ] repeat drop ] array-from-quote ] 'array-reverse' define
+[ request &*array:source* ! length dup swap [ #1 - dup-pair fetch &*array:source* @ array-push ] repeat drop-pair &*array:source* @ :p ] 'array-from-string' define
 
 "routines for rendering an array into a string"
 '*array:conversions*' variable
