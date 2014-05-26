@@ -1,2 +1,2 @@
-[ "quote -- max-value"  invoke-count-items #1 - [ max ] repeat ] 'find-max-value' define
-[ #6 #70 #123 #45 ] find-max-value
+[ #6 #222 #70 #123 #45 ] array-from-quote #0 [ max ] array-reduce
+
