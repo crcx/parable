@@ -97,6 +97,8 @@
 [ [ @ #1 + ] sip ! ] 'increment' define
 [ [ @ #1 - ] sip ! ] 'decrement' define
 [ swap request dup-pair copy swap [ [ invoke ] dip ] dip copy ] 'preserve' define
+[ #0 swap ! ] 'off' define
+[ #-1 swap ! ] 'on' define
 
 "numeric ranges"
 [ dup-pair < [ [ [ dup #1 + ] dip dup-pair = ] while-false ] [ [ [ dup #1 - ] dip dup-pair = ] while-false ] if drop ] 'expand-range' define
@@ -183,3 +185,19 @@
 [ #8 convert-with-base ] 'convert-from-octal' define
 [ #10 convert-with-base ] 'convert-from-decimal' define
 [ #16 convert-with-base ] 'convert-from-hexadecimal' define
+
+
+"Curry Combinator"
+'*curry:types*' variable
+&*curry:types* slice-set
+[ ] slice-store
+[ "number     #100 slice-store slice-store ] slice-store
+[ "string"    #101 slice-store slice-store ] slice-store
+[ "character" #102 slice-store slice-store ] slice-store
+[ "pointer"   #103 slice-store slice-store ] slice-store
+[ "flag"      #100 slice-store slice-store #114 slice-store ] slice-store
+
+[ type? #100 / &*curry:types* swap fetch invoke ] 'curry:compile-value' define
+[ #304 slice-store slice-store ] 'curry:compile-call' define
+
+[ [ request slice-set swap curry:compile-value curry:compile-call &*slice:current* @ :p ] preserve-slice ] 'curry' define
