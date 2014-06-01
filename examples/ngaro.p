@@ -12,14 +12,14 @@
 "directly whenever possible."
 "-------------------------------------------------------------"
 
-'ip' variable
+'ip' value
 'ram' variable
 'opcodes' variable
 'addresses' variable
 'output' variable
 
-[ &ip @ #1 + &ip ! ] 'ip+' define
-[ &ram &ip @ fetch ] '[ip]' define
+[ ip #1 + to ip ] 'ip+' define
+[ &ram ip fetch ] '[ip]' define
 
 [ &output @ :p :s ] 'display' define
 [ display swap + &output ! ] '+display' define
@@ -40,8 +40,8 @@
 [ &addresses array-push ] 'ngaro.push' define
 [ &addresses array-pop ] 'ngaro.pop' define
 [ ] 'ngaro.loop' define
-[ ip+ [ip] #1 - &ip ! ] 'ngaro.jump' define
-[ ngaro.pop &ip ! ] 'ngaro.return' define
+[ ip+ [ip] #1 - to ip ] 'ngaro.jump' define
+[ ngaro.pop to ip ] 'ngaro.return' define
 [ >  [ ngaro.jump ] [ ip+ ] if ] 'ngaro.jump.gt' define
 [ <  [ ngaro.jump ] [ ip+ ] if ] 'ngaro.jump.lt' define
 [ <> [ ngaro.jump ] [ ip+ ] if ] 'ngaro.jump.ne' define
@@ -63,7 +63,7 @@
 [ read-port ] 'ngaro.in' define
 [ write-port ] 'ngaro.out' define
 [ ngaro.devices ] 'ngaro.wait' define
-[ &ip @ ngaro.push #1 - &ip ! ] 'ngaro.implicit.call' define
+[ ip ngaro.push #1 - to ip ] 'ngaro.implicit.call' define
 
 "Build the dispatch table for the opcodes"
 &opcodes        slice-set
@@ -100,6 +100,6 @@
 &ngaro.wait     slice-store
 
 [ dup #0 #30 between? [ &opcodes swap fetch invoke ] [ ngaro.implicit.call ] if ip+ ] 'process-opcode' define
-[ #0 &ip ! [ [ip] process-opcode &ip @ #1000 <> ] while-true display ] 'process-bytecode' define
+[ #0 to ip [ [ip] process-opcode ip #1000 <> ] while-true display ] 'process-bytecode' define
 
 &ram slice-set
