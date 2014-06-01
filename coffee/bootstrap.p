@@ -201,3 +201,10 @@
 [ #304 slice-store slice-store ] 'curry:compile-call' define
 
 [ [ request slice-set swap curry:compile-value curry:compile-call &*slice:current* @ :p ] preserve-slice ] 'curry' define
+
+
+"Values"
+'*value:state*' variable
+[ &*value:state* on ] 'to' define
+[ &*value:state* @ :f [ ! &*value:state* off ] [ @ ] if ] 'value-handler' define
+[ request [ value-handler ] curry swap define ] 'value' define

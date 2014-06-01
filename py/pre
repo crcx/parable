@@ -1356,6 +1356,11 @@ bootstrap.append(""" [ "flag"      #100 slice-store slice-store #114 slice-store
 bootstrap.append(""" [ type? #100 / &*curry:types* swap fetch invoke ] 'curry:compile-value' define """)
 bootstrap.append(""" [ #304 slice-store slice-store ] 'curry:compile-call' define """)
 bootstrap.append(""" [ [ request slice-set swap curry:compile-value curry:compile-call &*slice:current* @ :p ] preserve-slice ] 'curry' define """)
+bootstrap.append(""" "Values" """)
+bootstrap.append(""" '*value:state*' variable """)
+bootstrap.append(""" [ &*value:state* on ] 'to' define """)
+bootstrap.append(""" [ &*value:state* @ :f [ ! &*value:state* off ] [ @ ] if ] 'value-handler' define """)
+bootstrap.append(""" [ request [ value-handler ] curry swap define ] 'value' define """)
 import sys, os
 
 def display_stack(verbose):
