@@ -18,8 +18,8 @@ char *errors;
 
 void prepare_error_reporting()
 {
-    errors = malloc(8192);
-    memset(errors, '\0', 8192);
+    errors = malloc(SLICE_LEN);
+    memset(errors, '\0', SLICE_LEN);
 }
 
 void report_error(char *string)
@@ -29,7 +29,7 @@ void report_error(char *string)
 
 void clear_errors()
 {
-    memset(errors, '\0', 8192);
+    memset(errors, '\0', SLICE_LEN);
 }
 
 void end_error_reporting()
