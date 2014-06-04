@@ -191,7 +191,7 @@
 '*curry:types*' variable
 &*curry:types* slice-set
 [ ] slice-store
-[ "number     #100 slice-store slice-store ] slice-store
+[ "number"    #100 slice-store slice-store ] slice-store
 [ "string"    #101 slice-store slice-store ] slice-store
 [ "character" #102 slice-store slice-store ] slice-store
 [ "pointer"   #103 slice-store slice-store ] slice-store
