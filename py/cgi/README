@@ -1,0 +1,16 @@
+This directory contains the CGI Endpoints for Parable as a Service
+
+0 - main interface
+0.ld - w/multi-line definition support (requires a blank line between functions)
+0.st - w/syntax tweaks (numbers without # prefix)
+0.ld.st - 0.ld + 0.st
+
+Each of these has a .low mode as well which reduces memory consumption and gives a
+smaller response set.
+
+# Setup
+
+Copy (or symlink) bootstrap.p and parable.py into the directory with these files.
+
+Call with a "code" parameter set to the code you want to run. Response set will be
+in JSON format.
