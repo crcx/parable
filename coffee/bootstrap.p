@@ -128,6 +128,7 @@
 [ dup-pair < [ drop ] [ nip ] if ] 'min' define
 [ dup-pair < [ nip ] [ drop ] if ] 'max' define
 [ [ #1 - [ dup ] repeat ] invoke-and-count-items-returned #1 - [ * ] repeat ] '^' define
+[ #1 swap [ [ * ] sip #1 - dup #1 <> ] while-true drop ] 'factorial' define
 
 "Sliced Memory Access"
 '*slice:current*' variable
