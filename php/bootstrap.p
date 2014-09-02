@@ -127,6 +127,7 @@
 [ dup negative? [ #-1 * ] if-true ] 'abs' define
 [ dup-pair < [ drop ] [ nip ] if ] 'min' define
 [ dup-pair < [ nip ] [ drop ] if ] 'max' define
+[ [ #1 - [ dup ] repeat ] invoke-and-count-items-returned #1 - [ * ] repeat ] '^' define
 
 "Sliced Memory Access"
 '*slice:current*' variable
