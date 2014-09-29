@@ -1296,6 +1296,7 @@ bootstrap.append(""" [ #1 swap [ [ * ] sip #1 - dup #1 <> ] while-true drop ] 'f
 bootstrap.append(""" "Sliced Memory Access" """)
 bootstrap.append(""" '*slice:current*' variable """)
 bootstrap.append(""" '*slice:offset*' variable """)
+bootstrap.append(""" [ &*slice:current* @ :p ] 'current-slice' define """)
 bootstrap.append(""" [ &*slice:current* @ &*slice:offset* @ ] 'slice-position' define """)
 bootstrap.append(""" [ &*slice:offset* increment ] 'slice-advance' define """)
 bootstrap.append(""" [ &*slice:offset* decrement ] 'slice-retreat' define """)

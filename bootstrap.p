@@ -133,6 +133,7 @@
 "Sliced Memory Access"
 '*slice:current*' variable
 '*slice:offset*' variable
+[ &*slice:current* @ :p ] 'current-slice' define
 [ &*slice:current* @ &*slice:offset* @ ] 'slice-position' define
 [ &*slice:offset* increment ] 'slice-advance' define
 [ &*slice:offset* decrement ] 'slice-retreat' define
