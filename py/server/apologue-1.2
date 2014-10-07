@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 
 # parable
-# copyright (c) 2013 charles childers
+# copyright (c) 2013 - 2014 charles childers
 #
-# This is an attempt to separate out the execution side of things from
-# the main Punga environment. As such it's being assembled as a simple
-# web service.
+# Perform a POST to this script. The resulting stack, stack types, provided
+# code, and any errors will be returned as a JSON object.
 #
-# Perform a POST to http://forthworks.com/punga/python/run.py with a
-# "code" field set to the code you want to run. The resulting stack,
-# stack types, provided code, and any errors will be returned as a JSON
-# object.
-
+# Fields:
+#
+# "code"   field set to the code you want to run.
+# "st"     enables 'syntax tweaks' (allows use of numbers without prefixes)
+# "ld"     enables 'long definitions' (requires a blank line between each function)
+# "rm"     reduces the memory usage (and results size) a little
+#
+# "code" is mandatory, the others can be set to "true", "false", or left out.
 
 import sys
 import cgi
@@ -32,11 +34,51 @@ def handler(signum, frame):
 
 signal.signal(signal.SIGALRM, handler)
 signal.alarm(30)
-parable.MAX_SLICES = 8192
-parable.SLICE_LEN = 256
+parable.MAX_SLICES = 16384
+parable.SLICE_LEN = 512
 
 message = ""
 
+
+def is_number(s):
+    """return True if s is a number, or False otherwise"""
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+
+def reduceMemory():
+    global parable
+    parable.MAX_SLICES = 16384
+    parable.SLICE_LEN = 512
+
+
+def condenseLines(code):
+    s = ''
+    r = []
+    for l in code:
+        if l != '' and l != '\n':
+            s = s + ' ' + l.strip()
+        else:
+            r.append(s.strip())
+            s = ''
+    return r
+
+def tweakSyntax(code):
+    r = []
+    for l in code:
+        if len(l) >= 1:
+            q = l.split(' ')
+            m = ''
+            for t in q:
+                if is_number(t):
+                    m = m + ' #' + t
+                else:
+                    m = m + ' ' + t
+            r.append(m)
+    return r
 
 def get_results():
     """export a parable session to the specified format"""
@@ -86,14 +128,27 @@ def process_input():
     global message
     form = cgi.FieldStorage()
     message = form.getvalue("code", " ")
+    st = form.getvalue("st", "false")
+    ld = form.getvalue("ld", "false")
+    rm = form.getvalue("rm", "false")
     prepare_slices()
     prepare_dictionary()
     parse_bootstrap(open('bootstrap.p').readlines())
     collect_unused_slices()
     f = message.split("\n")
     counter = 0
+
+    if rm == "true":
+        reduceMemory()
+
+    if ld == "true":
+        f = condenseLines(f)
+
+    if st == "true":
+        f = tweakSyntax(f)
+
     for line in f:
-        if len(line) >= 1:
+        if len(line) >= 1 and line != '':
             s = compile(line, request_slice())
             interpret(s)
             counter += 1
@@ -101,7 +156,6 @@ def process_input():
                 if len(stack) == 0:
                     collect_unused_slices()
                     counter = 0
-
 
 if __name__ == '__main__':
      process_input()
