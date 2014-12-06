@@ -211,3 +211,21 @@
 [ &*value:state* on ] 'to' define
 [ &*value:state* @ :f [ ! &*value:state* off ] [ @ ] if ] 'value-handler' define
 [ request [ value-handler ] curry swap define ] 'value' define
+
+
+"Constants"
+[ #3.141592653 ] 'math:pi' define
+[ #6.283185307 ] 'math:tau' define
+[ #2.718281828 ] 'math:e' define
+[ #1.618033988 ] 'math:golden-ratio' define
+[ #0.577215664 ] 'math:euler-mascheroni' define
+[ #1.414213562 ] 'math:pythagora' define
+[ #0.618033988 ] 'math:inverse-golden-ration' define
+[ #2.414213562 ] 'math:silver-ratio/mean' define
+[ #60 ] 'time:seconds/minute' define
+[ #60 ] 'time:minutes/hour' define
+[ #24 ] 'time:hours/day' define
+[ #7 ] 'time:days/week' define
+[ #365 ] 'time:days/year' define
+[ #365.25 ] 'time:days/julian-year' define
+[ #365.2425 ] 'time:days/gregorian-year' define
