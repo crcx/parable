@@ -229,3 +229,28 @@
 [ #365 ] 'time:days/year' define
 [ #365.25 ] 'time:days/julian-year' define
 [ #365.2425 ] 'time:days/gregorian-year' define
+
+
+"Hashing functions"
+[ #5381 swap [ :n [ swap ] dip over #-5 shift + + swap ] for-each-character ] 'hash:djb2' define
+[ :n over #-6 shift + over #-16 shift + swap - ] 'hash:sdbm<n>' define
+[ #0 swap [ [ swap ] dip hash:sdbm<n> swap ] for-each-character ] 'hash:sdbm' define
+[ #0 swap [ :n [ swap ] dip + #255 and swap ] for-each-character #255 xor #1 + #255 and ] 'hash:lrc' define
+[ #0 swap [ :n [ swap ] dip xor swap ] for-each-character ] 'hash:xor' define
+[ hash:djb2 ] 'chosen-hash' define
+[ #389 ] 'hash-prime' define
+[ chosen-hash hash-prime rem ] 'hash' define
+
+
+"Text Output Buffer"
+'TOB' variable
+[ &TOB array-push ] 'tob.append' define
+[ :s tob.append ] 'tob.number' define
+[ type? POINTER = [ :n :s tob.append ] [ tob.number ] if ] 'tob.pointer' define
+[ type? FLAG = [ :s tob.append ] [ tob.pointer ] if ] 'tob.flag' define
+[ type? CHARACTER = [ :s tob.append ] [ tob.flag ] if ] 'tob.character' define
+[ type? STRING = [ tob.append ] [ tob.character ] if ] 'tob.string' define
+[ tob.string ] '.' define
+[ &TOB array-length [ &TOB array-pop :p :s ] repeat ] 'show-tob' define
+
+
