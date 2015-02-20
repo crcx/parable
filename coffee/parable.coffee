@@ -65,6 +65,7 @@ BC_MULTIPLY = 202
 BC_DIVIDE = 203
 BC_REMAINDER = 204
 BC_FLOOR = 205
+BC_POW = 206
 BC_BITWISE_SHIFT = 210
 BC_BITWISE_AND = 211
 BC_BITWISE_OR = 212
@@ -619,6 +620,10 @@ interpret = (slice) ->
             stack_push (b % a), TYPE_NUMBER
         if opcode == BC_FLOOR
             stack_push Math.floor(stack_pop()), TYPE_NUMBER
+        if opcode == BC_POW
+            a = stack_pop()
+            b = stack_pop()
+            stack_push Math.pow(b, a), TYPE_NUMBER
         if opcode == BC_BITWISE_SHIFT
             a = stack_pop()
             b = stack_pop()
