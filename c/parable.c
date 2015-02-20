@@ -231,6 +231,7 @@ void interpret(int slice)
 {
     int a, b, c, q, m, x, y, z;
     int i, j;
+    double da, db;
     int offset = 0;
     char reform[STRING_LEN];
     double scratch;
@@ -384,6 +385,11 @@ void interpret(int slice)
                 break;
             case BC_FLOOR:
                 stack_push(floor(stack_pop()), TYPE_NUMBER);
+                break;
+            case BC_POW:
+                da = stack_pop();
+                db = stack_pop();
+                stack_push(pow(db, da), TYPE_NUMBER);
                 break;
             case BC_BITWISE_SHIFT:
                 a = stack_pop();

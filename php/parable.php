@@ -37,6 +37,7 @@ $BC_MULTIPLY      = 202;
 $BC_DIVIDE        = 203;
 $BC_REMAINDER     = 204;
 $BC_FLOOR         = 205;
+$BC_POW           = 206;
 $BC_BITWISE_SHIFT = 210;
 $BC_BITWISE_AND   = 211;
 $BC_BITWISE_OR    = 212;
@@ -410,7 +411,7 @@ function interpret($slice, $more = "")
     global $BC_PUSH_N, $BC_PUSH_S, $BC_PUSH_C, $BC_PUSH_F, $BC_PUSH_COMMENT;
     global $BC_TYPE_N, $BC_TYPE_S, $BC_TYPE_C, $BC_TYPE_F, $BC_TYPE_FLAG;
     global $BC_GET_TYPE, $BC_ADD, $BC_SUBTRACT, $BC_MULTIPLY, $BC_DIVIDE;
-    global $BC_REMAINDER, $BC_FLOOR, $BC_BITWISE_SHIFT, $BC_BITWISE_AND, $BC_BITWISE_OR;
+    global $BC_REMAINDER, $BC_FLOOR, $BC_POW, $BC_BITWISE_SHIFT, $BC_BITWISE_AND, $BC_BITWISE_OR;
     global $BC_BITWISE_XOR, $BC_COMPARE_LT, $BC_COMPARE_GT, $BC_COMPARE_LTEQ, $BC_COMPARE_GTEQ;
     global $BC_COMPARE_EQ, $BC_COMPARE_NEQ, $BC_FLOW_IF, $BC_FLOW_WHILE, $BC_FLOW_UNTIL;
     global $BC_FLOW_TIMES, $BC_FLOW_CALL, $BC_FLOW_CALL_F, $BC_FLOW_DIP, $BC_FLOW_SIP;
@@ -563,7 +564,7 @@ function interpret($slice, $more = "")
         }
         elseif ($opcode == $BC_FLOOR)
         {
-            if (check_depth(2))
+            if (check_depth(1))
             {
                 $a = stack_pop();
                 $a = floatval($a);
@@ -572,6 +573,20 @@ function interpret($slice, $more = "")
             else
                 $offset = $SLICE_LEN;
         }
+        elseif ($opcode == $BC_POW)
+        {
+            if (check_depth(2))
+            {
+                $a = stack_pop();
+                $a = floatval($a);
+                $b = stack_pop();
+                $b = floatval($b);
+                stack_push(pow($b, $a), $TYPE_NUMBER);
+            }
+            else
+                $offset = $SLICE_LEN;
+        }
+
         elseif ($opcode == $BC_BITWISE_SHIFT)
         {
             if (check_depth(2))

@@ -14,6 +14,7 @@
 [ `203 ] '/' define
 [ `204 ] 'rem' define
 [ `205 ] 'floor' define
+[ `206 ] '^' define
 [ `210 ] 'shift' define
 [ `211 ] 'and' define
 [ `212 ] 'or' define
@@ -127,7 +128,6 @@
 [ dup negative? [ #-1 * ] if-true ] 'abs' define
 [ dup-pair < [ drop ] [ nip ] if ] 'min' define
 [ dup-pair < [ nip ] [ drop ] if ] 'max' define
-[ #1 swap [ over * ] repeat nip ] '^' define
 [ #1 swap [ [ * ] sip #1 - dup #1 <> ] while-true drop ] 'factorial' define
 
 "Sliced Memory Access"
@@ -252,5 +252,4 @@
 [ type? STRING = [ tob.append ] [ tob.character ] if ] 'tob.string' define
 [ tob.string ] '.' define
 [ &TOB array-length [ &TOB array-pop :p :s ] repeat ] 'show-tob' define
-
 

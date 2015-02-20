@@ -15,6 +15,7 @@
 #define BC_DIVIDE 203
 #define BC_REMAINDER 204
 #define BC_FLOOR 205
+#define BC_POW 206
 #define BC_BITWISE_SHIFT 210
 #define BC_BITWISE_AND 211
 #define BC_BITWISE_OR 212

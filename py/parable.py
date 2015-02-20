@@ -49,6 +49,7 @@ BC_MULTIPLY = 202
 BC_DIVIDE = 203
 BC_REMAINDER = 204
 BC_FLOOR = 205
+BC_POW = 206
 BC_BITWISE_SHIFT = 210
 BC_BITWISE_AND = 211
 BC_BITWISE_OR = 212
@@ -243,8 +244,15 @@ def interpret(slice, more=None):
             else:
                 offset = SLICE_LEN
         elif opcode == BC_FLOOR:
-            if check_depth(2):
+            if check_depth(1):
                 stack_push(floor(float(stack_pop())), TYPE_NUMBER)
+            else:
+                offset = SLICE_LEN
+        elif opcode == BC_POW:
+            if check_depth(2):
+                a = stack_pop()
+                b = stack_pop()
+                stack_push(pow(b, a), TYPE_NUMBER)
             else:
                 offset = SLICE_LEN
         elif opcode == BC_BITWISE_SHIFT:
