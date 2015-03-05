@@ -55,6 +55,13 @@
 [ `801 ] 'to-uppercase' define
 [ `802 ] 'length' define
 [ `900 ] 'report-error' define
+[ `1000 ] 'sin' define
+[ `1001 ] 'cos' define
+[ `1002 ] 'tan' define
+[ `1003 ] 'asin' define
+[ `1004 ] 'acos' define
+[ `1005 ] 'atan' define
+[ `1006 ] 'atan2' define
 
 "Constants for data types recognized by Parable's VM"
 [ #100 ] 'NUMBER' define

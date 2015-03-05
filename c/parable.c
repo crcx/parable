@@ -711,6 +711,28 @@ void interpret(int slice)
                 slice_to_string(stack_pop(), p);
                 report_error(p);
                 break;
+            case BC_TRIG_SIN:
+                stack_push(sin(stack_pop()), TYPE_NUMBER);
+                break;
+            case BC_TRIG_COS:
+                stack_push(cos(stack_pop()), TYPE_NUMBER);
+                break;
+            case BC_TRIG_TAN:
+                stack_push(tan(stack_pop()), TYPE_NUMBER);
+                break;
+            case BC_TRIG_ASIN:
+                stack_push(asin(stack_pop()), TYPE_NUMBER);
+                break;
+            case BC_TRIG_ACOS:
+                stack_push(acos(stack_pop()), TYPE_NUMBER);
+                break;
+            case BC_TRIG_ATAN:
+                stack_push(atan(stack_pop()), TYPE_NUMBER);
+                break;
+            case BC_TRIG_ATAN2:
+                a = stack_pop();
+                stack_push(atan2(stack_pop(), a), TYPE_NUMBER);
+                break;
         }
         offset++;
     }

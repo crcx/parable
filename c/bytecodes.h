@@ -59,4 +59,11 @@
 #define BC_TO_UPPER 801
 #define BC_LENGTH 802
 #define BC_REPORT_ERROR 900
+#define BC_TRIG_SIN 1000
+#define BC_TRIG_COS 1001
+#define BC_TRIG_TAN 1002
+#define BC_TRIG_ASIN 1003
+#define BC_TRIG_ACOS 1004
+#define BC_TRIG_ATAN 1005
+#define BC_TRIG_ATAN2 1006
 
