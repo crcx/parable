@@ -1,5 +1,5 @@
 # parable
-# copyright (c) 2012 - 2014, charles childers
+# copyright (c) 2012 - 2015, charles childers
 # =============================================================
 
 # Known issues/remaining to-do:
@@ -109,6 +109,13 @@ BC_TO_LOWER = 800
 BC_TO_UPPER = 801
 BC_LENGTH = 802
 BC_REPORT_ERROR = 900
+BC_TRIG_SIN = 1000
+BC_TRIG_COS = 1001
+BC_TRIG_TAN = 1002
+BC_TRIG_ASIN = 1003
+BC_TRIG_ACOS = 1004
+BC_TRIG_ATAN = 1005
+BC_TRIG_ATAN2 = 1006
 
 
 # =============================================================
@@ -842,7 +849,35 @@ interpret = (slice) ->
             stack_push f.length, TYPE_NUMBER
         if opcode == BC_REPORT_ERROR
             report_error slice_to_string stack_pop()
-
+        if opcode == BC_TRIG_SIN
+            a = stack_pop()
+            b = Math.sin a
+            stack_push b, TYPE_NUMBER
+        if opcode == BC_TRIG_COS
+            a = stack_pop()
+            b = Math.cos a
+            stack_push b, TYPE_NUMBER
+        if opcode == BC_TRIG_TAN
+            a = stack_pop()
+            b = Math.tan a
+            stack_push b, TYPE_NUMBER
+        if opcode == BC_TRIG_ASIN
+            a = stack_pop()
+            b = Math.asin a
+            stack_push b, TYPE_NUMBER
+        if opcode == BC_TRIG_ACOS
+            a = stack_pop()
+            b = Math.acos a
+            stack_push b, TYPE_NUMBER
+        if opcode == BC_TRIG_ATAN
+            a = stack_pop()
+            b = Math.atan a
+            stack_push b, TYPE_NUMBER
+        if opcode == BC_TRIG_ATAN2
+            a = stack_pop()
+            b = stack_pop()
+            c = Math.atan2 b, a
+            stack_push c, TYPE_NUMBER
         offset++
     return 0
 
