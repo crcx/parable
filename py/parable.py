@@ -1,5 +1,5 @@
 # parable
-# Copyright (c) 2012, 2013, Charles Childers
+# Copyright (c) 2012-2015, Charles Childers
 # ==========================================
 
 #
