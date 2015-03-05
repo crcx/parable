@@ -6,7 +6,7 @@
 # Dependencies
 #
 import sys
-from math import floor
+import math
 
 #
 # Memory Configuration
@@ -93,6 +93,13 @@ BC_TO_LOWER = 800
 BC_TO_UPPER = 801
 BC_LENGTH = 802
 BC_REPORT = 900
+BC_TRIG_SIN = 1000
+BC_TRIG_COS = 1001
+BC_TRIG_TAN = 1002
+BC_TRIG_ASIN = 1003
+BC_TRIG_ACOS = 1004
+BC_TRIG_ATAN = 1005
+BC_TRIG_ATAN2 = 1006
 
 
 #
@@ -245,7 +252,7 @@ def interpret(slice, more=None):
                 offset = SLICE_LEN
         elif opcode == BC_FLOOR:
             if check_depth(1):
-                stack_push(floor(float(stack_pop())), TYPE_NUMBER)
+                stack_push(math.floor(float(stack_pop())), TYPE_NUMBER)
             else:
                 offset = SLICE_LEN
         elif opcode == BC_POW:
@@ -635,6 +642,28 @@ def interpret(slice, more=None):
                     a = slice_to_string(stack_pop())
                     report(a)
             offset = SLICE_LEN
+        elif opcode == BC_TRIG_SIN:
+            a = stack_pop()
+            stack_push(math.sin(a), TYPE_NUMBER)
+        elif opcode == BC_TRIG_COS:
+            a = stack_pop()
+            stack_push(math.cos(a), TYPE_NUMBER)
+        elif opcode == BC_TRIG_TAN:
+            a = stack_pop()
+            stack_push(math.tan(a), TYPE_NUMBER)
+        elif opcode == BC_TRIG_ASIN:
+            a = stack_pop()
+            stack_push(math.asin(a), TYPE_NUMBER)
+        elif opcode == BC_TRIG_ACOS:
+            a = stack_pop()
+            stack_push(math.acos(a), TYPE_NUMBER)
+        elif opcode == BC_TRIG_ATAN:
+            a = stack_pop()
+            stack_push(math.atan(a), TYPE_NUMBER)
+        elif opcode == BC_TRIG_ATAN2:
+            a = stack_pop()
+            b = stack_pop()
+            stack_push(math.atan2(b, a), TYPE_NUMBER)
         if more is not None:
             offset = more(slice, offset, opcode)
 

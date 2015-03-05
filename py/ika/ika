@@ -9,7 +9,7 @@
 # Dependencies
 #
 import sys
-from math import floor
+import math
 
 #
 # Memory Configuration
@@ -52,6 +52,7 @@ BC_MULTIPLY = 202
 BC_DIVIDE = 203
 BC_REMAINDER = 204
 BC_FLOOR = 205
+BC_POW = 206
 BC_BITWISE_SHIFT = 210
 BC_BITWISE_AND = 211
 BC_BITWISE_OR = 212
@@ -95,6 +96,13 @@ BC_TO_LOWER = 800
 BC_TO_UPPER = 801
 BC_LENGTH = 802
 BC_REPORT = 900
+BC_TRIG_SIN = 1000
+BC_TRIG_COS = 1001
+BC_TRIG_TAN = 1002
+BC_TRIG_ASIN = 1003
+BC_TRIG_ACOS = 1004
+BC_TRIG_ATAN = 1005
+BC_TRIG_ATAN2 = 1006
 
 
 #
@@ -246,8 +254,15 @@ def interpret(slice, more=None):
             else:
                 offset = SLICE_LEN
         elif opcode == BC_FLOOR:
+            if check_depth(1):
+                stack_push(math.floor(float(stack_pop())), TYPE_NUMBER)
+            else:
+                offset = SLICE_LEN
+        elif opcode == BC_POW:
             if check_depth(2):
-                stack_push(floor(float(stack_pop())), TYPE_NUMBER)
+                a = stack_pop()
+                b = stack_pop()
+                stack_push(pow(b, a), TYPE_NUMBER)
             else:
                 offset = SLICE_LEN
         elif opcode == BC_BITWISE_SHIFT:
@@ -630,6 +645,28 @@ def interpret(slice, more=None):
                     a = slice_to_string(stack_pop())
                     report(a)
             offset = SLICE_LEN
+        elif opcode == BC_TRIG_SIN:
+            a = stack_pop()
+            stack_push(math.sin(a), TYPE_NUMBER)
+        elif opcode == BC_TRIG_COS:
+            a = stack_pop()
+            stack_push(math.cos(a), TYPE_NUMBER)
+        elif opcode == BC_TRIG_TAN:
+            a = stack_pop()
+            stack_push(math.tan(a), TYPE_NUMBER)
+        elif opcode == BC_TRIG_ASIN:
+            a = stack_pop()
+            stack_push(math.asin(a), TYPE_NUMBER)
+        elif opcode == BC_TRIG_ACOS:
+            a = stack_pop()
+            stack_push(math.acos(a), TYPE_NUMBER)
+        elif opcode == BC_TRIG_ATAN:
+            a = stack_pop()
+            stack_push(math.atan(a), TYPE_NUMBER)
+        elif opcode == BC_TRIG_ATAN2:
+            a = stack_pop()
+            b = stack_pop()
+            stack_push(math.atan2(b, a), TYPE_NUMBER)
         if more is not None:
             offset = more(slice, offset, opcode)
 
@@ -1189,6 +1226,7 @@ bootstrap.append(""" [ `202 ] '*' define """)
 bootstrap.append(""" [ `203 ] '/' define """)
 bootstrap.append(""" [ `204 ] 'rem' define """)
 bootstrap.append(""" [ `205 ] 'floor' define """)
+bootstrap.append(""" [ `206 ] '^' define """)
 bootstrap.append(""" [ `210 ] 'shift' define """)
 bootstrap.append(""" [ `211 ] 'and' define """)
 bootstrap.append(""" [ `212 ] 'or' define """)
@@ -1229,6 +1267,13 @@ bootstrap.append(""" [ `800 ] 'to-lowercase' define """)
 bootstrap.append(""" [ `801 ] 'to-uppercase' define """)
 bootstrap.append(""" [ `802 ] 'length' define """)
 bootstrap.append(""" [ `900 ] 'report-error' define """)
+bootstrap.append(""" [ `1000 ] 'sin' define """)
+bootstrap.append(""" [ `1001 ] 'cos' define """)
+bootstrap.append(""" [ `1002 ] 'tan' define """)
+bootstrap.append(""" [ `1003 ] 'asin' define """)
+bootstrap.append(""" [ `1004 ] 'acos' define """)
+bootstrap.append(""" [ `1005 ] 'atan' define """)
+bootstrap.append(""" [ `1006 ] 'atan2' define """)
 bootstrap.append(""" "Constants for data types recognized by Parable's VM" """)
 bootstrap.append(""" [ #100 ] 'NUMBER' define """)
 bootstrap.append(""" [ #200 ] 'STRING' define """)
@@ -1294,7 +1339,6 @@ bootstrap.append(""" "Helpful Math" """)
 bootstrap.append(""" [ dup negative? [ #-1 * ] if-true ] 'abs' define """)
 bootstrap.append(""" [ dup-pair < [ drop ] [ nip ] if ] 'min' define """)
 bootstrap.append(""" [ dup-pair < [ nip ] [ drop ] if ] 'max' define """)
-bootstrap.append(""" [ [ #1 - [ dup ] repeat ] invoke-and-count-items-returned #1 - [ * ] repeat ] '^' define """)
 bootstrap.append(""" [ #1 swap [ [ * ] sip #1 - dup #1 <> ] while-true drop ] 'factorial' define """)
 bootstrap.append(""" "Sliced Memory Access" """)
 bootstrap.append(""" '*slice:current*' variable """)
@@ -1367,6 +1411,41 @@ bootstrap.append(""" '*value:state*' variable """)
 bootstrap.append(""" [ &*value:state* on ] 'to' define """)
 bootstrap.append(""" [ &*value:state* @ :f [ ! &*value:state* off ] [ @ ] if ] 'value-handler' define """)
 bootstrap.append(""" [ request [ value-handler ] curry swap define ] 'value' define """)
+bootstrap.append(""" "Constants" """)
+bootstrap.append(""" [ #3.141592653 ] 'math:pi' define """)
+bootstrap.append(""" [ #6.283185307 ] 'math:tau' define """)
+bootstrap.append(""" [ #2.718281828 ] 'math:e' define """)
+bootstrap.append(""" [ #1.618033988 ] 'math:golden-ratio' define """)
+bootstrap.append(""" [ #0.577215664 ] 'math:euler-mascheroni' define """)
+bootstrap.append(""" [ #1.414213562 ] 'math:pythagora' define """)
+bootstrap.append(""" [ #0.618033988 ] 'math:inverse-golden-ration' define """)
+bootstrap.append(""" [ #2.414213562 ] 'math:silver-ratio/mean' define """)
+bootstrap.append(""" [ #60 ] 'time:seconds/minute' define """)
+bootstrap.append(""" [ #60 ] 'time:minutes/hour' define """)
+bootstrap.append(""" [ #24 ] 'time:hours/day' define """)
+bootstrap.append(""" [ #7 ] 'time:days/week' define """)
+bootstrap.append(""" [ #365 ] 'time:days/year' define """)
+bootstrap.append(""" [ #365.25 ] 'time:days/julian-year' define """)
+bootstrap.append(""" [ #365.2425 ] 'time:days/gregorian-year' define """)
+bootstrap.append(""" "Hashing functions" """)
+bootstrap.append(""" [ #5381 swap [ :n [ swap ] dip over #-5 shift + + swap ] for-each-character ] 'hash:djb2' define """)
+bootstrap.append(""" [ :n over #-6 shift + over #-16 shift + swap - ] 'hash:sdbm<n>' define """)
+bootstrap.append(""" [ #0 swap [ [ swap ] dip hash:sdbm<n> swap ] for-each-character ] 'hash:sdbm' define """)
+bootstrap.append(""" [ #0 swap [ :n [ swap ] dip + #255 and swap ] for-each-character #255 xor #1 + #255 and ] 'hash:lrc' define """)
+bootstrap.append(""" [ #0 swap [ :n [ swap ] dip xor swap ] for-each-character ] 'hash:xor' define """)
+bootstrap.append(""" [ hash:djb2 ] 'chosen-hash' define """)
+bootstrap.append(""" [ #389 ] 'hash-prime' define """)
+bootstrap.append(""" [ chosen-hash hash-prime rem ] 'hash' define """)
+bootstrap.append(""" "Text Output Buffer" """)
+bootstrap.append(""" 'TOB' variable """)
+bootstrap.append(""" [ &TOB array-push ] 'tob.append' define """)
+bootstrap.append(""" [ :s tob.append ] 'tob.number' define """)
+bootstrap.append(""" [ type? POINTER = [ :n :s tob.append ] [ tob.number ] if ] 'tob.pointer' define """)
+bootstrap.append(""" [ type? FLAG = [ :s tob.append ] [ tob.pointer ] if ] 'tob.flag' define """)
+bootstrap.append(""" [ type? CHARACTER = [ :s tob.append ] [ tob.flag ] if ] 'tob.character' define """)
+bootstrap.append(""" [ type? STRING = [ tob.append ] [ tob.character ] if ] 'tob.string' define """)
+bootstrap.append(""" [ tob.string ] '.' define """)
+bootstrap.append(""" [ &TOB array-length [ &TOB array-pop :p :s ] repeat ] 'show-tob' define """)
 # i/o functions
 bootstrap.append(""" [ "value -"  `1000 ] '.' define """)
 bootstrap.append(""" [ #10 :c . ] 'show:cr' define """)
