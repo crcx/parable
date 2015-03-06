@@ -15,6 +15,9 @@
 [ `204 ] 'rem' define
 [ `205 ] 'floor' define
 [ `206 ] '^' define
+[ `207 ] 'log' define
+[ `208 ] 'log10' define
+[ `209 ] 'log<n>' define
 [ `210 ] 'shift' define
 [ `211 ] 'and' define
 [ `212 ] 'or' define
