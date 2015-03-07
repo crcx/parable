@@ -236,6 +236,8 @@
 [ #60 ] 'time:minutes/hour' define
 [ #24 ] 'time:hours/day' define
 [ #7 ] 'time:days/week' define
+[ #52 ] 'time:weeks/year' define
+[ #12 ] 'time:months/year' define
 [ #365 ] 'time:days/year' define
 [ #365.25 ] 'time:days/julian-year' define
 [ #365.2425 ] 'time:days/gregorian-year' define
