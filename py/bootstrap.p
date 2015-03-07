@@ -230,7 +230,7 @@
 [ #1.618033988 ] 'math:golden-ratio' define
 [ #0.577215664 ] 'math:euler-mascheroni' define
 [ #1.414213562 ] 'math:pythagora' define
-[ #0.618033988 ] 'math:inverse-golden-ration' define
+[ #0.618033988 ] 'math:inverse-golden-ratio' define
 [ #2.414213562 ] 'math:silver-ratio/mean' define
 [ #60 ] 'time:seconds/minute' define
 [ #60 ] 'time:minutes/hour' define
