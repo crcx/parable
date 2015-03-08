@@ -274,7 +274,7 @@ def interpret(slice, more=None):
                 stack_push(math.log(a), TYPE_NUMBER)
             else:
                 offset = SLICE_LEN
-        elif opcode == BC_LOG:
+        elif opcode == BC_LOG10:
             if check_depth(1):
                 a = stack_pop()
                 stack_push(math.log10(a), TYPE_NUMBER)
@@ -1443,12 +1443,14 @@ bootstrap.append(""" [ #2.718281828 ] 'math:e' define """)
 bootstrap.append(""" [ #1.618033988 ] 'math:golden-ratio' define """)
 bootstrap.append(""" [ #0.577215664 ] 'math:euler-mascheroni' define """)
 bootstrap.append(""" [ #1.414213562 ] 'math:pythagora' define """)
-bootstrap.append(""" [ #0.618033988 ] 'math:inverse-golden-ration' define """)
+bootstrap.append(""" [ #0.618033988 ] 'math:inverse-golden-ratio' define """)
 bootstrap.append(""" [ #2.414213562 ] 'math:silver-ratio/mean' define """)
 bootstrap.append(""" [ #60 ] 'time:seconds/minute' define """)
 bootstrap.append(""" [ #60 ] 'time:minutes/hour' define """)
 bootstrap.append(""" [ #24 ] 'time:hours/day' define """)
 bootstrap.append(""" [ #7 ] 'time:days/week' define """)
+bootstrap.append(""" [ #52 ] 'time:weeks/year' define """)
+bootstrap.append(""" [ #12 ] 'time:months/year' define """)
 bootstrap.append(""" [ #365 ] 'time:days/year' define """)
 bootstrap.append(""" [ #365.25 ] 'time:days/julian-year' define """)
 bootstrap.append(""" [ #365.2425 ] 'time:days/gregorian-year' define """)

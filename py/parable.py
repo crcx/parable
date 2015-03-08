@@ -271,7 +271,7 @@ def interpret(slice, more=None):
                 stack_push(math.log(a), TYPE_NUMBER)
             else:
                 offset = SLICE_LEN
-        elif opcode == BC_LOG:
+        elif opcode == BC_LOG10:
             if check_depth(1):
                 a = stack_pop()
                 stack_push(math.log10(a), TYPE_NUMBER)
