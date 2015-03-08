@@ -391,6 +391,19 @@ void interpret(int slice)
                 db = stack_pop();
                 stack_push(pow(db, da), TYPE_NUMBER);
                 break;
+            case BC_LOG:
+                da = stack_pop();
+                stack_push(log(da), TYPE_NUMBER);
+                break;
+            case BC_LOG10:
+                da = stack_pop();
+                stack_push(log10(da), TYPE_NUMBER);
+                break;
+            case BC_LOGN:
+                da = stack_pop(); /* base */
+                db = stack_pop();
+                stack_push(log(db) / log(da), TYPE_NUMBER);
+                break;
             case BC_BITWISE_SHIFT:
                 a = stack_pop();
                 b = stack_pop();
