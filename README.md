@@ -6,7 +6,7 @@ applications.
 
 ## Getting Started
 
-This repository contains implementations in Python, PHP, C, and CoffeeScript.
+This repository contains implementations in Python, C, and CoffeeScript.
 
 ### C
 
@@ -22,11 +22,6 @@ has been used under Python 2, 3, Pythonista, PyPy, and Jython.
 There are a couple of options for using it. For running scripts, you will use
 **pre**. For interactive use, **legend.py** should be used. (Note: legend
 requires a terminal supporting ANSI escape sequences).
-
-### PHP
-
-A file named **pre.php** is in the php directory. This needs to be kept in a
-directory along with **parable.php** and **bootstrap.p**.
 
 ## Using PRE
 
