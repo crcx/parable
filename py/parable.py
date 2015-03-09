@@ -89,6 +89,9 @@ BC_STACK_NIP = 505
 BC_STACK_DEPTH = 506
 BC_STACK_CLEAR = 507
 BC_QUOTE_NAME = 600
+BC_FUNCTION_EXISTS = 601
+BC_FUNCTION_LOOKUP = 602
+BC_FUNCTION_HIDE = 603
 BC_STRING_SEEK = 700
 BC_STRING_SUBSTR = 701
 BC_STRING_NUMERIC = 702
@@ -592,6 +595,31 @@ def interpret(slice, more=None):
                 add_definition(name, ptr)
             else:
                 offset = SLICE_LEN
+        elif opcode == BC_FUNCTION_EXISTS:
+            if check_depth(1):
+                name = slice_to_string(stack_pop())
+                if lookup_pointer(name) != -1:
+                    stack_push(-1, TYPE_FLAG)
+                else:
+                    stack_push(0, TYPE_FLAG)
+            else:
+                offset = SLICE_LEN
+        elif opcode == BC_FUNCTION_LOOKUP:
+            if check_depth(1):
+                name = slice_to_string(stack_pop())
+                if lookup_pointer(name) != -1:
+                    stack_push(lookup_pointer(name), TYPE_FUNCTION)
+                else:
+                    stack_push(-1, TYPE_FUNCTION)
+            else:
+                offset = SLICE_LEN
+        elif opcode == BC_FUNCTION_HIDE:
+            if check_depth(1):
+                name = slice_to_string(stack_pop())
+                if lookup_pointer(name) != -1:
+                    remove_name(name)
+            else:
+                offset = SLICE_LEN
         elif opcode == BC_STRING_SEEK:
             if check_depth(2):
                 a = slice_to_string(stack_pop())
@@ -887,6 +915,13 @@ def add_definition(name, slice):
         target = dictionary_slices[dictionary_names.index(name)]
         copy_slice(slice, target)
     return dictionary_names.index(name)
+
+
+def remove_name(name):
+    global dictionary_names, dictionary_slices
+    name = name.lower()
+    if in_dictionary(name) != False:
+        dictionary_names[dictionary_names.index(name)] = ""
 
 
 #
