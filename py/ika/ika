@@ -924,7 +924,9 @@ def remove_name(name):
     global dictionary_names, dictionary_slices
     name = name.lower()
     if in_dictionary(name) != False:
-        dictionary_names[dictionary_names.index(name)] = ""
+        i = dictionary_names.index(name)
+        del dictionary_names[i]
+        del dictionary_slices[i]
 
 
 #
