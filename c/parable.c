@@ -656,6 +656,35 @@ void interpret(int slice)
                 slice_to_string(a, p);
                 add_definition(p, (int) b);
                 break;
+            case BC_FUNCTION_EXISTS:
+                a = stack_pop();
+                slice_to_string(a, p);
+                if (lookup_definition(p) != -1)
+                {
+                    stack_push(-1, TYPE_FLAG);
+                }
+                else
+                {
+                    stack_push(0, TYPE_FLAG);
+                }
+                break;
+            case BC_FUNCTION_LOOKUP:
+                a = stack_pop();
+                slice_to_string(a, p);
+                if (lookup_definition(p) != -1)
+                {
+                    stack_push(lookup_definition(p), TYPE_FUNCTION);
+                }
+                else
+                {
+                    stack_push(-1, TYPE_FUNCTION);
+                }
+                break;
+            case BC_FUNCTION_HIDE:
+                a = stack_pop();
+                slice_to_string(a, p);
+                hide_definition(p);
+                break;
             case BC_STRING_SEEK:
                 slice_to_string(stack_pop(), foo);
                 slice_to_string(stack_pop(), bar);
@@ -774,6 +803,15 @@ void add_definition(char *name, int slice)
 }
 
 
+void hide_definition(char *name)
+{
+    if (lookup_definition(name) != -1)
+    {
+        strcpy(names[find_header(name)], "\0~removed-name\0");
+    }
+}
+
+
 void prepare_dictionary()
 {
     namep = 0;
@@ -793,6 +831,20 @@ int lookup_definition(char *name)
         n--;
         if (strcmp(names[n], name) == 0)
             slice = pointers[n];
+    }
+    return slice;
+}
+
+
+int find_header(char *name)
+{
+    int slice = -1;
+    int n = namep;
+    while (n > 0)
+    {
+        n--;
+        if (strcmp(names[n], name) == 0)
+            slice = n;
     }
     return slice;
 }

@@ -51,6 +51,9 @@
 [ `505 ] 'nip' define
 [ `506 ] 'depth' define
 [ `507 ] 'reset' define
+[ `601 ] 'function-exists?' define
+[ `602 ] 'lookup-function' define
+[ `603 ] 'hide-function' define
 [ `700 ] 'find' define
 [ `701 ] 'substring' define
 [ `702 ] 'numeric?' define
@@ -265,3 +268,6 @@
 [ tob.string ] '.' define
 [ &TOB array-length [ &TOB array-pop :p :s ] repeat ] 'show-tob' define
 
+
+"Dictionary"
+[ swap dup function-exists? [ dup lookup-function swap hide-function swap define ] [ drop ] if ] 'rename-function' define
