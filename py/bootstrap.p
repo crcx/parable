@@ -1,5 +1,5 @@
 "Standard Parable Bootstrap"
-"Copyright (c) 2012-2014, Charles Childers"
+"Copyright (c) 2012-2015, Charles Childers"
 
 "Primitives"
 [ `110 ] ':n' define
@@ -43,6 +43,8 @@
 [ `403 ] 'request' define
 [ `404 ] 'release' define
 [ `405 ] 'collect-garbage' define
+[ `406 ] 'get-slice-length' define
+[ `407 ] 'set-slice-length' define
 [ `500 ] 'dup' define
 [ `501 ] 'drop' define
 [ `502 ] 'swap' define
