@@ -5,11 +5,10 @@ Parable has a highly segmented memory model.
 ## General Layout
 
 Memory is organized into a series of *slices*. There are a fixed number
-of slices, each of which is a consistent length. The current defaults
+of slices, each of which is a variable length. The current defaults
 are:
 
         MAX_SLICES = 64000
-        SLICE_LEN = 1000
 
 Slices contain a linear sequence of numeric values. All compiled byte
 code, strings, and other data are stored in slices.
