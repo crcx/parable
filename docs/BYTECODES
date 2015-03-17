@@ -246,6 +246,38 @@ The use of this instruction is not defined for other types of values.
 
 ----
 
+# BC_POW
+
+Opcode: 206
+
+... TODO ...
+
+----
+
+# BC_LOG
+
+Opcode: 207
+
+... TODO ...
+
+----
+
+# BC_LOG10
+
+Opcode: 208
+
+... TODO ...
+
+----
+
+# BC_LOG_N
+
+Opcode: 209
+
+... TODO ...
+
+----
+
 # BC\_BITWISE\_SHIFT
 
 Opcode: 210
@@ -506,6 +538,22 @@ The approach I used was to:
 
 ----
 
+# BC_GET_SLICE_LENGTH
+
+Opcode: 406
+
+... TODO ...
+
+----
+
+# BC_SET_SLICE_LENGTH
+
+Opcode: 407
+
+... TODO ...
+
+----
+
 # BC\_STACK\_DUP
 
 Opcode: 500
@@ -633,3 +681,60 @@ Returns the length of a string on the stack. This consumes the string.
 Opcode: 900
 
 
+----
+
+# BC_SIN
+
+Opcode: 1000
+
+... TODO ...
+
+----
+
+# BC_COS
+
+Opcode: 1001
+
+... TODO ...
+
+----
+
+# BC_TAN
+
+Opcode: 1002
+
+... TODO ...
+
+----
+
+# BC_ASIN
+
+Opcode: 1003
+
+... TODO ...
+
+----
+
+# BC_ACOS
+
+Opcode: 1004
+
+... TODO ...
+
+----
+
+# BC_ATAN
+
+Opcode: 1005
+
+... TODO ...
+
+----
+
+# BC_ATAN2
+
+Opcode: 1006
+
+... TODO ...
+
+----
