@@ -121,6 +121,7 @@
 [ #1 - [ + ] repeat ] 'sum-range' define
 
 "Misc"
+[ [ get-slice-length + ] sip set-slice-length ] 'adjust-slice-length' define
 [ depth [ invoke ] dip depth swap - ] 'invoke-and-count-items-returned' define
 [ [ drop ] repeat ] 'drop-multiple' define
 
