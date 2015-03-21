@@ -971,7 +971,8 @@ def copy_slice(source, dest):
     """copy the contents of one slice to another"""
     global p_slices, p_map, p_sizes
     i = 0
-    while i < p_sizes[int(source)]:
+    l = p_sizes[int(source)]
+    while i <= l:
         p_slices[int(dest)][i] = p_slices[int(source)][i]
         i += 1
     p_sizes[int(dest)] = p_sizes[int(source)]
