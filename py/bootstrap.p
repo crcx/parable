@@ -155,7 +155,7 @@
 [ &*slice:offset* decrement ] 'slice-retreat' define
 [ slice-position store ] 'slice-store-current' define
 [ slice-position fetch ] 'slice-fetch-current' define
-[ slice-position store slice-advance ] 'slice-store' define
+[ slice-position store slice-advance #0 slice-position store ] 'slice-store' define
 [ slice-position fetch slice-advance ] 'slice-fetch' define
 [ slice-retreat slice-position store ] 'slice-store-retreat' define
 [ slice-retreat slice-position fetch ] 'slice-fetch-retreat' define
