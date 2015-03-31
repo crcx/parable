@@ -123,6 +123,7 @@
 "Misc"
 [ [ get-slice-length + ] sip set-slice-length ] 'adjust-slice-length' define
 [ depth [ invoke ] dip depth swap - ] 'invoke-and-count-items-returned' define
+[ [ depth [ invoke ] dip depth swap - ] + ] 'invoke-and-count-items-returned-with-adjustment' define
 [ [ drop ] repeat ] 'drop-multiple' define
 
 "String and Character"
@@ -169,23 +170,34 @@
 [ swap reverse length [ dup-pair #1 - fetch swap [ swap ] dip [ [ :c over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each-character' define
 
 "arrays"
-'*array:filter*' variable
-'*array:source*' variable
-'*array:results*' variable
-[ [ new-slice invoke-and-count-items-returned dup slice-store slice-store-items &*slice:current* @ ] preserve-slice :p ] 'array-from-quote' define
-[ @ ] 'array-length' define
-[ #1 + fetch ] 'array-fetch' define
-[ #1 + store ] 'array-store' define
-[ swap [ swap slice-set #0 slice-fetch [ over slice-fetch = or ] repeat ] preserve-slice nip :f ] 'array-contains?' define
-[ swap [ swap slice-set #0 slice-fetch [ over slice-fetch [ :p :s ] bi@ = or ] repeat ] preserve-slice nip :f ] 'array-contains-string?' define
-[ [ dup array-length #1 + store ] sip [ @ #1 + ] sip ! ] 'array-push' define
-[ [ dup array-length fetch ] sip [ @ #1 - ] sip ! ] 'array-pop' define
-[ &*array:results* zero-out &*array:filter* ! [ &*array:source* ! ] [ array-length ] bi [ &*array:source* @ array-pop dup &*array:filter* @ invoke [ &*array:results* array-push ] [ drop ] if ] repeat &*array:results* request [ copy ] sip ] 'array-filter' define
-[ &*array:results* zero-out &*array:filter* ! [ &*array:source* ! ] [ array-length ] bi [ &*array:source* @ array-pop &*array:filter* @ invoke &*array:results* array-push ] repeat &*array:results* request [ copy ] sip ] 'array-map' define
+'source' variable
+'filter' variable
+'results' variable
+
+[ dup get-slice-length over [ store ] dip #1 swap adjust-slice-length ] 'array-push' define
+[ [ #-1 swap adjust-slice-length ] sip dup get-slice-length fetch ] 'array-pop' define
+[ get-slice-length ] 'array-length' define
+[ &filter ! over array-length [ over array-pop &filter @ invoke ] repeat nip ] 'array-reduce' define
+[ [ new-slice invoke-and-count-items-returned slice-store-items &*slice:current* @ ] preserve-slice :p ] 'array-from-quote<in-stack-order>' define
+[ request [ copy ] sip &source ! [ #0 &source @ array-length [ &source @ over fetch swap #1 + ] repeat drop ] array-from-quote<in-stack-order> ] 'array-reverse' define
+[ array-from-quote<in-stack-order> array-reverse ] 'array-from-quote' define
+
+[ ] 'array<remap>' define
+[ type? STRING <> [ [ ] ] [ [ [ :p :s ] bi@ ] ] if 'array<remap>' define ] 'needs-remap?' define
+[ swap needs-remap? [ swap dup slice-set array-length #0 swap [ over slice-fetch array<remap> = or ] repeat ] preserve-slice nip :f ] 'array-contains?' define
+'array<remap>' hide-function
+'needs-remap?' hide-function
+
+[ &results zero-out &filter ! [ &source ! ] [ array-length ] bi ] 'prepare' define
+[ prepare [ &source @ array-pop dup &filter @ invoke [ &results array-push ] [ drop ] if ] repeat &results request [ copy ] sip ] 'array-filter' define
+[ prepare [ &source @ array-pop &filter @ invoke &results array-push ] repeat &results request [ copy ] sip ] 'array-map' define
 [ dup-pair [ array-length ] bi@ = [ dup array-length true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define
-[ &*array:filter* ! over array-length [ over array-pop &*array:filter* @ invoke ] repeat nip ] 'array-reduce' define
-[ request [ copy ] sip &*array:source* ! [ #0 &*array:source* @ array-length [ &*array:source* @ over array-fetch swap #1 + ] repeat drop ] array-from-quote ] 'array-reverse' define
-[ request &*array:source* ! length dup swap [ #1 - dup-pair fetch &*array:source* @ array-push ] repeat drop-pair &*array:source* @ :p ] 'array-from-string' define
+[ &filter ! over array-length [ over array-pop &filter @ invoke ] repeat nip ] 'array-reduce' define
+'prepare' hide-function
+
+'filter' hide-function
+'source' hide-function
+'results' hide-function
 
 "routines for rendering an array into a string"
 '*array:conversions*' variable
