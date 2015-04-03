@@ -15,8 +15,8 @@ import math
 # Memory Configuration
 #
 
-MAX_SLICES = 64000
-
+MAX_SLICES = 80000
+DEFAULT_SLICE_LEN = 1
 
 #
 # Constants for data types
@@ -949,12 +949,12 @@ p_sizes = []
 
 def request_slice():
     """request a new memory slice"""
-    global p_slices, p_map, p_sizes, MAX_SLICES
+    global p_slices, p_map, p_sizes, MAX_SLICES, DEFAULT_SLICE_LEN
     i = 0
     while i < MAX_SLICES:
         if p_map[i] == 0:
             p_map[i] = 1
-            p_slices[i] = [0 for x in range(1000)]
+            p_slices[i] = [0 for x in range(DEFAULT_SLICE_LEN)]
             p_sizes[i] = 0
             return i
         else:
@@ -974,7 +974,9 @@ def copy_slice(source, dest):
     i = 0
     l = p_sizes[int(source)]
     while i <= l:
-        p_slices[int(dest)][i] = p_slices[int(source)][i]
+        v = fetch(int(source), i)
+        store(v, int(dest), i)
+#        p_slices[int(dest)][i] = p_slices[int(source)][i]
         i += 1
     p_sizes[int(dest)] = p_sizes[int(source)]
 
