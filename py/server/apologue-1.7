@@ -10,8 +10,6 @@
 #
 # code                    field set to the code you want to run.
 # numbersWithoutPrefixes  attempt to identify numbers and add the # prefix
-# multipleLineDefinitons  allow definitions to span multiple lines
-#                         * requires a blank line between definitions
 #
 # "code" is mandatory, the others can be set to "true", "false", or left out.
 
@@ -50,27 +48,6 @@ def is_number(s):
         return False
 
 
-def condenseLines(code):
-    m = len(code)
-    s = ''
-    r = []
-    i = 0
-    c = 0
-    while i < m:
-        if code[i].endswith(' \\\n'):
-            s = s + ' ' + code[i][:-2].strip()
-            c = 1
-        else:
-            c = 0
-            s = s + ' ' + code[i]
-        if c == 0:
-            if s != '':
-                r.append(s.strip())
-            s = ''
-        i = i + 1
-    return r
-
-
 def tweakSyntax(code):
     r = []
     for l in code:
@@ -84,6 +61,7 @@ def tweakSyntax(code):
                     m = m + ' ' + t
             r.append(m)
     return r
+
 
 def get_results():
     """export a parable session to the specified format"""
@@ -141,16 +119,12 @@ def process_input():
     global form
     message = form.getvalue("code", " ")
     st = form.getvalue("numbersWithoutPrefixes", "false")
-    ld = form.getvalue("multipleLineDefinitions", "false")
     prepare_slices()
     prepare_dictionary()
     parse_bootstrap(open('bootstrap.p').readlines())
     collect_unused_slices()
     f = message.split("\n")
     counter = 0
-
-    if ld == "true":
-        f = condenseLines(f)
 
     if st == "true":
         f = tweakSyntax(f)
