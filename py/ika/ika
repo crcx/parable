@@ -1018,6 +1018,10 @@ def set_slice_length(slice, size):
     grow_by = size - old_size
     if grow_by > 0:
         p_slices[int(slice)].extend(range(int(grow_by)))
+    if grow_by < 0:
+        while grow_by < 0:
+            grow_by = grow_by + 1
+            del p_slices[int(slice)][-1]
     p_sizes[int(slice)] = size
 
 
