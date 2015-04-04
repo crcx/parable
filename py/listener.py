@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (c) 2013  Charles Childers
+# Copyright (c) 2013, 2015  Charles Childers
 #
 # This implements a pretty minimal user interface for parable. It
 # allows code (or a couple of commands) to be typed in, compiled,
@@ -8,9 +8,10 @@
 #
 # Commands recognized are:
 #
-# .s     display the stack
-# words  display all named elements
-# bye    exit listener
+# .              display the top value on the stack
+# show-stack     display the stack
+# show-named     display all named elements
+# bye            exit listener
 #
 # Anything else is treated as parable code.
 #
@@ -77,14 +78,14 @@ def display_value():
 
 
 def opcodes(slice, offset, opcode):
-    if opcode == 1000:
+    if opcode == 9000:
         display_value()
         stack_pop()
-    elif opcode == 1010:
+    elif opcode == 9010:
         dump_stack()
-    elif opcode == 1020:
+    elif opcode == 9020:
         exit()
-    elif opcode == 1030:
+    elif opcode == 9030:
         dump_dict()
 
     return offset
@@ -92,17 +93,19 @@ def opcodes(slice, offset, opcode):
 
 
 if __name__ == '__main__':
-    sys.stdout.write("parable (listener 2013-05-24)\n")
-    sys.stdout.write("Type bye to exit, words for a list of functions, or")
-    sys.stdout.write(" .s for a stack display\n")
+    sys.stdout.write("parable (listener 2015-04-03)\n")
+    sys.stdout.write('.              display the top value on the stack\n')
+    sys.stdout.write('show-stack     display the stack\n')
+    sys.stdout.write('show-named     display all named elements\n')
+    sys.stdout.write('bye            exit listener\n')
     prepare_slices()
     prepare_dictionary()
     parse_bootstrap(open('bootstrap.p').readlines())
 
-    interpret(compile("[ `1000 ] '.' define", request_slice()))
-    interpret(compile("[ `1010 ] 'show-stack' define", request_slice()))
-    interpret(compile("[ `1020 ] 'bye' define", request_slice()))
-    interpret(compile("[ `1030 ] 'show-named' define", request_slice()))
+    interpret(compile("[ `9000 ] '.' define", request_slice()))
+    interpret(compile("[ `9010 ] 'show-stack' define", request_slice()))
+    interpret(compile("[ `9020 ] 'bye' define", request_slice()))
+    interpret(compile("[ `9030 ] 'show-named' define", request_slice()))
 
     while 1 == 1:
         sys.stdout.write("\nok ")
