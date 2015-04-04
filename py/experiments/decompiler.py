@@ -1,18 +1,9 @@
-# parable
-# Copyright (c) 2012, 2013, Charles Childers
-# ====================================================================
-# a decompiler
-# since the compiler only uses a small subset of the byte codes, it is
-# pretty easy to generate a (mostly) accurate representation of the
-# original source.
-#
+# parable byte code decompiler
+# Copyright (c) 2014, Charles Childers
 
 from parable import *
 
-
 def pointer_to_name(ptr):
-    """given a parable pointer, return the corresponding name, or"""
-    """an empty string"""
     global dictionary_names, dictionary_slices
     s = ""
     if ptr in dictionary_slices:
@@ -21,11 +12,10 @@ def pointer_to_name(ptr):
 
 
 def deconstruct(slice):
-    """return a string containing the source code for a given slice"""
     global SLICE_LEN
     i = 0
     s = '[ '
-    while i < SLICE_LEN:
+    while i < (SLICE_LEN - 1):
         o = fetch(slice, i)
         if o == BC_PUSH_N:
             i += 1
@@ -69,13 +59,35 @@ def deconstruct(slice):
     return s
 
 
-def generate_source():
-    """return a string containing full source code for all named slices and"""
-    """their dependencies"""
+def trace(s):
+    deps = set()
+    deps.add(s)
+    for x in find_references(s):
+        deps.add(x)
+        for i in find_references(x):
+            deps.add(i)
+    return deps
+
+
+def generate_source(x):
+    global dictionary_names, dictionary_slices
+    src = ""
+    for s in sorted(trace(x)):
+        if pointer_to_name(s) != 'define':
+            if pointer_to_name(s) != '':
+                src += "[ ] '" + pointer_to_name(s) + "' define\n"
+                src += deconstruct(s)
+                src += " '" + pointer_to_name(s)
+                src += "' define\n"
+    return src + "\n"
+
+def generate_full_source():
     global dictionary_names, dictionary_slices
     src = ""
     for s in dictionary_slices:
-        src += deconstruct(s)
-        src += " '" + pointer_to_name(s)
-        src += "' define\n"
+        if pointer_to_name(s) != 'define':
+            src += "[ ] '" + pointer_to_name(s) + "' define\n"
+            src += deconstruct(s)
+            src += " '" + pointer_to_name(s)
+            src += "' define\n"
     return src + "\n"
