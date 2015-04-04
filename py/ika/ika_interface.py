@@ -56,11 +56,11 @@ files = []
 
 def opcodes(slice, offset, opcode):
     global files, TYPE_NUMBER
-    if opcode == 1000:
+    if opcode == 2000:
         display_value()
         stack_pop()
         sys.stdout.flush()
-    elif opcode == 2000:
+    elif opcode == 3000:
         slot = 0
         i = 1
         while i < 8:
@@ -72,42 +72,42 @@ def opcodes(slice, offset, opcode):
         if slot != 0:
             files[int(slot)] = open(name, mode)
         stack_push(slot, TYPE_NUMBER)
-    elif opcode == 2001:
+    elif opcode == 3001:
         slot = int(stack_pop())
         files[slot].close()
         files[slot] = 0
-    elif opcode == 2002:
+    elif opcode == 3002:
         slot = int(stack_pop())
         stack_push(ord(files[slot].read(1)), TYPE_NUMBER)
-    elif opcode == 2003:
+    elif opcode == 3003:
         slot = int(stack_pop())
         files[slot].write(unichr(int(stack_pop())))
-    elif opcode == 2004:
+    elif opcode == 3004:
         slot = int(stack_pop())
         stack_push(files[slot].tell(), TYPE_NUMBER)
-    elif opcode == 2005:
+    elif opcode == 3005:
         slot = int(stack_pop())
         pos = int(stack_pop())
         stack_push(files[slot].seek(pos, 0), TYPE_NUMBER)
-    elif opcode == 2006:
+    elif opcode == 3006:
         slot = int(stack_pop())
         at = files[slot].tell()
         files[slot].seek(0, 2) # SEEK_END
         stack_push(files[slot].tell(), TYPE_NUMBER)
         files[slot].seek(at, 0) # SEEK_SET
-    elif opcode == 2007:
+    elif opcode == 3007:
         name = slice_to_string(stack_pop())
         if os.path.exists(name):
             os.remove(name)
-    elif opcode == 2008:
+    elif opcode == 3008:
         name = slice_to_string(stack_pop())
         if os.path.exists(name):
             stack_push(-1, TYPE_FLAG)
         else:
             stack_push(0, TYPE_FLAG)
-    elif opcode == 3000:
+    elif opcode == 4000:
         stack_push(len(sys.argv) - 2, TYPE_NUMBER)
-    elif opcode == 3001:
+    elif opcode == 4001:
         n = int(stack_pop())
         stack_push(string_to_slice(sys.argv[n + 2]), TYPE_STRING)
     return offset
