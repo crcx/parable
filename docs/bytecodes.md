@@ -643,6 +643,32 @@ Usage:  pointer name --
 
 ----
 
+# BC\_FUNCTION\_EXISTS
+
+Opcode: 601
+
+Given a string, returns a flag of *true* if the function exists in the dictionary,
+or *false* if it does not.
+
+----
+
+# BC\_LOOKUP\_FUNCTION
+
+Opcode: 602
+
+Given a string, returns a pointer to the slice corresponding to it. If the function
+does not exist, a pointer to slice -1 will be returned.
+
+----
+
+# BC\_HIDE\_FUNCTION
+
+Opcode: 603
+
+Remove a function name from the dictionary. Takes a string, returns nothing.
+
+----
+
 # BC\_STRING\_SEEK
 
 Opcode: 700
