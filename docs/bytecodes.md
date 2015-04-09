@@ -246,7 +246,7 @@ The use of this instruction is not defined for other types of values.
 
 ----
 
-# BC_POW
+# BC\_POW
 
 Opcode: 206
 
@@ -254,27 +254,35 @@ Opcode: 206
 
 ----
 
-# BC_LOG
+# BC\_LOG
 
 Opcode: 207
 
-... TODO ...
+Return the natural logarithm of a value (to base e)
 
 ----
 
-# BC_LOG10
+# BC\_LOG10
 
 Opcode: 208
 
-... TODO ...
+Return the base 10 logarithm of a value
 
 ----
 
-# BC_LOG_N
+# BC\_LOG\_N
 
 Opcode: 209
 
-... TODO ...
+Given a stack:
+
+    +--------------+-----+
+    | number:base  | TOS |
+    +--------------+-----+
+    | number:value |     |
+    +--------------+-----+
+
+Return the logarithm of a value to a given base
 
 ----
 
@@ -308,6 +316,14 @@ Perform a bitwise OR operation on two NUMBER values.
 Opcode: 213
 
 Perform a bitwise XOR operation on two NUMBER values.
+
+----
+
+# BC\_RANDOM
+
+Opcode: 214
+
+Return a random value.
 
 ----
 
@@ -538,7 +554,7 @@ The approach I used was to:
 
 ----
 
-# BC_GET_SLICE_LENGTH
+# BC\_GET\_SLICE\_LENGTH
 
 Opcode: 406
 
@@ -546,7 +562,7 @@ Opcode: 406
 
 ----
 
-# BC_SET_SLICE_LENGTH
+# BC\_SET\_SLICE\_LENGTH
 
 Opcode: 407
 
@@ -683,58 +699,58 @@ Opcode: 900
 
 ----
 
-# BC_SIN
+# BC\_SIN
 
 Opcode: 1000
 
-... TODO ...
+Calculate and return the sine of a radian value
 
 ----
 
-# BC_COS
+# BC\_COS
 
 Opcode: 1001
 
-... TODO ...
+Calculate and return the cosine of a radian value
 
 ----
 
-# BC_TAN
+# BC\_TAN
 
 Opcode: 1002
 
-... TODO ...
+Calculate and return the tangent of a radian value
 
 ----
 
-# BC_ASIN
+# BC\_ASIN
 
 Opcode: 1003
 
-... TODO ...
+Calculate and return the arc sine of a radian value
 
 ----
 
-# BC_ACOS
+# BC\_ACOS
 
 Opcode: 1004
 
-... TODO ...
+Calculate and return the arc cosine of a radian value
 
 ----
 
-# BC_ATAN
+# BC\_ATAN
 
 Opcode: 1005
 
-... TODO ...
+Calculate and return the arc tangent of a radian value
 
 ----
 
-# BC_ATAN2
+# BC\_ATAN2
 
 Opcode: 1006
 
-... TODO ...
+Calculate and return atan(y / x) in radians
 
 ----
