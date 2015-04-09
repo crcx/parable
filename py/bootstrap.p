@@ -22,6 +22,7 @@
 [ `211 ] 'and' define
 [ `212 ] 'or' define
 [ `213 ] 'xor' define
+[ `214 ] 'random' define
 [ `220 ] '<' define
 [ `221 ] '>' define
 [ `222 ] '<=' define
