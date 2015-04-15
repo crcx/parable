@@ -170,6 +170,8 @@
 [ [ [ new-slice length [ #1 - ] sip [ dup-pair fetch slice-store #1 - ] repeat drop-pair #0 slice-store &*slice:current* @ :p :s ] preserve-slice ] if-string ] 'reverse' define
 [ swap reverse length [ dup-pair #1 - fetch swap [ swap ] dip [ [ :c over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each-character' define
 
+[ invoke-and-count-items-returned [ hide-function ] repeat ] 'hide-functions' define
+
 "arrays"
 'source' variable
 'filter' variable
@@ -186,8 +188,7 @@
 [ ] 'array<remap>' define
 [ type? STRING <> [ [ ] ] [ [ [ :p :s ] bi@ ] ] if 'array<remap>' define ] 'needs-remap?' define
 [ swap needs-remap? [ swap dup slice-set array-length #0 swap [ over slice-fetch array<remap> = or ] repeat ] preserve-slice nip :f ] 'array-contains?' define
-'array<remap>' hide-function
-'needs-remap?' hide-function
+[ 'array<remap>'  'needs-remap?' ] hide-functions
 
 [ &results zero-out &filter ! [ &source ! ] [ array-length ] bi ] 'prepare' define
 [ prepare [ &source @ array-pop dup &filter @ invoke [ &results array-push ] [ drop ] if ] repeat &results request [ copy ] sip ] 'array-filter' define
@@ -196,9 +197,7 @@
 [ &filter ! over array-length [ over array-pop &filter @ invoke ] repeat nip ] 'array-reduce' define
 'prepare' hide-function
 
-'filter' hide-function
-'source' hide-function
-'results' hide-function
+[ 'filter'  'source'  'results' ] hide-functions
 
 "routines for rendering an array into a string"
 '*array:conversions*' variable
@@ -233,27 +232,25 @@
 [ #304 slice-store slice-store ] 'curry:compile-call' define
 
 [ [ request slice-set swap curry:compile-value curry:compile-call &*slice:current* @ :p ] preserve-slice ] 'curry' define
-
+[ '*curry:types*'  'curry:compile-value'  'curry:compile-call' ] hide-functions
 
 "Values"
-'*value:types*' variable
-&*value:types* slice-set
+'*types*' variable
+&*types* slice-set
 [ ] slice-store
 [ "number"    :n ] slice-store
 [ "string"    :p :s ] slice-store
 [ "character" :c ] slice-store
 [ "pointer"   :p ] slice-store
 [ "flag"      :f ] slice-store
-
-[ #100 / &*value:types* swap fetch invoke ] 'value-restore-stored-type' define
-
-'*value:state*' variable
-[ &*value:state* on ] 'to' define
-[ [ type? ] dip [ #1 store ] sip ] 'value-preserve-type' define
-[ #1 fetch value-restore-stored-type ] 'value-restore-type' define
-
-[ &*value:state* @ :f [ value-preserve-type ! &*value:state* off ] [ dup @ swap value-restore-type ] if ] 'value-handler' define
+[ #100 / &*types* swap fetch invoke ] 'restore-stored-type' define
+'*state*' variable
+[ &*state* on ] 'to' define
+[ [ type? ] dip [ #1 store ] sip ] 'preserve-type' define
+[ #1 fetch restore-stored-type ] 'restore-type' define
+[ &*state* @ :f [ preserve-type ! &*state* off ] [ dup @ swap restore-type ] if ] 'value-handler' define
 [ request #2 over set-slice-length [ value-handler ] curry swap define ] 'value' define
+[ '*types*'  '*state*'  'restore-stored-type'  'preserve-type'  'restore-type'  'value-handler' ] hide-functions
 
 
 "Constants"
