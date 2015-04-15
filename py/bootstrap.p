@@ -236,10 +236,24 @@
 
 
 "Values"
+'*value:types*' variable
+&*value:types* slice-set
+[ ] slice-store
+[ "number"    :n ] slice-store
+[ "string"    :p :s ] slice-store
+[ "character" :c ] slice-store
+[ "pointer"   :p ] slice-store
+[ "flag"      :f ] slice-store
+
+[ #100 / &*value:types* swap fetch invoke ] 'value-restore-stored-type' define
+
 '*value:state*' variable
 [ &*value:state* on ] 'to' define
-[ &*value:state* @ :f [ ! &*value:state* off ] [ @ ] if ] 'value-handler' define
-[ request [ value-handler ] curry swap define ] 'value' define
+[ [ type? ] dip [ #1 store ] sip ] 'value-preserve-type' define
+[ #1 fetch value-restore-stored-type ] 'value-restore-type' define
+
+[ &*value:state* @ :f [ value-preserve-type ! &*value:state* off ] [ dup @ swap value-restore-type ] if ] 'value-handler' define
+[ request #2 over set-slice-length [ value-handler ] curry swap define ] 'value' define
 
 
 "Constants"
