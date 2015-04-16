@@ -108,6 +108,7 @@
 
 "variables"
 [ request swap define ] 'variable' define
+[ request [ swap define ] sip #0 store ] 'variable!' define
 [ request swap copy ] 'zero-out' define
 [ #0 fetch ] '@' define
 [ #0 store ] '!' define
