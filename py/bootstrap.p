@@ -251,6 +251,7 @@
 [ #1 fetch restore-stored-type ] 'restore-type' define
 [ &*state* @ :f [ preserve-type ! &*state* off ] [ dup @ swap restore-type ] if ] 'value-handler' define
 [ request #2 over set-slice-length [ value-handler ] curry swap define ] 'value' define
+[ [ value ] sip to lookup-function invoke ] 'value!' define
 [ '*types*'  '*state*'  'restore-stored-type'  'preserve-type'  'restore-type'  'value-handler' ] hide-functions
 
 
