@@ -1074,7 +1074,7 @@ def find_references(s):
 
 def seek_all_references():
     """return a list of all references in all named slices"""
-    global dictionary_slices, p_map
+    global MAX_SLICES, dictionary_slices, p_map
     maybe = []
     deps = []
     refs = []
@@ -1084,8 +1084,9 @@ def seek_all_references():
     maybe += sum(deps, [])
     maybe = list(set(maybe))
     for s in sorted(maybe):
-        if p_map[s] == 1:
-            refs.append(s)
+        if s < MAX_SLICES:
+            if p_map[s] == 1:
+                refs.append(s)
     return refs
 
 
