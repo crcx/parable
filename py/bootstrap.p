@@ -300,3 +300,24 @@
 
 "Dictionary"
 [ swap dup function-exists? [ dup lookup-function swap hide-function swap define ] [ drop ] if ] 'rename-function' define
+
+
+"More Arrays"
+'reconstruct' variable
+&reconstruct slice-set
+[ ] slice-store
+[ "number"    #100 slice-store slice-store ] slice-store
+[ "string"    #101 slice-store slice-store ] slice-store
+[ "character" #102 slice-store slice-store ] slice-store
+[ "pointer"   #103 slice-store slice-store ] slice-store
+[ "flag"      #100 slice-store slice-store #114 slice-store ] slice-store
+[ #100 / &reconstruct swap fetch invoke ] 'compile-value' define
+
+'data' value
+'types' value
+[ to types to data ] 'prepare' define
+[ #399 slice-store &*slice:current* @ :p ] 'terminate' define
+[ types over fetch [ data over fetch ] dip compile-value ] 'process' define
+[ prepare new-slice #0 data array-length [ process #1 + ] repeat drop terminate ] 'array-to-quote' define
+[ 'reconstruct' 'compile-value' 'data' 'types' 'prepare' 'extract' 'terminate' ] hide-functions
+
