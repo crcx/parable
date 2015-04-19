@@ -1595,6 +1595,12 @@ bootstrap.append(""" [ #399 slice-store &*slice:current* @ :p ] 'terminate' defi
 bootstrap.append(""" [ types over fetch [ data over fetch ] dip compile-value ] 'process' define """)
 bootstrap.append(""" [ prepare new-slice #0 data array-length [ process #1 + ] repeat drop terminate ] 'array-to-quote' define """)
 bootstrap.append(""" [ 'reconstruct' 'compile-value' 'data' 'types' 'prepare' 'extract' 'terminate' ] hide-functions """)
+bootstrap.append(""" 'source' value """)
+bootstrap.append(""" 'v' value """)
+bootstrap.append(""" 'i' value """)
+bootstrap.append(""" 'idx' value """)
+bootstrap.append(""" [ to source to v #0 to i #-1 to idx source array-length [ source i fetch v = [ i to idx ] if-true i #1 + to i ] repeat idx ] 'array-index-of' define """)
+bootstrap.append(""" [ 'source'  'v'  'i'  'idx' ] hide-functions """)
 import sys, os
 
 def display_stack(verbose):

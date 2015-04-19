@@ -321,3 +321,9 @@
 [ prepare new-slice #0 data array-length [ process #1 + ] repeat drop terminate ] 'array-to-quote' define
 [ 'reconstruct' 'compile-value' 'data' 'types' 'prepare' 'extract' 'terminate' ] hide-functions
 
+'source' value
+'v' value
+'i' value
+'idx' value
+[ to source to v #0 to i #-1 to idx source array-length [ source i fetch v = [ i to idx ] if-true i #1 + to i ] repeat idx ] 'array-index-of' define
+[ 'source'  'v'  'i'  'idx' ] hide-functions
