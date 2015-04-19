@@ -325,5 +325,7 @@
 'v' value
 'i' value
 'idx' value
-[ to source to v #0 to i #-1 to idx source array-length [ source i fetch v = [ i to idx ] if-true i #1 + to i ] repeat idx ] 'array-index-of' define
-[ 'source'  'v'  'i'  'idx' ] hide-functions
+[ type? STRING = [ [ :p :s ] dip ] [ :n ] if ] 'resolve-types' define
+[ to source to v #0 to i #-1 to idx source array-length [ source i fetch v resolve-types = [ i to idx ] if-true i #1 + to i ] repeat idx ] 'array-index-of' define
+[ 'source'  'v'  'i'  'idx'  'resolve-types' ] hide-functions
+

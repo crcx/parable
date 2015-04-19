@@ -1599,8 +1599,9 @@ bootstrap.append(""" 'source' value """)
 bootstrap.append(""" 'v' value """)
 bootstrap.append(""" 'i' value """)
 bootstrap.append(""" 'idx' value """)
-bootstrap.append(""" [ to source to v #0 to i #-1 to idx source array-length [ source i fetch v = [ i to idx ] if-true i #1 + to i ] repeat idx ] 'array-index-of' define """)
-bootstrap.append(""" [ 'source'  'v'  'i'  'idx' ] hide-functions """)
+bootstrap.append(""" [ type? STRING = [ [ :p :s ] dip ] [ :n ] if ] 'resolve-types' define """)
+bootstrap.append(""" [ to source to v #0 to i #-1 to idx source array-length [ source i fetch v resolve-types = [ i to idx ] if-true i #1 + to i ] repeat idx ] 'array-index-of' define """)
+bootstrap.append(""" [ 'source'  'v'  'i'  'idx'  'resolve-types' ] hide-functions """)
 import sys, os
 
 def display_stack(verbose):
