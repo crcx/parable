@@ -161,18 +161,15 @@ def display_stack():
 
 def display_errors():
     """display any error messages. returns number of lines rendered"""
-    l = 0
     for e in errors:
         write("\n" + e, COLOR_ERROR)
-        l += 1
-    return l
+    return len(errors)
 
 
 def draw_separator(width):
-    c = 0
-    while c < width:
+    while width > 0:
         write("-", COLOR_BAR)
-        c += 1
+        width -= 1
     return 1
 
 
@@ -186,7 +183,7 @@ def display(height, width):
     l = display_stack()
     l += display_errors()
     clear_errors()
-    while l < height - 1:
+    while l < (height - 1):
         sys.stdout.write("\n")
         l += 1
     l += draw_separator(width)
