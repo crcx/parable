@@ -1,9 +1,7 @@
-'data' value
-'keys' value
-'key'  value
-[ to key to keys to data key keys array-index-of dup #-1 <> [ data swap fetch  ] [ 'Index not found: ' key + report-error ] if ] 'array-fetch-by-name' define
-[ to key to keys to data key keys array-index-of dup #-1 <> [ data swap store ] [ drop-pair 'Index not found: ' key + report-error ] if ] 'array-store-by-name' define
-[ 'data' 'keys' 'key' ] hide-functions
+"data keys str"
+"value data keys str"
+[ swap array-index-of dup #-1 <> [ fetch ] [ nip 'Index not found' report-error ] if ] 'array-fetch-by-name' define
+[ swap array-index-of dup #-1 <> [ store ] [ drop-pair drop 'Index not found' report-error ] if ] 'array-store-by-name' define
 
 
 [ #10 #20 #30 #40 #50 ] array-from-quote 'd' define
