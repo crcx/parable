@@ -38,6 +38,7 @@ def display_stack(verbose):
 def display_errors():
     for e in errors:
         sys.stdout.write("\n" + e)
+    sys.stdout.write("\n")
 
 
 def display():

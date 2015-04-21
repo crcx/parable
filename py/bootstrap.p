@@ -296,6 +296,8 @@
 [ type? STRING = [ tob.append ] [ tob.character ] if ] 'tob.string' define
 [ tob.string ] '.' define
 [ &TOB array-length [ &TOB array-pop :p :s ] repeat ] 'show-tob' define
+[ #0 &TOB set-slice-length ] 'clear-tob' define
+[ 'TOB'  'tob.append'  'tob.number'  'tob.pointer'  'tob.flag'  'tob.character'  'tob.string' ] hide-functions
 
 
 "Dictionary"
