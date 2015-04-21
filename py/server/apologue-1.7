@@ -10,6 +10,7 @@
 #
 # code                    field set to the code you want to run.
 # numbersWithoutPrefixes  attempt to identify numbers and add the # prefix
+# multipleLineDefinitons  allow definitions to span multiple lines
 #
 # "code" is mandatory, the others can be set to "true", "false", or left out.
 
@@ -48,6 +49,27 @@ def is_number(s):
         return False
 
 
+def condenseLines(code):
+    m = len(code)
+    s = ''
+    r = []
+    i = 0
+    c = 0
+    while i < m:
+        if code[i].endswith(' \\\n'):
+            s = s + ' ' + code[i][:-2].strip()
+            c = 1
+        else:
+            c = 0
+            s = s + ' ' + code[i]
+        if c == 0:
+            if s != '' and s != ' \n':
+                r.append(s.strip())
+            s = ''
+        i = i + 1
+    return r
+
+
 def tweakSyntax(code):
     r = []
     for l in code:
@@ -61,7 +83,6 @@ def tweakSyntax(code):
                     m = m + ' ' + t
             r.append(m)
     return r
-
 
 def get_results():
     """export a parable session to the specified format"""
@@ -111,20 +132,25 @@ def get_results():
         else:
             p_slices.append([])
         i = i + 1
-
     return json.dumps({"symbols": dictionary_names, "symbol_map": dictionary_slices, "errors": errors, "parsed_stack": sequence, "types": types, "code": message, "slices": p_slices, "memory_map": p_map})
+
 
 def process_input():
     global message
     global form
     message = form.getvalue("code", " ")
     st = form.getvalue("numbersWithoutPrefixes", "false")
+    ld = form.getvalue("multipleLineDefinitions", "false")
     prepare_slices()
     prepare_dictionary()
     parse_bootstrap(open('bootstrap.p').readlines())
     collect_unused_slices()
     f = message.split("\n")
     counter = 0
+
+    if ld == "true":
+        f = condenseLines(f)
+        print f
 
     if st == "true":
         f = tweakSyntax(f)
@@ -139,6 +165,7 @@ def process_input():
                 if len(stack) == 0:
                     collect_unused_slices()
                     counter = 0
+
 
 if __name__ == '__main__':
      process_input()
