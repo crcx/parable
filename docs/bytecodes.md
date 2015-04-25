@@ -327,6 +327,14 @@ Return a random value.
 
 ----
 
+# BC\_SQRT
+
+Opcode: 215
+
+Returns the square root of a value.
+
+----
+
 # BC\_COMPARE\_LT
 
 Opcode: 220
