@@ -253,6 +253,7 @@
 [ &*state* @ :f [ preserve-type ! &*state* off ] [ dup @ swap restore-type ] if ] 'value-handler' define
 [ request #2 over set-slice-length [ value-handler ] curry swap define ] 'value' define
 [ [ value ] sip to lookup-function invoke ] 'value!' define
+[ array-from-quote #0 [ :p :s value ] array-reduce drop ] 'values' define
 [ '*types*'  '*state*'  'restore-stored-type'  'preserve-type'  'restore-type'  'value-handler' ] hide-functions
 
 
@@ -316,19 +317,14 @@
 [ "flag"      #100 slice-store slice-store #114 slice-store ] slice-store
 [ #100 / &reconstruct swap fetch invoke ] 'compile-value' define
 
-'data' value
-'types' value
+[ 'data' 'types' ] values
 [ to types to data ] 'prepare' define
 [ #399 slice-store &*slice:current* @ :p ] 'terminate' define
 [ types over fetch [ data over fetch ] dip compile-value ] 'process' define
 [ prepare new-slice #0 data array-length [ process #1 + ] repeat drop terminate ] 'array-to-quote' define
 [ 'reconstruct' 'compile-value' 'data' 'types' 'prepare' 'extract' 'terminate' ] hide-functions
 
-'source' value
-'v' value
-'i' value
-'idx' value
+[ 'source' 'v' 'i' 'idx' ] values
 [ type? STRING = [ [ :p :s ] dip ] [ :n ] if ] 'resolve-types' define
 [ to source to v #0 to i #-1 to idx source array-length [ source i fetch v resolve-types = [ i to idx ] if-true i #1 + to i ] repeat idx ] 'array-index-of' define
 [ 'source'  'v'  'i'  'idx'  'resolve-types' ] hide-functions
-
