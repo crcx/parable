@@ -23,6 +23,7 @@
 [ `212 ] 'or' define
 [ `213 ] 'xor' define
 [ `214 ] 'random' define
+[ `215 ] 'sqrt' define
 [ `220 ] '<' define
 [ `221 ] '>' define
 [ `222 ] '<=' define

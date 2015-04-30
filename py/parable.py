@@ -58,6 +58,7 @@ BC_BITWISE_AND = 211
 BC_BITWISE_OR = 212
 BC_BITWISE_XOR = 213
 BC_RANDOM = 214
+BC_SQRT = 215
 BC_COMPARE_LT = 220
 BC_COMPARE_GT = 221
 BC_COMPARE_LTEQ = 222
@@ -323,6 +324,11 @@ def interpret(slice, more=None):
                 offset = size
         elif opcode == BC_RANDOM:
             stack_push(random.SystemRandom().random(), TYPE_NUMBER)
+        elif opcode == BC_SQRT:
+            if check_depth(1):
+                stack_push(math.sqrt(stack_pop()), TYPE_NUMBER)
+            else:
+                offset = size
         elif opcode == BC_COMPARE_LT:
             if check_depth(2):
                 x = stack_type()
