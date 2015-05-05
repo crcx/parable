@@ -59,7 +59,7 @@
 [ `602 ] 'lookup-function' define
 [ `603 ] 'hide-function' define
 [ `700 ] 'find' define
-[ `701 ] 'substring' define
+[ `701 ] 'subslice' define
 [ `702 ] 'numeric?' define
 [ `800 ] 'to-lowercase' define
 [ `801 ] 'to-uppercase' define
@@ -138,9 +138,9 @@
 [ to-lowercase :s 'abcdefghijklmnopqrstuvwxyz1234567890' swap find [ false ] [ true ] if ] 'alphanumeric?' define
 [ to-lowercase :s 'bcdfghjklmnpqrstvwxyz' swap find [ false ] [ true ] if ] 'consonant?' define
 [ to-lowercase :s 'aeiou' swap find [ false ] [ true ] if ] 'vowel?' define
-[ :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ length ] dip swap substring ] 'trim-left' define
+[ :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ length ] dip swap subslice :s ] 'trim-left' define
 [ ] 'trim-right' define
-[ :s length dup-pair #1 - fetch nip #32 = [ length #1 - #0 swap substring trim-right ] if-true ] 'trim-right' define
+[ :s length dup-pair #1 - fetch nip #32 = [ length #1 - #0 swap subslice :s trim-right ] if-true ] 'trim-right' define
 [ trim-left trim-right ] 'trim' define
 [ invoke-and-count-items-returned #1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define
 

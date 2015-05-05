@@ -99,7 +99,7 @@ BC_FUNCTION_EXISTS = 601
 BC_FUNCTION_LOOKUP = 602
 BC_FUNCTION_HIDE = 603
 BC_STRING_SEEK = 700
-BC_STRING_SUBSTR = 701
+BC_SLICE_SUBSLICE = 701
 BC_STRING_NUMERIC = 702
 BC_TO_LOWER = 800
 BC_TO_UPPER = 801
@@ -647,13 +647,18 @@ def interpret(slice, more=None):
                 stack_push(b.find(a), TYPE_NUMBER)
             else:
                 offset = size
-        elif opcode == BC_STRING_SUBSTR:
+        elif opcode == BC_SLICE_SUBSLICE:
             if check_depth(3):
                 a = int(stack_pop())
                 b = int(stack_pop())
-                c = slice_to_string(stack_pop())
-                c = c[b:a]
-                stack_push(string_to_slice(c), TYPE_STRING)
+                c = p_slices[int(stack_pop())]
+                d = c[b:a+1]
+                e = request_slice()
+                i  = 0
+                while i < len(d):
+                    store(d[i], e, i)
+                    i = i + 1
+                stack_push(e, TYPE_FUNCTION)
             else:
                 offset = size
         elif opcode == BC_STRING_NUMERIC:
@@ -1374,7 +1379,7 @@ bootstrap.append(""" [ `601 ] 'function-exists?' define """)
 bootstrap.append(""" [ `602 ] 'lookup-function' define """)
 bootstrap.append(""" [ `603 ] 'hide-function' define """)
 bootstrap.append(""" [ `700 ] 'find' define """)
-bootstrap.append(""" [ `701 ] 'substring' define """)
+bootstrap.append(""" [ `701 ] 'subslice' define """)
 bootstrap.append(""" [ `702 ] 'numeric?' define """)
 bootstrap.append(""" [ `800 ] 'to-lowercase' define """)
 bootstrap.append(""" [ `801 ] 'to-uppercase' define """)
@@ -1446,9 +1451,9 @@ bootstrap.append(""" [ :s '`~!@#$%^&*()'"<>,.:;[]{}\|-_=+' swap find [ false ] [
 bootstrap.append(""" [ to-lowercase :s 'abcdefghijklmnopqrstuvwxyz1234567890' swap find [ false ] [ true ] if ] 'alphanumeric?' define """)
 bootstrap.append(""" [ to-lowercase :s 'bcdfghjklmnpqrstvwxyz' swap find [ false ] [ true ] if ] 'consonant?' define """)
 bootstrap.append(""" [ to-lowercase :s 'aeiou' swap find [ false ] [ true ] if ] 'vowel?' define """)
-bootstrap.append(""" [ :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ length ] dip swap substring ] 'trim-left' define """)
+bootstrap.append(""" [ :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ length ] dip swap subslice :s ] 'trim-left' define """)
 bootstrap.append(""" [ ] 'trim-right' define """)
-bootstrap.append(""" [ :s length dup-pair #1 - fetch nip #32 = [ length #1 - #0 swap substring trim-right ] if-true ] 'trim-right' define """)
+bootstrap.append(""" [ :s length dup-pair #1 - fetch nip #32 = [ length #1 - #0 swap subslice :s trim-right ] if-true ] 'trim-right' define """)
 bootstrap.append(""" [ trim-left trim-right ] 'trim' define """)
 bootstrap.append(""" [ invoke-and-count-items-returned #1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define """)
 bootstrap.append(""" "Helpful Math" """)

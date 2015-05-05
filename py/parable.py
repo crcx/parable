@@ -97,7 +97,7 @@ BC_FUNCTION_EXISTS = 601
 BC_FUNCTION_LOOKUP = 602
 BC_FUNCTION_HIDE = 603
 BC_STRING_SEEK = 700
-BC_STRING_SUBSTR = 701
+BC_SLICE_SUBSLICE = 701
 BC_STRING_NUMERIC = 702
 BC_TO_LOWER = 800
 BC_TO_UPPER = 801
@@ -645,13 +645,18 @@ def interpret(slice, more=None):
                 stack_push(b.find(a), TYPE_NUMBER)
             else:
                 offset = size
-        elif opcode == BC_STRING_SUBSTR:
+        elif opcode == BC_SLICE_SUBSLICE:
             if check_depth(3):
                 a = int(stack_pop())
                 b = int(stack_pop())
-                c = slice_to_string(stack_pop())
-                c = c[b:a]
-                stack_push(string_to_slice(c), TYPE_STRING)
+                c = p_slices[int(stack_pop())]
+                d = c[b:a+1]
+                e = request_slice()
+                i  = 0
+                while i < len(d):
+                    store(d[i], e, i)
+                    i = i + 1
+                stack_push(e, TYPE_FUNCTION)
             else:
                 offset = size
         elif opcode == BC_STRING_NUMERIC:
