@@ -63,7 +63,6 @@
 [ `702 ] 'numeric?' define
 [ `800 ] 'to-lowercase' define
 [ `801 ] 'to-uppercase' define
-[ `802 ] 'length' define
 [ `900 ] 'report-error' define
 [ `1000 ] 'sin' define
 [ `1001 ] 'cos' define
@@ -124,6 +123,7 @@
 [ #1 - [ + ] repeat ] 'sum-range' define
 
 "Misc"
+[ dup get-slice-length ] 'string-length' define
 [ [ get-slice-length + ] sip set-slice-length ] 'adjust-slice-length' define
 [ depth [ invoke ] dip depth swap - ] 'invoke-and-count-items-returned' define
 [ [ depth [ invoke ] dip depth swap - ] + ] 'invoke-and-count-items-returned-with-adjustment' define
@@ -138,9 +138,9 @@
 [ to-lowercase :s 'abcdefghijklmnopqrstuvwxyz1234567890' swap find [ false ] [ true ] if ] 'alphanumeric?' define
 [ to-lowercase :s 'bcdfghjklmnpqrstvwxyz' swap find [ false ] [ true ] if ] 'consonant?' define
 [ to-lowercase :s 'aeiou' swap find [ false ] [ true ] if ] 'vowel?' define
-[ :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ length ] dip swap subslice :s ] 'trim-left' define
+[ :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ string-length ] dip swap subslice :s ] 'trim-left' define
 [ ] 'trim-right' define
-[ :s length dup-pair #1 - fetch nip #32 = [ length #1 - #0 swap subslice :s trim-right ] if-true ] 'trim-right' define
+[ :s string-length dup-pair #1 - fetch nip #32 = [ string-length #1 - #0 swap subslice :s trim-right ] if-true ] 'trim-right' define
 [ trim-left trim-right ] 'trim' define
 [ invoke-and-count-items-returned #1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define
 
@@ -169,8 +169,8 @@
 [ &*slice:current* @ [ &*slice:offset* @ [ invoke ] dip &*slice:offset* ! ] dip &*slice:current* ! ] 'preserve-slice' define
 
 "more strings"
-[ [ [ new-slice length [ #1 - ] sip [ dup-pair fetch slice-store #1 - ] repeat drop-pair #0 slice-store &*slice:current* @ :p :s ] preserve-slice ] if-string ] 'reverse' define
-[ swap reverse length [ dup-pair #1 - fetch swap [ swap ] dip [ [ :c over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each-character' define
+[ [ [ new-slice string-length [ #1 - ] sip [ dup-pair fetch slice-store #1 - ] repeat drop-pair #0 slice-store &*slice:current* @ :p :s ] preserve-slice ] if-string ] 'reverse' define
+[ swap reverse string-length [ dup-pair #1 - fetch swap [ swap ] dip [ [ :c over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each-character' define
 
 [ invoke-and-count-items-returned [ hide-function ] repeat ] 'hide-functions' define
 

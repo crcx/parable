@@ -101,7 +101,6 @@ BC_SLICE_SUBSLICE = 701
 BC_STRING_NUMERIC = 702
 BC_TO_LOWER = 800
 BC_TO_UPPER = 801
-BC_LENGTH = 802
 BC_REPORT = 900
 BC_TRIG_SIN = 1000
 BC_TRIG_COS = 1001
@@ -698,15 +697,6 @@ def interpret(slice, more=None):
                     stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                 else:
                     report('ERROR: BC_TO_LOWER requires STRING or CHARACTER')
-            else:
-                offset = size
-        elif opcode == BC_LENGTH:
-            if check_depth(1):
-                if stack_type() == TYPE_STRING:
-                    a = slice_to_string(stack_tos())
-                    stack_push(len(a), TYPE_NUMBER)
-                else:
-                    stack_push(0, TYPE_NUMBER)
             else:
                 offset = size
         elif opcode == BC_REPORT:

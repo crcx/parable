@@ -103,7 +103,6 @@ BC_SLICE_SUBSLICE = 701
 BC_STRING_NUMERIC = 702
 BC_TO_LOWER = 800
 BC_TO_UPPER = 801
-BC_LENGTH = 802
 BC_REPORT = 900
 BC_TRIG_SIN = 1000
 BC_TRIG_COS = 1001
@@ -700,15 +699,6 @@ def interpret(slice, more=None):
                     stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                 else:
                     report('ERROR: BC_TO_LOWER requires STRING or CHARACTER')
-            else:
-                offset = size
-        elif opcode == BC_LENGTH:
-            if check_depth(1):
-                if stack_type() == TYPE_STRING:
-                    a = slice_to_string(stack_tos())
-                    stack_push(len(a), TYPE_NUMBER)
-                else:
-                    stack_push(0, TYPE_NUMBER)
             else:
                 offset = size
         elif opcode == BC_REPORT:
@@ -1383,7 +1373,6 @@ bootstrap.append(""" [ `701 ] 'subslice' define """)
 bootstrap.append(""" [ `702 ] 'numeric?' define """)
 bootstrap.append(""" [ `800 ] 'to-lowercase' define """)
 bootstrap.append(""" [ `801 ] 'to-uppercase' define """)
-bootstrap.append(""" [ `802 ] 'length' define """)
 bootstrap.append(""" [ `900 ] 'report-error' define """)
 bootstrap.append(""" [ `1000 ] 'sin' define """)
 bootstrap.append(""" [ `1001 ] 'cos' define """)
@@ -1438,6 +1427,7 @@ bootstrap.append(""" "numeric ranges" """)
 bootstrap.append(""" [ dup-pair < [ [ [ dup #1 + ] dip dup-pair = ] while-false ] [ [ [ dup #1 - ] dip dup-pair = ] while-false ] if drop ] 'expand-range' define """)
 bootstrap.append(""" [ #1 - [ + ] repeat ] 'sum-range' define """)
 bootstrap.append(""" "Misc" """)
+bootstrap.append(""" [ dup get-slice-length ] 'string-length' define """)
 bootstrap.append(""" [ [ get-slice-length + ] sip set-slice-length ] 'adjust-slice-length' define """)
 bootstrap.append(""" [ depth [ invoke ] dip depth swap - ] 'invoke-and-count-items-returned' define """)
 bootstrap.append(""" [ [ depth [ invoke ] dip depth swap - ] + ] 'invoke-and-count-items-returned-with-adjustment' define """)
@@ -1451,9 +1441,9 @@ bootstrap.append(""" [ :s '`~!@#$%^&*()'"<>,.:;[]{}\|-_=+' swap find [ false ] [
 bootstrap.append(""" [ to-lowercase :s 'abcdefghijklmnopqrstuvwxyz1234567890' swap find [ false ] [ true ] if ] 'alphanumeric?' define """)
 bootstrap.append(""" [ to-lowercase :s 'bcdfghjklmnpqrstvwxyz' swap find [ false ] [ true ] if ] 'consonant?' define """)
 bootstrap.append(""" [ to-lowercase :s 'aeiou' swap find [ false ] [ true ] if ] 'vowel?' define """)
-bootstrap.append(""" [ :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ length ] dip swap subslice :s ] 'trim-left' define """)
+bootstrap.append(""" [ :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ string-length ] dip swap subslice :s ] 'trim-left' define """)
 bootstrap.append(""" [ ] 'trim-right' define """)
-bootstrap.append(""" [ :s length dup-pair #1 - fetch nip #32 = [ length #1 - #0 swap subslice :s trim-right ] if-true ] 'trim-right' define """)
+bootstrap.append(""" [ :s string-length dup-pair #1 - fetch nip #32 = [ string-length #1 - #0 swap subslice :s trim-right ] if-true ] 'trim-right' define """)
 bootstrap.append(""" [ trim-left trim-right ] 'trim' define """)
 bootstrap.append(""" [ invoke-and-count-items-returned #1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define """)
 bootstrap.append(""" "Helpful Math" """)
@@ -1479,8 +1469,8 @@ bootstrap.append(""" [ [ slice-store ] repeat ] 'slice-store-items' define """)
 bootstrap.append(""" [ request slice-set ] 'new-slice' define """)
 bootstrap.append(""" [ &*slice:current* @ [ &*slice:offset* @ [ invoke ] dip &*slice:offset* ! ] dip &*slice:current* ! ] 'preserve-slice' define """)
 bootstrap.append(""" "more strings" """)
-bootstrap.append(""" [ [ [ new-slice length [ #1 - ] sip [ dup-pair fetch slice-store #1 - ] repeat drop-pair #0 slice-store &*slice:current* @ :p :s ] preserve-slice ] if-string ] 'reverse' define """)
-bootstrap.append(""" [ swap reverse length [ dup-pair #1 - fetch swap [ swap ] dip [ [ :c over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each-character' define """)
+bootstrap.append(""" [ [ [ new-slice string-length [ #1 - ] sip [ dup-pair fetch slice-store #1 - ] repeat drop-pair #0 slice-store &*slice:current* @ :p :s ] preserve-slice ] if-string ] 'reverse' define """)
+bootstrap.append(""" [ swap reverse string-length [ dup-pair #1 - fetch swap [ swap ] dip [ [ :c over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each-character' define """)
 bootstrap.append(""" [ invoke-and-count-items-returned [ hide-function ] repeat ] 'hide-functions' define """)
 bootstrap.append(""" "arrays" """)
 bootstrap.append(""" 'source' variable """)
