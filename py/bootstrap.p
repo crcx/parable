@@ -142,19 +142,23 @@
 [ [ drop ] repeat ] 'drop-multiple' define
 
 "String and Character"
-[ dup to-lowercase = ] 'lowercase?' define
-[ dup to-uppercase = ] 'uppercase?' define
-[ type? CHARACTER = [ to-lowercase $a $z between? ] [ false ] if ] 'letter?' define
-[ [ $0 $9 between? ] if-character ] 'digit?' define
-[ :s '`~!@#$%^&*()'"<>,.:;[]{}\|-_=+' swap find [ false ] [ true ] if ] 'symbol?' define
-[ to-lowercase :s 'abcdefghijklmnopqrstuvwxyz1234567890' swap find [ false ] [ true ] if ] 'alphanumeric?' define
-[ to-lowercase :s 'bcdfghjklmnpqrstvwxyz' swap find [ false ] [ true ] if ] 'consonant?' define
-[ to-lowercase :s 'aeiou' swap find [ false ] [ true ] if ] 'vowel?' define
-[ :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ string-length ] dip swap subslice :s ] 'trim-left' define
+"Note that this is only supporting the basic ASCII character set presently."
+[ "vs-f" swap :s find not true? ] 'string-contains?' define
+[ "v-f"  :c $0 $9 between? ] 'digit?' define
+[ "v-f"  '`~!@#$%^&*()'"<>,.:;[]{}\|-_=+'                    string-contains? ] 'symbol?' define
+[ "v-f"  to-lowercase 'abcdefghijklmnopqrstuvwxyz'           string-contains? ] 'letter?' define
+[ "v-f"  to-lowercase 'abcdefghijklmnopqrstuvwxyz1234567890' string-contains? ] 'alphanumeric?' define
+[ "v-f"  to-lowercase 'bcdfghjklmnpqrstvwxyz'                string-contains? ] 'consonant?' define
+[ "v-f"  to-lowercase 'aeiou'                                string-contains? ] 'vowel?' define
+[ "v-f"  dup to-lowercase = ] 'lowercase?' define
+[ "v-f"  dup to-uppercase = ] 'uppercase?' define
+[ "p-s" invoke-and-count-items-returned #1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define
+
+"Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
+[ "s-s"  :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ string-length ] dip swap subslice :s ] 'trim-left' define
 [ ] 'trim-right' define
-[ :s string-length dup-pair #1 - fetch nip #32 = [ string-length #1 - #0 swap subslice :s trim-right ] if-true ] 'trim-right' define
-[ trim-left trim-right ] 'trim' define
-[ invoke-and-count-items-returned #1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define
+[ "s-s"  :s string-length dup-pair #1 - fetch nip #32 = [ string-length #1 - #0 swap subslice :s trim-right ] if-true ] 'trim-right' define
+[ "s-s" trim-left trim-right ] 'trim' define
 
 "Helpful Math"
 [ dup negative? [ #-1 * ] if-true ] 'abs' define
