@@ -1,7 +1,9 @@
-"Standard Parable Bootstrap"
+"Parable Standard Library"
 "Copyright (c) 2012-2015, Charles Childers"
 
-"Primitives"
+"At this point, the language consists of [ ] define and the various prefixes. The rest of this will build Parable into a useful language."
+
+"First, map the byte codes to named functions. These are the primitives."
 [ "v-n"    `110 ] ':n' define
 [ "v-s"    `111 ] ':s' define
 [ "v-c"    `112 ] ':c' define
@@ -79,44 +81,54 @@
 [ #400 ] 'POINTER' define
 [ #500 ] 'FLAG' define
 
-"Stack Flow"
-[ over over ] 'dup-pair' define
-[ drop drop ] 'drop-pair' define
-[ [ dip ] dip invoke ] 'bi*' define
-[ dup bi* ] 'bi@' define
-[ [ [ swap [ dip ] dip ] dip dip ] dip invoke ] 'tri*' define
-[ dup dup tri* ] 'tri@' define
+"The basic bi/tri combinators provided as part of the primitives allow application of multiple quotes to a single data element. Here we add new forms that are very useful."
+"We consider the bi/tri variants to consist of one of three types."
+"Cleave combinators (bi, tri) apply multiple quotations to a single value (or set of values)."
 
-"Conditionals"
+"Spread combinators (bi*, tri*) apply multiple quotations to multiple values."
+[ "vvpp-?"   [ dip ] dip invoke ] 'bi*' define
+[ "vvvppp-?" [ [ swap [ dip ] dip ] dip dip ] dip invoke ] 'tri*' define
+
+"Apply combinators (bi@, tri@) apply a single quotation to multiple values."
+[ "vvp-?"    dup bi* ] 'bi@' define
+[ "vvvp-?"   dup dup tri* ] 'tri@' define
+
+"Stack Flow"
+[ "vV-vVvV"  over over ] 'dup-pair' define
+[ "vv-"      drop drop ] 'drop-pair' define
+
+"Expand the basic conditionals into a more useful set."
 [ #-1 :f ] 'true' define
 [ #0 :f ] 'false' define
+[ :f :n #-1 xor :f ] 'not' define
 [ [ ] if ] 'if-true' define
 [ [ ] swap if ] 'if-false' define
-[ [ [ :n ] bi@ ] dip :n dup-pair > [ swap ] if-true [ over ] dip <= [ >= ] dip and :f ] 'between?' define
-[ #0 <> ] 'true?' define
-[ #0 = ] 'false?' define
-[ #2 rem #0 = ] 'even?' define
-[ #2 rem #0 <> ] 'odd?' define
+[ #0 = ] 'zero?' define
+[ :f :n zero? not ] 'true?' define
+[ :f :n zero? ] 'false?' define
+[ #2 rem zero? ] 'even?' define
+[ #2 rem zero? not ] 'odd?' define
 [ #0 < ] 'negative?' define
 [ #0 >= ] 'positive?' define
-[ #0 = ] 'zero?' define
 [ [ type? CHARACTER = ] dip if-true ] 'if-character' define
 [ [ type? STRING = ] dip if-true ] 'if-string' define
 [ [ type? NUMBER = ] dip if-true ] 'if-number' define
 [ [ type? POINTER = ] dip if-true ] 'if-pointer' define
 [ [ type? FLAG = ] dip if-true ] 'if-flag' define
+[ [ [ :n ] bi@ ] dip :n dup-pair > [ swap ] if-true [ over ] dip <= [ >= ] dip and :f ] 'between?' define
 
-"variables"
+"Simple variables are just named slices, with functions to access the first element. They're useful for holding single values, but don't track data types."
 [ request swap define ] 'variable' define
 [ request [ swap define ] sip #0 store ] 'variable!' define
-[ request swap copy ] 'zero-out' define
 [ #0 fetch ] '@' define
 [ #0 store ] '!' define
-[ [ @ #1 + ] sip ! ] 'increment' define
-[ [ @ #1 - ] sip ! ] 'decrement' define
-[ swap request dup-pair copy swap [ [ invoke ] dip ] dip copy ] 'preserve' define
 [ #0 swap ! ] 'off' define
 [ #-1 swap ! ] 'on' define
+[ [ @ #1 + ] sip ! ] 'increment' define
+[ [ @ #1 - ] sip ! ] 'decrement' define
+[ request swap copy ] 'zero-out' define
+[ swap request dup-pair copy swap [ [ invoke ] dip ] dip copy ] 'preserve' define
+
 
 "numeric ranges"
 [ dup-pair < [ [ [ dup #1 + ] dip dup-pair = ] while-false ] [ [ [ dup #1 - ] dip dup-pair = ] while-false ] if drop ] 'expand-range' define
