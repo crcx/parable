@@ -135,11 +135,14 @@
 [ #1 - [ + ] repeat ] 'sum-range' define
 
 "Misc"
-[ dup get-slice-length ] 'string-length' define
+[ dup get-slice-length ] 'slice-length' define
 [ [ get-slice-length + ] sip set-slice-length ] 'adjust-slice-length' define
 [ depth [ invoke ] dip depth swap - ] 'invoke-and-count-items-returned' define
 [ [ depth [ invoke ] dip depth swap - ] + ] 'invoke-and-count-items-returned-with-adjustment' define
 [ [ drop ] repeat ] 'drop-multiple' define
+
+[ invoke-and-count-items-returned [ hide-function ] repeat ] 'hide-functions' define
+[ swap dup function-exists? [ dup lookup-function swap hide-function swap define ] [ drop ] if ] 'rename-function' define
 
 "String and Character"
 "Note that this is only supporting the basic ASCII character set presently."
@@ -155,9 +158,9 @@
 [ "p-s" invoke-and-count-items-returned #1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define
 
 "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
-[ "s-s"  :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ string-length ] dip swap subslice :s ] 'trim-left' define
+[ "s-s"  :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ slice-length ] dip swap subslice :s ] 'trim-left' define
 [ ] 'trim-right' define
-[ "s-s"  :s string-length dup-pair #1 - fetch nip #32 = [ string-length #1 - #0 swap subslice :s trim-right ] if-true ] 'trim-right' define
+[ "s-s"  :s slice-length dup-pair #1 - fetch nip #32 = [ slice-length #1 - #0 swap subslice :s trim-right ] if-true ] 'trim-right' define
 [ "s-s" trim-left trim-right ] 'trim' define
 
 "Helpful Math"
@@ -184,11 +187,6 @@
 [ request slice-set ] 'new-slice' define
 [ &*slice:current* @ [ &*slice:offset* @ [ invoke ] dip &*slice:offset* ! ] dip &*slice:current* ! ] 'preserve-slice' define
 
-"more strings"
-[ [ [ new-slice string-length [ #1 - ] sip [ dup-pair fetch slice-store #1 - ] repeat drop-pair #0 slice-store &*slice:current* @ :p :s ] preserve-slice ] if-string ] 'reverse' define
-[ swap reverse string-length [ dup-pair #1 - fetch swap [ swap ] dip [ [ over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each' define
-
-[ invoke-and-count-items-returned [ hide-function ] repeat ] 'hide-functions' define
 
 "arrays"
 'source' variable
@@ -202,6 +200,8 @@
 [ [ new-slice invoke-and-count-items-returned slice-store-items &*slice:current* @ ] preserve-slice :p ] 'array-from-quote<in-stack-order>' define
 [ request [ copy ] sip &source ! [ #0 &source @ array-length [ &source @ over fetch swap #1 + ] repeat drop ] array-from-quote<in-stack-order> ] 'array-reverse' define
 [ array-from-quote<in-stack-order> array-reverse ] 'array-from-quote' define
+
+[ swap array-reverse slice-length [ dup-pair #1 - fetch swap [ swap ] dip [ [ over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each' define
 
 [ ] 'array<remap>' define
 [ type? STRING <> [ [ ] ] [ [ [ :p :s ] bi@ ] ] if 'array<remap>' define ] 'needs-remap?' define
@@ -285,7 +285,6 @@
 
 
 "Dictionary"
-[ swap dup function-exists? [ dup lookup-function swap hide-function swap define ] [ drop ] if ] 'rename-function' define
 
 
 "More Arrays"
