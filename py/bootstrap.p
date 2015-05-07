@@ -186,7 +186,7 @@
 
 "more strings"
 [ [ [ new-slice string-length [ #1 - ] sip [ dup-pair fetch slice-store #1 - ] repeat drop-pair #0 slice-store &*slice:current* @ :p :s ] preserve-slice ] if-string ] 'reverse' define
-[ swap reverse string-length [ dup-pair #1 - fetch swap [ swap ] dip [ [ :c over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each-character' define
+[ swap reverse string-length [ dup-pair #1 - fetch swap [ swap ] dip [ [ over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each' define
 
 [ invoke-and-count-items-returned [ hide-function ] repeat ] 'hide-functions' define
 
@@ -229,7 +229,7 @@
 '*conversion:base*' variable
 [ :n #48 - &*conversion:base* @ #16 = [ dup #16 > [ #7 - ] if-true ] if-true ] 'conversion:to-digit' define
 [ [ swap &*conversion:base* @ * + ] dip ] 'conversion:accumulate' define
-[ &*conversion:base* ! #0 swap [ conversion:to-digit swap conversion:accumulate ] for-each-character ] 'convert-with-base' define
+[ &*conversion:base* ! #0 swap [ :c conversion:to-digit swap conversion:accumulate ] for-each ] 'convert-with-base' define
 [ #2 convert-with-base ] 'convert-from-binary' define
 [ #8 convert-with-base ] 'convert-from-octal' define
 [ #10 convert-with-base ] 'convert-from-decimal' define
@@ -273,13 +273,12 @@
 [ '*types*'  '*state*'  'restore-stored-type'  'preserve-type'  'restore-type'  'value-handler' ] hide-functions
 
 
-
 "Hashing functions"
-[ #5381 swap [ :n [ swap ] dip over #-5 shift + + swap ] for-each-character ] 'hash:djb2' define
+[ #5381 swap [ :n [ swap ] dip over #-5 shift + + swap ] for-each ] 'hash:djb2' define
 [ :n over #-6 shift + over #-16 shift + swap - ] 'hash:sdbm<n>' define
-[ #0 swap [ [ swap ] dip hash:sdbm<n> swap ] for-each-character ] 'hash:sdbm' define
-[ #0 swap [ :n [ swap ] dip + #255 and swap ] for-each-character #255 xor #1 + #255 and ] 'hash:lrc' define
-[ #0 swap [ :n [ swap ] dip xor swap ] for-each-character ] 'hash:xor' define
+[ #0 swap [ :c [ swap ] dip hash:sdbm<n> swap ] for-each ] 'hash:sdbm' define
+[ #0 swap [ :n [ swap ] dip + #255 and swap ] for-each #255 xor #1 + #255 and ] 'hash:lrc' define
+[ #0 swap [ :n [ swap ] dip xor swap ] for-each ] 'hash:xor' define
 [ hash:djb2 ] 'chosen-hash' define
 [ #389 ] 'hash-prime' define
 [ chosen-hash hash-prime rem ] 'hash' define
