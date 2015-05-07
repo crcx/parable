@@ -2,75 +2,75 @@
 "Copyright (c) 2012-2015, Charles Childers"
 
 "Primitives"
-[ `110 ] ':n' define
-[ `111 ] ':s' define
-[ `112 ] ':c' define
-[ `113 ] ':p' define
-[ `114 ] ':f' define
-[ `120 ] 'type?' define
-[ `200 ] '+' define
-[ `201 ] '-' define
-[ `202 ] '*' define
-[ `203 ] '/' define
-[ `204 ] 'rem' define
-[ `205 ] 'floor' define
-[ `206 ] '^' define
-[ `207 ] 'log' define
-[ `208 ] 'log10' define
-[ `209 ] 'log<n>' define
-[ `210 ] 'shift' define
-[ `211 ] 'and' define
-[ `212 ] 'or' define
-[ `213 ] 'xor' define
-[ `214 ] 'random' define
-[ `215 ] 'sqrt' define
-[ `220 ] '<' define
-[ `221 ] '>' define
-[ `222 ] '<=' define
-[ `223 ] '>=' define
-[ `224 ] '=' define
-[ `225 ] '<>' define
-[ `300 ] 'if' define
-[ `301 ] 'while-true' define
-[ `302 ] 'while-false' define
-[ `303 ] 'repeat' define
-[ `305 ] 'invoke' define
-[ `306 ] 'dip' define
-[ `307 ] 'sip' define
-[ `308 ] 'bi' define
-[ `309 ] 'tri' define
-[ `400 ] 'copy' define
-[ `401 ] 'fetch' define
-[ `402 ] 'store' define
-[ `403 ] 'request' define
-[ `404 ] 'release' define
-[ `405 ] 'collect-garbage' define
-[ `406 ] 'get-slice-length' define
-[ `407 ] 'set-slice-length' define
-[ `500 ] 'dup' define
-[ `501 ] 'drop' define
-[ `502 ] 'swap' define
-[ `503 ] 'over' define
-[ `504 ] 'tuck' define
-[ `505 ] 'nip' define
-[ `506 ] 'depth' define
-[ `507 ] 'reset' define
-[ `601 ] 'function-exists?' define
-[ `602 ] 'lookup-function' define
-[ `603 ] 'hide-function' define
-[ `700 ] 'find' define
-[ `701 ] 'subslice' define
-[ `702 ] 'numeric?' define
-[ `800 ] 'to-lowercase' define
-[ `801 ] 'to-uppercase' define
-[ `900 ] 'report-error' define
-[ `1000 ] 'sin' define
-[ `1001 ] 'cos' define
-[ `1002 ] 'tan' define
-[ `1003 ] 'asin' define
-[ `1004 ] 'acos' define
-[ `1005 ] 'atan' define
-[ `1006 ] 'atan2' define
+[ "v-n"    `110 ] ':n' define
+[ "v-s"    `111 ] ':s' define
+[ "v-c"    `112 ] ':c' define
+[ "v-p"    `113 ] ':p' define
+[ "v-f"    `114 ] ':f' define
+[ "v-vn"   `120 ] 'type?' define
+[ "nn-n"   `200 ] '+' define
+[ "nn-n"   `201 ] '-' define
+[ "nn-n"   `202 ] '*' define
+[ "nn-n"   `203 ] '/' define
+[ "nn-n"   `204 ] 'rem' define
+[ "n-n"    `205 ] 'floor' define
+[ "nn-n"   `206 ] '^' define
+[ "n-n"    `207 ] 'log' define
+[ "n-n"    `208 ] 'log10' define
+[ "nn-n"   `209 ] 'log<n>' define
+[ "nn-n"   `210 ] 'shift' define
+[ "nn-n"   `211 ] 'and' define
+[ "nn-n"   `212 ] 'or' define
+[ "nn-n"   `213 ] 'xor' define
+[ "-n"     `214 ] 'random' define
+[ "n-n"    `215 ] 'sqrt' define
+[ "nn-f"   `220 ] '<' define
+[ "nn-f"   `221 ] '>' define
+[ "nn-f"   `222 ] '<=' define
+[ "nn-f"   `223 ] '>=' define
+[ "vv-f"   `224 ] '=' define
+[ "vv-f"   `225 ] '<>' define
+[ "fpp-"   `300 ] 'if' define
+[ "p-"     `301 ] 'while-true' define
+[ "p-"     `302 ] 'while-false' define
+[ "np-"    `303 ] 'repeat' define
+[ "p-"     `305 ] 'invoke' define
+[ "vp-v"   `306 ] 'dip' define
+[ "vp-v"   `307 ] 'sip' define
+[ "vpp-?"  `308 ] 'bi' define
+[ "vppp-?" `309 ] 'tri' define
+[ "pp-"    `400 ] 'copy' define
+[ "pn-n"   `401 ] 'fetch' define
+[ "npn-"   `402 ] 'store' define
+[ "-p"     `403 ] 'request' define
+[ "p-"     `404 ] 'release' define
+[ "-"      `405 ] 'collect-garbage' define
+[ "p-n"    `406 ] 'get-slice-length' define
+[ "np-"    `407 ] 'set-slice-length' define
+[ "v-vv"   `500 ] 'dup' define
+[ "v-"     `501 ] 'drop' define
+[ "vV-Vv"  `502 ] 'swap' define
+[ "vV-vVv" `503 ] 'over' define
+[ "vV-VvV" `504 ] 'tuck' define
+[ "vV-V"   `505 ] 'nip' define
+[ "-n"     `506 ] 'depth' define
+[ "...-"   `507 ] 'reset' define
+[ "s-f"    `601 ] 'function-exists?' define
+[ "s-p"    `602 ] 'lookup-function' define
+[ "s-"     `603 ] 'hide-function' define
+[ "ss-n"   `700 ] 'find' define
+[ "pnn-p"  `701 ] 'subslice' define
+[ "s-f"    `702 ] 'numeric?' define
+[ "v-v"    `800 ] 'to-lowercase' define
+[ "v-v"    `801 ] 'to-uppercase' define
+[ "s-"     `900 ] 'report-error' define
+[ "n-n"    `1000 ] 'sin' define
+[ "n-n"    `1001 ] 'cos' define
+[ "n-n"    `1002 ] 'tan' define
+[ "n-n"    `1003 ] 'asin' define
+[ "n-n"    `1004 ] 'acos' define
+[ "n-n"    `1005 ] 'atan' define
+[ "n-n"    `1006 ] 'atan2' define
 
 "Constants for data types recognized by Parable's VM"
 [ #100 ] 'NUMBER' define
