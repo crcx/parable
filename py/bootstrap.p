@@ -98,36 +98,36 @@
 [ "vv-"      drop drop ] 'drop-pair' define
 
 "Expand the basic conditionals into a more useful set."
-[ #-1 :f ] 'true' define
-[ #0 :f ] 'false' define
-[ :f :n #-1 xor :f ] 'not' define
-[ [ ] if ] 'if-true' define
-[ [ ] swap if ] 'if-false' define
-[ #0 = ] 'zero?' define
-[ :f :n zero? not ] 'true?' define
-[ :f :n zero? ] 'false?' define
-[ #2 rem zero? ] 'even?' define
-[ #2 rem zero? not ] 'odd?' define
-[ #0 < ] 'negative?' define
-[ #0 >= ] 'positive?' define
-[ [ type? CHARACTER = ] dip if-true ] 'if-character' define
-[ [ type? STRING = ] dip if-true ] 'if-string' define
-[ [ type? NUMBER = ] dip if-true ] 'if-number' define
-[ [ type? POINTER = ] dip if-true ] 'if-pointer' define
-[ [ type? FLAG = ] dip if-true ] 'if-flag' define
-[ [ [ :n ] bi@ ] dip :n dup-pair > [ swap ] if-true [ over ] dip <= [ >= ] dip and :f ] 'between?' define
+[ "-f"   #-1 :f ] 'true' define
+[ "-f"   #0  :f ] 'false' define
+[ "f-f"  :f :n #-1 xor :f ] 'not' define
+[ "fp-"  [ ] if ] 'if-true' define
+[ "fp-"  [ ] swap if ] 'if-false' define
+[ "v-f"  #0 = ] 'zero?' define
+[ "v-f"  :f :n zero? not ] 'true?' define
+[ "v-f"  :f :n zero? ] 'false?' define
+[ "n-f"  #2 rem zero? ] 'even?' define
+[ "n-f"  #2 rem zero? not ] 'odd?' define
+[ "n-f"  #0 < ] 'negative?' define
+[ "n-f"  #0 >= ] 'positive?' define
+[ "cp-"  [ type? CHARACTER = ] dip if-true ] 'if-character' define
+[ "sp-"  [ type? STRING = ] dip if-true ] 'if-string' define
+[ "np-"  [ type? NUMBER = ] dip if-true ] 'if-number' define
+[ "pp-"  [ type? POINTER = ] dip if-true ] 'if-pointer' define
+[ "fp-"  [ type? FLAG = ] dip if-true ] 'if-flag' define
+[ "nnn-f"  [ [ :n ] bi@ ] dip :n dup-pair > [ swap ] if-true [ over ] dip <= [ >= ] dip and :f ] 'between?' define
 
 "Simple variables are just named slices, with functions to access the first element. They're useful for holding single values, but don't track data types."
-[ request swap define ] 'variable' define
-[ request [ swap define ] sip #0 store ] 'variable!' define
-[ #0 fetch ] '@' define
-[ #0 store ] '!' define
-[ #0 swap ! ] 'off' define
-[ #-1 swap ! ] 'on' define
-[ [ @ #1 + ] sip ! ] 'increment' define
-[ [ @ #1 - ] sip ! ] 'decrement' define
-[ request swap copy ] 'zero-out' define
-[ swap request dup-pair copy swap [ [ invoke ] dip ] dip copy ] 'preserve' define
+[ "s-"   request swap define ] 'variable' define
+[ "vs-"  request [ swap define ] sip #0 store ] 'variable!' define
+[ "p-n"  #0 fetch ] '@' define
+[ "vp-"  #0 store ] '!' define
+[ "p-"   #0 swap ! ] 'off' define
+[ "p-"   #-1 swap ! ] 'on' define
+[ "p-"   [ @ #1 + ] sip ! ] 'increment' define
+[ "p-"   [ @ #1 - ] sip ! ] 'decrement' define
+[ "p-"   request swap copy ] 'zero-out' define
+[ "pp-"  swap request dup-pair copy swap [ [ invoke ] dip ] dip copy ] 'preserve' define
 
 
 "numeric ranges"
@@ -135,14 +135,14 @@
 [ #1 - [ + ] repeat ] 'sum-range' define
 
 "Misc"
-[ dup get-slice-length ] 'slice-length' define
-[ [ get-slice-length + ] sip set-slice-length ] 'adjust-slice-length' define
-[ depth [ invoke ] dip depth swap - ] 'invoke-and-count-items-returned' define
-[ [ depth [ invoke ] dip depth swap - ] + ] 'invoke-and-count-items-returned-with-adjustment' define
-[ [ drop ] repeat ] 'drop-multiple' define
+[ "p-pn"  dup get-slice-length ] 'slice-length' define
+[ "np-"   [ get-slice-length + ] sip set-slice-length ] 'adjust-slice-length' define
+[ "p-?n"  depth [ invoke ] dip depth swap - ] 'invoke-and-count-items-returned' define
+[ "pn-?n" [ depth [ invoke ] dip depth swap - ] + ] 'invoke-and-count-items-returned-with-adjustment' define
+[ "?n-"   [ drop ] repeat ] 'drop-multiple' define
 
-[ invoke-and-count-items-returned [ hide-function ] repeat ] 'hide-functions' define
-[ swap dup function-exists? [ dup lookup-function swap hide-function swap define ] [ drop ] if ] 'rename-function' define
+[ "p-"   invoke-and-count-items-returned [ hide-function ] repeat ] 'hide-functions' define
+[ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap define ] [ drop ] if ] 'rename-function' define
 
 "String and Character"
 "Note that this is only supporting the basic ASCII character set presently."
