@@ -16,11 +16,15 @@ This is a primitive corresponding to a byte code.
 
 ## :n
 
+Convert a value to a number.
+
     value -- number
 
 This is a primitive corresponding to a byte code.
 
 ## :s
+
+Convert a value to a string.
 
     value -- string
 
@@ -28,11 +32,15 @@ This is a primitive corresponding to a byte code.
 
 ## :c
 
+Convert a value to a character.
+
     value -- character
 
 This is a primitive corresponding to a byte code.
 
 ## :p
+
+Convert a value to a pointer.
 
     value -- pointer
 
@@ -40,11 +48,16 @@ This is a primitive corresponding to a byte code.
 
 ## :f
 
+Convert a value to a flag.
+
     value -- flag
 
 This is a primitive corresponding to a byte code.
 
 ## type?
+
+Return a number indicating the type of the top value on the stack. This will
+correspond to *NUMBER*, *CHARACTER*, *STRING*, *POINTER*, or *FLAG*.
 
     value -- value number
 
@@ -52,11 +65,15 @@ This is a primitive corresponding to a byte code.
 
 ## +
 
+Add A to B, returning the result.
+
     number:a number:b -- number:result
 
 This is a primitive corresponding to a byte code.
 
 ## -
+
+Subtract B from A, returning the result.
 
     number:a number:b -- number:result
 
@@ -64,17 +81,23 @@ This is a primitive corresponding to a byte code.
 
 ## *
 
+Multiply A by B, returning a result.
+
     number:a number:b -- number:result
 
 This is a primitive corresponding to a byte code.
 
 ## /
 
+Divide A by B, returning the result.
+
     number:a number:b -- number:result
 
 This is a primitive corresponding to a byte code.
 
 ## rem
+
+Divide A by B, returning the remainder.
 
     number:a number:b -- number:result
 
@@ -144,6 +167,8 @@ This is a primitive corresponding to a byte code.
 
 ## sqrt
 
+Calculate and return the square root of a number.
+
     number -- number
 
 This is a primitive corresponding to a byte code.
@@ -206,11 +231,17 @@ This is a primitive corresponding to a byte code.
 
 ## while-true
 
+Execute the code in pointer repeatedly, until the code returns a flag of *false*.
+The code must return a flag after each execution cycle.
+
     pointer --
 
 This is a primitive corresponding to a byte code.
 
 ## while-false
+
+Execute the code in pointer repeatedly, until the code returns a flag of *true*.
+The code must return a flag after each execution cycle.
 
     pointer --
 
@@ -252,13 +283,17 @@ This is a primitive corresponding to a byte code.
 
 ## bi
 
-[ "vpp-?"  `308 ] 'bi' define
+Apply each quotation to a copy of value.
+
+    value pointer:a pointer:b -- ?
 
 This is a primitive corresponding to a byte code.
 
 ## tri
 
-[ "vppp-?" `309 ] 'tri' define
+Apply each quotation to a copy of value.
+
+    value pointer:a pointer:b pointer:c -- ?
 
 This is a primitive corresponding to a byte code.
 
@@ -312,23 +347,31 @@ This is a primitive corresponding to a byte code.
 
 ## get-buffer-length
 
-[ "p-n"    `406 ] 'get-buffer-length' define
+Return the length of a slice.
+
+    pointer -- number
 
 This is a primitive corresponding to a byte code.
 
 ## set-buffer-length
 
-[ "np-"    `407 ] 'set-buffer-length' define
+Set the length of a slice to the specified size.
+
+    number pointer --
 
 This is a primitive corresponding to a byte code.
 
 ## dup
+
+Duplicate the top value on the stack.
 
     value -- value value
 
 This is a primitive corresponding to a byte code.
 
 ## drop
+
+Remove a value from the stack.
 
     value --
 
@@ -342,17 +385,23 @@ This is a primitive corresponding to a byte code.
 
 ## over
 
+Put a copy of the second item on the stack over the first item.
+
     value:a value:b -- value:a value:b value:a
 
 This is a primitive corresponding to a byte code.
 
 ## tuck
 
+Put a copy of the first item on the stack under the second item.
+
     value:a value:b -- value:b value:a value:b
 
 This is a primitive corresponding to a byte code.
 
 ## nip
+
+Remove the second item on the stack.
 
     value:a value:b -- value:b
 
@@ -366,11 +415,16 @@ This is a primitive corresponding to a byte code.
 
 ## reset
 
+Remove all items from the stack.
+
     ... --
 
 This is a primitive corresponding to a byte code.
 
 ## function-exists?
+
+Given a string containing a function name, returns *true* if the function 
+exists or *false* if it does not.
 
     string -- flag
 
