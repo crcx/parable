@@ -4,6 +4,7 @@
 "At this point, the language consists of [ ] define and the various prefixes. The rest of this will build Parable into a useful language."
 
 "First, map the byte codes to named functions. These are the primitives."
+
 [ "v-n"    `110 ] ':n' define
 [ "v-s"    `111 ] ':s' define
 [ "v-c"    `112 ] ':c' define
@@ -172,20 +173,20 @@
 
 "Sliced Memory Access"
 [ '*slice:current*'  '*slice:offset*' ] variables
-[ &*slice:current* @ :p ] 'current-slice' define
-[ &*slice:current* @ &*slice:offset* @ ] 'slice-position' define
-[ &*slice:offset* increment ] 'slice-advance' define
-[ &*slice:offset* decrement ] 'slice-retreat' define
-[ slice-position store ] 'slice-store-current' define
-[ slice-position fetch ] 'slice-fetch-current' define
-[ slice-position store slice-advance #0 slice-position store ] 'slice-store' define
-[ slice-position fetch slice-advance ] 'slice-fetch' define
-[ slice-retreat slice-position store ] 'slice-store-retreat' define
-[ slice-retreat slice-position fetch ] 'slice-fetch-retreat' define
-[ &*slice:current* ! &*slice:offset* zero-out ] 'slice-set' define
-[ [ slice-store ] repeat ] 'slice-store-items' define
-[ request slice-set ] 'new-slice' define
-[ &*slice:current* @ [ &*slice:offset* @ [ invoke ] dip &*slice:offset* ! ] dip &*slice:current* ! ] 'preserve-slice' define
+[ "-p"     &*slice:current* @ :p ] 'current-slice' define
+[ "-pn"    &*slice:current* @ &*slice:offset* @ ] 'slice-position' define
+[ "-"      &*slice:offset* increment ] 'slice-advance' define
+[ "-"      &*slice:offset* decrement ] 'slice-retreat' define
+[ "n-"     slice-position store ] 'slice-store-current' define
+[ "-n"     slice-position fetch ] 'slice-fetch-current' define
+[ "v-"     slice-position store slice-advance #0 slice-position store ] 'slice-store' define
+[ "-n"     slice-position fetch slice-advance ] 'slice-fetch' define
+[ "v-"     slice-retreat slice-position store ] 'slice-store-retreat' define
+[ "-n"     slice-retreat slice-position fetch ] 'slice-fetch-retreat' define
+[ "p-"     &*slice:current* ! &*slice:offset* zero-out ] 'slice-set' define
+[ "...n-"  [ slice-store ] repeat ] 'slice-store-items' define
+[ "-"      request slice-set ] 'new-slice' define
+[ "p-"     &*slice:current* @ [ &*slice:offset* @ [ invoke ] dip &*slice:offset* ! ] dip &*slice:current* ! ] 'preserve-slice' define
 
 
 "arrays"
@@ -224,12 +225,12 @@
 '*conversion:base*' variable
 [ :n #48 - &*conversion:base* @ #16 = [ dup #16 > [ #7 - ] if-true ] if-true ] 'conversion:to-digit' define
 [ [ swap &*conversion:base* @ * + ] dip ] 'conversion:accumulate' define
-[ &*conversion:base* ! #0 swap [ :c conversion:to-digit swap conversion:accumulate ] for-each ] 'convert-with-base' define
-[ #2 convert-with-base ] 'convert-from-binary' define
-[ #8 convert-with-base ] 'convert-from-octal' define
-[ #10 convert-with-base ] 'convert-from-decimal' define
-[ #16 convert-with-base ] 'convert-from-hexadecimal' define
-[ 'conversion:to-digit'  'conversion:accumulate' ] hide-functions
+[ "sn-n" &*conversion:base* ! #0 swap [ :c conversion:to-digit swap conversion:accumulate ] for-each ] 'convert-with-base' define
+[ "s-n"  #2 convert-with-base ] 'convert-from-binary' define
+[ "s-n"  #8 convert-with-base ] 'convert-from-octal' define
+[ "s-n"  #10 convert-with-base ] 'convert-from-decimal' define
+[ "s-n"  #16 convert-with-base ] 'convert-from-hexadecimal' define
+[ '*conversion:base*'  'conversion:to-digit'  'conversion:accumulate' ] hide-functions
 
 "Curry Combinator"
 '*curry:types*' variable
