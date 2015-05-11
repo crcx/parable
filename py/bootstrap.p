@@ -131,8 +131,8 @@
 
 
 "numeric ranges"
-[ dup-pair < [ [ [ dup #1 + ] dip dup-pair = ] while-false ] [ [ [ dup #1 - ] dip dup-pair = ] while-false ] if drop ] 'expand-range' define
-[ #1 - [ + ] repeat ] 'sum-range' define
+[ "nn-..."  dup-pair < [ [ [ dup #1 + ] dip dup-pair = ] while-false ] [ [ [ dup #1 - ] dip dup-pair = ] while-false ] if drop ] 'expand-range' define
+[ "...n-"   #1 - [ + ] repeat ] 'sum-range' define
 
 "Misc"
 [ "p-pn"  dup get-slice-length ] 'slice-length' define
@@ -143,6 +143,7 @@
 
 [ "p-"   invoke-and-count-items-returned [ hide-function ] repeat ] 'hide-functions' define
 [ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap define ] [ drop ] if ] 'rename-function' define
+[ "p-"   invoke-and-count-items-returned [ variable ] repeat ] 'variables' define
 
 "String and Character"
 "Note that this is only supporting the basic ASCII character set presently."
@@ -164,14 +165,13 @@
 [ "s-s" trim-left trim-right ] 'trim' define
 
 "Helpful Math"
-[ dup negative? [ #-1 * ] if-true ] 'abs' define
-[ dup-pair < [ drop ] [ nip ] if ] 'min' define
-[ dup-pair < [ nip ] [ drop ] if ] 'max' define
-[ #1 swap [ [ * ] sip #1 - dup #1 <> ] while-true drop ] 'factorial' define
+[ "n-n"   dup negative? [ #-1 * ] if-true ] 'abs' define
+[ "nn-n"  dup-pair < [ drop ] [ nip ] if ] 'min' define
+[ "nn-n"  dup-pair < [ nip ] [ drop ] if ] 'max' define
+[ "n-"    #1 swap [ [ * ] sip #1 - dup #1 <> ] while-true drop ] 'factorial' define
 
 "Sliced Memory Access"
-'*slice:current*' variable
-'*slice:offset*' variable
+[ '*slice:current*'  '*slice:offset*' ] variables
 [ &*slice:current* @ :p ] 'current-slice' define
 [ &*slice:current* @ &*slice:offset* @ ] 'slice-position' define
 [ &*slice:offset* increment ] 'slice-advance' define
@@ -189,33 +189,28 @@
 
 
 "arrays"
-'source' variable
-'filter' variable
-'results' variable
+[ 'source'  'filter'  'results' ] variables
 
-[ dup get-slice-length over [ store ] dip #1 swap adjust-slice-length ] 'array-push' define
-[ [ #-1 swap adjust-slice-length ] sip dup get-slice-length fetch ] 'array-pop' define
-[ get-slice-length ] 'array-length' define
-[ &filter ! over array-length [ over array-pop &filter @ invoke ] repeat nip ] 'array-reduce' define
-[ [ new-slice invoke-and-count-items-returned slice-store-items &*slice:current* @ ] preserve-slice :p ] 'array-from-quote<in-stack-order>' define
-[ request [ copy ] sip &source ! [ #0 &source @ array-length [ &source @ over fetch swap #1 + ] repeat drop ] array-from-quote<in-stack-order> ] 'array-reverse' define
-[ array-from-quote<in-stack-order> array-reverse ] 'array-from-quote' define
-
-[ swap array-reverse slice-length [ dup-pair #1 - fetch swap [ swap ] dip [ [ over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each' define
+[ "np-"    dup get-slice-length over [ store ] dip #1 swap adjust-slice-length ] 'array-push' define
+[ "p-n"    [ #-1 swap adjust-slice-length ] sip dup get-slice-length fetch ] 'array-pop' define
+[ "p-n"    get-slice-length ] 'array-length' define
+[ "pnp-n"  &filter ! over array-length [ over array-pop &filter @ invoke ] repeat nip ] 'array-reduce' define
+[ "p-p"    [ new-slice invoke-and-count-items-returned slice-store-items &*slice:current* @ ] preserve-slice :p ] 'array-from-quote<in-stack-order>' define
+[ "p-p"    request [ copy ] sip &source ! [ #0 &source @ array-length [ &source @ over fetch swap #1 + ] repeat drop ] array-from-quote<in-stack-order> ] 'array-reverse' define
+[ "p-p"    array-from-quote<in-stack-order> array-reverse ] 'array-from-quote' define
+[ "pp-?"   swap array-reverse slice-length [ dup-pair #1 - fetch swap [ swap ] dip [ [ over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each' define
 
 [ ] 'array<remap>' define
 [ type? STRING <> [ [ ] ] [ [ [ :p :s ] bi@ ] ] if 'array<remap>' define ] 'needs-remap?' define
-[ swap needs-remap? [ swap dup slice-set array-length #0 swap [ over slice-fetch array<remap> = or ] repeat ] preserve-slice nip :f ] 'array-contains?' define
+[ "pv-f"   swap needs-remap? [ swap dup slice-set array-length #0 swap [ over slice-fetch array<remap> = or ] repeat ] preserve-slice nip :f ] 'array-contains?' define
 [ 'array<remap>'  'needs-remap?' ] hide-functions
 
 [ &results zero-out &filter ! [ &source ! ] [ array-length ] bi ] 'prepare' define
-[ prepare [ &source @ array-pop dup &filter @ invoke [ &results array-push ] [ drop ] if ] repeat &results request [ copy ] sip ] 'array-filter' define
-[ prepare [ &source @ array-pop &filter @ invoke &results array-push ] repeat &results request [ copy ] sip ] 'array-map' define
-[ dup-pair [ array-length ] bi@ = [ dup array-length true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define
-[ &filter ! over array-length [ over array-pop &filter @ invoke ] repeat nip ] 'array-reduce' define
-'prepare' hide-function
+[ "pp-p"   prepare [ &source @ array-pop dup &filter @ invoke [ &results array-push ] [ drop ] if ] repeat &results request [ copy ] sip ] 'array-filter' define
+[ "pp-p"   prepare [ &source @ array-pop &filter @ invoke &results array-push ] repeat &results request [ copy ] sip ] 'array-map' define
+[ "pp-f"   dup-pair [ array-length ] bi@ = [ dup array-length true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define
 
-[ 'filter'  'source'  'results' ] hide-functions
+[ 'prepare'  'filter'  'source'  'results' ] hide-functions
 
 "routines for rendering an array into a string"
 '*array:conversions*' variable
@@ -234,7 +229,7 @@
 [ #8 convert-with-base ] 'convert-from-octal' define
 [ #10 convert-with-base ] 'convert-from-decimal' define
 [ #16 convert-with-base ] 'convert-from-hexadecimal' define
-
+[ 'conversion:to-digit'  'conversion:accumulate' ] hide-functions
 
 "Curry Combinator"
 '*curry:types*' variable
@@ -263,28 +258,26 @@
 [ "flag"      :f ] slice-store
 [ #100 / &*types* swap fetch invoke ] 'restore-stored-type' define
 '*state*' variable
-[ &*state* on ] 'to' define
+[ "-" &*state* on ] 'to' define
 [ [ type? ] dip [ #1 store ] sip ] 'preserve-type' define
 [ #1 fetch restore-stored-type ] 'restore-type' define
 [ &*state* @ :f [ preserve-type ! &*state* off ] [ dup @ swap restore-type ] if ] 'value-handler' define
-[ request #2 over set-slice-length [ value-handler ] curry swap define ] 'value' define
-[ [ value ] sip to lookup-function invoke ] 'value!' define
-[ array-from-quote #0 [ :p :s value ] array-reduce drop ] 'values' define
+[ "s-" request #2 over set-slice-length [ value-handler ] curry swap define ] 'value' define
+[ "ns-" [ value ] sip to lookup-function invoke ] 'value!' define
+[ "p-" array-from-quote #0 [ :p :s value ] array-reduce drop ] 'values' define
 [ '*types*'  '*state*'  'restore-stored-type'  'preserve-type'  'restore-type'  'value-handler' ] hide-functions
 
 
 "Hashing functions"
-[ #5381 swap [ :n [ swap ] dip over #-5 shift + + swap ] for-each ] 'hash:djb2' define
+[ "s-n" #5381 swap [ :n [ swap ] dip over #-5 shift + + swap ] for-each ] 'hash:djb2' define
 [ :n over #-6 shift + over #-16 shift + swap - ] 'hash:sdbm<n>' define
-[ #0 swap [ :c [ swap ] dip hash:sdbm<n> swap ] for-each ] 'hash:sdbm' define
-[ #0 swap [ :n [ swap ] dip + #255 and swap ] for-each #255 xor #1 + #255 and ] 'hash:lrc' define
-[ #0 swap [ :n [ swap ] dip xor swap ] for-each ] 'hash:xor' define
-[ hash:djb2 ] 'chosen-hash' define
+[ "s-n" #0 swap [ :c [ swap ] dip hash:sdbm<n> swap ] for-each ] 'hash:sdbm' define
+'hash-sdbm<n>' hide-function
+[ "s-n" #0 swap [ :n [ swap ] dip + #255 and swap ] for-each #255 xor #1 + #255 and ] 'hash:lrc' define
+[ "s-n" #0 swap [ :n [ swap ] dip xor swap ] for-each ] 'hash:xor' define
+[ "s-b" hash:djb2 ] 'chosen-hash' define
 [ #389 ] 'hash-prime' define
-[ chosen-hash hash-prime rem ] 'hash' define
-
-
-"Dictionary"
+[ "s-n" chosen-hash hash-prime rem ] 'hash' define
 
 
 "More Arrays"
@@ -302,7 +295,7 @@
 [ to types to data ] 'prepare' define
 [ #399 slice-store &*slice:current* @ :p ] 'terminate' define
 [ types over fetch [ data over fetch ] dip compile-value ] 'process' define
-[ prepare new-slice #0 data array-length [ process #1 + ] repeat drop terminate ] 'array-to-quote' define
+[ "pn-s" prepare new-slice #0 data array-length [ process #1 + ] repeat drop terminate ] 'array-to-quote' define
 [ 'reconstruct' 'compile-value' 'data' 'types' 'prepare' 'extract' 'terminate' ] hide-functions
 
 [ 'source' 'v' 'i' 'idx' ] values
@@ -314,8 +307,8 @@
 "Text Output Buffer"
 'TOB' variable
 [ &TOB array-push ] 'append-value' define
-[ &TOB array-length [ &TOB array-pop :p :s ] repeat ] 'show-tob' define
-[ #0 &TOB set-slice-length ] 'clear-tob' define
+[ "-..." &TOB array-length [ &TOB array-pop :p :s ] repeat ] 'show-tob' define
+[ "-" #0 &TOB set-slice-length ] 'clear-tob' define
 
 'TOB:Handlers' variable
 &TOB:Handlers slice-set
@@ -325,7 +318,7 @@
 [ "character"  :s    append-value ] slice-store
 [ "pointer"    :n :s append-value ] slice-store
 [ "flag"       :s    append-value ] slice-store
-[ type? #100 / &TOB:Handlers swap fetch invoke ] '.' define
+[ "v-" type? #100 / &TOB:Handlers swap fetch invoke ] '.' define
 [ 'TOB' 'append-value' 'TOB:Handlers' ] hide-functions
 
 
