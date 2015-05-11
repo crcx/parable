@@ -48,8 +48,8 @@
 [ "-p"     `403 ] 'request' define
 [ "p-"     `404 ] 'release' define
 [ "-"      `405 ] 'collect-garbage' define
-[ "p-n"    `406 ] 'get-slice-length' define
-[ "np-"    `407 ] 'set-slice-length' define
+[ "p-n"    `406 ] 'get-buffer-length' define
+[ "np-"    `407 ] 'set-buffer-length' define
 [ "v-vv"   `500 ] 'dup' define
 [ "v-"     `501 ] 'drop' define
 [ "vV-Vv"  `502 ] 'swap' define
@@ -136,8 +136,8 @@
 [ "...n-"   #1 - [ + ] repeat ] 'sum-range' define
 
 "Misc"
-[ "p-pn"  dup get-slice-length ] 'slice-length' define
-[ "np-"   [ get-slice-length + ] sip set-slice-length ] 'adjust-slice-length' define
+[ "p-pn"  dup get-buffer-length ] 'buffer-length' define
+[ "np-"   [ get-buffer-length + ] sip set-buffer-length ] 'adjust-buffer-length' define
 [ "p-?n"  depth [ invoke ] dip depth swap - ] 'invoke-and-count-items-returned' define
 [ "pn-?n" [ depth [ invoke ] dip depth swap - ] + ] 'invoke-and-count-items-returned-with-adjustment' define
 [ "?n-"   [ drop ] repeat ] 'drop-multiple' define
@@ -160,9 +160,9 @@
 [ "p-s" invoke-and-count-items-returned #1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define
 
 "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
-[ "s-s"  :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ slice-length ] dip swap subslice :s ] 'trim-left' define
+[ "s-s"  :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ buffer-length ] dip swap subslice :s ] 'trim-left' define
 [ ] 'trim-right' define
-[ "s-s"  :s slice-length dup-pair #1 - fetch nip #32 = [ slice-length #1 - #0 swap subslice :s trim-right ] if-true ] 'trim-right' define
+[ "s-s"  :s buffer-length dup-pair #1 - fetch nip #32 = [ buffer-length #1 - #0 swap subslice :s trim-right ] if-true ] 'trim-right' define
 [ "s-s" trim-left trim-right ] 'trim' define
 
 "Helpful Math"
@@ -171,43 +171,40 @@
 [ "nn-n"  dup-pair < [ nip ] [ drop ] if ] 'max' define
 [ "n-"    #1 swap [ [ * ] sip #1 - dup #1 <> ] while-true drop ] 'factorial' define
 
-"Sliced Memory Access"
-[ '*slice:current*'  '*slice:offset*' ] variables
-[ "-p"     &*slice:current* @ :p ] 'current-slice' define
-[ "-pn"    &*slice:current* @ &*slice:offset* @ ] 'slice-position' define
-[ "-"      &*slice:offset* increment ] 'slice-advance' define
-[ "-"      &*slice:offset* decrement ] 'slice-retreat' define
-[ "n-"     slice-position store ] 'slice-store-current' define
-[ "-n"     slice-position fetch ] 'slice-fetch-current' define
-[ "v-"     slice-position store slice-advance #0 slice-position store ] 'slice-store' define
-[ "-n"     slice-position fetch slice-advance ] 'slice-fetch' define
-[ "v-"     slice-retreat slice-position store ] 'slice-store-retreat' define
-[ "-n"     slice-retreat slice-position fetch ] 'slice-fetch-retreat' define
-[ "p-"     &*slice:current* ! &*slice:offset* zero-out ] 'slice-set' define
-[ "...n-"  [ slice-store ] repeat ] 'slice-store-items' define
-[ "-"      request slice-set ] 'new-slice' define
-[ "p-"     &*slice:current* @ [ &*slice:offset* @ [ invoke ] dip &*slice:offset* ! ] dip &*slice:current* ! ] 'preserve-slice' define
-[ "s-"     request [ swap define ] sip slice-set ] 'named-slice' define
-'*array:conversions*' variable
-&*array:conversions* slice-set
-
+"Slice as a linear buffer"
+[ '*current-buffer*'  '*buffer-offset*' ] variables
+[ "-p"     &*current-buffer* @ :p ] 'current-buffer' define
+[ "-pn"    current-buffer &*buffer-offset* @ ] 'buffer-position' define
+[ "-"      &*buffer-offset* increment ] 'buffer-advance' define
+[ "-"      &*buffer-offset* decrement ] 'buffer-retreat' define
+[ "n-"     buffer-position store ] 'buffer-store-current' define
+[ "-n"     buffer-position fetch ] 'buffer-fetch-current' define
+[ "v-"     buffer-position store buffer-advance #0 buffer-position store ] 'buffer-store' define
+[ "-n"     buffer-position fetch buffer-advance ] 'buffer-fetch' define
+[ "v-"     buffer-retreat buffer-position store ] 'buffer-store-retreat' define
+[ "-n"     buffer-retreat buffer-position fetch ] 'buffer-fetch-retreat' define
+[ "p-"     &*current-buffer* ! &*buffer-offset* zero-out ] 'set-buffer' define
+[ "...n-"  [ buffer-store ] repeat ] 'buffer-store-items' define
+[ "-"      request set-buffer ] 'new-buffer' define
+[ "p-"     &*current-buffer* @ [ &*buffer-offset* @ [ invoke ] dip &*buffer-offset* ! ] dip &*current-buffer* ! ] 'preserve-buffer' define
+[ "s-"     request [ swap define ] sip set-buffer ] 'named-buffer' define
 
 
 "arrays"
 [ 'source'  'filter'  'results' ] variables
 
-[ "np-"    dup get-slice-length over [ store ] dip #1 swap adjust-slice-length ] 'array-push' define
-[ "p-n"    [ #-1 swap adjust-slice-length ] sip dup get-slice-length fetch ] 'array-pop' define
-[ "p-n"    get-slice-length ] 'array-length' define
+[ "np-"    dup get-buffer-length over [ store ] dip #1 swap adjust-buffer-length ] 'array-push' define
+[ "p-n"    [ #-1 swap adjust-buffer-length ] sip dup get-buffer-length fetch ] 'array-pop' define
+[ "p-n"    get-buffer-length ] 'array-length' define
 [ "pnp-n"  &filter ! over array-length [ over array-pop &filter @ invoke ] repeat nip ] 'array-reduce' define
-[ "p-p"    [ new-slice invoke-and-count-items-returned slice-store-items &*slice:current* @ ] preserve-slice :p ] 'array-from-quote<in-stack-order>' define
+[ "p-p"    [ new-buffer invoke-and-count-items-returned buffer-store-items &*current-buffer* @ ] preserve-buffer :p ] 'array-from-quote<in-stack-order>' define
 [ "p-p"    request [ copy ] sip &source ! [ #0 &source @ array-length [ &source @ over fetch swap #1 + ] repeat drop ] array-from-quote<in-stack-order> ] 'array-reverse' define
 [ "p-p"    array-from-quote<in-stack-order> array-reverse ] 'array-from-quote' define
-[ "pp-?"   swap array-reverse slice-length [ dup-pair #1 - fetch swap [ swap ] dip [ [ over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each' define
+[ "pp-?"   swap array-reverse buffer-length [ dup-pair #1 - fetch swap [ swap ] dip [ [ over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each' define
 
 [ ] 'array<remap>' define
 [ type? STRING <> [ [ ] ] [ [ [ :p :s ] bi@ ] ] if 'array<remap>' define ] 'needs-remap?' define
-[ "pv-f"   swap needs-remap? [ swap dup slice-set array-length #0 swap [ over slice-fetch array<remap> = or ] repeat ] preserve-slice nip :f ] 'array-contains?' define
+[ "pv-f"   swap needs-remap? [ swap dup set-buffer array-length #0 swap [ over buffer-fetch array<remap> = or ] repeat ] preserve-buffer nip :f ] 'array-contains?' define
 [ 'array<remap>'  'needs-remap?' ] hide-functions
 
 [ &results zero-out &filter ! [ &source ! ] [ array-length ] bi ] 'prepare' define
@@ -218,10 +215,10 @@
 [ 'prepare'  'filter'  'source'  'results' ] hide-functions
 
 "routines for rendering an array into a string"
-'*array:conversions*' named-slice
-[ "array  --  string"  '' [ :s '#' swap + + #32 :c :s + ] array-reduce ] slice-store
-[ "array  --  string"  '' [ :p :s  $' :s swap + $' :s + + #32 :c :s + ] array-reduce ] slice-store
-[ "array  --  string"  '' [ :c :s '$' swap + + #32 :c :s + ] array-reduce ] slice-store
+'*array:conversions*' named-buffer
+[ "array  --  string"  '' [ :s '#' swap + + #32 :c :s + ] array-reduce ] buffer-store
+[ "array  --  string"  '' [ :p :s  $' :s swap + $' :s + + #32 :c :s + ] array-reduce ] buffer-store
+[ "array  --  string"  '' [ :c :s '$' swap + + #32 :c :s + ] array-reduce ] buffer-store
 [ "pointer:array number:type - string"  #100 / #1 - &*array:conversions* swap fetch :p invoke ] 'array-to-string' define
 
 "Conversion of strings to numbers"
@@ -236,38 +233,77 @@
 [ '*conversion:base*'  'conversion:to-digit'  'conversion:accumulate' ] hide-functions
 
 "Curry Combinator"
-'*curry:types*' named-slice
-[ ] slice-store
-[ "number"    #100 slice-store slice-store ] slice-store
-[ "string"    #101 slice-store slice-store ] slice-store
-[ "character" #102 slice-store slice-store ] slice-store
-[ "pointer"   #103 slice-store slice-store ] slice-store
-[ "flag"      #100 slice-store slice-store #114 slice-store ] slice-store
+'*curry:types*' named-buffer
+[ ] buffer-store
+[ "number"    #100 buffer-store buffer-store ] buffer-store
+[ "string"    #101 buffer-store buffer-store ] buffer-store
+[ "character" #102 buffer-store buffer-store ] buffer-store
+[ "pointer"   #103 buffer-store buffer-store ] buffer-store
+[ "flag"      #100 buffer-store buffer-store #114 buffer-store ] buffer-store
 
 [ type? #100 / &*curry:types* swap fetch invoke ] 'curry:compile-value' define
-[ #304 slice-store slice-store ] 'curry:compile-call' define
+[ #304 buffer-store buffer-store ] 'curry:compile-call' define
 
-[ [ request slice-set swap curry:compile-value curry:compile-call &*slice:current* @ :p ] preserve-slice ] 'curry' define
+[ [ request set-buffer swap curry:compile-value curry:compile-call &*current-buffer* @ :p ] preserve-buffer ] 'curry' define
 [ '*curry:types*'  'curry:compile-value'  'curry:compile-call' ] hide-functions
 
 "Values"
-'*types*' named-slice
-[ ] slice-store
-[ "number"    :n ] slice-store
-[ "string"    :p :s ] slice-store
-[ "character" :c ] slice-store
-[ "pointer"   :p ] slice-store
-[ "flag"      :f ] slice-store
+'*types*' named-buffer
+[ ] buffer-store
+[ "number"    :n ] buffer-store
+[ "string"    :p :s ] buffer-store
+[ "character" :c ] buffer-store
+[ "pointer"   :p ] buffer-store
+[ "flag"      :f ] buffer-store
 [ #100 / &*types* swap fetch invoke ] 'restore-stored-type' define
 '*state*' variable
 [ "-" &*state* on ] 'to' define
 [ [ type? ] dip [ #1 store ] sip ] 'preserve-type' define
 [ #1 fetch restore-stored-type ] 'restore-type' define
 [ &*state* @ :f [ preserve-type ! &*state* off ] [ dup @ swap restore-type ] if ] 'value-handler' define
-[ "s-" request #2 over set-slice-length [ value-handler ] curry swap define ] 'value' define
+[ "s-" request #2 over set-buffer-length [ value-handler ] curry swap define ] 'value' define
 [ "ns-" [ value ] sip to lookup-function invoke ] 'value!' define
 [ "p-" array-from-quote #0 [ :p :s value ] array-reduce drop ] 'values' define
 [ '*types*'  '*state*'  'restore-stored-type'  'preserve-type'  'restore-type'  'value-handler' ] hide-functions
+
+"More Arrays"
+'reconstruct' named-buffer
+[ ] buffer-store
+[ "number"    #100 buffer-store buffer-store ] buffer-store
+[ "string"    #101 buffer-store buffer-store ] buffer-store
+[ "character" #102 buffer-store buffer-store ] buffer-store
+[ "pointer"   #103 buffer-store buffer-store ] buffer-store
+[ "flag"      #100 buffer-store buffer-store #114 buffer-store ] buffer-store
+[ #100 / &reconstruct swap fetch invoke ] 'compile-value' define
+
+[ 'data' 'types' ] values
+[ to types to data ] 'prepare' define
+[ #399 buffer-store &*current-buffer* @ :p ] 'terminate' define
+[ types over fetch [ data over fetch ] dip compile-value ] 'process' define
+[ "pn-s" prepare new-buffer #0 data array-length [ process #1 + ] repeat drop terminate ] 'array-to-quote' define
+[ 'reconstruct' 'compile-value' 'data' 'types' 'prepare' 'extract' 'terminate' ] hide-functions
+
+[ 'source' 'v' 'i' 'idx' ] values
+[ type? STRING = [ [ :p :s ] dip ] [ :n ] if ] 'resolve-types' define
+[ "vp-n"  to source to v #0 to i #-1 to idx source array-length [ source i fetch v resolve-types = [ i to idx ] if-true i #1 + to i ] repeat idx ] 'array-index-of' define
+[ 'source'  'v'  'i'  'idx'  'resolve-types' ] hide-functions
+
+
+"Text Output Buffer"
+'TOB' variable
+[ &TOB array-push ] 'append-value' define
+[ "-..." &TOB array-length [ &TOB array-pop :p :s ] repeat ] 'show-tob' define
+[ "-" #0 &TOB set-buffer-length ] 'clear-tob' define
+
+'TOB:Handlers' named-buffer
+[ ] buffer-store
+[ "number"     :s    append-value ] buffer-store
+[ "string"           append-value ] buffer-store
+[ "character"  :s    append-value ] buffer-store
+[ "pointer"    :n :s append-value ] buffer-store
+[ "flag"       :s    append-value ] buffer-store
+[ "v-"  type? #100 / &TOB:Handlers swap fetch invoke ] '.' define
+[ 'TOB' 'append-value' 'TOB:Handlers' ] hide-functions
 
 
 "Hashing functions"
@@ -280,46 +316,6 @@
 [ "s-b" hash:djb2 ] 'chosen-hash' define
 [ #389 ] 'hash-prime' define
 [ "s-n" chosen-hash hash-prime rem ] 'hash' define
-
-
-"More Arrays"
-'reconstruct' named-slice
-[ ] slice-store
-[ "number"    #100 slice-store slice-store ] slice-store
-[ "string"    #101 slice-store slice-store ] slice-store
-[ "character" #102 slice-store slice-store ] slice-store
-[ "pointer"   #103 slice-store slice-store ] slice-store
-[ "flag"      #100 slice-store slice-store #114 slice-store ] slice-store
-[ #100 / &reconstruct swap fetch invoke ] 'compile-value' define
-
-[ 'data' 'types' ] values
-[ to types to data ] 'prepare' define
-[ #399 slice-store &*slice:current* @ :p ] 'terminate' define
-[ types over fetch [ data over fetch ] dip compile-value ] 'process' define
-[ "pn-s" prepare new-slice #0 data array-length [ process #1 + ] repeat drop terminate ] 'array-to-quote' define
-[ 'reconstruct' 'compile-value' 'data' 'types' 'prepare' 'extract' 'terminate' ] hide-functions
-
-[ 'source' 'v' 'i' 'idx' ] values
-[ type? STRING = [ [ :p :s ] dip ] [ :n ] if ] 'resolve-types' define
-[ to source to v #0 to i #-1 to idx source array-length [ source i fetch v resolve-types = [ i to idx ] if-true i #1 + to i ] repeat idx ] 'array-index-of' define
-[ 'source'  'v'  'i'  'idx'  'resolve-types' ] hide-functions
-
-
-"Text Output Buffer"
-'TOB' variable
-[ &TOB array-push ] 'append-value' define
-[ "-..." &TOB array-length [ &TOB array-pop :p :s ] repeat ] 'show-tob' define
-[ "-" #0 &TOB set-slice-length ] 'clear-tob' define
-
-'TOB:Handlers' named-slice
-[ ] slice-store
-[ "number"     :s    append-value ] slice-store
-[ "string"           append-value ] slice-store
-[ "character"  :s    append-value ] slice-store
-[ "pointer"    :n :s append-value ] slice-store
-[ "flag"       :s    append-value ] slice-store
-[ "v-" type? #100 / &TOB:Handlers swap fetch invoke ] '.' define
-[ 'TOB' 'append-value' 'TOB:Handlers' ] hide-functions
 
 
 "Constants"
