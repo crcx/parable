@@ -187,6 +187,10 @@
 [ "...n-"  [ slice-store ] repeat ] 'slice-store-items' define
 [ "-"      request slice-set ] 'new-slice' define
 [ "p-"     &*slice:current* @ [ &*slice:offset* @ [ invoke ] dip &*slice:offset* ! ] dip &*slice:current* ! ] 'preserve-slice' define
+[ "s-"     request [ swap define ] sip slice-set ] 'named-slice' define
+'*array:conversions*' variable
+&*array:conversions* slice-set
+
 
 
 "arrays"
@@ -214,8 +218,7 @@
 [ 'prepare'  'filter'  'source'  'results' ] hide-functions
 
 "routines for rendering an array into a string"
-'*array:conversions*' variable
-&*array:conversions* slice-set
+'*array:conversions*' named-slice
 [ "array  --  string"  '' [ :s '#' swap + + #32 :c :s + ] array-reduce ] slice-store
 [ "array  --  string"  '' [ :p :s  $' :s swap + $' :s + + #32 :c :s + ] array-reduce ] slice-store
 [ "array  --  string"  '' [ :c :s '$' swap + + #32 :c :s + ] array-reduce ] slice-store
@@ -233,8 +236,7 @@
 [ '*conversion:base*'  'conversion:to-digit'  'conversion:accumulate' ] hide-functions
 
 "Curry Combinator"
-'*curry:types*' variable
-&*curry:types* slice-set
+'*curry:types*' named-slice
 [ ] slice-store
 [ "number"    #100 slice-store slice-store ] slice-store
 [ "string"    #101 slice-store slice-store ] slice-store
@@ -249,8 +251,7 @@
 [ '*curry:types*'  'curry:compile-value'  'curry:compile-call' ] hide-functions
 
 "Values"
-'*types*' variable
-&*types* slice-set
+'*types*' named-slice
 [ ] slice-store
 [ "number"    :n ] slice-store
 [ "string"    :p :s ] slice-store
@@ -282,8 +283,7 @@
 
 
 "More Arrays"
-'reconstruct' variable
-&reconstruct slice-set
+'reconstruct' named-slice
 [ ] slice-store
 [ "number"    #100 slice-store slice-store ] slice-store
 [ "string"    #101 slice-store slice-store ] slice-store
@@ -311,8 +311,7 @@
 [ "-..." &TOB array-length [ &TOB array-pop :p :s ] repeat ] 'show-tob' define
 [ "-" #0 &TOB set-slice-length ] 'clear-tob' define
 
-'TOB:Handlers' variable
-&TOB:Handlers slice-set
+'TOB:Handlers' named-slice
 [ ] slice-store
 [ "number"     :s    append-value ] slice-store
 [ "string"           append-value ] slice-store
