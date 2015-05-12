@@ -38,5 +38,16 @@ Consider the following, which is functionally equivilent to the example for *var
     "Multiply the value in temp by 1000 and update it with the new value:"
     temp #1000 to temp
 
-
 Values are cleaner to read than values, but have additional overhead since they need to decide whether they are being read or updated.
+
+Unlike variables, values store and restore the data type automatically. E.g., to store and work on a string you could do:
+
+    'temp' variable
+    'hello' &temp !
+    &temp @ :p :s 'world!' +
+
+Or:
+
+    'temp' value
+    'hello' to temp
+    temp 'world!' +
