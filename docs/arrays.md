@@ -1,4 +1,4 @@
-∑# Arrays
+# Arrays
 
 I find the array functions in Parable to be incredibly useful. While I had previously implemented a vocabulary for arrays in Retro, I didn't actually use it for much.
 
