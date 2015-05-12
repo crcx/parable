@@ -105,6 +105,8 @@ This is a primitive corresponding to a byte code.
 
 ## floor
 
+Return the largest integer value less than or equal to number.
+
     number -- number
 
 This is a primitive corresponding to a byte code.
@@ -117,17 +119,23 @@ This is a primitive corresponding to a byte code.
 
 ## log
 
+Return the natural logarithm of number (to base e).
+
     number -- number
 
 This is a primitive corresponding to a byte code.
 
 ## log10
 
+Return the base 10 logarithm of number.
+
     number -- number
 
 This is a primitive corresponding to a byte code.
 
 ## log<n>
+
+Return the logarithm of a to the given base, calculated as log(a)/log(b)
 
     number:a number:b -- number:result
 
