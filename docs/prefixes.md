@@ -18,6 +18,10 @@ The prefixes recognized are:
         <td valign='top' width='90%'>Strings</td>
     </tr>
     <tr>
+        <td valign='top' width='10%'>"</td>
+        <td valign='top' width='90%'>Comments</td>
+    </tr>
+    <tr>
         <td valign='top' width='10%'>&</td>
         <td valign='top' width='90%'>Pointers</td>
     </tr>
