@@ -137,7 +137,7 @@
 
 "Misc"
 [ "p-pn"  dup get-buffer-length ] 'slice-length' define
-[ "np-"   [ get-buffer-length + ] sip set-buffer-length ] 'adjust-buffer-length' define
+[ "np-"   [ get-buffer-length + ] sip set-buffer-length ] 'adjust-slice-length' define
 [ "p-?n"  depth [ invoke ] dip depth swap - ] 'invoke-and-count-items-returned' define
 [ "pn-?n" [ depth [ invoke ] dip depth swap - ] + ] 'invoke-and-count-items-returned-with-adjustment' define
 [ "?n-"   [ drop ] repeat ] 'drop-multiple' define
@@ -193,8 +193,8 @@
 "arrays"
 [ 'source'  'filter'  'results' ] variables
 
-[ "np-"    dup get-buffer-length over [ store ] dip #1 swap adjust-buffer-length ] 'array-push' define
-[ "p-n"    [ #-1 swap adjust-buffer-length ] sip dup get-buffer-length fetch ] 'array-pop' define
+[ "np-"    dup get-buffer-length over [ store ] dip #1 swap adjust-slice-length ] 'array-push' define
+[ "p-n"    [ #-1 swap adjust-slice-length ] sip dup get-buffer-length fetch ] 'array-pop' define
 [ "p-n"    get-buffer-length ] 'array-length' define
 [ "pnp-n"  &filter ! over array-length [ over array-pop &filter @ invoke ] repeat nip ] 'array-reduce' define
 [ "p-p"    [ new-buffer invoke-and-count-items-returned buffer-store-items &*current-buffer* @ ] preserve-buffer :p ] 'array-from-quote<in-stack-order>' define
