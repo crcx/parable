@@ -149,17 +149,23 @@ This is a primitive corresponding to a byte code.
 
 ## and
 
+Perform a bitwise AND operation on the two values provided.
+
     number:a number:b -- number:result
 
 This is a primitive corresponding to a byte code.
 
 ## or
 
+Perform a bitwise OR operation on the two values provided.
+
     number:a number:b -- number:result
 
 This is a primitive corresponding to a byte code.
 
 ## xor
+
+Perform a bitwise XOR operation on the two values provided.
 
     number:a number:b -- number:result
 
@@ -387,6 +393,8 @@ This is a primitive corresponding to a byte code.
 
 ## swap
 
+Switch the positions of the top two items on the stack.
+
     value:a value:b -- value:b value:a
 
 This is a primitive corresponding to a byte code.
@@ -417,7 +425,9 @@ This is a primitive corresponding to a byte code.
 
 ## depth
 
-[ "-n"     `506 ] 'depth' define
+Return the number of items on the stack.
+
+    -- number
 
 This is a primitive corresponding to a byte code.
 
@@ -440,11 +450,15 @@ This is a primitive corresponding to a byte code.
 
 ## lookup-function
 
+Given a string, return a pointer to the or data under that name. If the function does not exist, returns a pointer to -1 (a guaranteed invalid slice).
+
     string -- pointer
 
 This is a primitive corresponding to a byte code.
 
 ## hide-function
+
+Given a string, remove the header corresponding to the name. This does not remove the definition, just disassociates the name from the slice.
 
     string --
 
@@ -463,6 +477,8 @@ This is a primitive corresponding to a byte code.
 This is a primitive corresponding to a byte code.
 
 ## numeric?
+
+Given a string, returns **true** if the string is a valid number, or **false** otherwise.
 
     string -- flag
 
