@@ -145,7 +145,7 @@ This is a primitive corresponding to a byte code.
 
 ## shift
 
-...TODO...
+Perform a bitwise shift of A by B bits. If B is negative, shift left, otherwise shift right.
 
     number:a number:b -- number:result
 
@@ -478,7 +478,7 @@ This is a primitive corresponding to a byte code.
 
 ## subslice
 
-...TODO...
+Return a new slice containing the contents of the slice at pointer, starting from the specified offset, and ending at (but not including) the ending offset.
 
     pointer number:start number:end -- pointer:result
 
@@ -494,19 +494,23 @@ This is a primitive corresponding to a byte code.
 
 ## to-uppercase
 
-[ "v-v"    `800 ] 'to-lowercase' define
+Convert a CHARACTER or STRING to uppercase.
+
+    value -- value
 
 This is a primitive corresponding to a byte code.
 
 ## to-lowercase
 
-[ "v-v"    `801 ] 'to-uppercase' define
+Convert a CHARACTER or STRING to lowercase.
+
+    value -- value
 
 This is a primitive corresponding to a byte code.
 
 ## report-error
 
-...TODO...
+Add the specified string to the system error log.
 
     string --
 
@@ -514,7 +518,7 @@ This is a primitive corresponding to a byte code.
 
 ## sin
 
-...TODO...
+Calculate the sine of a number, with the result in radians.
 
     number -- number
 
@@ -522,7 +526,7 @@ This is a primitive corresponding to a byte code.
 
 ## cos
 
-...TODO...
+Calculate the cosine of a number, with the result in radians.
 
     number -- number
 
@@ -530,7 +534,7 @@ This is a primitive corresponding to a byte code.
 
 ## tan
 
-...TODO...
+Calculate the tangent of a number, with the result in radians.
 
     number -- number
 
@@ -538,7 +542,7 @@ This is a primitive corresponding to a byte code.
 
 ## asin
 
-...TODO...
+Calculate the arcsine of a number, with the result in radians.
 
     number -- number
 
@@ -546,7 +550,7 @@ This is a primitive corresponding to a byte code.
 
 ## acos
 
-...TODO...
+Calculate the arccosine of a number, with the result in radians.
 
     number -- number
 
@@ -554,15 +558,15 @@ This is a primitive corresponding to a byte code.
 
 ## atan
 
-...TODO...
+Calculate the arctangent of a number, with the result in radians.
 
     number -- number
 
 ## atan2
 
-...TODO...
+Return atan(y / x), in radians
 
-[ "n-n"    `1006 ] 'atan2' define
+    number:x number:y -- number
 
 This is a primitive corresponding to a byte code.
 
