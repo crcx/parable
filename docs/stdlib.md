@@ -602,33 +602,33 @@ Constant; value for the FLAG data type.
 
 ## bi*
 
-...TODO...
+Apply pointer:a to value:a and pointer:b to value:b. Returns the results.
 
     value:a value:b pointer:a pointer:b -- ?
 
 ## tri*
 
-...TODO...
+Apply pointer:a to value:a, pointer:b to value:b, and pointer:c to value:c. Returns the results.
 
     value:a value:b value:c pointer:a pointer:b pointer:c -- ?
 
 ## bi@
 
-...TODO...
+Apply code at pointer to a value:a and value:b. Returns the results.
 
     value:a value:b pointer -- ?
 
 ## tri@
 
-...TODO...
+Apply code at pointer to a value:a, value:b, and value:c. Returns the results.
 
     value:a value:b value:c pointer -- ?
 
 ## dup-pair
 
-...TODO...
+Duplicate the top two values on the stack.
 
-[ "vV-vVvV"  over over ] 'dup-pair' define
+    value:a value:b -- value:a value:b value:a value:b 
 
 ## drop-pair
 
