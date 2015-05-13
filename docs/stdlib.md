@@ -735,46 +735,189 @@ Execute the code in pointer if value is a FLAG
     value pointer --
 
 
+## between?
 
-[ "nnn-f"  [ [ :n ] bi@ ] dip :n dup-pair > [ swap ] if-true [ over ] dip <= [ >= ] dip and :f ] 'between?' define
+...TODO...
 
-"Simple variables are just named slices, with functions to access the first element. They're useful for holding single values, but don't track data types."
-[ "s-"   request swap define ] 'variable' define
-[ "vs-"  request [ swap define ] sip #0 store ] 'variable!' define
-[ "p-n"  #0 fetch ] '@' define
-[ "vp-"  #0 store ] '!' define
-[ "p-"   #0 swap ! ] 'off' define
-[ "p-"   #-1 swap ! ] 'on' define
-[ "p-"   [ @ #1 + ] sip ! ] 'increment' define
-[ "p-"   [ @ #1 - ] sip ! ] 'decrement' define
-[ "p-"   request swap copy ] 'zero-out' define
-[ "pp-"  swap request dup-pair copy swap [ [ invoke ] dip ] dip copy ] 'preserve' define
+    number number number -- flag
 
-[ "nn-..."  dup-pair < [ [ [ dup #1 + ] dip dup-pair = ] while-false ] [ [ [ dup #1 - ] dip dup-pair = ] while-false ] if drop ] 'expand-range' define
-[ "...n-"   #1 - [ + ] repeat ] 'sum-range' define
+## variable
 
-[ "p-pn"  dup get-buffer-length ] 'buffer-length' define
-[ "np-"   [ get-buffer-length + ] sip set-buffer-length ] 'adjust-buffer-length' define
-[ "p-?n"  depth [ invoke ] dip depth swap - ] 'invoke-and-count-items-returned' define
-[ "pn-?n" [ depth [ invoke ] dip depth swap - ] + ] 'invoke-and-count-items-returned-with-adjustment' define
-[ "?n-"   [ drop ] repeat ] 'drop-multiple' define
+...TODO...
 
-[ "p-"   invoke-and-count-items-returned [ hide-function ] repeat ] 'hide-functions' define
-[ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap define ] [ drop ] if ] 'rename-function' define
-[ "p-"   invoke-and-count-items-returned [ variable ] repeat ] 'variables' define
+    string --
 
-[ "vs-f" swap :s find not true? ] 'string-contains?' define
-[ "v-f"  :c $0 $9 between? ] 'digit?' define
-[ "v-f"  '`~!@#$%^&*()'"<>,.:;[]{}\|-_=+'                    string-contains? ] 'symbol?' define
-[ "v-f"  to-lowercase 'abcdefghijklmnopqrstuvwxyz'           string-contains? ] 'letter?' define
-[ "v-f"  to-lowercase 'abcdefghijklmnopqrstuvwxyz1234567890' string-contains? ] 'alphanumeric?' define
-[ "v-f"  to-lowercase 'bcdfghjklmnpqrstvwxyz'                string-contains? ] 'consonant?' define
-[ "v-f"  to-lowercase 'aeiou'                                string-contains? ] 'vowel?' define
-[ "v-f"  dup to-lowercase = ] 'lowercase?' define
-[ "v-f"  dup to-uppercase = ] 'uppercase?' define
-[ "p-s" invoke-and-count-items-returned #1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define
+## variable!
 
-"Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
+...TODO...
+
+    value string --
+
+## @
+
+...TODO...
+
+    pointer -- number
+
+## !
+
+...TODO...
+
+    value pointer --
+
+## on
+
+...TODO...
+
+    pointer --
+
+## off
+
+...TODO...
+
+    pointer --
+
+## increment
+
+...TODO...
+
+    pointer --
+
+## decrement
+
+...TODO...
+
+    pointer --
+
+## zero-out
+
+...TODO...
+
+    pointer --
+
+## preserve
+
+...TODO...
+
+    pointer pointer --
+
+## expand-range
+
+...TODO...
+
+    number:lower number:upper -- ...
+
+## sum-range
+
+...TODO...
+
+    ... number -- number
+
+## slice-length
+
+...TODO...
+
+    pointer -- pointer number
+
+## adjust-slice-length
+
+...TODO...
+
+    number pointer --
+
+## invoke-and-count-items-returned
+
+...TODO...
+
+    pointer -- ? number
+
+## invoke-and-count-items-returned-with-adjustment
+
+    pointer number -- ? number
+
+## drop-multiple
+
+...TODO...
+
+    ... n -- ?
+
+## hide-functions
+
+...TODO...
+
+    pointer --
+
+## rename-function
+
+...TODO...
+
+    string string --
+
+## variables
+
+...TODO...
+
+    pointer --
+
+## string-contains?
+
+...TODO...
+
+    value string -- flag
+
+## digit?
+
+...TODO...
+
+    value -- flag
+
+## symbol?
+
+...TODO...
+
+    value -- flag
+
+## letter?
+
+...TODO...
+
+    value -- flag
+
+## alphanumeric?
+
+...TODO...
+
+    value -- flag
+
+## consonant?
+
+...TODO...
+
+    value -- flag
+
+## vowel?
+
+...TODO...
+
+    value -- flag
+
+## lowercase?
+
+...TODO...
+
+    value -- flag
+
+## uppercase?
+
+...TODO...
+
+    value -- flag
+
+## build-string
+
+...TODO...
+
+    pointer -- string
 
 ## trim-left
 
@@ -818,119 +961,252 @@ Execute the code in pointer if value is a FLAG
 
     number -- number
 
-[ '*current-buffer*'  '*buffer-offset*' ] variables
+## *current-buffer*
+
+Variable
+
+    -- pointer
+
+## *buffer-offset*
+
+Variable
+
+    -- pointer
+
+## current-buffer
+
 [ "-p"     &*current-buffer* @ :p ] 'current-buffer' define
+
+## buffer-position
+
 [ "-pn"    current-buffer &*buffer-offset* @ ] 'buffer-position' define
+
+## buffer-advance
+
 [ "-"      &*buffer-offset* increment ] 'buffer-advance' define
+
+## buffer-retreat
+
 [ "-"      &*buffer-offset* decrement ] 'buffer-retreat' define
+
+## buffer-store-current
+
 [ "n-"     buffer-position store ] 'buffer-store-current' define
+
+## buffer-fetch-current
+
 [ "-n"     buffer-position fetch ] 'buffer-fetch-current' define
+
+## buffer-store
+
 [ "v-"     buffer-position store buffer-advance #0 buffer-position store ] 'buffer-store' define
+
+## buffer-fetch
+
 [ "-n"     buffer-position fetch buffer-advance ] 'buffer-fetch' define
+
+## buffer-store-retreat
+
 [ "v-"     buffer-retreat buffer-position store ] 'buffer-store-retreat' define
+
+## buffer-fetch-retreat
+
 [ "-n"     buffer-retreat buffer-position fetch ] 'buffer-fetch-retreat' define
+
+## set-buffer
+
 [ "p-"     &*current-buffer* ! &*buffer-offset* zero-out ] 'set-buffer' define
+
+## buffer-store-items
+
 [ "...n-"  [ buffer-store ] repeat ] 'buffer-store-items' define
+
+## new-buffer
+
 [ "-"      request set-buffer ] 'new-buffer' define
+
+## preserve-buffer
+
 [ "p-"     &*current-buffer* @ [ &*buffer-offset* @ [ invoke ] dip &*buffer-offset* ! ] dip &*current-buffer* ! ] 'preserve-buffer' define
+
+## named-buffer
+
 [ "s-"     request [ swap define ] sip set-buffer ] 'named-buffer' define
 
+## array-push
 
 [ "np-"    dup get-buffer-length over [ store ] dip #1 swap adjust-buffer-length ] 'array-push' define
+
+## array-pop
+
 [ "p-n"    [ #-1 swap adjust-buffer-length ] sip dup get-buffer-length fetch ] 'array-pop' define
+
+## array-length
+
 [ "p-n"    get-buffer-length ] 'array-length' define
+
+## array-reduce
+
 [ "pnp-n"  &filter ! over array-length [ over array-pop &filter @ invoke ] repeat nip ] 'array-reduce' define
+
+## array-from-quote<in-stack-order>
+
 [ "p-p"    [ new-buffer invoke-and-count-items-returned buffer-store-items &*current-buffer* @ ] preserve-buffer :p ] 'array-from-quote<in-stack-order>' define
-[ "p-p"    request [ copy ] sip &source ! [ #0 &source @ array-length [ &source @ over fetch swap #1 + ] repeat drop ] array-from-quote<in-stack-order> ] 'array-reverse' define
+
+## array-reverse
+
+[ "p-p"    request [ copy ] sip &source ! [ #0 &source @ array-length [ &source @ over fetch swap #1 + ] repeat drop ] 
+array-from-quote<in-stack-order> ] 'array-reverse' define
+
+## array-from-quote
+
 [ "p-p"    array-from-quote<in-stack-order> array-reverse ] 'array-from-quote' define
+
+## for-each
+
 [ "pp-?"   swap array-reverse buffer-length [ dup-pair #1 - fetch swap [ swap ] dip [ [ over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each' define
+
+## array-contains
 
 [ "pv-f"   swap needs-remap? [ swap dup set-buffer array-length #0 swap [ over buffer-fetch array<remap> = or ] repeat ] preserve-buffer nip :f ] 'array-contains?' define
 
+## array-filter
+
 [ "pp-p"   prepare [ &source @ array-pop dup &filter @ invoke [ &results array-push ] [ drop ] if ] repeat &results request [ copy ] sip ] 'array-filter' define
+
+## array-map
+
 [ "pp-p"   prepare [ &source @ array-pop &filter @ invoke &results array-push ] repeat &results request [ copy ] sip ] 'array-map' define
+
+## array-compare
+
 [ "pp-f"   dup-pair [ array-length ] bi@ = [ dup array-length true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define
+
+## array-to-string
 
 [ "pointer:array number:type - string"  #100 / #1 - &*array:conversions* swap fetch :p invoke ] 'array-to-string' define
 
+## convert-with-base
+
 [ "sn-n" &*conversion:base* ! #0 swap [ :c conversion:to-digit swap conversion:accumulate ] for-each ] 'convert-with-base' define
+
+## convert-from-binary
+
 [ "s-n"  #2 convert-with-base ] 'convert-from-binary' define
+
+## convert-from-octal
+
 [ "s-n"  #8 convert-with-base ] 'convert-from-octal' define
+
+## convert-from-decimal
+
 [ "s-n"  #10 convert-with-base ] 'convert-from-decimal' define
+
+## convert-from-hexadecimal
+
 [ "s-n"  #16 convert-with-base ] 'convert-from-hexadecimal' define
+
+## curry
+
+...TODO...
 
 [ [ request set-buffer swap curry:compile-value curry:compile-call &*current-buffer* @ :p ] preserve-buffer ] 'curry' define
 
-"Values"
-'*types*' named-buffer
-[ ] buffer-store
-[ "number"    :n ] buffer-store
-[ "string"    :p :s ] buffer-store
-[ "character" :c ] buffer-store
-[ "pointer"   :p ] buffer-store
-[ "flag"      :f ] buffer-store
-[ #100 / &*types* swap fetch invoke ] 'restore-stored-type' define
-'*state*' variable
-[ "-" &*state* on ] 'to' define
-[ [ type? ] dip [ #1 store ] sip ] 'preserve-type' define
-[ #1 fetch restore-stored-type ] 'restore-type' define
-[ &*state* @ :f [ preserve-type ! &*state* off ] [ dup @ swap restore-type ] if ] 'value-handler' define
-[ "s-" request #2 over set-buffer-length [ value-handler ] curry swap define ] 'value' define
-[ "ns-" [ value ] sip to lookup-function invoke ] 'value!' define
-[ "p-" array-from-quote #0 [ :p :s value ] array-reduce drop ] 'values' define
-[ '*types*'  '*state*'  'restore-stored-type'  'preserve-type'  'restore-type'  'value-handler' ] hide-functions
+## to
 
-"More Arrays"
-'reconstruct' named-buffer
-[ ] buffer-store
-[ "number"    #100 buffer-store buffer-store ] buffer-store
-[ "string"    #101 buffer-store buffer-store ] buffer-store
-[ "character" #102 buffer-store buffer-store ] buffer-store
-[ "pointer"   #103 buffer-store buffer-store ] buffer-store
-[ "flag"      #100 buffer-store buffer-store #114 buffer-store ] buffer-store
-[ #100 / &reconstruct swap fetch invoke ] 'compile-value' define
+...TODO...
 
-[ 'data' 'types' ] values
-[ to types to data ] 'prepare' define
-[ #399 buffer-store &*current-buffer* @ :p ] 'terminate' define
-[ types over fetch [ data over fetch ] dip compile-value ] 'process' define
-[ "pn-s" prepare new-buffer #0 data array-length [ process #1 + ] repeat drop terminate ] 'array-to-quote' define
-[ 'reconstruct' 'compile-value' 'data' 'types' 'prepare' 'extract' 'terminate' ] hide-functions
+    --
 
-[ 'source' 'v' 'i' 'idx' ] values
-[ type? STRING = [ [ :p :s ] dip ] [ :n ] if ] 'resolve-types' define
-[ "vp-n"  to source to v #0 to i #-1 to idx source array-length [ source i fetch v resolve-types = [ i to idx ] if-true i #1 + to i ] repeat idx ] 'array-index-of' define
-[ 'source'  'v'  'i'  'idx'  'resolve-types' ] hide-functions
+## value
 
+...TODO...
 
-"Text Output Buffer"
-'TOB' variable
-[ &TOB array-push ] 'append-value' define
-[ "-..." &TOB array-length [ &TOB array-pop :p :s ] repeat ] 'show-tob' define
-[ "-" #0 &TOB set-buffer-length ] 'clear-tob' define
+    string --
 
-'TOB:Handlers' named-buffer
-[ ] buffer-store
-[ "number"     :s    append-value ] buffer-store
-[ "string"           append-value ] buffer-store
-[ "character"  :s    append-value ] buffer-store
-[ "pointer"    :n :s append-value ] buffer-store
-[ "flag"       :s    append-value ] buffer-store
-[ "v-"  type? #100 / &TOB:Handlers swap fetch invoke ] '.' define
-[ 'TOB' 'append-value' 'TOB:Handlers' ] hide-functions
+## value!
 
+...TODO...
 
-"Hashing functions"
-[ "s-n" #5381 swap [ :n [ swap ] dip over #-5 shift + + swap ] for-each ] 'hash:djb2' define
-[ :n over #-6 shift + over #-16 shift + swap - ] 'hash:sdbm<n>' define
-[ "s-n" #0 swap [ :c [ swap ] dip hash:sdbm<n> swap ] for-each ] 'hash:sdbm' define
-'hash-sdbm<n>' hide-function
-[ "s-n" #0 swap [ :n [ swap ] dip + #255 and swap ] for-each #255 xor #1 + #255 and ] 'hash:lrc' define
-[ "s-n" #0 swap [ :n [ swap ] dip xor swap ] for-each ] 'hash:xor' define
-[ "s-b" hash:djb2 ] 'chosen-hash' define
-[ #389 ] 'hash-prime' define
-[ "s-n" chosen-hash hash-prime rem ] 'hash' define
+    value string --
 
+## values
+
+...TODO...
+
+    pointer --
+
+## array-to-quote
+
+...TODO...
+
+    pointer number -- string
+
+## array-index-of
+
+...TODO...
+
+    value pointer -- number
+
+## show-tob
+
+...TODO...
+
+    -- ...
+
+## clear-tob
+
+...TODO...
+
+    --
+
+## .
+
+...TODO...
+
+    value --
+
+## hash:djb2
+
+...TODO...
+
+    string -- number
+
+## hash:sdbm
+
+...TODO...
+
+    string -- number
+
+## hash:lrc
+
+...TODO...
+
+    string -- number
+
+## hash:xor
+
+...TODO...
+
+    string -- number
+
+## chosen-hash
+
+...TODO...
+
+    string -- number
+
+## hash-prime
+
+Constant, prime number for hash functionality
+
+    -- number
+
+## hash
+
+...TODO...
+
+    string -- number
 
 ## math:pi
 
