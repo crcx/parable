@@ -113,6 +113,8 @@ This is a primitive corresponding to a byte code.
 
 ## ^
 
+...TODO...
+
     number:a number:b -- number:result
 
 This is a primitive corresponding to a byte code.
@@ -142,6 +144,8 @@ Return the logarithm of a to the given base, calculated as log(a)/log(b)
 This is a primitive corresponding to a byte code.
 
 ## shift
+
+...TODO...
 
     number:a number:b -- number:result
 
@@ -466,13 +470,17 @@ This is a primitive corresponding to a byte code.
 
 ## find
 
-[ "ss-n"   `700 ] 'find' define
+...TODO...
+
+    string string -- number
 
 This is a primitive corresponding to a byte code.
 
 ## subslice
 
-[ "pnn-p"  `701 ] 'subslice' define
+...TODO...
+
+    pointer number:start number:end -- pointer:result
 
 This is a primitive corresponding to a byte code.
 
@@ -498,11 +506,15 @@ This is a primitive corresponding to a byte code.
 
 ## report-error
 
+...TODO...
+
     string --
 
 This is a primitive corresponding to a byte code.
 
 ## sin
+
+...TODO...
 
     number -- number
 
@@ -510,11 +522,15 @@ This is a primitive corresponding to a byte code.
 
 ## cos
 
+...TODO...
+
     number -- number
 
 This is a primitive corresponding to a byte code.
 
 ## tan
+
+...TODO...
 
     number -- number
 
@@ -522,11 +538,15 @@ This is a primitive corresponding to a byte code.
 
 ## asin
 
+...TODO...
+
     number -- number
 
 This is a primitive corresponding to a byte code.
 
 ## acos
+
+...TODO...
 
     number -- number
 
@@ -534,9 +554,13 @@ This is a primitive corresponding to a byte code.
 
 ## atan
 
+...TODO...
+
     number -- number
 
 ## atan2
+
+...TODO...
 
 [ "n-n"    `1006 ] 'atan2' define
 
@@ -544,41 +568,61 @@ This is a primitive corresponding to a byte code.
 
 ## NUMBER
 
+Constant; value for the NUMBER data type.
+
     -- number
 
 ## STRING
+
+Constant; value for the STRING data type.
 
     -- number
 
 ## CHARACTER
 
+Constant; value for the CHARACTER data type.
+
     -- number
 
 ## POINTER
+
+Constant; value for the POINTER data type.
 
     -- number
 
 ## FLAG
 
+Constant; value for the FLAG data type.
+
     -- number
 
 ## bi*
+
+...TODO...
 
     value:a value:b pointer:a pointer:b -- ?
 
 ## tri*
 
+...TODO...
+
     value:a value:b value:c pointer:a pointer:b pointer:c -- ?
 
 ## bi@
+
+...TODO...
 
     value:a value:b pointer -- ?
 
 ## tri@
 
+...TODO...
+
     value:a value:b value:c pointer -- ?
 
 ## dup-pair
+
+...TODO...
 
 [ "vV-vVvV"  over over ] 'dup-pair' define
 
@@ -588,63 +632,110 @@ Drop two values off the stack.
 
     value value --
 
-----
-
-"Expand the basic conditionals into a more useful set."
-
 ## true
+
+Return a true flag.
 
     -- flag
 
 ## false
+
+Return a false flag.
 
     -- flag
 
 ## not
 
+...TODO...
+
     flag -- flag
 
 ## if-true
+
+Execute the code at pointer if flag is true.
 
     flag pointer --
 
 ## if-false
 
+Execute the code at pointer if flag is false.
+
     flag pointer --
 
 ## zero?
+
+Returns **true** if the number is equal to zero, or **false** if not.
 
     number -- flag
 
 ## true?
 
+Returns **true** if the value can be converted to a **true** flag, or **false** otherwise.
+
     value -- flag
 
 ## false
+
+Returns **true** if the value can be converted to a **false** flag, or **false** otherwise.
 
     value -- flag
 
 ## even?
 
+...TODO...
+
     number -- flag
 
 ## odd?
+
+...TODO...
 
     number -- flag
 
 ## negative?
 
+...TODO...
+
     number -- flag
 
 ## positive?
 
+...TODO...
+
     number -- flag
 
-[ "cp-"  [ type? CHARACTER = ] dip if-true ] 'if-character' define
-[ "sp-"  [ type? STRING = ] dip if-true ] 'if-string' define
-[ "np-"  [ type? NUMBER = ] dip if-true ] 'if-number' define
-[ "pp-"  [ type? POINTER = ] dip if-true ] 'if-pointer' define
-[ "fp-"  [ type? FLAG = ] dip if-true ] 'if-flag' define
+## if-character
+
+Execute the code in pointer if value is a CHARACTER
+
+    value pointer --
+
+## if-string
+
+Execute the code in pointer if value is a STRING
+
+    value pointer --
+
+## if-number
+
+Execute the code in pointer if value is a NUMBER
+
+    value pointer --
+
+## if-pointer
+
+Execute the code in pointer if value is a POINTER
+
+    value pointer --
+
+## if-flag
+
+Execute the code in pointer if value is a FLAG
+
+    value pointer --
+
+
+
 [ "nnn-f"  [ [ :n ] bi@ ] dip :n dup-pair > [ swap ] if-true [ over ] dip <= [ >= ] dip and :f ] 'between?' define
 
 "Simple variables are just named slices, with functions to access the first element. They're useful for holding single values, but don't track data types."
@@ -686,29 +777,44 @@ Drop two values off the stack.
 "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
 
 ## trim-left
+
+...TODO...
+
     string -- string
 
 ## trim-right
+
+...TODO...
 
     string -- string
 
 ## trim
 
+...TODO...
+
     string -- string
 
 ## abs
+
+...TODO...
 
     number -- number
 
 ## min
 
+...TODO...
+
     number number -- number
 
 ## max
 
+...TODO...
+
     number number -- number
 
 ## factorial
+
+...TODO...
 
     number -- number
 
@@ -826,21 +932,136 @@ Drop two values off the stack.
 [ "s-n" chosen-hash hash-prime rem ] 'hash' define
 
 
-"Constants"
-[ #3.141592653 ] 'math:pi' define
+## math:pi
+
+Constant, value of PI (3.14159...)
+
+    -- number
+
+## math:tau
+
+Constant, value of ... (...)
+
+    -- number
+
 [ #6.283185307 ] 'math:tau' define
+
+## math:e
+
+
+Constant, value of ... (...)
+
+    -- number
+
 [ #2.718281828 ] 'math:e' define
+
+## math:golden-ration
+
+Constant, value of ... (...)
+
+    -- number
+
 [ #1.618033988 ] 'math:golden-ratio' define
+
+## math:euler-mascheroni
+
+Constant, value of ... (...)
+
+    -- number
+
 [ #0.577215664 ] 'math:euler-mascheroni' define
+
+## math:pythagora
+
 [ #1.414213562 ] 'math:pythagora' define
+
+Constant, value of ... (...)
+
+    -- number
+
+## math:inverse-golden-ratio
+
+Constant, value of ... (...)
+
+    -- number
+
 [ #0.618033988 ] 'math:inverse-golden-ratio' define
+
+## math:silver-ration/mean
+
+Constant, value of ... (...)
+
+    -- number
+
 [ #2.414213562 ] 'math:silver-ratio/mean' define
+
+## time:seconds/minute
+
+Constant, value of ... (...)
+
+    -- number
+
 [ #60 ] 'time:seconds/minute' define
+
+## time:minutes/hour
+
+Constant, value of ... (...)
+
+    -- number
+
 [ #60 ] 'time:minutes/hour' define
+
+## time:hours/day
+
+Constant, value of ... (...)
+
+    -- number
+
 [ #24 ] 'time:hours/day' define
+
+## time:days/week
+
+Constant, value of ... (...)
+
+    -- number
+
 [ #7 ] 'time:days/week' define
+
+## time:weeks/year
+
+Constant, value of ... (...)
+
+    -- number
+
 [ #52 ] 'time:weeks/year' define
+
+## time:months/year
+
+Constant, value of ... (...)
+
+    -- number
+
 [ #12 ] 'time:months/year' define
+
+## time:days/year
+
+Constant, value of ... (...)
+
+    -- number
 [ #365 ] 'time:days/year' define
+
+## time:days/julian-year
+
+Constant, value of ... (...)
+
+    -- number
+
 [ #365.25 ] 'time:days/julian-year' define
+
+## time:greagorian/year
+
+Constant, value of ... (...)
+
+    -- number
+
 [ #365.2425 ] 'time:days/gregorian-year' define
