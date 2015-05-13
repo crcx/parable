@@ -650,7 +650,7 @@ Return a false flag.
 
 ## not
 
-...TODO...
+Invert the flag on the stack.
 
     flag -- flag
 
@@ -686,25 +686,25 @@ Returns **true** if the value can be converted to a **false** flag, or **false**
 
 ## even?
 
-...TODO...
+Return **true** if number is even, or **false** otherwise.
 
     number -- flag
 
 ## odd?
 
-...TODO...
+Return **true** if number is odd, or **false** otherwise.
 
     number -- flag
 
 ## negative?
 
-...TODO...
+Return **true** if number is negative, or **false** otherwise.
 
     number -- flag
 
 ## positive?
 
-...TODO...
+Return **true** if number is positive, or **false** otherwise.
 
     number -- flag
 
@@ -738,64 +738,63 @@ Execute the code in pointer if value is a FLAG
 
     value pointer --
 
-
 ## between?
 
-...TODO...
+Return **true** if A is between B and C, inclusive. Or **false** otherwise.
 
-    number number number -- flag
+    number:a number:b number:c -- flag
 
 ## variable
 
-...TODO...
+Create a simple named variable
 
     string --
 
 ## variable!
 
-...TODO...
+Create a simple named variable with an initial value.
 
     value string --
 
 ## @
 
-...TODO...
+Fetch the value stored in a simple variable.
 
     pointer -- number
 
 ## !
 
-...TODO...
+Store value into a simple variable.
 
     value pointer --
 
 ## on
 
-...TODO...
+Set a simple variable to a value of -1.
 
     pointer --
 
 ## off
 
-...TODO...
+Set a simple variable to a value of 0.
 
     pointer --
 
 ## increment
 
-...TODO...
+Increment the value of a simple variable by 1.
 
     pointer --
 
 ## decrement
 
-...TODO...
+Decrement the value of a simple variable by 1.
 
     pointer --
 
 ## zero-out
 
-...TODO...
+Set a slice to a length of zero and wipe out any stored values in the process.
 
     pointer --
 
@@ -807,59 +806,61 @@ Execute the code in pointer if value is a FLAG
 
 ## expand-range
 
-...TODO...
+Return a numeric range starting with lower and ending with upper, inclusive. All values are placed on the stack.
 
     number:lower number:upper -- ...
 
 ## sum-range
 
-...TODO...
+Add *number* values on the stack.
 
     ... number -- number
 
 ## slice-length
 
-...TODO...
+Return the length of a slice. Unlike **get-slice-length** this does not consume the pointer.
 
     pointer -- pointer number
 
 ## adjust-slice-length
 
-...TODO...
+Adjust the length of a slice. You can use this to shrink or grow slices as needed.
 
     number pointer --
 
 ## invoke-and-count-items-returned
 
-...TODO...
+Execute the code at pointer, and return the results of execution, and a value indicating the number of items returned (or consumed) as a result.
 
     pointer -- ? number
 
 ## invoke-and-count-items-returned-with-adjustment
 
+Execute the code at pointer, and return the results of execution, and a value indicating the number of items returned (or consumed) as a result. Adds *number* to the results.
+
     pointer number -- ? number
 
 ## drop-multiple
 
-...TODO...
+Drop the specified number of values from the stack.
 
-    ... n -- ?
+    ... number -- ?
 
 ## hide-functions
 
-...TODO...
+Execute code at pointer, and remove the function names it pushes to the stack.
 
     pointer --
 
 ## rename-function
 
-...TODO...
+Remove the old header for a function and attach the new one to it.
 
-    string string --
+    string:old string:new --
 
 ## variables
 
-...TODO...
+Execute code at pointer, and create a simple variable for each name that it returns.
 
     pointer --
 
@@ -871,25 +872,25 @@ Execute the code in pointer if value is a FLAG
 
 ## digit?
 
-...TODO...
+Return **true** if value is a numeric digit, or **false** otherwise.
 
     value -- flag
 
 ## symbol?
 
-...TODO...
+Return **true** if value is an ASCII symbol, or **false** otherwise.
 
     value -- flag
 
 ## letter?
 
-...TODO...
+Return **true** if value is a letter, or **false** otherwise.
 
     value -- flag
 
 ## alphanumeric?
 
-...TODO...
+Return **true** if value is a letter or numeric digit, or **false** otherwise.
 
     value -- flag
 
@@ -925,37 +926,37 @@ Execute the code in pointer if value is a FLAG
 
 ## trim-left
 
-...TODO...
+Trim leading white space from a string.
 
     string -- string
 
 ## trim-right
 
-...TODO...
+Trim trailing white space from a string.
 
     string -- string
 
 ## trim
 
-...TODO...
+Trim all leading and trailing white space from a string.
 
     string -- string
 
 ## abs
 
-...TODO...
+Return the absolute value of a number.
 
     number -- number
 
 ## min
 
-...TODO...
+Return the lesser of two numbers.
 
     number number -- number
 
 ## max
 
-...TODO...
+Return the greater of two numbers.
 
     number number -- number
 
