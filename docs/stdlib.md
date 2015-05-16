@@ -113,7 +113,9 @@ This is a primitive corresponding to a byte code.
 
 ## ^
 
-...TODO...
+math.pow(x, y)
+
+Return A raised to the power of B.
 
     number:a number:b -- number:result
 
@@ -470,9 +472,9 @@ This is a primitive corresponding to a byte code.
 
 ## find
 
-...TODO...
+Find substring *needle* in string *haystack*. Returns the starting offset, or -1 if no match is found.
 
-    string string -- number
+    string:haystack string:needle -- number
 
 This is a primitive corresponding to a byte code.
 
@@ -800,9 +802,9 @@ Set a slice to a length of zero and wipe out any stored values in the process.
 
 ## preserve
 
-...TODO...
+Execute code in *pointer:code*, preserving and restoring the data in the *pointer:data*.
 
-    pointer pointer --
+    pointer:data pointer:code --
 
 ## expand-range
 
@@ -866,7 +868,7 @@ Execute code at pointer, and create a simple variable for each name that it retu
 
 ## string-contains?
 
-...TODO...
+Returns **true** if value is found in the specified string, or **false** otherwise.
 
     value string -- flag
 
@@ -896,31 +898,31 @@ Return **true** if value is a letter or numeric digit, or **false** otherwise.
 
 ## consonant?
 
-...TODO...
+Return **true** if the value is a consonant, or **false** otherwise.
 
     value -- flag
 
 ## vowel?
 
-...TODO...
+Return **true** if the value is a vowel, or **false** otherwise.
 
     value -- flag
 
 ## lowercase?
 
-...TODO...
+Return **true** if the value is a lowercase character, or **false** otherwise.
 
     value -- flag
 
 ## uppercase?
 
-...TODO...
+Return **true** if the value is an uppercase character, or **false** otherwise.
 
     value -- flag
 
 ## build-string
 
-...TODO...
+Execute the code in the specified slice, and construct a string from the returned values.
 
     pointer -- string
 
@@ -962,114 +964,170 @@ Return the greater of two numbers.
 
 ## factorial
 
-...TODO...
+Return the factorial of a number.
 
     number -- number
 
 ## *current-buffer*
 
-Variable
+Variable.
+
+Variable holding the current buffer slice number.
 
     -- pointer
 
 ## *buffer-offset*
 
-Variable
+Variable.
+
+Variable holding the current offset into the current buffer.
 
     -- pointer
 
 ## current-buffer
 
-[ "-p"     &*current-buffer* @ :p ] 'current-buffer' define
+Return a pointer to the current buffer.
+
+    -- pointer
 
 ## buffer-position
 
-[ "-pn"    current-buffer &*buffer-offset* @ ] 'buffer-position' define
+Returns the current buffer and offset pair.
+
+    -- pointer number
 
 ## buffer-advance
 
-[ "-"      &*buffer-offset* increment ] 'buffer-advance' define
+Increment the current buffer offset.
+
+    --
 
 ## buffer-retreat
 
-[ "-"      &*buffer-offset* decrement ] 'buffer-retreat' define
+Decrement the current buffer offset.
+
+    --
 
 ## buffer-store-current
 
-[ "n-"     buffer-position store ] 'buffer-store-current' define
+Store a value into the current location in the buffer.
+
+    value --
 
 ## buffer-fetch-current
 
-[ "-n"     buffer-position fetch ] 'buffer-fetch-current' define
+Fetch the value at the current location in the buffer.
+
+    -- number
 
 ## buffer-store
 
-[ "v-"     buffer-position store buffer-advance #0 buffer-position store ] 'buffer-store' define
+Store a value into the current location in the buffer, and then increment to the next offset.
+
+    value --
 
 ## buffer-fetch
 
-[ "-n"     buffer-position fetch buffer-advance ] 'buffer-fetch' define
+Fetch a value from the current location in the buffer, and then increment to the next offset.
+
+    -- number
 
 ## buffer-store-retreat
 
-[ "v-"     buffer-retreat buffer-position store ] 'buffer-store-retreat' define
+Store a value into the current location in the buffer, and then decrement to the next offset.
+
+    value --
 
 ## buffer-fetch-retreat
 
-[ "-n"     buffer-retreat buffer-position fetch ] 'buffer-fetch-retreat' define
+Fetch a value from the current location in the buffer, and then decrement to the next offset.
+
+    -- number
 
 ## set-buffer
 
-[ "p-"     &*current-buffer* ! &*buffer-offset* zero-out ] 'set-buffer' define
+Set pointer as the active buffer.
+
+    pointer --
 
 ## buffer-store-items
 
-[ "...n-"  [ buffer-store ] repeat ] 'buffer-store-items' define
+Store the specified number of values into the buffer.
+
+    ... number --
 
 ## new-buffer
 
-[ "-"      request set-buffer ] 'new-buffer' define
+Allocate a new buffer and set it as the active one.
+
+    --
 
 ## preserve-buffer
 
-[ "p-"     &*current-buffer* @ [ &*buffer-offset* @ [ invoke ] dip &*buffer-offset* ! ] dip &*current-buffer* ! ] 'preserve-buffer' define
+Execute the code at *pointer*, while preserving and restoring the current buffer and offset. (This
+allows the code in the slice to allocate a new buffer, and restores the old settings when done.)
+
+    pointer --
 
 ## named-buffer
 
-[ "s-"     request [ swap define ] sip set-buffer ] 'named-buffer' define
+Create a new buffer, and attach a name to it.
+
+    string --
 
 ## array-push
 
-[ "np-"    dup get-buffer-length over [ store ] dip #1 swap adjust-buffer-length ] 'array-push' define
+Push a value to the end of an array.
+
+    value pointer --
 
 ## array-pop
 
-[ "p-n"    [ #-1 swap adjust-buffer-length ] sip dup get-buffer-length fetch ] 'array-pop' define
+Pop a value off of an array.
+
+    pointer -- number
 
 ## array-length
 
-[ "p-n"    get-buffer-length ] 'array-length' define
+Return the length of an array.
+
+    pointer -- number
 
 ## array-reduce
 
-[ "pnp-n"  &filter ! over array-length [ over array-pop &filter @ invoke ] repeat nip ] 'array-reduce' define
+Reduce an array to a single value.
+
+    pointer:array number pointer:code -- number
+
+Example:
+
+    [ #1 #2 #3 ] array-from-quote
+    #0 [ + ] array-reduce
 
 ## array-from-quote<in-stack-order>
 
-[ "p-p"    [ new-buffer invoke-and-count-items-returned buffer-store-items &*current-buffer* @ ] preserve-buffer :p ] 'array-from-quote<in-stack-order>' define
+Execute code in slice, and return an array constructed from the values in it.
+
+    pointer -- pointer
 
 ## array-reverse
 
-[ "p-p"    request [ copy ] sip &source ! [ #0 &source @ array-length [ &source @ over fetch swap #1 + ] repeat drop ] 
-array-from-quote<in-stack-order> ] 'array-reverse' define
+Reverse the order of values in an array.
+
+    pointer -- pointer
 
 ## array-from-quote
 
-[ "p-p"    array-from-quote<in-stack-order> array-reverse ] 'array-from-quote' define
+Execute code in slice, and return an array constructed from the values in it. Like **array-from-pointer<in-stack-order>**, but
+reverses the order of the elements.
+
+    pointer -- pointer
 
 ## for-each
 
-[ "pp-?"   swap array-reverse buffer-length [ dup-pair #1 - fetch swap [ swap ] dip [ [ over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each' define
+Execute code in **pointer:code** once for each element in the array.
+
+    pointer:data pointer:code -- ?
 
 ## array-contains
 
@@ -1093,111 +1151,121 @@ array-from-quote<in-stack-order> ] 'array-reverse' define
 
 ## convert-with-base
 
-[ "sn-n" &*conversion:base* ! #0 swap [ :c conversion:to-digit swap conversion:accumulate ] for-each ] 'convert-with-base' define
+Convert string into a number using the current base.
+
+    string number -- number
 
 ## convert-from-binary
 
-[ "s-n"  #2 convert-with-base ] 'convert-from-binary' define
+Convert a string containing a binary value into a number.
+
+    string -- number
 
 ## convert-from-octal
 
-[ "s-n"  #8 convert-with-base ] 'convert-from-octal' define
+Convert a string containing a octal value into a number.
+
+    string -- number
 
 ## convert-from-decimal
 
-[ "s-n"  #10 convert-with-base ] 'convert-from-decimal' define
+Convert a string containing a decimal value into a number.
+
+    string -- number
 
 ## convert-from-hexadecimal
 
-[ "s-n"  #16 convert-with-base ] 'convert-from-hexadecimal' define
+Convert a string containing a hexadecimal value into a number.
+
+    string -- number
 
 ## curry
 
-...TODO...
+Given a value and a quotation, return a new quotation that applies the original to the value.
 
-[ [ request set-buffer swap curry:compile-value curry:compile-call &*current-buffer* @ :p ] preserve-buffer ] 'curry' define
+    value pointer -- pointer
 
 ## to
 
-...TODO...
+Set a flag so that the next value will update it's stored value rather than returing it.
 
     --
 
 ## value
 
-...TODO...
+Create a new value.
 
     string --
 
 ## value!
 
-...TODO...
+Create a new value with an initial value.
 
     value string --
 
 ## values
 
-...TODO...
+Execute code in pointer, creating a new value for each name. The code should return a series of strings.
 
     pointer --
 
 ## array-to-quote
 
-...TODO...
+Convert an array of values into a string. The number identifies the data type in the array.
 
     pointer number -- string
 
 ## array-index-of
 
-...TODO...
+Return the offset of the specified value in the array.
 
     value pointer -- number
 
 ## show-tob
 
-...TODO...
+Push the strings in the text output buffer to the stack.
 
     -- ...
 
 ## clear-tob
 
-...TODO...
+Remove all items from the text output buffer.
 
     --
 
 ## .
 
-...TODO...
+Append a value to the text output buffer.
 
     value --
 
 ## hash:djb2
 
-...TODO...
+Hash a string using the DJB2 algo.
 
     string -- number
 
 ## hash:sdbm
 
-...TODO...
+Hash a string using the SDBM algo.
 
     string -- number
 
 ## hash:lrc
 
-...TODO...
+Hash a string using the LRC algo.
 
     string -- number
 
 ## hash:xor
 
-...TODO...
+Hash a string using the XOR algo.
 
     string -- number
 
 ## chosen-hash
 
-...TODO...
+This should be set to the preferred hash function. Defaults to **hash:djb2**.
 
     string -- number
 
@@ -1209,7 +1277,7 @@ Constant, prime number for hash functionality
 
 ## hash
 
-...TODO...
+Invoke **chosen-hash**, then modulus against the **hash-prime**.
 
     string -- number
 
@@ -1221,128 +1289,96 @@ Constant, value of PI (3.14159...)
 
 ## math:tau
 
-Constant, value of ... (...)
+Constant, value of Tau. (6.28318...)
 
     -- number
-
-[ #6.283185307 ] 'math:tau' define
 
 ## math:e
 
-
-Constant, value of ... (...)
-
-    -- number
-
-[ #2.718281828 ] 'math:e' define
-
-## math:golden-ration
-
-Constant, value of ... (...)
+Constant, value of E (2.71828...)
 
     -- number
 
-[ #1.618033988 ] 'math:golden-ratio' define
+## math:golden-ratio
+
+Constant, value of golden ratio (1.61803...)
+
+    -- number
 
 ## math:euler-mascheroni
 
-Constant, value of ... (...)
+Constant, value of Euler-Mascheroni (0.57721...)
 
     -- number
 
-[ #0.577215664 ] 'math:euler-mascheroni' define
-
 ## math:pythagora
 
-[ #1.414213562 ] 'math:pythagora' define
-
-Constant, value of ... (...)
+Constant, value of Pythagora (1.414213...)
 
     -- number
 
 ## math:inverse-golden-ratio
 
-Constant, value of ... (...)
+Constant, value of inverse golden ratio (0.61803...)
 
     -- number
 
-[ #0.618033988 ] 'math:inverse-golden-ratio' define
+## math:silver-ratio/mean
 
-## math:silver-ration/mean
-
-Constant, value of ... (...)
+Constant, value of silver ration / mean (2.41421...)
 
     -- number
-
-[ #2.414213562 ] 'math:silver-ratio/mean' define
 
 ## time:seconds/minute
 
-Constant, value of ... (...)
+Constant, value of seconds per minute
 
     -- number
-
-[ #60 ] 'time:seconds/minute' define
 
 ## time:minutes/hour
 
-Constant, value of ... (...)
+Constant, value of minutes per hour
 
     -- number
-
-[ #60 ] 'time:minutes/hour' define
 
 ## time:hours/day
 
-Constant, value of ... (...)
+Constant, value of hours per day
 
     -- number
-
-[ #24 ] 'time:hours/day' define
 
 ## time:days/week
 
-Constant, value of ... (...)
+Constant, value of days per week
 
     -- number
-
-[ #7 ] 'time:days/week' define
 
 ## time:weeks/year
 
-Constant, value of ... (...)
+Constant, value of weeks per year
 
     -- number
-
-[ #52 ] 'time:weeks/year' define
 
 ## time:months/year
 
-Constant, value of ... (...)
+Constant, value of months per year
 
     -- number
-
-[ #12 ] 'time:months/year' define
 
 ## time:days/year
 
-Constant, value of ... (...)
+Constant, value of days per year
 
     -- number
-[ #365 ] 'time:days/year' define
 
 ## time:days/julian-year
 
-Constant, value of ... (...)
+Constant, value of days per julian year
 
     -- number
-
-[ #365.25 ] 'time:days/julian-year' define
 
 ## time:greagorian/year
 
-Constant, value of ... (...)
+Constant, value of days per greagorian year
 
     -- number
-
-[ #365.2425 ] 'time:days/gregorian-year' define
