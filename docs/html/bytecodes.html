@@ -1,0 +1,1174 @@
+<link rel='stylesheet' href='stylesheet.css'>
+<h1>Byte Codes Overview</h1>
+
+<p>Parable is built over a byte coded virtual machine.</p>
+
+<p>In memory, the byte codes are stored sequentially in a slice. E.g., given a tiny
+definition:</p>
+
+<pre><code>[ #1 #2 + #3 * ]
+</code></pre>
+
+<p>The compiler will allocate a slice, and compile the following byte code:</p>
+
+<pre><code>BC_PUSH_N
+1
+BC_PUSH_N
+2
+BC_ADD
+BC_PUSH_N
+3
+BC_MULTIPLY
+BC_FLOW_RETURN
+</code></pre>
+
+<p>Most byte codes are single values and occupy a single cell. The few exceptions
+to this are the instructions which push values to the stack or directly call a
+function. Where the byte codes require more than one cell, a diagram with the
+expected structure is provided.</p>
+
+<p>The descriptions of the byte codes will also include a <em>stack comment</em>. This
+is a single line that indicates what stack values are consumed, and what is
+returned after execution. A typical stack comment will look like:</p>
+
+<pre><code>character string -- number
+</code></pre>
+
+<p>In this case, the input is on the left side of the --, and the results are on
+the right. On each side, the item to the right is the top of stack.</p>
+
+<h1>Byte Code Listing</h1>
+
+<h2>BC_PUSH_N</h2>
+
+<p>Opcode: 100</p>
+
+<p>This pushes the value in the next memory cell to the stack. The type is
+set to NUMBER.</p>
+
+<p>In memory, this is structured as:</p>
+
+<pre><code>+-----------+
+| BC_PUSH_N |
++-----------+
+| value     |
++-----------+
+</code></pre>
+
+<p>Stack Effect:</p>
+
+<pre><code>-- number
+</code></pre>
+
+<hr />
+
+<h2>BC_PUSH_S</h2>
+
+<p>Opcode: 101</p>
+
+<p>This pushes the value in the next memory cell to the stack. The type is
+set to STRING.</p>
+
+<p>In memory, this is structured as:</p>
+
+<pre><code>+-----------+
+| BC_PUSH_S |
++-----------+
+| pointer   |
++-----------+
+</code></pre>
+
+<p>Stack Effect:</p>
+
+<pre><code>-- string
+</code></pre>
+
+<hr />
+
+<h2>BC_PUSH_C</h2>
+
+<p>Opcode: 102</p>
+
+<p>This pushes the value in the next memory cell to the stack. The type is
+set to CHARACTER.</p>
+
+<p>In memory, this is structured as:</p>
+
+<pre><code>+-------------+
+| BC_PUSH_C   |
++-------------+
+| ASCII value |
++-------------+
+</code></pre>
+
+<p>Stack Effect:</p>
+
+<pre><code>-- character
+</code></pre>
+
+<hr />
+
+<h2>BC_PUSH_F</h2>
+
+<p>Opcode: 103</p>
+
+<p>This pushes the value in the next memory cell to the stack. The type is
+set to FUNCTION.</p>
+
+<p>In memory, this is structured as:</p>
+
+<pre><code>+-----------+
+| BC_PUSH_F |
++-----------+
+| pointer   |
++-----------+
+</code></pre>
+
+<p>Stack Effect:</p>
+
+<pre><code>-- pointer
+</code></pre>
+
+<hr />
+
+<h2>BC_PUSH_COMMENT</h2>
+
+<p>Opcode: 104</p>
+
+<p>This ignores the value in the next cell. The following cell will contain a
+pointer to a comment.</p>
+
+<p>In memory, this is structured as:</p>
+
+<pre><code>+-----------------+
+| BC_PUSH_COMMENT |
++-----------------+
+| pointer         |
++-----------------+
+</code></pre>
+
+<p>Comments are kept by the compiler, but ignored at runtime. This allows for
+easier decompilation, at a slight performance hit if you use them
+extensively.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>--
+</code></pre>
+
+<hr />
+
+<h2>BC_TYPE_N</h2>
+
+<p>Opcode: 110</p>
+
+<p>Convert the value on the stack to a NUMBER.</p>
+
+<p>If the value is a STRING, it is parsed as a number and the result is pushed.</p>
+
+<p>If the value is a CHARACTER, it is converted to the corresponding ASCII code.</p>
+
+<p>If the value is a POINTER, the type is converted to number.</p>
+
+<p>If the value is a FLAG, one of the following is returned: -1 for <em>true</em>, 0 for
+<em>false</em>, or 1 for <em>malformed flag</em>.</p>
+
+<p>If the value is a NUMBER, no change occurs.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>value -- number
+</code></pre>
+
+<hr />
+
+<h2>BC_TYPE_S</h2>
+
+<p>Opcode: 111</p>
+
+<p>Convert the value on the stack to a new STRING. If the value is already a STRING
+this does nothing.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>value -- string
+</code></pre>
+
+<hr />
+
+<h2>BC_TYPE_C</h2>
+
+<p>Opcode: 112</p>
+
+<p>Convert the value on the stack to a CHARACTER.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>value -- character
+</code></pre>
+
+<hr />
+
+<h2>BC_TYPE_F</h2>
+
+<p>Opcode: 113</p>
+
+<p>Convert the value on the stack to a POINTER.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>value -- pointer
+</code></pre>
+
+<hr />
+
+<h2>BC_TYPE_FLAG</h2>
+
+<p>Opcode: 114</p>
+
+<p>Convert the value on the stack to a FLAG.</p>
+
+<p>If value is a NUMBER, the following applies:</p>
+
+<pre><code>+--------+----------------+
+| -1     | true           |
++--------+----------------+
+|  0     | false          |
++--------+----------------+
+| others | malformed flag |
++--------+----------------+
+</code></pre>
+
+<p>If the value is a STRING, the following applies:</p>
+
+<pre><code>+---------+----------------+
+| 'true'  | true           |
++---------+----------------+
+| 'false' | false          |
++---------+----------------+
+| others  | malformed flag |
++---------+----------------+
+</code></pre>
+
+<p>Behaviour for CHARACTER and POINTER types is not defined.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>value -- flag
+</code></pre>
+
+<hr />
+
+<h2>BC_GET_TYPE</h2>
+
+<p>Opcode: 120</p>
+
+<p>Pushes a NUMBER to the stack indicating the data type of the top element. Valid
+types are:</p>
+
+<pre><code>+-----+-------------+
+| 100 | *NUMBER*    |
++-----+-------------+
+| 200 | *STRING*    |
++-----+-------------+
+| 300 | *CHARACTER* |
++-----+-------------+
+| 400 | *POINTER*   |
++-----+-------------+
+| 500 | *FLAG*      |
++-----+-------------+
+</code></pre>
+
+<p>Stack Effect:</p>
+
+<pre><code>value -- value number:type
+</code></pre>
+
+<hr />
+
+<h2>BC_ADD</h2>
+
+<p>Opcode: 200</p>
+
+<p>If the top two values are NUMBER, pop them off the stack, add them together, and
+push the resulting NUMBER back to the stack.</p>
+
+<p>If the top two values are STRING, pop them off, concatencate them together, and
+push the new STRING to the stack.</p>
+
+<p>The use of this instruction is not defined for other types of values.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>number:A number:B -- number:(A+B)
+</code></pre>
+
+<hr />
+
+<h2>BC_SUBTRACT</h2>
+
+<p>Opcode: 201</p>
+
+<p>Pop two NUMBER values off the stack, subtract them, and push the resulting
+NUMBER back to the stack.</p>
+
+<p>The use of this instruction is not defined for other types of values.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>number:A number:B -- number:(A-B)
+</code></pre>
+
+<hr />
+
+<h2>BC_MULTIPLY</h2>
+
+<p>Opcode: 202</p>
+
+<p>Pop two NUMBER values off the stack, multiply them, and push the resulting
+NUMBER back to the stack.</p>
+
+<p>The use of this instruction is not defined for other types of values.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>number:A number:B -- number:(A*B)
+</code></pre>
+
+<hr />
+
+<h2>BC_DIVIDE</h2>
+
+<p>Opcode: 203</p>
+
+<p>Pop two NUMBER values off the stack, divide them, and push the resulting
+NUMBER back to the stack.</p>
+
+<p>The use of this instruction is not defined for other types of values.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>number:A number:B -- number:(A/B)
+</code></pre>
+
+<hr />
+
+<h2>BC_REMAINDER</h2>
+
+<p>Opcode: 204</p>
+
+<p>Pop two NUMBER values off the stack, find the remainder, and push the resulting
+NUMBER back to the stack.</p>
+
+<p>The use of this instruction is not defined for other types of values.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>number:A number:B -- number:(A % B)
+</code></pre>
+
+<hr />
+
+<h2>BC_FLOOR</h2>
+
+<p>Opcode: 205</p>
+
+<p>Round the NUMBER on top of stack down to the nearest integer value.</p>
+
+<p>The use of this instruction is not defined for other types of values.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>number -- number
+</code></pre>
+
+<hr />
+
+<h2>BC_POW</h2>
+
+<p>Opcode: 206</p>
+
+<p>... TODO ...</p>
+
+<hr />
+
+<h2>BC_LOG</h2>
+
+<p>Opcode: 207</p>
+
+<p>Return the natural logarithm of a value (to base e)</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>number -- log(number)
+</code></pre>
+
+<hr />
+
+<h2>BC_LOG10</h2>
+
+<p>Opcode: 208</p>
+
+<p>Return the base 10 logarithm of a value</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>number -- log10(number)
+</code></pre>
+
+<hr />
+
+<h2>BC_LOG_N</h2>
+
+<p>Opcode: 209</p>
+
+<p>Given a stack:</p>
+
+<pre><code>+--------------+-----+
+| number:base  | TOS |
++--------------+-----+
+| number:value |     |
++--------------+-----+
+</code></pre>
+
+<p>Return the logarithm of a value to a given base</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>number:value number:base -- number:log(base, value)
+</code></pre>
+
+<hr />
+
+<h2>BC_BITWISE_SHIFT</h2>
+
+<p>Opcode: 210</p>
+
+<p>Shifts a value left or right by the specified number of bits. Shifts right if
+positive, or left if negative.</p>
+
+<hr />
+
+<h2>BC_BITWISE_AND</h2>
+
+<p>Opcode: 211</p>
+
+<p>Perform a bitwise AND operation on two NUMBER values.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>number:A number:B -- number
+</code></pre>
+
+<hr />
+
+<h2>BC_BITWISE_OR</h2>
+
+<p>Opcode: 212</p>
+
+<p>Perform a bitwise OR operation on two NUMBER values.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>number:A number:B -- number
+</code></pre>
+
+<hr />
+
+<h2>BC_BITWISE_XOR</h2>
+
+<p>Opcode: 213</p>
+
+<p>Perform a bitwise XOR operation on two NUMBER values.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>number:A number:B -- number
+</code></pre>
+
+<hr />
+
+<h2>BC_RANDOM</h2>
+
+<p>Opcode: 214</p>
+
+<p>Return a random value between 0 and 1.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>-- number
+</code></pre>
+
+<hr />
+
+<h2>BC_SQRT</h2>
+
+<p>Opcode: 215</p>
+
+<p>Returns the square root of a value.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>number -- number
+</code></pre>
+
+<hr />
+
+<h2>BC_COMPARE_LT</h2>
+
+<p>Opcode: 220</p>
+
+<p>Compare two values to see if one is less than the other.</p>
+
+<p>Given a stack:</p>
+
+<pre><code>+----+-----+
+| B  | TOS |
++----+-----+
+| A  |     |
++----+-----+
+</code></pre>
+
+<p>This will compare A &lt; B, and return a flag</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>value:A value:B -- flag
+</code></pre>
+
+<hr />
+
+<h2>BC_COMPARE_GT</h2>
+
+<p>Opcode: 221</p>
+
+<p>Compare two values to see if one is greater than the other.</p>
+
+<p>Given a stack:</p>
+
+<pre><code>+----+-----+
+| B  | TOS |
++----+-----+
+| A  |     |
++----+-----+
+</code></pre>
+
+<p>This will compare A > B, and return a flag</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>value:A value:B -- flag
+</code></pre>
+
+<hr />
+
+<h2>BC_COMPARE_LTEQ</h2>
+
+<p>Opcode: 222</p>
+
+<p>Compare two values to see if one is less than or equal to the other.</p>
+
+<p>Given a stack:</p>
+
+<pre><code>+----+-----+
+| B  | TOS |
++----+-----+
+| A  |     |
++----+-----+
+</code></pre>
+
+<p>This will compare A &lt;= B, and return a flag</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>value:A value:B -- flag
+</code></pre>
+
+<hr />
+
+<h2>BC_COMPARE_GTEQ</h2>
+
+<p>Opcode: 223</p>
+
+<p>Compare two values to see if one is less than or equal to the other.</p>
+
+<p>Given a stack:</p>
+
+<pre><code>+----+-----+
+| n0 | TOS |
++----+-----+
+| n1 |     |
++----+-----+
+</code></pre>
+
+<p>This will compare n1 >= n0, and return a flag</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>value:A value:B -- flag
+</code></pre>
+
+<hr />
+
+<h2>BC_COMPARE_EQ</h2>
+
+<p>Opcode: 224</p>
+
+<p>Compare two values for equality.</p>
+
+<p>If the values are strings, it compares the actual strings, not their pointers.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>value:A value:B -- flag
+</code></pre>
+
+<hr />
+
+<h2>BC_COMPARE_NEQ</h2>
+
+<p>Opcode: 225</p>
+
+<p>Compare two values for inequality.</p>
+
+<p>If the values are strings, it compares the actual strings, not their pointers.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>value:A value:B -- flag
+</code></pre>
+
+<hr />
+
+<h2>BC_FLOW_IF</h2>
+
+<p>Opcode: 300</p>
+
+<p>Takes three elements (two quotes, and a flag), and conditionally executes
+one of the quotes based on the flag.</p>
+
+<p>Example stack:</p>
+
+<pre><code>+------+-----+
+| q0   | TOS |
++------+-----+
+| q1   |     |
++------+-----+
+| flag |     |
++------+-----+
+</code></pre>
+
+<p>If FLAG is true, executes q1. If false, executes q0.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>flag quote:true quote:false --
+</code></pre>
+
+<hr />
+
+<h2>BC_FLOW_WHILE</h2>
+
+<p>Opcode: 301</p>
+
+<p>Takes a quote from the stack, and executes the quote. If the quote returns a
+true FLAG, executes it again until the returned flag is false.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>quote --
+</code></pre>
+
+<hr />
+
+<h2>BC_FLOW_UNTIL</h2>
+
+<p>Opcode: 302</p>
+
+<p>Takes a quote from the stack, and executes the quote. If the quote returns a
+false FLAG, executes it again until the returned flag is true.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>quote --
+</code></pre>
+
+<hr />
+
+<h2>BC_FLOW_TIMES</h2>
+
+<p>Opcode: 303</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>number quote --
+</code></pre>
+
+<hr />
+
+<h2>BC_FLOW_CALL</h2>
+
+<p>Opcode: 304</p>
+
+<p>Calls a function.</p>
+
+<p>In memory, this is structured as:</p>
+
+<pre><code>+--------------+
+| BC_FLOW_CALL |
++--------------+
+| pointer      |
++--------------+
+</code></pre>
+
+<p>Stack Effect:</p>
+
+<pre><code>--
+</code></pre>
+
+<hr />
+
+<h2>BC_FLOW_CALL_F</h2>
+
+<p>Opcode: 305</p>
+
+<p>Call a function. Takes a pointer to the function from the stack.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>pointer --
+</code></pre>
+
+<hr />
+
+<h2>BC_FLOW_DIP</h2>
+
+<p>Opcode: 306</p>
+
+<p>Execute a quotation with a value temporarily removed from the stack.</p>
+
+<p>In a traditional Forth this would be the equivilent of:</p>
+
+<pre><code>&gt;r ... r&gt;
+</code></pre>
+
+<p>Stack Effect:</p>
+
+<pre><code>value quote -- value
+</code></pre>
+
+<hr />
+
+<h2>BC_FLOW_SIP</h2>
+
+<p>Opcode: 307</p>
+
+<p>Execute a quotation with a value on the stack that will be restored
+after execution completes.</p>
+
+<p>In a traditional Forth this would be the equivilent of:</p>
+
+<pre><code>dup &gt;r ... r&gt;
+</code></pre>
+
+<p>Stack Effect:</p>
+
+<pre><code>value quote -- value
+</code></pre>
+
+<hr />
+
+<h2>BC_FLOW_BI</h2>
+
+<p>Opcode: 308</p>
+
+<hr />
+
+<h2>BC_FLOW_TRI</h2>
+
+<p>Opcode: 309</p>
+
+<hr />
+
+<h2>BC_FLOW_RETURN</h2>
+
+<p>Opcode: 399</p>
+
+<p>Return from the current function. This is generally stored as the last value in
+a function definition.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>--
+</code></pre>
+
+<hr />
+
+<h2>BC_MEM_COPY</h2>
+
+<p>Opcode: 400</p>
+
+<hr />
+
+<h2>BC_MEM_FETCH</h2>
+
+<p>Opcode: 401</p>
+
+<p>Fetch a value from a specified location in a slice.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>pointer number:offset -- number
+</code></pre>
+
+<hr />
+
+<h2>BC_MEM_STORE</h2>
+
+<p>Opcode: 402</p>
+
+<p>Store a value into a slice at the specified location.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>number:value pointer number:offset --
+</code></pre>
+
+<hr />
+
+<h2>BC_MEM_REQUEST</h2>
+
+<p>Opcode: 403</p>
+
+<p>Request a memory slice. Pushes a pointer to the stack.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>-- pointer
+</code></pre>
+
+<hr />
+
+<h2>BC_MEM_RELEASE</h2>
+
+<p>Opcode: 404</p>
+
+<p>Remove a pointer from the stack and release the corresponding slice.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>pointer --
+</code></pre>
+
+<hr />
+
+<h2>BC_MEM_COLLECT</h2>
+
+<p>Opcode: 405</p>
+
+<p>Scan memory and recover unused slices where possible.</p>
+
+<p>The approach I used was to:</p>
+
+<ul>
+<li>scan the dictionary and stack for pointers to named slices</li>
+<li>keep any slices referenced by these, or their dependencies</li>
+<li>free everything else</li>
+</ul>
+
+<p>Stack Effect:</p>
+
+<pre><code>--
+</code></pre>
+
+<hr />
+
+<h2>BC_GET_SLICE_LENGTH</h2>
+
+<p>Opcode: 406</p>
+
+<p>... TODO ...</p>
+
+<hr />
+
+<h2>BC_SET_SLICE_LENGTH</h2>
+
+<p>Opcode: 407</p>
+
+<p>... TODO ...</p>
+
+<hr />
+
+<h2>BC_STACK_DUP</h2>
+
+<p>Opcode: 500</p>
+
+<p>Make a copy of the top item on the stack. (For STRING values, this creates
+a copy of the original string).</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>value -- value value
+</code></pre>
+
+<hr />
+
+<h2>BC_STACK_DROP</h2>
+
+<p>Opcode: 501</p>
+
+<p>Remove the top value from the stack.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>value --
+</code></pre>
+
+<hr />
+
+<h2>BC_STACK_SWAP</h2>
+
+<p>Opcode: 502</p>
+
+<p>Exchange the positions of the top two items on the stack.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>value:A value:B -- value:B value:A
+</code></pre>
+
+<hr />
+
+<h2>BC_STACK_OVER</h2>
+
+<p>Opcode: 503</p>
+
+<hr />
+
+<h2>BC_STACK_TUCK</h2>
+
+<p>Opcode: 504</p>
+
+<hr />
+
+<h2>BC_STACK_NIP</h2>
+
+<p>Opcode: 505</p>
+
+<p>Remove the second item on the stack.</p>
+
+<hr />
+
+<h2>BC_STACK_DEPTH</h2>
+
+<p>Opcode: 506</p>
+
+<p>Pushes the a NUMBER indicating the number of items on the stack.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>-- number
+</code></pre>
+
+<hr />
+
+<h2>BC_STACK_CLEAR</h2>
+
+<p>Opcode: 507</p>
+
+<p>Removes all values from the stack.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>... --
+</code></pre>
+
+<hr />
+
+<h2>BC_QUOTE_NAME</h2>
+
+<p>Opcode: 600</p>
+
+<p>Attaches a name to a quotation. This is mapped to <em>define</em> by the core language,
+and is considered a built-in part of the core language (along with the core
+syntax).</p>
+
+<p>Usage:  pointer name --</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>pointer string:name --
+</code></pre>
+
+<hr />
+
+<h2>BC_FUNCTION_EXISTS</h2>
+
+<p>Opcode: 601</p>
+
+<p>Given a string, returns a flag of <em>true</em> if the function exists in the dictionary,
+or <em>false</em> if it does not.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>string -- flag
+</code></pre>
+
+<hr />
+
+<h2>BC_LOOKUP_FUNCTION</h2>
+
+<p>Opcode: 602</p>
+
+<p>Given a string, returns a pointer to the slice corresponding to it. If the
+function does not exist, a pointer to slice -1 will be returned.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>string -- pointer
+</code></pre>
+
+<hr />
+
+<h2>BC_HIDE_FUNCTION</h2>
+
+<p>Opcode: 603</p>
+
+<p>Remove a function name from the dictionary. Takes a string, returns nothing.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>string --
+</code></pre>
+
+<hr />
+
+<h2>BC_STRING_SEEK</h2>
+
+<p>Opcode: 700</p>
+
+<hr />
+
+<h2>BC_SLICE_SUBSLICE</h2>
+
+<p>Opcode: 701</p>
+
+<p>Extract a portion of a slice, starting at <em>start</em> and ending at (but not
+including) <em>end</em>.</p>
+
+<p>slice, start, end</p>
+
+<p>returns new-slice</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>pointer number:start number:end -- pointer
+</code></pre>
+
+<hr />
+
+<h2>BC_STRING_NUMERIC</h2>
+
+<p>Opcode: 702</p>
+
+<p>Returns a TRUE flag if the string on TOS can be parsed as a NUMBER, or FALSE
+otherwise. This consumes the string.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>string -- flag
+</code></pre>
+
+<hr />
+
+<h2>BC_TO_LOWER</h2>
+
+<p>Opcode: 800</p>
+
+<p>Convert the CHARACTER or STRING value on the stack to lower case. If the value
+is a STRING, returns a new STRING.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>value -- value
+</code></pre>
+
+<hr />
+
+<h2>BC_TO_UPPER</h2>
+
+<p>Opcode: 801</p>
+
+<p>Convert the CHARACTER or STRING value on the stack to upper case. If the value
+is a STRING, returns a new STRING.</p>
+
+<hr />
+
+<h2>BC_REPORT_ERROR</h2>
+
+<p>Opcode: 900</p>
+
+<p>Takes a string, and adds it to the error log.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>string --
+</code></pre>
+
+<hr />
+
+<h2>BC_SIN</h2>
+
+<p>Opcode: 1000</p>
+
+<p>Calculate and return the sine of a radian value</p>
+
+<hr />
+
+<h2>BC_COS</h2>
+
+<p>Opcode: 1001</p>
+
+<p>Calculate and return the cosine of a radian value</p>
+
+<hr />
+
+<h2>BC_TAN</h2>
+
+<p>Opcode: 1002</p>
+
+<p>Calculate and return the tangent of a radian value</p>
+
+<hr />
+
+<h2>BC_ASIN</h2>
+
+<p>Opcode: 1003</p>
+
+<p>Calculate and return the arc sine of a radian value</p>
+
+<hr />
+
+<h2>BC_ACOS</h2>
+
+<p>Opcode: 1004</p>
+
+<p>Calculate and return the arc cosine of a radian value</p>
+
+<hr />
+
+<h2>BC_ATAN</h2>
+
+<p>Opcode: 1005</p>
+
+<p>Calculate and return the arc tangent of a radian value</p>
+
+<hr />
+
+<h2>BC_ATAN2</h2>
+
+<p>Opcode: 1006</p>
+
+<p>Calculate and return atan(y / x) in radians</p>
+
+<hr />

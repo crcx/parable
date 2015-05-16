@@ -1,0 +1,240 @@
+<link rel='stylesheet' href='stylesheet.css'>
+<h1>Quick Reference</h1>
+
+<p>Parable code consists of whitespace separated tokens. Each token can recieve a single character prefix, which tells the compiler how to process it. Tokens without a prefix are treated as function calls. All code is compiled before being run, with each physical source line being compiled and run separately.</p>
+
+<p>You can use any characters except for whitespace in a function name, but the use of $, &amp;, #, [, ], ', and " as single character function names is not allowed. (However you may use these if the name is three characters or longer)</p>
+
+<hr />
+
+<h2>Data Types</h2>
+
+<p>Parable supports five primary data types:</p>
+
+<ul>
+<li>Numbers</li>
+<li>Characters</li>
+<li>Strings</li>
+<li>Pointers</li>
+<li>Flags</li>
+</ul>
+
+<hr />
+
+<h2>Prefixes</h2>
+
+<p>You can tell Parable how to treat a token by giving it a prefix:</p>
+
+<h3>Numbers</h3>
+
+<pre><code>#100
+#-40.76
+</code></pre>
+
+<h3>Characters</h3>
+
+<pre><code>$a
+$9
+$~
+</code></pre>
+
+<h3>Strings</h3>
+
+<pre><code>'hello'
+'this one has spaces'
+</code></pre>
+
+<h3>Pointers</h3>
+
+<pre><code>&amp;100
+&amp;collect-garbage
+</code></pre>
+
+<h3>Flags</h3>
+
+<p>Flags are returned by various functions. you can push them to the stack with:</p>
+
+<pre><code>true
+false
+</code></pre>
+
+<h3>Comments</h3>
+
+<p>Comments get enclosed in double quotes:</p>
+
+<pre><code>"this is a comment"
+</code></pre>
+
+<hr />
+
+<h2>Type Conversions</h2>
+
+<p>Parable allows for conversions between data types.</p>
+
+<h3>:n</h3>
+
+<p>Converts a value to a number. for pointers, the actual value remains the same. For flags, one of the following occur:</p>
+
+<pre><code>true    -&gt;   -1
+false   -&gt;    0
+other   -&gt;    1
+</code></pre>
+
+<p>For strings, if the string is a valid number, it is converted and pushed to the stack. If the string is not a number, the result is not defined.</p>
+
+<p>For characters, this returns the ASCII (or Unicode) value.</p>
+
+<h3>:c</h3>
+
+<p>Converts a value to a character.</p>
+
+<p>Numbers and pointers are assumed to be valid ASCII (or Unicode) values.</p>
+
+<p>Strings will have their first character returned.</p>
+
+<h3>:s</h3>
+
+<p>Numbers are converted to strings.</p>
+
+<p>Pointers are assumed to point to a string, and their internal type is changed.</p>
+
+<p>Characters are converted to strings.</p>
+
+<p>Flags become one of:</p>
+
+<pre><code>true    -&gt;  'true'
+false   -&gt;  'false'
+other   -&gt;  'malformed flag'
+</code></pre>
+
+<h3>:p</h3>
+
+<p>The value becomes treated as a pointer.</p>
+
+<p>For numbers, strings, and characters, the internal type is changed.</p>
+
+<p>For flags, the results are not defined.</p>
+
+<h3>:f</h3>
+
+<p>The value is converted to a flag.</p>
+
+<p>Strings get converted as:</p>
+
+<pre><code>'true'   -&gt;  true
+'false'  -&gt;  false
+</code></pre>
+
+<p>Numbers get converted as:</p>
+
+<pre><code>-1  -&gt;  true
+ 0  -&gt;  false
+</code></pre>
+
+<p>Any other string or number results in a malformed flag.</p>
+
+<p>The results for pointers and characters are not defined.</p>
+
+<hr />
+
+<h2>Quotations</h2>
+
+<p>A quote is an anonymous block of code. These form the basis of function
+definition, flow control, and various stack operations. to create a new
+quote, wrap the code in a pair of square brackets:</p>
+
+<pre><code>[ ]
+</code></pre>
+
+<p>Quotes can be nested, and are passed around via pointers.</p>
+
+<p>Functions operating on quotes are called <em>combinators</em>.</p>
+
+<hr />
+
+<h2>Flow: loops</h2>
+
+<p>Parable provides three looping combinators.</p>
+
+<h3>repeat</h3>
+
+<p>repeat is used for simple counted loops. it takes a count and a quote, and
+runs the quote the specified number of times.</p>
+
+<pre><code>#10 [ $a ] repeat
+#0 #10 [ dup #1 + ] repeat
+</code></pre>
+
+<h3>while-true</h3>
+
+<p>Executes a quote repeatedly until the quote returns a non-true flag.</p>
+
+<pre><code>#10 [ dup #1 - dup #0 &lt;&gt; ] while-true
+</code></pre>
+
+<h3>while-false</h3>
+
+<p>Executes a quote repeatedly until the quote returns a non-false flag.</p>
+
+<pre><code>#10 [ dup #1 - dup #0 = ] while-false
+</code></pre>
+
+<hr />
+
+<h2>Flow: conditionals</h2>
+
+<p>Three conditional execution combinators are provided.</p>
+
+<h3>if</h3>
+
+<p>Takes a flag, and two quotes. It will execute the first quote if the flag
+is true, or the second if the flag is false.</p>
+
+<pre><code>true [ #1 ] [ #2 ] if
+"will return #1"
+
+false [ #1 ] [ #2 ] if
+"will return 2"
+</code></pre>
+
+<h3>if-true</h3>
+
+<p>Takes a flag and a quote. It will execute the quote if the flag is true.</p>
+
+<pre><code>true [ #1 ] if-true
+</code></pre>
+
+<h3>if-false</h3>
+
+<p>Takes a flag and a quote. It will execute the quote if the flag is false.</p>
+
+<pre><code>false [ #1 ] if-false
+</code></pre>
+
+<hr />
+
+<h2>Stack Manipulation</h2>
+
+<p>Parable provides a number of simple shuffler functions from Forth: dup, drop, swap, over, tuck, nip</p>
+
+<p>It also provides combinators: dip, sip, bi, tri, bi@, bi*</p>
+
+<p>Parable does not provide a secondary stack, but some common Forth idioms can be handled easily using combinators: (both Forth and Parable code samples shown)</p>
+
+<h3>Temporarily removing a value from the stack</h3>
+
+<pre><code>&gt;r ... r&gt;
+[ ... ] dip
+</code></pre>
+
+<h3>Execute a sequence of code with a copy of a value</h3>
+
+<pre><code>dup &gt;r ... r&gt;
+[ ... ] sip
+</code></pre>
+
+<h3>Execute code, preserving the contents of a variable:</h3>
+
+<pre><code>base @ &gt;r ... r&gt; base !
+&amp;base [ ... ] preserve
+</code></pre>

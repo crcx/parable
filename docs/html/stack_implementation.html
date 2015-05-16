@@ -1,0 +1,267 @@
+<link rel='stylesheet' href='stylesheet.css'>
+<h1>Stack Implementation</h1>
+
+<p>Parable is built around the concept of a last-in, first-out (LIFO) stack.
+This is used to pass data between functions, and generally holds all input
+and output generated.</p>
+
+<p>The stack implementation consists of two fundamental parts: something that
+holds the values, and something that holds the corresponding data types.
+In the implementations done so far, these have been arrays or lists.</p>
+
+<p>Internally, the stack only holds numeric values. The actual types are handled
+via conventions within the byte code interpreter. As an example:</p>
+
+<pre><code>    #100.50
+    $a
+    'hello'
+</code></pre>
+
+<p>Parable will push a value to the stack:</p>
+
+<pre><code>         Stack    Type
+         -------+----------------
+         100.50   TYPE_NUMBER
+         97       TYPE_CHARACTER
+    top: 8        TYPE_STRING
+</code></pre>
+
+<p>The byte codes will look at the type listing to decide how to interpret
+the corresponding values. If the user does something like:</p>
+
+<pre><code>    'hello' to-uppercase
+</code></pre>
+
+<p>The compiler will generate byte codes:</p>
+
+<pre><code>    BC_PUSH_S     &lt;pointer to 'hello'&gt;
+    BC_FLOW_CALL  &lt;pointer to 'to-uppercase'&gt;
+</code></pre>
+
+<p>The interpreter will push the pointer to 'hello' to the stack, with a type
+of TYPE_STRING. When the bytecode for BC_TO_UPPER is reached during the
+call operation, it will convert the Parable string into a native string,
+make the case conversion, convert back to a Parable string, and store the
+results in a new slice. All operations on non-numeric data will do any
+necessary conversions automatically.</p>
+
+<p>Parable only exposes the data stack. No addressing or alternate stacks are
+provided.</p>
+
+<p>The stack values can correspond to one of the following data types:</p>
+
+<pre><code>    Type             Value
+    ---------------+------
+    TYPE_NUMBER      100
+    TYPE_STRING      200
+    TYPE_CHARACTER   300
+    TYPE_FUNCTION    400
+    TYPE_FLAG        500
+</code></pre>
+
+<p>Any other type value should be considered an error.</p>
+
+<h2>functions</h2>
+
+<p>The following functions and data structures are provided by the
+reference implementation:</p>
+
+<pre><code>    stack = []
+    types = []
+</code></pre>
+
+<p><strong>stack_clear()</strong></p>
+
+<p>Removes all values from the stack.</p>
+
+<p><strong>stack_push(value, type)</strong></p>
+
+<p>Push a value (of the specified type) to the stack.</p>
+
+<p><strong>stack_drop()</strong></p>
+
+<p>Remove the top value from the stack.</p>
+
+<p><strong>stack_pop()</strong></p>
+
+<p>Remove and return the top value from the stack.</p>
+
+<p><strong>stack_tos()</strong></p>
+
+<p>Returns a copy of the top value on the stack.</p>
+
+<p><strong>stack_type()</strong></p>
+
+<p>Returns the type identifier for the top item on the stack.</p>
+
+<p><strong>stack_swap()</strong></p>
+
+<p>Switch the positions of the top two items on the stack.</p>
+
+<p><strong>stack_dup()</strong></p>
+
+<p>Duplicates the top value on the stack. If this value is a
+string, it makes a copy and pushes the pointer to the copy
+rather than duplicate the original pointer.</p>
+
+<p><strong>stack_over()</strong></p>
+
+<p>Put a copy of the second item on the stack over the top item.
+If the second value is a string, makes a copy of it and pushes
+the pointer to that rather than the original pointer.</p>
+
+<p><strong>stack_tuck()</strong></p>
+
+<p>Put a copy of the top item under the second item. If the top
+value is a string, makes a copy and pushes the pointer to the
+copy rather than the original pointer.</p>
+
+<p><strong>stack_change_type(type)</strong></p>
+
+<p>Convert the type of an item on the stack to a different type.
+This is subject to a few rules, based on the requested type:</p>
+
+<ul>
+<li><p>TYPE_NUMBER</p>
+
+<ul>
+<li>TYPE_STRING is converted to a number</li>
+<li>If TYPE_STRING can not be converted to a number, a zero is pushed</li>
+</ul></li>
+<li><p>TYPE_STRING</p>
+
+<ul>
+<li>TYPE_NUMBER is converted to a string</li>
+<li>TYPE_CHARACTER is converted to a string</li>
+<li><p>TYPE_FLAG becomes one of:</p>
+
+<ul>
+<li>'true'</li>
+<li>'false'</li>
+<li>'malformed flag'</li>
+</ul></li>
+<li><p>TYPE_FUNCTION becomes a string</p></li>
+</ul></li>
+<li><p>TYPE_CHARACTER</p>
+
+<ul>
+<li>TYPE_STRING gets the first character returned</li>
+</ul></li>
+<li><p>TYPE_FLAG</p>
+
+<ul>
+<li><p>TYPE_STRING conversion based on the following rules:</p>
+
+<ul>
+<li>'true' -> true</li>
+<li>'false' -> false</li>
+<li>anything else is a malformed flag</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<p>Unless otherwise noted, only the type portion of the stack record is
+modified.</p>
+
+<h2>other functionality</h2>
+
+<p>Additional functionality in the byte code is built over the functions
+listed above. These are the remaining stack functions and some Python
+snippits showing simple implementations of them.</p>
+
+<p><strong>nip</strong></p>
+
+<p>Remove the second item from the stack.</p>
+
+<pre><code>    stack_swap()
+    stack_drop()
+</code></pre>
+
+<p><strong>depth</strong></p>
+
+<p>Return the number of items on the stack.</p>
+
+<pre><code>    stack_push(len(stack), TYPE_NUMBER)
+</code></pre>
+
+<p><strong>dip</strong></p>
+
+<p>Given a quote and a value, invoke the quote with the value
+temporarily removed from the stack.</p>
+
+<pre><code>    quote = stack_pop()
+    type = stack_type()
+    value = stack_pop()
+    interpret(quote)
+    stack_push(value, type)
+</code></pre>
+
+<p><strong>sip</strong></p>
+
+<p>Given a quote and a value, execute the quote with the value on the stack,
+then place a copy of the value back on the stack after execution.</p>
+
+<pre><code>    quote = stack_pop()
+    stack_dup()
+    type = stack_type()
+    value = stack_pop()
+    interpret(quote)
+    stack_push(value, type)
+</code></pre>
+
+<p><strong>bi</strong></p>
+
+<p>Given two quotes and value, apply each quote to a copy of the value.</p>
+
+<pre><code>     # get the two quotes
+     a = stack_pop()
+     b = stack_pop()
+
+     # make a copy of the stack value
+     stack_dup()
+     type = stack_type()
+     value = stack_pop()
+
+     # execute a quote against the original value
+     interpret(b)
+
+     # execute a quote against the copied value
+     stack_push(value, type)
+     interpret(a)
+</code></pre>
+
+<p><strong>tri</strong></p>
+
+<p>Given three quotes and a value, apply each quote to a copy of the value.</p>
+
+<pre><code>     # get the three quotes
+     a = stack_pop()
+     b = stack_pop()
+     c = stack_pop()
+
+     # make a copy of the stack value
+     stack_dup()
+     type_a = stack_type()
+     value_a = stack_pop()
+
+     # make another copy of the stack value
+     stack_dup()
+     type_b = stack_type()
+     value_b = stack_pop()
+
+     # execute a quote against the original value
+     interpret(c)
+
+     # execute a quote against the first copy
+     stack_push(value_a, type_a)
+     interpret(b)
+
+     # execute a quote against the second copy
+     stack_push(value_b, type_b)
+     interpret(a)
+</code></pre>
+
+<p><strong>check_depth(cells)</strong></p>
+
+<p>Returns True if the stack contains at least <em>cells</em> number of items, or
+False otherwise. If False, reports an underflow error.</p>

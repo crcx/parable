@@ -1,0 +1,181 @@
+<link rel='stylesheet' href='stylesheet.css'>
+<h1>Quotations</h1>
+
+<p>Parable is built around the use of a stack for passing data, and anonymous functions called <em>quotations</em>. Quotations can be nested, named, and passed around on the stack.</p>
+
+<p>To create a quotation, simply wrap the code sequence in an open and closing square bracket (separated by a whitespace). E.g. to create a quotation returning the string <em>'hello world'</em> just do:</p>
+
+<pre><code>[ 'hello world' ]
+</code></pre>
+
+<p>Quotations can be nested. This can be seen here:</p>
+
+<pre><code>[ [ 'this quote returns a string' ] ]
+</code></pre>
+
+<p>And to name a quotation (or other <a href="pointers.html">pointer</a>), just use <strong>define</strong>:</p>
+
+<pre><code>[ 'hello world' ]  'hello' define
+</code></pre>
+
+<h1>Combinators</h1>
+
+<p>Functions that operate on quotations are called <em>combinators</em>. Parable groups these loosely into three broad categories: <em>compositional</em>, <em>execution flow</em>, and <em>data flow</em>.</p>
+
+<h2>Compositional</h2>
+
+<p>A compositional combinator takes elements from the stack and returns a new quotation.</p>
+
+<h3>Curry</h3>
+
+<p><strong>Curry</strong> takes a value and a quote and returns a new quote applying the specified quote to the specified value.</p>
+
+<h2>Execution Flow</h2>
+
+<p>Combinators of this type execute other functions.</p>
+
+<h3>Fundamental</h3>
+
+<h4>Invoke</h4>
+
+<p><strong>Invoke</strong> takes a quote and executes it immediately.</p>
+
+<pre><code>#4 [ #100 * ] invoke
+#33 &amp;+ invoke
+</code></pre>
+
+<h3>Conditionals</h3>
+
+<p>Retro provides four combinators for use with conditional execution of quotes. These are <strong>if</strong>,<strong>ifTrue</strong>,<strong>ifFalse</strong>, and<strong>when</strong>.</p>
+
+<h4>if</h4>
+
+<p><strong>if</strong> takes a flag and two quotes from the stack. If the flag is true, the first quote is executed. If false, the second quote is executed.</p>
+
+<pre><code>true  [ 'true' ] [ 'false' ] if
+false [ 'true' ] [ 'false' ] if
+</code></pre>
+
+<h4>if-true</h4>
+
+<p><strong>if-true</strong> takes a flag and one quote from the stack. If the flag is true, the quote is executed. If false, the quote is discarded.</p>
+
+<pre><code>true  [ 'true' ] if-true
+false [ 'true' ] if-true
+</code></pre>
+
+<h4>if-false</h4>
+
+<p><strong>if-false</strong> takes a flag and one quote from the stack. If the flag is false, the quote is executed. If true, the quote is discarded.</p>
+
+<pre><code>true  [ 'false' ] if-false
+false [ 'false' ] if-false
+</code></pre>
+
+<h3>Looping</h3>
+
+<p>Several combinators are available for handling various looping constructs.</p>
+
+<h4>while-true</h4>
+
+<p><strong>while-true</strong> takes a quote from the stack and executes it repeatedly as long as the quote returns a <strong>true</strong> flag on the stack. This flag must be well formed.</p>
+
+<pre><code>#10 [ dup #1 - dup #0 &lt;&gt; ] while-true
+</code></pre>
+
+<h4>while-false</h4>
+
+<p><strong>while-false</strong> is the inverse of <strong>while-true</strong>. It will execute the quotation repeatedly until the quote returns a <strong>true</strong> flag.</p>
+
+<h4>repeat</h4>
+
+<p><strong>repeat</strong> takes a count and quote from the stack. The quote will be executed the number of times specified. No indexes are pushed to the stack.</p>
+
+<pre><code>#1 #10 [ dup #1 + ] repeat
+</code></pre>
+
+<h2>Data Flow</h2>
+
+<p>These combinators exist to simplify stack usage in various circumstances.</p>
+
+<h3>Preserving</h3>
+
+<p>Preserving combinators execute code while preserving portions of the data stack.</p>
+
+<h4>dip</h4>
+
+<p><strong>dip</strong> takes a value and a quote, moves the value off the main stack temporarily, executes the quote, and then restores the value.</p>
+
+<pre><code>#10 #20 [ #1 + ] dip
+</code></pre>
+
+<p>Would yield the following on the stack:</p>
+
+<pre><code>#11 #20
+</code></pre>
+
+<h4>sip</h4>
+
+<p><strong>sip</strong> is similar to <strong>dip</strong>, but leaves a copy of the original value on the stack during execution of the quote. So:</p>
+
+<pre><code>#10 [ #1 + ] sip
+</code></pre>
+
+<p>Leaves us with:</p>
+
+<pre><code>#11 #10
+</code></pre>
+
+<h3>Cleave</h3>
+
+<p>Cleave combinators apply multiple quotations to a single value or set of values.</p>
+
+<h4>bi</h4>
+
+<p><strong>bi</strong> takes a value and two quotes, it then applies each quote to a copy of the value.</p>
+
+<pre><code>#100 [ #1 + ] [ #1 - ] bi
+</code></pre>
+
+<h4>tri</h4>
+
+<p><strong>tri</strong> takes a value and three quotes. It then applies each quote to a copy of the value.</p>
+
+<pre><code>#100 [ #1 + ] [ #1 - ] [ dup * ] tri
+</code></pre>
+
+<h3>Spread</h3>
+
+<p>Spread combinators apply multiple quotations to multiple values. The asterisk suffixed to these function names signifies that they are spread combinators.</p>
+
+<h4>bi*</h4>
+
+<p><strong>bi*</strong> takes two values and two quotes. It applies the first quote to the first value and the second quote to the second value.</p>
+
+<pre><code>#1 #2 [ #1 + ] [ #2 * ] bi*
+</code></pre>
+
+<h4>tri*</h4>
+
+<p><strong>tri*</strong> takes three values and three quotes, applying the first quote to the first value, the second quote to the second value, and the third quote to the third value.</p>
+
+<pre><code>#1 #2 #3 [ #1 + ] [ #2 * ] [ #1 - ] tri*
+</code></pre>
+
+<h3>Apply</h3>
+
+<p>Apply combinators apply a single quotation to multiple values. The at (@) sign suffixed to these function names signifies that they are apply combinators.</p>
+
+<h4>bi@</h4>
+
+<p><strong>bi@</strong> takes two values and a quote. It then applies the quote to each value.</p>
+
+<pre><code>#1 #2 [ #1 + ] bi@
+</code></pre>
+
+<h4>tri@</h4>
+
+<p><strong>tri@</strong> takes three values and a quote. It then applies the quote to each value.</p>
+
+<pre><code>#1 #2 #3 [ #1 + ] tri@
+</code></pre>

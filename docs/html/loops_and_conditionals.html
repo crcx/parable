@@ -1,0 +1,27 @@
+<link rel='stylesheet' href='stylesheet.css'>
+<h1>Loops</h1>
+
+<p>Parable provides three looping combinators.</p>
+
+<h2>repeat</h2>
+
+<p>repeat is used for simple counted loops. it takes a count and a quote, and
+runs the quote the specified number of times.</p>
+
+<pre><code>#10 [ $a ] repeat
+#0 #10 [ dup #1 + ] repeat
+</code></pre>
+
+<h2>while-true</h2>
+
+<p>Executes a quote repeatedly until the quote returns a non-true flag.</p>
+
+<pre><code>#10 [ dup #1 - dup #0 &lt;&gt; ] while-true
+</code></pre>
+
+<h2>while-false</h2>
+
+<p>Executes a quote repeatedly until the quote returns a non-false flag.</p>
+
+<pre><code>#10 [ dup #1 - dup #0 = ] while-false
+</code></pre>
