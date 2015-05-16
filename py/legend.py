@@ -138,7 +138,7 @@ def display_stack():
             write("\t'" + slice_to_string(stack[i]) + "'", COLOR_STACK_S)
             write("\n\t\tstored at: " + unicode(stack[i]), 'normal')
             l += 1
-        elif types[i] == TYPE_FUNCTION:
+        elif types[i] == TYPE_POINTER:
             write("\t&" + unicode(stack[i]), COLOR_STACK_F)
             if pointer_to_name(stack[i]) != "":
                 write("\n\t\tpointer to: ", 'normal')
