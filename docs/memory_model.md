@@ -1,6 +1,6 @@
 # Memory Model
 
-In Parable, memory is organized a series of slices, each of which has a dynamically sized length. Each slice is technically a separate entity, and contains a single function or set of data.
+In Parable, memory is organized as series of slices, each of which has a dynamically sized length. Each slice is technically a separate entity, and contains a single function or a set of data.
 
 It's important to note that each quotation is a separate function, existing in its own slice.
 
