@@ -648,10 +648,11 @@ Stack Effect:
 
 Opcode: 303
 
+Execute the code in quote the specified number of times.
+
 Stack Effect:
 
     number quote --
-
 
 ----
 
@@ -821,7 +822,9 @@ Stack Effect:
 
 Opcode: 406
 
-... TODO ...
+Stack Effect:
+
+    pointer -- number
 
 ----
 
@@ -829,7 +832,9 @@ Opcode: 406
 
 Opcode: 407
 
-... TODO ...
+Stack Effect:
+
+    number pointer --
 
 ----
 
@@ -874,11 +879,19 @@ Stack Effect:
 
 Opcode: 503
 
+Stack Effect:
+
+    value:A value:B -- value:A value:B value:A
+
 ----
 
 ## BC\_STACK\_TUCK
 
 Opcode: 504
+
+Stack Effect:
+
+    value:A value:B -- value:B value:A value:B
 
 ----
 
@@ -887,6 +900,10 @@ Opcode: 504
 Opcode: 505
 
 Remove the second item on the stack.
+
+Stack Effect:
+
+    value:A value:B -- value:B
 
 ----
 
@@ -921,8 +938,6 @@ Opcode: 600
 Attaches a name to a quotation. This is mapped to *define* by the core language,
 and is considered a built-in part of the core language (along with the core
 syntax).
-
-Usage:  pointer name --
 
 Stack Effect:
 
@@ -971,6 +986,12 @@ Stack Effect:
 ## BC\_STRING\_SEEK
 
 Opcode: 700
+
+Find needle in haystack, return a pointer to it, or -1 if not found.
+
+Stack Effect:
+
+    string:haystack string:needle -- number
 
 ----
 
@@ -1024,6 +1045,10 @@ Opcode: 801
 Convert the CHARACTER or STRING value on the stack to upper case. If the value
 is a STRING, returns a new STRING.
 
+Stack Effect:
+
+    value -- value
+
 ----
 
 ## BC\_REPORT\_ERROR
@@ -1044,6 +1069,10 @@ Opcode: 1000
 
 Calculate and return the sine of a radian value
 
+Stack Effect:
+
+    number -- number
+
 ----
 
 ## BC\_COS
@@ -1051,6 +1080,10 @@ Calculate and return the sine of a radian value
 Opcode: 1001
 
 Calculate and return the cosine of a radian value
+
+Stack Effect:
+
+    number -- number
 
 ----
 
@@ -1060,6 +1093,10 @@ Opcode: 1002
 
 Calculate and return the tangent of a radian value
 
+Stack Effect:
+
+    number -- number
+
 ----
 
 ## BC\_ASIN
@@ -1067,6 +1104,10 @@ Calculate and return the tangent of a radian value
 Opcode: 1003
 
 Calculate and return the arc sine of a radian value
+
+Stack Effect:
+
+    number -- number
 
 ----
 
@@ -1076,6 +1117,10 @@ Opcode: 1004
 
 Calculate and return the arc cosine of a radian value
 
+Stack Effect:
+
+    number -- number
+
 ----
 
 ## BC\_ATAN
@@ -1083,6 +1128,10 @@ Calculate and return the arc cosine of a radian value
 Opcode: 1005
 
 Calculate and return the arc tangent of a radian value
+
+Stack Effect:
+
+    number -- number
 
 ----
 
