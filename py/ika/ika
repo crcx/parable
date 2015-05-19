@@ -1442,6 +1442,7 @@ bootstrap.append(""" [ "np-"   [ get-buffer-length + ] sip set-buffer-length ] '
 bootstrap.append(""" [ "p-?n"  depth [ invoke ] dip depth swap - ] 'invoke-and-count-items-returned' define """)
 bootstrap.append(""" [ "pn-?n" [ depth [ invoke ] dip depth swap - ] + ] 'invoke-and-count-items-returned-with-adjustment' define """)
 bootstrap.append(""" [ "?n-"   [ drop ] repeat ] 'drop-multiple' define """)
+bootstrap.append(""" [ "p-p"    request [ copy ] sip ] 'slice-duplicate' define """)
 bootstrap.append(""" [ "p-"   invoke-and-count-items-returned [ hide-function ] repeat ] 'hide-functions' define """)
 bootstrap.append(""" [ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap define ] [ drop ] if ] 'rename-function' define """)
 bootstrap.append(""" [ "p-"   invoke-and-count-items-returned [ variable ] repeat ] 'variables' define """)

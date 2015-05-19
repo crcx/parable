@@ -141,7 +141,7 @@
 [ "p-?n"  depth [ invoke ] dip depth swap - ] 'invoke-and-count-items-returned' define
 [ "pn-?n" [ depth [ invoke ] dip depth swap - ] + ] 'invoke-and-count-items-returned-with-adjustment' define
 [ "?n-"   [ drop ] repeat ] 'drop-multiple' define
-
+[ "p-p"    request [ copy ] sip ] 'slice-duplicate' define
 [ "p-"   invoke-and-count-items-returned [ hide-function ] repeat ] 'hide-functions' define
 [ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap define ] [ drop ] if ] 'rename-function' define
 [ "p-"   invoke-and-count-items-returned [ variable ] repeat ] 'variables' define

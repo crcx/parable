@@ -1075,6 +1075,12 @@ Create a new buffer, and attach a name to it.
 
     string --
 
+## slice-duplicate
+
+Make a copy of a slice.
+
+    pointer:original -- pointer:copy
+
 ## array-push
 
 Push a value to the end of an array.
