@@ -23,7 +23,7 @@ DEFAULT_SLICE_LEN = 1
 TYPE_NUMBER = 100
 TYPE_STRING = 200
 TYPE_CHARACTER = 300
-TYPE_FUNCTION = 400
+TYPE_POINTER = 400
 TYPE_FLAG = 500
 
 
@@ -97,11 +97,10 @@ BC_FUNCTION_EXISTS = 601
 BC_FUNCTION_LOOKUP = 602
 BC_FUNCTION_HIDE = 603
 BC_STRING_SEEK = 700
-BC_STRING_SUBSTR = 701
+BC_SLICE_SUBSLICE = 701
 BC_STRING_NUMERIC = 702
 BC_TO_LOWER = 800
 BC_TO_UPPER = 801
-BC_LENGTH = 802
 BC_REPORT = 900
 BC_TRIG_SIN = 1000
 BC_TRIG_COS = 1001
@@ -182,7 +181,7 @@ def interpret(slice, more=None):
             stack_push(fetch(slice, offset), TYPE_CHARACTER)
         elif opcode == BC_PUSH_F:
             offset += 1
-            stack_push(fetch(slice, offset), TYPE_FUNCTION)
+            stack_push(fetch(slice, offset), TYPE_POINTER)
         elif opcode == BC_PUSH_COMMENT:
             offset += 1
         elif opcode == BC_TYPE_N:
@@ -202,7 +201,7 @@ def interpret(slice, more=None):
                 offset = size
         elif opcode == BC_TYPE_F:
             if check_depth(1):
-                stack_change_type(TYPE_FUNCTION)
+                stack_change_type(TYPE_POINTER)
             else:
                 offset = size
         elif opcode == BC_TYPE_FLAG:
@@ -556,7 +555,7 @@ def interpret(slice, more=None):
             else:
                 offset = size
         elif opcode == BC_MEM_REQUEST:
-            stack_push(request_slice(), TYPE_FUNCTION)
+            stack_push(request_slice(), TYPE_POINTER)
         elif opcode == BC_MEM_RELEASE:
             if check_depth(1):
                 release_slice(stack_pop())
@@ -626,9 +625,9 @@ def interpret(slice, more=None):
             if check_depth(1):
                 name = slice_to_string(stack_pop())
                 if lookup_pointer(name) != -1:
-                    stack_push(lookup_pointer(name), TYPE_FUNCTION)
+                    stack_push(lookup_pointer(name), TYPE_POINTER)
                 else:
-                    stack_push(-1, TYPE_FUNCTION)
+                    stack_push(-1, TYPE_POINTER)
             else:
                 offset = size
         elif opcode == BC_FUNCTION_HIDE:
@@ -645,13 +644,18 @@ def interpret(slice, more=None):
                 stack_push(b.find(a), TYPE_NUMBER)
             else:
                 offset = size
-        elif opcode == BC_STRING_SUBSTR:
+        elif opcode == BC_SLICE_SUBSLICE:
             if check_depth(3):
                 a = int(stack_pop())
                 b = int(stack_pop())
-                c = slice_to_string(stack_pop())
-                c = c[b:a]
-                stack_push(string_to_slice(c), TYPE_STRING)
+                c = p_slices[int(stack_pop())]
+                d = c[b:a+1]
+                e = request_slice()
+                i  = 0
+                while i < len(d):
+                    store(d[i], e, i)
+                    i = i + 1
+                stack_push(e, TYPE_POINTER)
             else:
                 offset = size
         elif opcode == BC_STRING_NUMERIC:
@@ -693,15 +697,6 @@ def interpret(slice, more=None):
                     stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                 else:
                     report('ERROR: BC_TO_LOWER requires STRING or CHARACTER')
-            else:
-                offset = size
-        elif opcode == BC_LENGTH:
-            if check_depth(1):
-                if stack_type() == TYPE_STRING:
-                    a = slice_to_string(stack_tos())
-                    stack_push(len(a), TYPE_NUMBER)
-                else:
-                    stack_push(0, TYPE_NUMBER)
             else:
                 offset = size
         elif opcode == BC_REPORT:
@@ -868,7 +863,7 @@ def stack_change_type(type):
                 stack_push(string_to_slice('false'), TYPE_STRING)
             else:
                 stack_push(string_to_slice('malformed flag'), TYPE_STRING)
-        elif stack_type() == TYPE_FUNCTION:
+        elif stack_type() == TYPE_POINTER:
             types.pop()
             types.append(TYPE_STRING)
         else:
@@ -880,9 +875,9 @@ def stack_change_type(type):
         else:
             s = stack_pop()
             stack_push(int(s), TYPE_CHARACTER)
-    elif type == TYPE_FUNCTION:
+    elif type == TYPE_POINTER:
         types.pop()
-        types.append(TYPE_FUNCTION)
+        types.append(TYPE_POINTER)
     elif type == TYPE_FLAG:
         if stack_type() == TYPE_STRING:
             s = slice_to_string(stack_pop())

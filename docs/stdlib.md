@@ -968,7 +968,7 @@ Return the factorial of a number.
 
     number -- number
 
-## *current-buffer*
+## *CURRENT-BUFFER
 
 Variable.
 
@@ -976,7 +976,7 @@ Variable holding the current buffer slice number.
 
     -- pointer
 
-## *buffer-offset*
+## *BUFFER-OFFSET
 
 Variable.
 
