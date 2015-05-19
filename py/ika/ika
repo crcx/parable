@@ -1643,7 +1643,7 @@ def dump_stack():
             sys.stdout.write("\t$" + unicode(unichr(stack[i])))
         elif types[i] == TYPE_STRING:
             sys.stdout.write(("\t'" + slice_to_string(stack[i]) +"'").encode('utf-8'))
-        elif types[i] == TYPE_FUNCTION:
+        elif types[i] == TYPE_POINTER:
             sys.stdout.write("\t&" + unicode(stack[i]))
         elif types[i] == TYPE_FLAG:
             if stack[i] == -1:
@@ -1667,7 +1667,7 @@ def display_value():
         sys.stdout.write(unicode(unichr(stack[i])))
     elif types[i] == TYPE_STRING:
         sys.stdout.write(slice_to_string(stack[i]))
-    elif types[i] == TYPE_FUNCTION:
+    elif types[i] == TYPE_POINTER:
         sys.stdout.write('&' + unicode(stack[i]))
     elif types[i] == TYPE_FLAG:
         if stack[i] == -1:

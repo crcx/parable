@@ -17,7 +17,7 @@ def display_stack(verbose):
             sys.stdout.write(("\t'" + slice_to_string(stack[i]) + "'").encode('utf-8'))
             if verbose == True:
                 sys.stdout.write("\n\t\tstored at: " + unicode(stack[i]))
-        elif types[i] == TYPE_FUNCTION:
+        elif types[i] == TYPE_POINTER:
             sys.stdout.write("\t&" + unicode(stack[i]))
             if verbose == True:
                 if pointer_to_name(stack[i]) != "":

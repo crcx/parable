@@ -157,13 +157,13 @@
 [ "v-f"  to-lowercase 'aeiou'                                string-contains? ] 'vowel?' define
 [ "v-f"  dup to-lowercase = ] 'lowercase?' define
 [ "v-f"  dup to-uppercase = ] 'uppercase?' define
-[ "p-s" invoke-and-count-items-returned #1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define
+[ "p-s"  invoke-and-count-items-returned #1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define
 
 "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
 [ "s-s"  :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ slice-length ] dip swap subslice :s ] 'trim-left' define
 [ ] 'trim-right' define
 [ "s-s"  :s slice-length dup-pair #1 - fetch nip #32 = [ slice-length #1 - #0 swap subslice :s trim-right ] if-true ] 'trim-right' define
-[ "s-s" trim-left trim-right ] 'trim' define
+[ "s-s"  trim-left trim-right ] 'trim' define
 
 "Helpful Math"
 [ "n-n"   dup negative? [ #-1 * ] if-true ] 'abs' define
@@ -172,21 +172,21 @@
 [ "n-"    #1 swap [ [ * ] sip #1 - dup #1 <> ] while-true drop ] 'factorial' define
 
 "Slice as a linear buffer"
-[ '*current-buffer*'  '*buffer-offset*' ] variables
-[ "-p"     &*current-buffer* @ :p ] 'current-buffer' define
-[ "-pn"    current-buffer &*buffer-offset* @ ] 'buffer-position' define
-[ "-"      &*buffer-offset* increment ] 'buffer-advance' define
-[ "-"      &*buffer-offset* decrement ] 'buffer-retreat' define
+[ '*CURRENT-BUFFER'  '*BUFFER-OFFSET' ] variables
+[ "-p"     &*CURRENT-BUFFER @ :p ] 'current-buffer' define
+[ "-pn"    current-buffer &*BUFFER-OFFSET @ ] 'buffer-position' define
+[ "-"      &*BUFFER-OFFSET increment ] 'buffer-advance' define
+[ "-"      &*BUFFER-OFFSET decrement ] 'buffer-retreat' define
 [ "n-"     buffer-position store ] 'buffer-store-current' define
 [ "-n"     buffer-position fetch ] 'buffer-fetch-current' define
 [ "v-"     buffer-position store buffer-advance #0 buffer-position store ] 'buffer-store' define
 [ "-n"     buffer-position fetch buffer-advance ] 'buffer-fetch' define
 [ "v-"     buffer-retreat buffer-position store ] 'buffer-store-retreat' define
 [ "-n"     buffer-retreat buffer-position fetch ] 'buffer-fetch-retreat' define
-[ "p-"     &*current-buffer* ! &*buffer-offset* zero-out ] 'set-buffer' define
+[ "p-"     &*CURRENT-BUFFER ! &*BUFFER-OFFSET zero-out ] 'set-buffer' define
 [ "...n-"  [ buffer-store ] repeat ] 'buffer-store-items' define
 [ "-"      request set-buffer ] 'new-buffer' define
-[ "p-"     &*current-buffer* @ [ &*buffer-offset* @ [ invoke ] dip &*buffer-offset* ! ] dip &*current-buffer* ! ] 'preserve-buffer' define
+[ "p-"     &*CURRENT-BUFFER @ [ &*BUFFER-OFFSET @ [ invoke ] dip &*BUFFER-OFFSET ! ] dip &*CURRENT-BUFFER ! ] 'preserve-buffer' define
 [ "s-"     request [ swap define ] sip set-buffer ] 'named-buffer' define
 
 
@@ -197,7 +197,7 @@
 [ "p-n"    [ #-1 swap adjust-slice-length ] sip dup get-buffer-length fetch ] 'array-pop' define
 [ "p-n"    get-buffer-length ] 'array-length' define
 [ "pnp-n"  &filter ! over array-length [ over array-pop &filter @ invoke ] repeat nip ] 'array-reduce' define
-[ "p-p"    [ new-buffer invoke-and-count-items-returned buffer-store-items &*current-buffer* @ ] preserve-buffer :p ] 'array-from-quote<in-stack-order>' define
+[ "p-p"    [ new-buffer invoke-and-count-items-returned buffer-store-items &*CURRENT-BUFFER @ ] preserve-buffer :p ] 'array-from-quote<in-stack-order>' define
 [ "p-p"    request [ copy ] sip &source ! [ #0 &source @ array-length [ &source @ over fetch swap #1 + ] repeat drop ] array-from-quote<in-stack-order> ] 'array-reverse' define
 [ "p-p"    array-from-quote<in-stack-order> array-reverse ] 'array-from-quote' define
 [ "pp-?"   swap array-reverse slice-length [ dup-pair #1 - fetch swap [ swap ] dip [ [ over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each' define
@@ -244,7 +244,7 @@
 [ type? #100 / &*curry:types* swap fetch invoke ] 'curry:compile-value' define
 [ #304 buffer-store buffer-store ] 'curry:compile-call' define
 
-[ [ request set-buffer swap curry:compile-value curry:compile-call &*current-buffer* @ :p ] preserve-buffer ] 'curry' define
+[ "vp-p"  [ request set-buffer swap curry:compile-value curry:compile-call &*CURRENT-BUFFER @ :p ] preserve-buffer ] 'curry' define
 [ '*curry:types*'  'curry:compile-value'  'curry:compile-call' ] hide-functions
 
 "Values"
@@ -278,7 +278,7 @@
 
 [ 'data' 'types' ] values
 [ to types to data ] 'prepare' define
-[ #399 buffer-store &*current-buffer* @ :p ] 'terminate' define
+[ #399 buffer-store &*CURRENT-BUFFER @ :p ] 'terminate' define
 [ types over fetch [ data over fetch ] dip compile-value ] 'process' define
 [ "pn-s" prepare new-buffer #0 data array-length [ process #1 + ] repeat drop terminate ] 'array-to-quote' define
 [ 'reconstruct' 'compile-value' 'data' 'types' 'prepare' 'extract' 'terminate' ] hide-functions
