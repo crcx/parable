@@ -699,6 +699,8 @@ false FLAG, executes it again until the returned flag is true.</p>
 
 <p>Opcode: 303</p>
 
+<p>Execute the code in quote the specified number of times.</p>
+
 <p>Stack Effect:</p>
 
 <pre><code>number quote --
@@ -887,7 +889,10 @@ a function definition.</p>
 
 <p>Opcode: 406</p>
 
-<p>... TODO ...</p>
+<p>Stack Effect:</p>
+
+<pre><code>pointer -- number
+</code></pre>
 
 <hr />
 
@@ -895,7 +900,10 @@ a function definition.</p>
 
 <p>Opcode: 407</p>
 
-<p>... TODO ...</p>
+<p>Stack Effect:</p>
+
+<pre><code>number pointer --
+</code></pre>
 
 <hr />
 
@@ -943,11 +951,21 @@ a copy of the original string).</p>
 
 <p>Opcode: 503</p>
 
+<p>Stack Effect:</p>
+
+<pre><code>value:A value:B -- value:A value:B value:A
+</code></pre>
+
 <hr />
 
 <h2>BC_STACK_TUCK</h2>
 
 <p>Opcode: 504</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>value:A value:B -- value:B value:A value:B
+</code></pre>
 
 <hr />
 
@@ -956,6 +974,11 @@ a copy of the original string).</p>
 <p>Opcode: 505</p>
 
 <p>Remove the second item on the stack.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>value:A value:B -- value:B
+</code></pre>
 
 <hr />
 
@@ -992,8 +1015,6 @@ a copy of the original string).</p>
 <p>Attaches a name to a quotation. This is mapped to <em>define</em> by the core language,
 and is considered a built-in part of the core language (along with the core
 syntax).</p>
-
-<p>Usage:  pointer name --</p>
 
 <p>Stack Effect:</p>
 
@@ -1046,6 +1067,13 @@ function does not exist, a pointer to slice -1 will be returned.</p>
 <h2>BC_STRING_SEEK</h2>
 
 <p>Opcode: 700</p>
+
+<p>Find needle in haystack, return a pointer to it, or -1 if not found.</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>string:haystack string:needle -- number
+</code></pre>
 
 <hr />
 
@@ -1102,6 +1130,11 @@ is a STRING, returns a new STRING.</p>
 <p>Convert the CHARACTER or STRING value on the stack to upper case. If the value
 is a STRING, returns a new STRING.</p>
 
+<p>Stack Effect:</p>
+
+<pre><code>value -- value
+</code></pre>
+
 <hr />
 
 <h2>BC_REPORT_ERROR</h2>
@@ -1123,6 +1156,11 @@ is a STRING, returns a new STRING.</p>
 
 <p>Calculate and return the sine of a radian value</p>
 
+<p>Stack Effect:</p>
+
+<pre><code>number -- number
+</code></pre>
+
 <hr />
 
 <h2>BC_COS</h2>
@@ -1130,6 +1168,11 @@ is a STRING, returns a new STRING.</p>
 <p>Opcode: 1001</p>
 
 <p>Calculate and return the cosine of a radian value</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>number -- number
+</code></pre>
 
 <hr />
 
@@ -1139,6 +1182,11 @@ is a STRING, returns a new STRING.</p>
 
 <p>Calculate and return the tangent of a radian value</p>
 
+<p>Stack Effect:</p>
+
+<pre><code>number -- number
+</code></pre>
+
 <hr />
 
 <h2>BC_ASIN</h2>
@@ -1146,6 +1194,11 @@ is a STRING, returns a new STRING.</p>
 <p>Opcode: 1003</p>
 
 <p>Calculate and return the arc sine of a radian value</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>number -- number
+</code></pre>
 
 <hr />
 
@@ -1155,6 +1208,11 @@ is a STRING, returns a new STRING.</p>
 
 <p>Calculate and return the arc cosine of a radian value</p>
 
+<p>Stack Effect:</p>
+
+<pre><code>number -- number
+</code></pre>
+
 <hr />
 
 <h2>BC_ATAN</h2>
@@ -1162,6 +1220,11 @@ is a STRING, returns a new STRING.</p>
 <p>Opcode: 1005</p>
 
 <p>Calculate and return the arc tangent of a radian value</p>
+
+<p>Stack Effect:</p>
+
+<pre><code>number -- number
+</code></pre>
 
 <hr />
 

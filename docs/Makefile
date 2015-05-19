@@ -4,6 +4,7 @@ default:
 	$(MD) arrays.md                  >html/arrays.html
 	$(MD) bytecodes.md               >html/bytecodes.html
 	$(MD) characters.md              >html/characters.html
+	$(MD) comments.md                >html/comments.html
 	$(MD) compiler_implementation.md >html/compiler_implementation.html
 	$(MD) datatypes.md               >html/datatypes.html
 	$(MD) flags.md                   >html/flags.html
