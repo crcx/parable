@@ -2,7 +2,7 @@
 
 [ ] 'character-counts' define
 [ [ #255 [ #0 ] repeat ] array-from-quote 'character-counts' define ] 'reset-counts' define
-[ reset-counts [ :n &character-counts swap dup-pair fetch #1 + swap [ swap ] dip store ] for-each-character ] 'count-frequency' define
+[ reset-counts [ &character-counts swap dup-pair fetch #1 + swap [ swap ] dip store ] for-each ] 'count-frequency' define
 
 [ to-lowercase :p [ :c letter? ] array-filter :s count-frequency ] 'count-letters' define
 

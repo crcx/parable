@@ -53,20 +53,20 @@
 
 "We will build a string to hold the answer."
 
-    new-slice
-    #4 #4 tap slice-store
-    #2 #3 tap slice-store
-    #1 #5 tap slice-store
-    #1 #2 tap slice-store
-    #2 #4 tap slice-store
-    #4 #2 tap slice-store
-    #1 #4 tap slice-store
-    #3 #2 tap slice-store
-    #1 #1 tap slice-store
-    #3 #3 tap slice-store
-    #0 slice-store
+    new-buffer
+    #4 #4 tap buffer-store
+    #2 #3 tap buffer-store
+    #1 #5 tap buffer-store
+    #1 #2 tap buffer-store
+    #2 #4 tap buffer-store
+    #4 #2 tap buffer-store
+    #1 #4 tap buffer-store
+    #3 #2 tap buffer-store
+    #1 #1 tap buffer-store
+    #3 #3 tap buffer-store
+    #0 buffer-store
 
-    &*slice:current* @ :p :s
+    &*CURRENT-BUFFER @ :p :s
 
 "And now we have the final clue needed to solve the puzzle:"
 

@@ -13,10 +13,7 @@
 "-------------------------------------------------------------"
 
 'ip' value
-'ram' variable
-'opcodes' variable
-'addresses' variable
-'output' variable
+[ 'ram'  'opcodes'  'addresses'  'output' ] variables
 
 [ ip #1 + to ip ] 'ip+' define
 [ &ram ip fetch ] '[ip]' define
@@ -66,40 +63,40 @@
 [ ip ngaro.push #1 - to ip ] 'ngaro.implicit.call' define
 
 "Build the dispatch table for the opcodes"
-&opcodes        slice-set
-&ngaro.nop      slice-store
-&ngaro.lit      slice-store
-&ngaro.dup      slice-store
-&ngaro.drop     slice-store
-&ngaro.swap     slice-store
-&ngaro.push     slice-store
-&ngaro.pop      slice-store
-&ngaro.loop     slice-store
-&ngaro.jump     slice-store
-&ngaro.return   slice-store
-&ngaro.jump.gt  slice-store
-&ngaro.jump.lt  slice-store
-&ngaro.jump.ne  slice-store
-&ngaro.jump.eq  slice-store
-&ngaro.fetch    slice-store
-&ngaro.store    slice-store
-&ngaro.add      slice-store
-&ngaro.sub      slice-store
-&ngaro.mul      slice-store
-&ngaro.divmod   slice-store
-&ngaro.and      slice-store
-&ngaro.or       slice-store
-&ngaro.xor      slice-store
-&ngaro.shl      slice-store
-&ngaro.shr      slice-store
-&ngaro.zeroexit slice-store
-&ngaro.inc      slice-store
-&ngaro.dec      slice-store
-&ngaro.in       slice-store
-&ngaro.out      slice-store
-&ngaro.wait     slice-store
+&opcodes        set-buffer
+&ngaro.nop      buffer-store
+&ngaro.lit      buffer-store
+&ngaro.dup      buffer-store
+&ngaro.drop     buffer-store
+&ngaro.swap     buffer-store
+&ngaro.push     buffer-store
+&ngaro.pop      buffer-store
+&ngaro.loop     buffer-store
+&ngaro.jump     buffer-store
+&ngaro.return   buffer-store
+&ngaro.jump.gt  buffer-store
+&ngaro.jump.lt  buffer-store
+&ngaro.jump.ne  buffer-store
+&ngaro.jump.eq  buffer-store
+&ngaro.fetch    buffer-store
+&ngaro.store    buffer-store
+&ngaro.add      buffer-store
+&ngaro.sub      buffer-store
+&ngaro.mul      buffer-store
+&ngaro.divmod   buffer-store
+&ngaro.and      buffer-store
+&ngaro.or       buffer-store
+&ngaro.xor      buffer-store
+&ngaro.shl      buffer-store
+&ngaro.shr      buffer-store
+&ngaro.zeroexit buffer-store
+&ngaro.inc      buffer-store
+&ngaro.dec      buffer-store
+&ngaro.in       buffer-store
+&ngaro.out      buffer-store
+&ngaro.wait     buffer-store
 
 [ dup #0 #30 between? [ &opcodes swap fetch invoke ] [ ngaro.implicit.call ] if ip+ ] 'process-opcode' define
 [ #0 to ip [ [ip] process-opcode ip #1000 <> ] while-true display ] 'process-bytecode' define
 
-&ram slice-set
+&ram set-buffer
