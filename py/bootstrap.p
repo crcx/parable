@@ -207,7 +207,7 @@
 [ "pv-f"   swap needs-remap? [ swap dup set-buffer array-length #0 swap [ over buffer-fetch array<remap> = or ] repeat ] preserve-buffer nip :f ] 'array-contains?' define
 [ 'array<remap>'  'needs-remap?' ] hide-functions
 
-[ &results zero-out &filter ! [ &source ! ] [ array-length ] bi ] 'prepare' define
+[ [ array-reverse ] dip &results zero-out &filter ! [ &source ! ] [ array-length ] bi ] 'prepare' define
 [ "pp-p"   prepare [ &source @ array-pop dup &filter @ invoke [ &results array-push ] [ drop ] if ] repeat &results request [ copy ] sip ] 'array-filter' define
 [ "pp-p"   prepare [ &source @ array-pop &filter @ invoke &results array-push ] repeat &results request [ copy ] sip ] 'array-map' define
 [ "pp-f"   dup-pair [ array-length ] bi@ = [ dup array-length true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define
