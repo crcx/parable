@@ -33,7 +33,7 @@ def dump_stack():
             sys.stdout.write("\t$" + str(chr(stack[i])))
         elif types[i] == TYPE_STRING:
             sys.stdout.write("\t'" + slice_to_string(stack[i]) +"'")
-        elif types[i] == TYPE_FUNCTION:
+        elif types[i] == TYPE_POINTER:
             sys.stdout.write("\t&" + str(stack[i]))
         elif types[i] == TYPE_FLAG:
             if stack[i] == -1:
@@ -66,7 +66,7 @@ def display_value():
         sys.stdout.write(str(chr(stack[i])))
     elif types[i] == TYPE_STRING:
         sys.stdout.write(slice_to_string(stack[i]))
-    elif types[i] == TYPE_FUNCTION:
+    elif types[i] == TYPE_POINTER:
         sys.stdout.write('&' + str(stack[i]))
     elif types[i] == TYPE_FLAG:
         if stack[i] == -1:
@@ -93,8 +93,8 @@ def opcodes(slice, offset, opcode):
 
 
 if __name__ == '__main__':
-    sys.stdout.write("parable (listener 2015-04-03)\n")
-    sys.stdout.write('.              display the top value on the stack\n')
+    sys.stdout.write("parable (listener 2015-05-22)\n")
+    sys.stdout.write('?              display the top value on the stack\n')
     sys.stdout.write('show-stack     display the stack\n')
     sys.stdout.write('show-named     display all named elements\n')
     sys.stdout.write('bye            exit listener\n')
@@ -102,7 +102,7 @@ if __name__ == '__main__':
     prepare_dictionary()
     parse_bootstrap(open('bootstrap.p').readlines())
 
-    interpret(compile("[ `9000 ] '.' define", request_slice()))
+    interpret(compile("[ `9000 ] '?' define", request_slice()))
     interpret(compile("[ `9010 ] 'show-stack' define", request_slice()))
     interpret(compile("[ `9020 ] 'bye' define", request_slice()))
     interpret(compile("[ `9030 ] 'show-named' define", request_slice()))
