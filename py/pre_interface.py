@@ -57,19 +57,24 @@ def load_file(file):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        MAX_SLICES = 8000
     prepare_slices()
     prepare_dictionary()
     parse_bootstrap(bootstrap)
     collect_unused_slices()
 
     if len(sys.argv) < 2:
-        sys.exit('Usage: %s filename(s)' % sys.argv[0])
-
-    for source in sys.argv:
-        if not os.path.exists(source):
-            sys.exit('ERROR: source file "%s" was not found!' % source)
-        if source != sys.argv[0]:
-            load_file(source)
+        if os.path.exists('source.p'):
+            load_file('source.p')
+        else:
+            sys.exit('Usage: %s filename(s)' % sys.argv[0])
+    else:
+        for source in sys.argv:
+            if not os.path.exists(source):
+                sys.exit('ERROR: source file "%s" was not found!' % source)
+            if source != sys.argv[0]:
+                load_file(source)
 
     display()
     sys.stdout.flush()
