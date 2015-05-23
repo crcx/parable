@@ -14,7 +14,6 @@ import random
 #
 
 MAX_SLICES = 80000
-DEFAULT_SLICE_LEN = 1
 
 #
 # Constants for data types
@@ -951,12 +950,12 @@ p_sizes = []
 
 def request_slice():
     """request a new memory slice"""
-    global p_slices, p_map, p_sizes, MAX_SLICES, DEFAULT_SLICE_LEN
+    global p_slices, p_map, p_sizes, MAX_SLICES
     i = 0
     while i < MAX_SLICES:
         if p_map[i] == 0:
             p_map[i] = 1
-            p_slices[i] = [0] #[0 for x in range(DEFAULT_SLICE_LEN)]
+            p_slices[i] = [0]
             p_sizes[i] = 0
             return i
         else:
@@ -1025,7 +1024,6 @@ def set_slice_length(slice, size):
             grow_by = grow_by + 1
             del p_slices[int(slice)][-1]
     p_sizes[int(slice)] = size
-
 
 def string_to_slice(string):
     """convert a string into a slice"""
