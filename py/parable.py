@@ -977,7 +977,6 @@ def copy_slice(source, dest):
     while i <= l:
         v = fetch(int(source), i)
         store(v, int(dest), i)
-#        p_slices[int(dest)][i] = p_slices[int(source)][i]
         i += 1
     p_sizes[int(dest)] = p_sizes[int(source)]
 
@@ -1024,6 +1023,7 @@ def set_slice_length(slice, size):
             grow_by = grow_by + 1
             del p_slices[int(slice)][-1]
     p_sizes[int(slice)] = size
+
 
 def string_to_slice(string):
     """convert a string into a slice"""

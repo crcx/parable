@@ -17,7 +17,6 @@ import random
 #
 
 MAX_SLICES = 80000
-DEFAULT_SLICE_LEN = 1
 
 #
 # Constants for data types
@@ -954,12 +953,12 @@ p_sizes = []
 
 def request_slice():
     """request a new memory slice"""
-    global p_slices, p_map, p_sizes, MAX_SLICES, DEFAULT_SLICE_LEN
+    global p_slices, p_map, p_sizes, MAX_SLICES
     i = 0
     while i < MAX_SLICES:
         if p_map[i] == 0:
             p_map[i] = 1
-            p_slices[i] = [0 for x in range(DEFAULT_SLICE_LEN)]
+            p_slices[i] = [0]
             p_sizes[i] = 0
             return i
         else:
@@ -981,7 +980,6 @@ def copy_slice(source, dest):
     while i <= l:
         v = fetch(int(source), i)
         store(v, int(dest), i)
-#        p_slices[int(dest)][i] = p_slices[int(source)][i]
         i += 1
     p_sizes[int(dest)] = p_sizes[int(source)]
 
@@ -1499,7 +1497,7 @@ bootstrap.append(""" [ ] 'array<remap>' define """)
 bootstrap.append(""" [ type? STRING <> [ [ ] ] [ [ [ :p :s ] bi@ ] ] if 'array<remap>' define ] 'needs-remap?' define """)
 bootstrap.append(""" [ "pv-f"   swap needs-remap? [ swap dup set-buffer array-length #0 swap [ over buffer-fetch array<remap> = or ] repeat ] preserve-buffer nip :f ] 'array-contains?' define """)
 bootstrap.append(""" [ 'array<remap>'  'needs-remap?' ] hide-functions """)
-bootstrap.append(""" [ &results zero-out &filter ! [ &source ! ] [ array-length ] bi ] 'prepare' define """)
+bootstrap.append(""" [ [ array-reverse ] dip &results zero-out &filter ! [ &source ! ] [ array-length ] bi ] 'prepare' define """)
 bootstrap.append(""" [ "pp-p"   prepare [ &source @ array-pop dup &filter @ invoke [ &results array-push ] [ drop ] if ] repeat &results request [ copy ] sip ] 'array-filter' define """)
 bootstrap.append(""" [ "pp-p"   prepare [ &source @ array-pop &filter @ invoke &results array-push ] repeat &results request [ copy ] sip ] 'array-map' define """)
 bootstrap.append(""" [ "pp-f"   dup-pair [ array-length ] bi@ = [ dup array-length true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define """)
