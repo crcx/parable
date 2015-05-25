@@ -25,3 +25,31 @@ Executes a quote repeatedly until the quote returns a non-false flag.
 
     #10 [ dup #1 - dup #0 = ] while-false
 
+# Conditionals
+
+## if
+
+Takes a boolean flag and two pointers. If the flag is **true**, it will execute the
+first one. If **false**, executes the second.
+
+    #1 #2 = [ 'this is returned if true' ]  [ 'and this is returned if false' ] if
+
+## if-true
+
+    #1 #2 = [ 'this is returned if the flag is true' ] if-true
+
+## if-false
+
+    #1 #2 = [ 'this is returned if the flag is false' ] if-true
+
+## if-number
+
+## if-string
+
+## if-character
+
+## if-pointer
+
+## if-flag
+
+
