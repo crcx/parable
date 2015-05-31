@@ -48,8 +48,8 @@
 [ "-p"     `403 ] 'request' define
 [ "p-"     `404 ] 'release' define
 [ "-"      `405 ] 'collect-garbage' define
-[ "p-n"    `406 ] 'get-buffer-length' define
-[ "np-"    `407 ] 'set-buffer-length' define
+[ "p-n"    `406 ] 'get-slice-length' define
+[ "np-"    `407 ] 'set-slice-length' define
 [ "v-vv"   `500 ] 'dup' define
 [ "v-"     `501 ] 'drop' define
 [ "vV-Vv"  `502 ] 'swap' define
@@ -136,8 +136,8 @@
 [ "...n-n"   #1 - [ + ] repeat ] 'sum-range' define
 
 "Misc"
-[ "p-pn"  dup get-buffer-length ] 'slice-length' define
-[ "np-"   [ get-buffer-length + ] sip set-buffer-length ] 'adjust-slice-length' define
+[ "p-pn"  dup get-slice-length ] 'slice-length' define
+[ "np-"   [ get-slice-length + ] sip set-slice-length ] 'adjust-slice-length' define
 [ "p-?n"  depth [ invoke ] dip depth swap - ] 'invoke-and-count-items-returned' define
 [ "pn-?n" [ depth [ invoke ] dip depth swap - ] + ] 'invoke-and-count-items-returned-with-adjustment' define
 [ "?n-"   [ drop ] repeat ] 'drop-multiple' define
@@ -193,9 +193,9 @@
 "arrays"
 [ 'source'  'filter'  'results' ] variables
 
-[ "np-"    dup get-buffer-length over [ store ] dip #1 swap adjust-slice-length ] 'array-push' define
-[ "p-n"    [ #-1 swap adjust-slice-length ] sip dup get-buffer-length fetch ] 'array-pop' define
-[ "p-n"    get-buffer-length ] 'array-length' define
+[ "np-"    dup get-slice-length over [ store ] dip #1 swap adjust-slice-length ] 'array-push' define
+[ "p-n"    [ #-1 swap adjust-slice-length ] sip dup get-slice-length fetch ] 'array-pop' define
+[ "p-n"    get-slice-length ] 'array-length' define
 [ "pnp-n"  &filter ! over array-length [ over array-pop &filter @ invoke ] repeat nip ] 'array-reduce' define
 [ "p-p"    [ new-buffer invoke-and-count-items-returned buffer-store-items &*CURRENT-BUFFER @ ] preserve-buffer :p ] 'array-from-quote<in-stack-order>' define
 [ "p-p"    request [ copy ] sip &source ! [ #0 &source @ array-length [ &source @ over fetch swap #1 + ] repeat drop ] array-from-quote<in-stack-order> ] 'array-reverse' define
@@ -261,7 +261,7 @@
 [ [ type? ] dip [ #1 store ] sip ] 'preserve-type' define
 [ #1 fetch restore-stored-type ] 'restore-type' define
 [ &*state* @ :f [ preserve-type ! &*state* off ] [ dup @ swap restore-type ] if ] 'value-handler' define
-[ "s-" request #2 over set-buffer-length [ value-handler ] curry swap define ] 'value' define
+[ "s-" request #2 over set-slice-length [ value-handler ] curry swap define ] 'value' define
 [ "ns-" [ value ] sip to lookup-function invoke ] 'value!' define
 [ "p-" array-from-quote #0 [ :p :s value ] array-reduce drop ] 'values' define
 [ '*types*'  '*state*'  'restore-stored-type'  'preserve-type'  'restore-type'  'value-handler' ] hide-functions
@@ -293,7 +293,7 @@
 'TOB' variable
 [ &TOB array-push ] 'append-value' define
 [ "-..." &TOB array-length [ &TOB array-pop :p :s ] repeat ] 'show-tob' define
-[ "-" #0 &TOB set-buffer-length ] 'clear-tob' define
+[ "-" #0 &TOB set-slice-length ] 'clear-tob' define
 
 'TOB:Handlers' named-buffer
 [ ] buffer-store

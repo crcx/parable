@@ -365,7 +365,7 @@ Perform a garbage collection cycle.
 
 This is a primitive corresponding to a byte code.
 
-## get-buffer-length
+## get-slice-length
 
 Return the length of a slice.
 
@@ -373,7 +373,7 @@ Return the length of a slice.
 
 This is a primitive corresponding to a byte code.
 
-## set-buffer-length
+## set-slice-length
 
 Set the length of a slice to the specified size.
 

@@ -25,3 +25,33 @@ runs the quote the specified number of times.</p>
 
 <pre><code>#10 [ dup #1 - dup #0 = ] while-false
 </code></pre>
+
+<h1>Conditionals</h1>
+
+<h2>if</h2>
+
+<p>Takes a boolean flag and two pointers. If the flag is <strong>true</strong>, it will execute the
+first one. If <strong>false</strong>, executes the second.</p>
+
+<pre><code>#1 #2 = [ 'this is returned if true' ]  [ 'and this is returned if false' ] if
+</code></pre>
+
+<h2>if-true</h2>
+
+<pre><code>#1 #2 = [ 'this is returned if the flag is true' ] if-true
+</code></pre>
+
+<h2>if-false</h2>
+
+<pre><code>#1 #2 = [ 'this is returned if the flag is false' ] if-true
+</code></pre>
+
+<h2>if-number</h2>
+
+<h2>if-string</h2>
+
+<h2>if-character</h2>
+
+<h2>if-pointer</h2>
+
+<h2>if-flag</h2>
