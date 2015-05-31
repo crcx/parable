@@ -1001,7 +1001,7 @@ def store(value, slice, offset):
     """store a value into a slice"""
     global p_slices, p_map
     if get_slice_length(slice) < offset:
-        set_slice_length(slice, offset + 1)
+        set_slice_length(slice, offset)
     p_slices[int(slice)][int(offset)] = value
 
 
