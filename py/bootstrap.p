@@ -193,7 +193,7 @@
 "arrays"
 [ 'source'  'filter'  'results' ] variables
 
-[ "np-"    dup get-slice-length over [ store ] dip #1 swap adjust-slice-length ] 'array-push' define
+[ "np-"    slice-length over [ store ] dip #1 swap adjust-slice-length ] 'array-push' define
 [ "p-n"    [ #-1 swap adjust-slice-length ] sip dup get-slice-length fetch ] 'array-pop' define
 [ "p-n"    get-slice-length ] 'array-length' define
 [ "pnp-n"  &filter ! over array-length [ over array-pop &filter @ invoke ] repeat nip ] 'array-reduce' define

@@ -1485,7 +1485,7 @@ bootstrap.append(""" [ "p-"     &*CURRENT-BUFFER @ [ &*BUFFER-OFFSET @ [ invoke 
 bootstrap.append(""" [ "s-"     request [ swap define ] sip set-buffer ] 'named-buffer' define """)
 bootstrap.append(""" "arrays" """)
 bootstrap.append(""" [ 'source'  'filter'  'results' ] variables """)
-bootstrap.append(""" [ "np-"    dup get-slice-length over [ store ] dip #1 swap adjust-slice-length ] 'array-push' define """)
+bootstrap.append(""" [ "np-"    slice-length over [ store ] dip #1 swap adjust-slice-length ] 'array-push' define """)
 bootstrap.append(""" [ "p-n"    [ #-1 swap adjust-slice-length ] sip dup get-slice-length fetch ] 'array-pop' define """)
 bootstrap.append(""" [ "p-n"    get-slice-length ] 'array-length' define """)
 bootstrap.append(""" [ "pnp-n"  &filter ! over array-length [ over array-pop &filter @ invoke ] repeat nip ] 'array-reduce' define """)
