@@ -81,8 +81,8 @@ BC_MEM_STORE = 402
 BC_MEM_REQUEST = 403
 BC_MEM_RELEASE = 404
 BC_MEM_COLLECT = 405
-BC_MEM_GET_SIZE = 406
-BC_MEM_SET_SIZE = 407
+BC_MEM_GET_LAST = 406
+BC_MEM_SET_LAST = 407
 BC_STACK_DUP = 500
 BC_STACK_DROP = 501
 BC_STACK_SWAP = 502
@@ -166,7 +166,7 @@ def check_depth(cells):
 def interpret(slice, more=None):
     """Interpret the byte codes contained in a slice."""
     offset = 0
-    size = get_slice_length(int(slice))
+    size = get_last_index(int(slice))
     while offset < size:
         opcode = fetch(slice, offset)
         if opcode == BC_PUSH_N:
@@ -562,13 +562,13 @@ def interpret(slice, more=None):
                 offset = size
         elif opcode == BC_MEM_COLLECT:
             collect_unused_slices()
-        elif opcode == BC_MEM_GET_SIZE:
+        elif opcode == BC_MEM_GET_LAST:
             a = stack_pop()
-            stack_push(get_slice_length(a), TYPE_NUMBER)
-        elif opcode == BC_MEM_SET_SIZE:
+            stack_push(get_last_index(a), TYPE_NUMBER)
+        elif opcode == BC_MEM_SET_LAST:
             a = stack_pop()
             b = stack_pop()
-            set_slice_length(a, b)
+            set_slice_last_index(a, b)
         elif opcode == BC_STACK_DUP:
             if check_depth(1):
                 stack_dup()
@@ -992,26 +992,26 @@ def prepare_slices():
 def fetch(slice, offset):
     """obtain a value stored in a slice"""
     global p_slices, p_map
-    if get_slice_length(slice) < offset:
-        set_slice_length(slice, offset)
+    if get_last_index(slice) < offset:
+        set_slice_last_index(slice, offset)
     return p_slices[int(slice)][int(offset)]
 
 
 def store(value, slice, offset):
     """store a value into a slice"""
     global p_slices, p_map
-    if get_slice_length(slice) < offset:
-        set_slice_length(slice, offset)
+    if get_last_index(slice) < offset:
+        set_slice_last_index(slice, offset)
     p_slices[int(slice)][int(offset)] = value
 
 
-def get_slice_length(slice):
+def get_last_index(slice):
     """get the length of a slice"""
     global p_sizes
     return p_sizes[int(slice)]
 
 
-def set_slice_length(slice, size):
+def set_slice_last_index(slice, size):
     """set the length of a slice"""
     global p_slices, p_sizes
     old_size = p_sizes[int(slice)]
@@ -1039,7 +1039,7 @@ def slice_to_string(slice):
     """convert a slice into a string"""
     s = []
     i = 0
-    size = get_slice_length(int(slice))
+    size = get_last_index(int(slice))
     while i <= size:
         s.append(unichr(int(fetch(slice, i))))
         i += 1
@@ -1060,7 +1060,7 @@ def find_references(s):
     global dictionary_slices
     ptrs = []
     i = 0
-    while i < get_slice_length(s):
+    while i < get_last_index(s):
         if fetch(s, i) >= 0:
             ptrs.append(int(fetch(s, i)))
         i += 1

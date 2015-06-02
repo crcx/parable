@@ -83,8 +83,8 @@ BC_MEM_STORE = 402
 BC_MEM_REQUEST = 403
 BC_MEM_RELEASE = 404
 BC_MEM_COLLECT = 405
-BC_MEM_GET_SIZE = 406
-BC_MEM_SET_SIZE = 407
+BC_MEM_GET_LAST = 406
+BC_MEM_SET_LAST = 407
 BC_STACK_DUP = 500
 BC_STACK_DROP = 501
 BC_STACK_SWAP = 502
@@ -168,7 +168,7 @@ def check_depth(cells):
 def interpret(slice, more=None):
     """Interpret the byte codes contained in a slice."""
     offset = 0
-    size = get_slice_length(int(slice))
+    size = get_last_index(int(slice))
     while offset < size:
         opcode = fetch(slice, offset)
         if opcode == BC_PUSH_N:
@@ -564,13 +564,13 @@ def interpret(slice, more=None):
                 offset = size
         elif opcode == BC_MEM_COLLECT:
             collect_unused_slices()
-        elif opcode == BC_MEM_GET_SIZE:
+        elif opcode == BC_MEM_GET_LAST:
             a = stack_pop()
-            stack_push(get_slice_length(a), TYPE_NUMBER)
-        elif opcode == BC_MEM_SET_SIZE:
+            stack_push(get_last_index(a), TYPE_NUMBER)
+        elif opcode == BC_MEM_SET_LAST:
             a = stack_pop()
             b = stack_pop()
-            set_slice_length(a, b)
+            set_slice_last_index(a, b)
         elif opcode == BC_STACK_DUP:
             if check_depth(1):
                 stack_dup()
@@ -994,26 +994,26 @@ def prepare_slices():
 def fetch(slice, offset):
     """obtain a value stored in a slice"""
     global p_slices, p_map
-    if get_slice_length(slice) < offset:
-        set_slice_length(slice, offset)
+    if get_last_index(slice) < offset:
+        set_slice_last_index(slice, offset)
     return p_slices[int(slice)][int(offset)]
 
 
 def store(value, slice, offset):
     """store a value into a slice"""
     global p_slices, p_map
-    if get_slice_length(slice) < offset:
-        set_slice_length(slice, offset)
+    if get_last_index(slice) < offset:
+        set_slice_last_index(slice, offset)
     p_slices[int(slice)][int(offset)] = value
 
 
-def get_slice_length(slice):
+def get_last_index(slice):
     """get the length of a slice"""
     global p_sizes
     return p_sizes[int(slice)]
 
 
-def set_slice_length(slice, size):
+def set_slice_last_index(slice, size):
     """set the length of a slice"""
     global p_slices, p_sizes
     old_size = p_sizes[int(slice)]
@@ -1041,7 +1041,7 @@ def slice_to_string(slice):
     """convert a slice into a string"""
     s = []
     i = 0
-    size = get_slice_length(int(slice))
+    size = get_last_index(int(slice))
     while i <= size:
         s.append(unichr(int(fetch(slice, i))))
         i += 1
@@ -1062,7 +1062,7 @@ def find_references(s):
     global dictionary_slices
     ptrs = []
     i = 0
-    while i < get_slice_length(s):
+    while i < get_last_index(s):
         if fetch(s, i) >= 0:
             ptrs.append(int(fetch(s, i)))
         i += 1
@@ -1350,8 +1350,8 @@ bootstrap.append(""" [ "npn-"   `402 ] 'store' define """)
 bootstrap.append(""" [ "-p"     `403 ] 'request' define """)
 bootstrap.append(""" [ "p-"     `404 ] 'release' define """)
 bootstrap.append(""" [ "-"      `405 ] 'collect-garbage' define """)
-bootstrap.append(""" [ "p-n"    `406 ] 'get-slice-length' define """)
-bootstrap.append(""" [ "np-"    `407 ] 'set-slice-length' define """)
+bootstrap.append(""" [ "p-n"    `406 ] 'get-last-index' define """)
+bootstrap.append(""" [ "np-"    `407 ] 'set-last-index' define """)
 bootstrap.append(""" [ "v-vv"   `500 ] 'dup' define """)
 bootstrap.append(""" [ "v-"     `501 ] 'drop' define """)
 bootstrap.append(""" [ "vV-Vv"  `502 ] 'swap' define """)
@@ -1428,8 +1428,10 @@ bootstrap.append(""" "numeric ranges" """)
 bootstrap.append(""" [ "nn-..."  dup-pair < [ [ [ dup #1 + ] dip dup-pair = ] while-false ] [ [ [ dup #1 - ] dip dup-pair = ] while-false ] if drop ] 'expand-range' define """)
 bootstrap.append(""" [ "...n-n"   #1 - [ + ] repeat ] 'sum-range' define """)
 bootstrap.append(""" "Misc" """)
-bootstrap.append(""" [ "p-pn"  dup get-slice-length ] 'slice-length' define """)
-bootstrap.append(""" [ "np-"   [ get-slice-length + ] sip set-slice-length ] 'adjust-slice-length' define """)
+bootstrap.append(""" [ "p-pn"  dup get-last-index ] 'slice-last-index' define """)
+bootstrap.append(""" [ "p-n"   get-last-index #1 + ] 'get-slice-length' define """)
+bootstrap.append(""" [ "p-pn"  slice-last-index #1 + ] 'slice-length' define """)
+bootstrap.append(""" [ "np-"   [ get-last-index + ] sip set-last-index ] 'adjust-slice-length' define """)
 bootstrap.append(""" [ "p-?n"  depth [ invoke ] dip depth swap - ] 'invoke-and-count-items-returned' define """)
 bootstrap.append(""" [ "pn-?n" [ depth [ invoke ] dip depth swap - ] + ] 'invoke-and-count-items-returned-with-adjustment' define """)
 bootstrap.append(""" [ "?n-"   [ drop ] repeat ] 'drop-multiple' define """)
@@ -1450,9 +1452,9 @@ bootstrap.append(""" [ "v-f"  dup to-lowercase = ] 'lowercase?' define """)
 bootstrap.append(""" [ "v-f"  dup to-uppercase = ] 'uppercase?' define """)
 bootstrap.append(""" [ "p-s"  invoke-and-count-items-returned #1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define """)
 bootstrap.append(""" "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive." """)
-bootstrap.append(""" [ "s-s"  :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ slice-length ] dip swap subslice :s ] 'trim-left' define """)
+bootstrap.append(""" [ "s-s"  :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ slice-last-index ] dip swap subslice :s ] 'trim-left' define """)
 bootstrap.append(""" [ ] 'trim-right' define """)
-bootstrap.append(""" [ "s-s"  :s slice-length dup-pair #1 - fetch nip #32 = [ slice-length #1 - #0 swap subslice :s trim-right ] if-true ] 'trim-right' define """)
+bootstrap.append(""" [ "s-s"  :s slice-last-index dup-pair #1 - fetch nip #32 = [ slice-last-index #1 - #0 swap subslice :s trim-right ] if-true ] 'trim-right' define """)
 bootstrap.append(""" [ "s-s"  trim-left trim-right ] 'trim' define """)
 bootstrap.append(""" "Helpful Math" """)
 bootstrap.append(""" [ "n-n"   dup negative? [ #-1 * ] if-true ] 'abs' define """)
@@ -1478,17 +1480,17 @@ bootstrap.append(""" [ "p-"     &*CURRENT-BUFFER @ [ &*BUFFER-OFFSET @ [ invoke 
 bootstrap.append(""" [ "s-"     request [ swap define ] sip set-buffer ] 'named-buffer' define """)
 bootstrap.append(""" "arrays" """)
 bootstrap.append(""" [ 'source'  'filter'  'results' ] variables """)
-bootstrap.append(""" [ "np-"    slice-length over [ store ] dip #1 swap adjust-slice-length ] 'array-push' define """)
-bootstrap.append(""" [ "p-n"    [ #-1 swap adjust-slice-length ] sip dup get-slice-length fetch ] 'array-pop' define """)
-bootstrap.append(""" [ "p-n"    get-slice-length ] 'array-length' define """)
+bootstrap.append(""" [ "np-"    slice-last-index over [ store ] dip #1 swap adjust-slice-length ] 'array-push' define """)
+bootstrap.append(""" [ "p-n"    [ #-1 swap adjust-slice-length ] sip dup get-last-index fetch ] 'array-pop' define """)
+bootstrap.append(""" [ "p-n"    get-last-index ] 'array-length' define """)
 bootstrap.append(""" [ "pnp-n"  &filter ! over array-length [ over array-pop &filter @ invoke ] repeat nip ] 'array-reduce' define """)
 bootstrap.append(""" [ "p-p"    [ new-buffer invoke-and-count-items-returned buffer-store-items &*CURRENT-BUFFER @ ] preserve-buffer :p ] 'array-from-quote<in-stack-order>' define """)
-bootstrap.append(""" [ "p-p"    request [ copy ] sip &source ! [ #0 &source @ array-length [ &source @ over fetch swap #1 + ] repeat drop ] array-from-quote<in-stack-order> ] 'array-reverse' define """)
+bootstrap.append(""" [ "p-p"    request [ copy ] sip &source ! [ #0 &source @ get-slice-length [ &source @ over fetch swap #1 + ] repeat drop ] array-from-quote<in-stack-order> ] 'array-reverse' define """)
 bootstrap.append(""" [ "p-p"    array-from-quote<in-stack-order> array-reverse ] 'array-from-quote' define """)
-bootstrap.append(""" [ "pp-?"   swap array-reverse slice-length [ dup-pair #1 - fetch swap [ swap ] dip [ [ over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each' define """)
+bootstrap.append(""" [ "pp-?"   swap array-reverse slice-last-index [ dup-pair #1 - fetch swap [ swap ] dip [ [ over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each' define """)
 bootstrap.append(""" [ ] 'array<remap>' define """)
 bootstrap.append(""" [ type? STRING <> [ [ ] ] [ [ [ :p :s ] bi@ ] ] if 'array<remap>' define ] 'needs-remap?' define """)
-bootstrap.append(""" [ "pv-f"   swap needs-remap? [ swap dup set-buffer array-length #0 swap [ over buffer-fetch array<remap> = or ] repeat ] preserve-buffer nip :f ] 'array-contains?' define """)
+bootstrap.append(""" [ "pv-f"   swap needs-remap? [ swap dup set-buffer slice-last-index #0 swap [ over buffer-fetch array<remap> = or ] repeat ] preserve-buffer nip :f ] 'array-contains?' define """)
 bootstrap.append(""" [ 'array<remap>'  'needs-remap?' ] hide-functions """)
 bootstrap.append(""" [ [ array-reverse ] dip &results zero-out &filter ! [ &source ! ] [ array-length ] bi ] 'prepare' define """)
 bootstrap.append(""" [ "pp-p"   prepare [ &source @ array-pop dup &filter @ invoke [ &results array-push ] [ drop ] if ] repeat &results request [ copy ] sip ] 'array-filter' define """)
@@ -1537,9 +1539,9 @@ bootstrap.append(""" [ "-" &*state* on ] 'to' define """)
 bootstrap.append(""" [ [ type? ] dip [ #1 store ] sip ] 'preserve-type' define """)
 bootstrap.append(""" [ #1 fetch restore-stored-type ] 'restore-type' define """)
 bootstrap.append(""" [ &*state* @ :f [ preserve-type ! &*state* off ] [ dup @ swap restore-type ] if ] 'value-handler' define """)
-bootstrap.append(""" [ "s-" request #2 over set-slice-length [ value-handler ] curry swap define ] 'value' define """)
+bootstrap.append(""" [ "s-" request #2 over set-last-index [ value-handler ] curry swap define ] 'value' define """)
 bootstrap.append(""" [ "ns-" [ value ] sip to lookup-function invoke ] 'value!' define """)
-bootstrap.append(""" [ "p-" array-from-quote #0 [ :p :s value ] array-reduce drop ] 'values' define """)
+bootstrap.append(""" [ "p-" invoke-and-count-items-returned [ value ] repeat ] 'values' define """)
 bootstrap.append(""" [ '*types*'  '*state*'  'restore-stored-type'  'preserve-type'  'restore-type'  'value-handler' ] hide-functions """)
 bootstrap.append(""" "More Arrays" """)
 bootstrap.append(""" 'reconstruct' named-buffer """)
@@ -1564,7 +1566,7 @@ bootstrap.append(""" "Text Output Buffer" """)
 bootstrap.append(""" 'TOB' variable """)
 bootstrap.append(""" [ &TOB array-push ] 'append-value' define """)
 bootstrap.append(""" [ "-..." &TOB array-length [ &TOB array-pop :p :s ] repeat ] 'show-tob' define """)
-bootstrap.append(""" [ "-" #0 &TOB set-slice-length ] 'clear-tob' define """)
+bootstrap.append(""" [ "-" #0 &TOB set-last-index ] 'clear-tob' define """)
 bootstrap.append(""" 'TOB:Handlers' named-buffer """)
 bootstrap.append(""" [ ] buffer-store """)
 bootstrap.append(""" [ "number"     :s    append-value ] buffer-store """)

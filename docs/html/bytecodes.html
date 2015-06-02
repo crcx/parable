@@ -885,9 +885,12 @@ a function definition.</p>
 
 <hr />
 
-<h2>BC_GET_SLICE_LENGTH</h2>
+<h2>BC_GET_SLICE_LAST</h2>
 
 <p>Opcode: 406</p>
+
+<p>Return the last valid index in a slice. This is the length, minus 1 (since addressing is
+zero based)</p>
 
 <p>Stack Effect:</p>
 
@@ -896,9 +899,11 @@ a function definition.</p>
 
 <hr />
 
-<h2>BC_SET_SLICE_LENGTH</h2>
+<h2>BC_SET_SLICE_LAST</h2>
 
 <p>Opcode: 407</p>
+
+<p>Set the last valid index in a slice.</p>
 
 <p>Stack Effect:</p>
 

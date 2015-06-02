@@ -365,17 +365,17 @@ Perform a garbage collection cycle.
 
 This is a primitive corresponding to a byte code.
 
-## get-slice-length
+## get-last-index
 
-Return the length of a slice.
+Return the last index in a slice.
 
     pointer -- number
 
 This is a primitive corresponding to a byte code.
 
-## set-slice-length
+## set-last-index
 
-Set the length of a slice to the specified size.
+Set the last index of a slice.
 
     number pointer --
 
@@ -447,7 +447,7 @@ This is a primitive corresponding to a byte code.
 
 ## function-exists?
 
-Given a string containing a function name, returns *true* if the function 
+Given a string containing a function name, returns *true* if the function
 exists or *false* if it does not.
 
     string -- flag
@@ -817,6 +817,18 @@ Return a numeric range starting with lower and ending with upper, inclusive. All
 Add *number* values on the stack.
 
     ... number -- number
+
+## slice-last-index
+
+Return the last index in a slice. This preserves the pointer.
+
+    pointer -- pointer number
+
+## get-slice-length
+
+Return the length of a slice.
+
+    pointer -- number
 
 ## slice-length
 

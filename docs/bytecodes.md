@@ -818,9 +818,12 @@ Stack Effect:
 
 ----
 
-## BC\_GET\_SLICE\_LENGTH
+## BC\_GET\_SLICE\_LAST
 
 Opcode: 406
+
+Return the last valid index in a slice. This is the length, minus 1 (since addressing is
+zero based)
 
 Stack Effect:
 
@@ -828,9 +831,11 @@ Stack Effect:
 
 ----
 
-## BC\_SET\_SLICE\_LENGTH
+## BC\_SET\_SLICE\_LAST
 
 Opcode: 407
+
+Set the last valid index in a slice.
 
 Stack Effect:
 

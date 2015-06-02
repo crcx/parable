@@ -410,18 +410,18 @@ after execution completes.</p>
 
 <p>This is a primitive corresponding to a byte code.</p>
 
-<h2>get-slice-length</h2>
+<h2>get-last-index</h2>
 
-<p>Return the length of a slice.</p>
+<p>Return the last index in a slice.</p>
 
 <pre><code>pointer -- number
 </code></pre>
 
 <p>This is a primitive corresponding to a byte code.</p>
 
-<h2>set-slice-length</h2>
+<h2>set-last-index</h2>
 
-<p>Set the length of a slice to the specified size.</p>
+<p>Set the last index of a slice.</p>
 
 <pre><code>number pointer --
 </code></pre>
@@ -502,7 +502,7 @@ after execution completes.</p>
 
 <h2>function-exists?</h2>
 
-<p>Given a string containing a function name, returns <em>true</em> if the function 
+<p>Given a string containing a function name, returns <em>true</em> if the function
 exists or <em>false</em> if it does not.</p>
 
 <pre><code>string -- flag
@@ -928,6 +928,20 @@ exists or <em>false</em> if it does not.</p>
 <p>Add <em>number</em> values on the stack.</p>
 
 <pre><code>... number -- number
+</code></pre>
+
+<h2>slice-last-index</h2>
+
+<p>Return the last index in a slice. This preserves the pointer.</p>
+
+<pre><code>pointer -- pointer number
+</code></pre>
+
+<h2>get-slice-length</h2>
+
+<p>Return the length of a slice.</p>
+
+<pre><code>pointer -- number
 </code></pre>
 
 <h2>slice-length</h2>
