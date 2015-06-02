@@ -1032,7 +1032,6 @@ def string_to_slice(string):
     for char in list(string):
         store(ord(char.encode('utf-8')), s, i)
         i += 1
-    store(0, s, i)
     return s
 
 
@@ -1041,11 +1040,8 @@ def slice_to_string(slice):
     s = []
     i = 0
     size = get_slice_length(int(slice))
-    while i < size:
-        if fetch(slice, i) != 0:
-            s.append(unichr(int(fetch(slice, i))))
-        else:
-            i = size
+    while i <= size:
+        s.append(unichr(int(fetch(slice, i))))
         i += 1
     return ''.join(s)
 
