@@ -192,12 +192,48 @@
 [ "s-"     request [ swap define ] sip set-buffer ] 'named-buffer' define
 
 
+"Curry Combinator"
+'*curry:types*' named-buffer
+[ ] buffer-store
+[ "number"    #100 buffer-store buffer-store ] buffer-store
+[ "string"    #101 buffer-store buffer-store ] buffer-store
+[ "character" #102 buffer-store buffer-store ] buffer-store
+[ "pointer"   #103 buffer-store buffer-store ] buffer-store
+[ "flag"      #100 buffer-store buffer-store #114 buffer-store ] buffer-store
+
+[ type? #100 / &*curry:types* swap fetch invoke ] 'curry:compile-value' define
+[ #304 buffer-store buffer-store ] 'curry:compile-call' define
+
+[ "vp-p"  [ request set-buffer swap curry:compile-value curry:compile-call &*CURRENT-BUFFER @ :p ] preserve-buffer ] 'curry' define
+[ '*curry:types*'  'curry:compile-value'  'curry:compile-call' ] hide-functions
+
+"Values"
+'*types*' named-buffer
+[ ] buffer-store
+[ "number"    :n ] buffer-store
+[ "string"    :p :s ] buffer-store
+[ "character" :c ] buffer-store
+[ "pointer"   :p ] buffer-store
+[ "flag"      :f ] buffer-store
+[ #100 / &*types* swap fetch invoke ] 'restore-stored-type' define
+'*state*' variable
+[ "-" &*state* on ] 'to' define
+[ [ type? ] dip [ #1 store ] sip ] 'preserve-type' define
+[ #1 fetch restore-stored-type ] 'restore-type' define
+[ &*state* @ :f [ preserve-type ! &*state* off ] [ dup @ swap restore-type ] if ] 'value-handler' define
+[ "s-" request #2 over set-last-index [ value-handler ] curry swap define ] 'value' define
+[ "ns-" [ value ] sip to lookup-function invoke ] 'value!' define
+[ "p-" invoke-and-count-items-returned [ value ] repeat ] 'values' define
+[ '*types*'  '*state*'  'restore-stored-type'  'preserve-type'  'restore-type'  'value-handler' ] hide-functions
+
+
 "arrays"
 [ 'source'  'filter'  'results' ] variables
 
-[ "np-"    slice-last-index over [ store ] dip #1 swap adjust-slice-length ] 'array-push' define
-[ "p-n"    [ #-1 swap adjust-slice-length ] sip dup get-last-index fetch ] 'array-pop' define
+[ "vp-"    slice-last-index over [ store ] dip #1 swap adjust-slice-length ] 'array-push' define
+[ "p-n"    #-1 over adjust-slice-length slice-last-index fetch ] 'array-pop' define
 [ "p-n"    get-last-index ] 'array-length' define
+
 [ "pnp-n"  &filter ! over array-length [ over array-pop &filter @ invoke ] repeat nip ] 'array-reduce' define
 [ "p-p"    [ new-buffer invoke-and-count-items-returned buffer-store-items &*CURRENT-BUFFER @ ] preserve-buffer :p ] 'array-from-quote<in-stack-order>' define
 [ "p-p"    request [ copy ] sip &source ! [ #0 &source @ get-slice-length [ &source @ over fetch swap #1 + ] repeat drop ] array-from-quote<in-stack-order> ] 'array-reverse' define
@@ -234,39 +270,6 @@
 [ "s-n"  #16 convert-with-base ] 'convert-from-hexadecimal' define
 [ '*conversion:base*'  'conversion:to-digit'  'conversion:accumulate' ] hide-functions
 
-"Curry Combinator"
-'*curry:types*' named-buffer
-[ ] buffer-store
-[ "number"    #100 buffer-store buffer-store ] buffer-store
-[ "string"    #101 buffer-store buffer-store ] buffer-store
-[ "character" #102 buffer-store buffer-store ] buffer-store
-[ "pointer"   #103 buffer-store buffer-store ] buffer-store
-[ "flag"      #100 buffer-store buffer-store #114 buffer-store ] buffer-store
-
-[ type? #100 / &*curry:types* swap fetch invoke ] 'curry:compile-value' define
-[ #304 buffer-store buffer-store ] 'curry:compile-call' define
-
-[ "vp-p"  [ request set-buffer swap curry:compile-value curry:compile-call &*CURRENT-BUFFER @ :p ] preserve-buffer ] 'curry' define
-[ '*curry:types*'  'curry:compile-value'  'curry:compile-call' ] hide-functions
-
-"Values"
-'*types*' named-buffer
-[ ] buffer-store
-[ "number"    :n ] buffer-store
-[ "string"    :p :s ] buffer-store
-[ "character" :c ] buffer-store
-[ "pointer"   :p ] buffer-store
-[ "flag"      :f ] buffer-store
-[ #100 / &*types* swap fetch invoke ] 'restore-stored-type' define
-'*state*' variable
-[ "-" &*state* on ] 'to' define
-[ [ type? ] dip [ #1 store ] sip ] 'preserve-type' define
-[ #1 fetch restore-stored-type ] 'restore-type' define
-[ &*state* @ :f [ preserve-type ! &*state* off ] [ dup @ swap restore-type ] if ] 'value-handler' define
-[ "s-" request #2 over set-last-index [ value-handler ] curry swap define ] 'value' define
-[ "ns-" [ value ] sip to lookup-function invoke ] 'value!' define
-[ "p-" invoke-and-count-items-returned [ value ] repeat ] 'values' define
-[ '*types*'  '*state*'  'restore-stored-type'  'preserve-type'  'restore-type'  'value-handler' ] hide-functions
 
 "More Arrays"
 'reconstruct' named-buffer
