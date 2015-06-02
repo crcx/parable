@@ -228,15 +228,15 @@
 
 
 "arrays"
-[ 'source'  'filter'  'results' ] variables
+[ 'source'  'results'  'filter' ] values
 
 [ "vp-"    slice-last-index over [ store ] dip #1 swap adjust-slice-length ] 'array-push' define
 [ "p-n"    #-1 over adjust-slice-length slice-last-index fetch ] 'array-pop' define
 [ "p-n"    get-last-index ] 'array-length' define
 
-[ "pnp-n"  &filter ! over array-length [ over array-pop &filter @ invoke ] repeat nip ] 'array-reduce' define
+[ "pnp-n"  to filter over array-length [ over array-pop filter invoke ] repeat nip ] 'array-reduce' define
 [ "p-p"    [ new-buffer invoke-and-count-items-returned buffer-store-items &*CURRENT-BUFFER @ ] preserve-buffer :p ] 'array-from-quote<in-stack-order>' define
-[ "p-p"    request [ copy ] sip &source ! [ #0 &source @ get-slice-length [ &source @ over fetch swap #1 + ] repeat drop ] array-from-quote<in-stack-order> ] 'array-reverse' define
+[ "p-p"    request [ copy ] sip to source [ #0 source get-slice-length [ source over fetch swap #1 + ] repeat drop ] array-from-quote<in-stack-order> ] 'array-reverse' define
 [ "p-p"    array-from-quote<in-stack-order> array-reverse ] 'array-from-quote' define
 [ "pp-?"   swap array-reverse slice-last-index [ dup-pair #1 - fetch swap [ swap ] dip [ [ over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each' define
 
@@ -245,9 +245,9 @@
 [ "pv-f"   swap needs-remap? [ swap dup set-buffer slice-last-index #0 swap [ over buffer-fetch array<remap> = or ] repeat ] preserve-buffer nip :f ] 'array-contains?' define
 [ 'array<remap>'  'needs-remap?' ] hide-functions
 
-[ [ array-reverse ] dip &results zero-out &filter ! [ &source ! ] [ array-length ] bi ] 'prepare' define
-[ "pp-p"   prepare [ &source @ array-pop dup &filter @ invoke [ &results array-push ] [ drop ] if ] repeat &results request [ copy ] sip ] 'array-filter' define
-[ "pp-p"   prepare [ &source @ array-pop &filter @ invoke &results array-push ] repeat &results request [ copy ] sip ] 'array-map' define
+[ [ array-reverse ] dip request to results to filter [ to source ] [ array-length ] bi ] 'prepare' define
+[ "pp-p"   prepare [ source array-pop dup filter invoke [ results array-push ] [ drop ] if ] repeat results request [ copy ] sip ] 'array-filter' define
+[ "pp-p"   prepare [ source array-pop filter invoke results array-push ] repeat results request [ copy ] sip ] 'array-map' define
 [ "pp-f"   dup-pair [ array-length ] bi@ = [ dup array-length true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define
 
 [ 'prepare'  'filter'  'source'  'results' ] hide-functions
