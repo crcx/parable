@@ -263,7 +263,7 @@
 [ &*state* @ :f [ preserve-type ! &*state* off ] [ dup @ swap restore-type ] if ] 'value-handler' define
 [ "s-" request #2 over set-slice-length [ value-handler ] curry swap define ] 'value' define
 [ "ns-" [ value ] sip to lookup-function invoke ] 'value!' define
-[ "p-" array-from-quote #0 [ :p :s value ] array-reduce drop ] 'values' define
+[ "p-" invoke-and-count-items-returned [ value ] repeat ] 'values' define
 [ '*types*'  '*state*'  'restore-stored-type'  'preserve-type'  'restore-type'  'value-handler' ] hide-functions
 
 "More Arrays"
