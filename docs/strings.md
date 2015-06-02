@@ -8,6 +8,6 @@ Examples:
     'this is a string'
     'yet another, much longer string containing a bunch of data'
 
-Each string is stored in a separate slice. Strings are zero terminated.
+Each string is stored in a separate slice. String length is the same as the corresponding slice length.
 
-*Tip: don't use double quotes (") for strings. Double quotes are used for comments.*
+*Tip: make sure to use use single quotes (') for strings. Double quotes are used for comments.*
