@@ -88,12 +88,17 @@ request 'f' define
 
 'sqrt'
 
+    #144 sqrt #12 = check
+
 '<'
 
     #1 #2 < check
     #2 #1 < :n #0 = check
 
 '>'
+
+    #1 #2 > :n #0 = check
+    #2 #1 > check
 
 '<='
 
@@ -112,6 +117,9 @@ request 'f' define
 'repeat'
 
 'invoke'
+
+    [ #1 #3 + ] '"4"' define
+    &"4" invoke #4 = check
 
 'dip'
 
@@ -157,7 +165,15 @@ request 'f' define
 
 'over'
 
+    #1 #2 over #1 = swap #2 = and swap #1 = and check
+    $e #2 over $e = swap #2 = and swap $e = and check
+    '1' #2 over '1' = swap #2 = and swap '1' = and check
+
 'tuck'
+
+    #1 #2 tuck #2 = swap #1 = and swap #2 = and check
+    $e #2 tuck #2 = swap $e = and swap #2 = and check
+    '1' #2 tuck #2 = swap '1' = and swap #2 = and check
 
 'nip'
 
@@ -173,6 +189,9 @@ request 'f' define
     'foobar' function-exists? :n #0  = check
 
 'lookup-function'
+
+    'define' lookup-function &0 = check
+    'foobar' lookup-function &-1 = check
 
 'hide-function'
 
