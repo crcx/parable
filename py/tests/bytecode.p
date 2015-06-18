@@ -1,3 +1,18 @@
+"Tests for the Parable VM Byte Code"
+"-----------------------------------------------------------------------------"
+"There is some implicit trust here:"
+
+"- that the compiler works properly"
+"- that request, define, fetch, store, :s, and + all work"
+
+"Some things can not be easily tested. We must accept this (for now). The"
+"important part is that we can verify that the behaviours match the docs."
+"If they do not, figure out which is wrong, and fix it."
+
+"Higher level functions will be tested separately."
+
+"-----------------------------------------------------------------------------"
+
 request 't' define
 request 'f' define
 [ &t #0 fetch #1 + &t #0 store ] '+t' define
