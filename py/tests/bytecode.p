@@ -79,9 +79,21 @@ request 'f' define
 
 '/'
 
+    #4 #2 / #2 = check
+    #8 #2 / #4 = check
+    #5 #2 / #2.5 = check
+
 'rem'
 
+    #4 #2 rem #0 = check
+    #5 #2 rem #1 = check
+
 'floor'
+
+    #1.1 floor #1 = check
+    #3.4 floor #3 = check
+    #5.5 floor #5 = check
+    #5.7 floor #5 = check
 
 '^'
 
@@ -95,11 +107,31 @@ request 'f' define
 
 'and'
 
+    #-1 #0 and #0 = check
+    #0 #-1 and #0 = check
+    #-1 #-1 and #-1 = check
+    #0 #0 and #0 = check
+
 'or'
+
+    #-1 #0 or #-1 = check
+    #0 #-1 or #-1 = check
+    #-1 #-1 or #-1 = check
+    #0 #0 or #0 = check
 
 'xor'
 
+    #-1 #0 xor #-1 = check
+    #0 #-1 xor #-1 = check
+    #-1 #-1 xor #0 = check
+    #0 #0 xor #0 = check
+
 'random'
+
+    random random <> check
+    random random <> check
+    random random <> check
+    random random <> check
 
 'sqrt'
 
@@ -137,6 +169,8 @@ request 'f' define
     &"4" invoke #4 = check
 
 'dip'
+
+    #1 [ #2 ] dip #1 = swap #2 = and check
 
 'sip'
 
@@ -195,6 +229,9 @@ request 'f' define
     #1 #2 #3 nip #3 = swap #1 = and check
 
 'depth'
+
+    depth [ #1 #2 #3 depth ] dip - #3 = check
+    drop drop drop
 
 'reset'
 
