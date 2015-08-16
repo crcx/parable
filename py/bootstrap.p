@@ -73,3 +73,38 @@
 [ #300 ] 'CHARACTER' define
 [ #400 ] 'POINTER' define
 [ #500 ] 'FLAG' define
+
+
+"-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+
+"simple, forth-style variables"
+[ request swap define ] 'variable' define
+[ #0 fetch ] '@' define
+[ #0 store ] '!' define
+
+
+
+"returns the number of cells in a slice"
+[ "p-n"  get-last-index #1 + ] 'length?' define
+
+
+"min/max"
+[ over over < [ nip ] [ drop ] if ] 'max' define
+[ over over > [ nip ] [ drop ] if ] 'min' define
+
+
+"utility functions"
+[ depth [ invoke ] dip depth swap - ] 'delta-stack-change' define
+
+
+
+"new array code"
+[ "vp-"  :p dup length? store ] 'a:push' define
+[ "p-v"  :p [ dup get-last-index fetch ] sip dup length? #2 - swap set-last-index ] 'a:pop' define
+
+
+"construct a new array from values returned by a quotation"
+'a' variable
+[ request &a ! delta-stack-change #0 max [ &a @ a:push ] repeat &a @ :p ] 'a:from-quote' define
+'a' hide-function
+
