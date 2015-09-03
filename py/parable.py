@@ -98,6 +98,7 @@ BC_FUNCTION_HIDE = 603
 BC_STRING_SEEK = 700
 BC_SLICE_SUBSLICE = 701
 BC_STRING_NUMERIC = 702
+BC_SLICE_REVERSE = 703
 BC_TO_LOWER = 800
 BC_TO_UPPER = 801
 BC_REPORT = 900
@@ -648,7 +649,7 @@ def interpret(slice, more=None):
                 a = int(stack_pop())
                 b = int(stack_pop())
                 c = p_slices[int(stack_pop())]
-                d = c[b:a+1]
+                d = c[b:a]
                 e = request_slice()
                 i  = 0
                 while i < len(d):
@@ -664,6 +665,13 @@ def interpret(slice, more=None):
                     stack_push(-1, TYPE_FLAG)
                 else:
                     stack_push(0, TYPE_FLAG)
+            else:
+                offset = size
+        elif opcode == BC_SLICE_REVERSE:
+            if check_depth(1):
+                a = stack_pop()
+                p_slices[int(a)] = p_slices[int(a)][::-1]
+                stack_push(a, TYPE_POINTER)
             else:
                 offset = size
         elif opcode == BC_TO_UPPER:
