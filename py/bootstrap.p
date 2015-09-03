@@ -57,6 +57,7 @@
 [ "ss-n"   `700 ] 'find' define
 [ "pnn-p"  `701 ] 'subslice' define
 [ "s-f"    `702 ] 'numeric?' define
+[ "p-p"    `703 ] 'reverse' define
 [ "v-v"    `800 ] 'to-lowercase' define
 [ "v-v"    `801 ] 'to-uppercase' define
 [ "s-"     `900 ] 'report-error' define
@@ -106,8 +107,15 @@
 
 "construct a new array from values returned by a quotation"
 'a' variable
-[ request &a ! delta-stack-change #0 max [ &a @ a:push ] repeat &a @ :p ] 'a:from-quote' define
+[ request &a ! delta-stack-change #0 max [ &a @ a:push ] repeat &a @ #1 over length? subslice :p ] 'a:from-quote' define
 'a' hide-function
+
+
+
+'f' variable
+[ "pnp-n"  &f ! over length? [ over a:pop &f @ invoke ] repeat nip ] 'a:reduce' define
+'f' hide-function
+
 
 "---------------------------------------------------------"
 "untested / to be reworked"
@@ -170,7 +178,7 @@
 [ "p-?n"  depth [ invoke ] dip depth swap - ] 'invoke-and-count-items-returned' define
 [ "pn-?n" [ depth [ invoke ] dip depth swap - ] + ] 'invoke-and-count-items-returned-with-adjustment' define
 [ "?n-"   [ drop ] repeat ] 'drop-multiple' define
-[ "p-p"    request [ copy ] sip ] 'slice-duplicate' define
+[ "p-p"   request [ copy ] sip ] 'slice-duplicate' define
 [ "p-"   invoke-and-count-items-returned [ hide-function ] repeat ] 'hide-functions' define
 [ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap define ] [ drop ] if ] 'rename-function' define
 [ "p-"   invoke-and-count-items-returned [ variable ] repeat ] 'variables' define
@@ -255,32 +263,46 @@
 [ 'source'  'results'  'filter' ] values
 
 [ "vp-"    slice-last-index over [ store ] dip #1 swap adjust-slice-length ] 'array-push' define
+
 [ "p-n"    #-1 over adjust-slice-length slice-last-index fetch ] 'array-pop' define
+
 [ "p-n"    get-last-index ] 'array-length' define
 
-[ "pnp-n"  to filter over array-length [ over array-pop filter invoke ] repeat nip ] 'array-reduce' define
-[ "p-p"    [ new-buffer invoke-and-count-items-returned buffer-store-items &*CURRENT-BUFFER @ ] preserve-buffer :p ] 'array-from-quote<in-stack-order>' define
-[ "p-p"    request [ copy ] sip to source [ #0 source get-slice-length [ source over fetch swap #1 + ] repeat drop ] array-from-quote<in-stack-order> ] 'array-reverse' define
-[ "p-p"    array-from-quote<in-stack-order> array-reverse ] 'array-from-quote' define
-[ "pp-?"   swap array-reverse slice-last-index [ dup-pair #1 - fetch swap [ swap ] dip [ [ over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each' define
+[ "p-p"    a:from-quote ] 'array-from-quote<in-stack-order>' define
+
+[ "p-p"    array-from-quote<in-stack-order> reverse ] 'array-from-quote' define
+
+[ "pp-?"   swap reverse slice-last-index [ dup-pair #1 - fetch swap [ swap ] dip [ [ over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each' define
+
+'f' variable
+[ &f ! slice-duplicate dup length? [ [ a:pop &f @ invoke ] sip ] repeat drop ]
+'for-each' define
+'f' hide-function
+
 
 [ ] 'array<remap>' define
+
 [ type? STRING <> [ [ ] ] [ [ [ :p :s ] bi@ ] ] if 'array<remap>' define ] 'needs-remap?' define
+
 [ "pv-f"   swap needs-remap? [ swap dup set-buffer slice-last-index #0 swap [ over buffer-fetch array<remap> = or ] repeat ] preserve-buffer nip :f ] 'array-contains?' define
+
 [ 'array<remap>'  'needs-remap?' ] hide-functions
 
-[ [ array-reverse ] dip request to results to filter [ to source ] [ array-length ] bi ] 'prepare' define
-[ "pp-p"   prepare [ source array-pop dup filter invoke [ results array-push ] [ drop ] if ] repeat results request [ copy ] sip ] 'array-filter' define
-[ "pp-p"   prepare [ source array-pop filter invoke results array-push ] repeat results request [ copy ] sip ] 'array-map' define
-[ "pp-f"   dup-pair [ array-length ] bi@ = [ dup array-length true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define
+[ [ reverse ] dip request to results to filter [ to source ] [ length? ] bi results a:pop drop ] 'prepare' define
+
+[ "pp-p"   prepare [ source a:pop dup filter invoke [ results a:push ] [ drop ] if ] repeat results request [ copy ] sip ] 'array-filter' define
+
+[ "pp-p"   prepare [ source a:pop filter invoke results a:push ] repeat results request [ copy ] sip ] 'array-map' define
+
+[ "pp-f"   dup-pair [ length? ] bi@ = [ dup length? true swap [ [ dup-pair [ a:pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define
 
 [ 'prepare'  'filter'  'source'  'results' ] hide-functions
 
 "routines for rendering an array into a string"
 '*array:conversions*' named-buffer
-[ "array  --  string"  '' [ :s '#' swap + + #32 :c :s + ] array-reduce ] buffer-store
-[ "array  --  string"  '' [ :p :s  $' :s swap + $' :s + + #32 :c :s + ] array-reduce ] buffer-store
-[ "array  --  string"  '' [ :c :s '$' swap + + #32 :c :s + ] array-reduce ] buffer-store
+[ "array  --  string"  '' [ :s '#' swap + + #32 :c :s + ] a:reduce ] buffer-store
+[ "array  --  string"  '' [ :p :s  $' :s swap + $' :s + + #32 :c :s + ] a:reduce ] buffer-store
+[ "array  --  string"  '' [ :c :s '$' swap + + #32 :c :s + ] a:reduce ] buffer-store
 [ "pointer:array number:type - string"  #100 / #1 - &*array:conversions* swap fetch :p invoke ] 'array-to-string' define
 
 "Conversion of strings to numbers"
@@ -346,22 +368,3 @@
 [ #389 ] 'hash-prime' define
 [ "s-n" chosen-hash hash-prime rem ] 'hash' define
 
-
-"Constants"
-[ #3.141592653 ] 'math:pi' define
-[ #6.283185307 ] 'math:tau' define
-[ #2.718281828 ] 'math:e' define
-[ #1.618033988 ] 'math:golden-ratio' define
-[ #0.577215664 ] 'math:euler-mascheroni' define
-[ #1.414213562 ] 'math:pythagora' define
-[ #0.618033988 ] 'math:inverse-golden-ratio' define
-[ #2.414213562 ] 'math:silver-ratio/mean' define
-[ #60 ] 'time:seconds/minute' define
-[ #60 ] 'time:minutes/hour' define
-[ #24 ] 'time:hours/day' define
-[ #7 ] 'time:days/week' define
-[ #52 ] 'time:weeks/year' define
-[ #12 ] 'time:months/year' define
-[ #365 ] 'time:days/year' define
-[ #365.25 ] 'time:days/julian-year' define
-[ #365.2425 ] 'time:days/gregorian-year' define
