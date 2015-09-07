@@ -75,13 +75,10 @@
 [ #400 ] 'POINTER' define
 [ #500 ] 'FLAG' define
 
-
-"-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-
 "simple, forth-style variables"
-[ request swap define ] 'variable' define
-[ #0 fetch ] '@' define
-[ #0 store ] '!' define
+[ "s-"   request swap define ] 'variable' define
+[ "p-v"  #0 fetch ] '@' define
+[ "vp-"  #0 store ] '!' define
 
 
 
@@ -96,29 +93,8 @@
 
 
 "utility functions"
-[ depth [ invoke ] dip depth swap - ] 'delta-stack-change' define
+[ "q-...n"  depth [ invoke ] dip depth swap - ] 'invoke<depth?>' define
 
-
-
-"new array code"
-[ "vp-"  :p dup length? store ] 'a:push' define
-[ "p-v"  :p [ dup get-last-index fetch ] sip dup length? #2 - swap set-last-index ] 'a:pop' define
-
-
-"construct a new array from values returned by a quotation"
-'a' variable
-[ request &a ! delta-stack-change #0 max [ &a @ a:push ] repeat &a @ #1 over length? subslice :p ] 'a:from-quote' define
-'a' hide-function
-
-
-
-'f' variable
-[ "pnp-n"  &f ! over length? [ over a:pop &f @ invoke ] repeat nip ] 'a:reduce' define
-'f' hide-function
-
-
-"---------------------------------------------------------"
-"untested / to be reworked"
 
 "The basic bi/tri combinators provided as part of the primitives allow application of multiple quotes to a single data element. Here we add new forms that are very useful."
 "We consider the bi/tri variants to consist of one of three types."
@@ -170,18 +146,16 @@
 [ "nn-..."  dup-pair < [ [ [ dup #1 + ] dip dup-pair = ] while-false ] [ [ [ dup #1 - ] dip dup-pair = ] while-false ] if drop ] 'expand-range' define
 [ "...n-n"   #1 - [ + ] repeat ] 'sum-range' define
 
+
 "Misc"
 [ "p-pn"  dup get-last-index ] 'slice-last-index' define
-[ "p-n"   get-last-index #1 + ] 'get-slice-length' define
 [ "p-pn"  slice-last-index #1 + ] 'slice-length' define
 [ "np-"   [ get-last-index + ] sip set-last-index ] 'adjust-slice-length' define
-[ "p-?n"  depth [ invoke ] dip depth swap - ] 'invoke-and-count-items-returned' define
-[ "pn-?n" [ depth [ invoke ] dip depth swap - ] + ] 'invoke-and-count-items-returned-with-adjustment' define
 [ "?n-"   [ drop ] repeat ] 'drop-multiple' define
 [ "p-p"   request [ copy ] sip ] 'slice-duplicate' define
-[ "p-"   invoke-and-count-items-returned [ hide-function ] repeat ] 'hide-functions' define
+[ "p-"   invoke<depth?> [ hide-function ] repeat ] 'hide-functions' define
 [ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap define ] [ drop ] if ] 'rename-function' define
-[ "p-"   invoke-and-count-items-returned [ variable ] repeat ] 'variables' define
+[ "p-"   invoke<depth?> [ variable ] repeat ] 'variables' define
 
 "String and Character"
 "Note that this is only supporting the basic ASCII character set presently."
@@ -194,7 +168,7 @@
 [ "v-f"  to-lowercase 'aeiou'                                string-contains? ] 'vowel?' define
 [ "v-f"  dup to-lowercase = ] 'lowercase?' define
 [ "v-f"  dup to-uppercase = ] 'uppercase?' define
-[ "p-s"  invoke-and-count-items-returned #1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define
+[ "p-s"  invoke<depth?> #1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define
 
 "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
 [ "s-s"  :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ slice-last-index ] dip swap subslice :s ] 'trim-left' define
@@ -255,27 +229,33 @@
 [ &*state* @ :f [ preserve-type ! &*state* off ] [ dup @ swap restore-type ] if ] 'value-handler' define
 [ "s-" request #2 over set-last-index [ value-handler ] curry swap define ] 'value' define
 [ "ns-" [ value ] sip to lookup-function invoke ] 'value!' define
-[ "p-" invoke-and-count-items-returned [ value ] repeat ] 'values' define
+[ "p-" invoke<depth?> [ value ] repeat ] 'values' define
 [ '*types*'  '*state*'  'restore-stored-type'  'preserve-type'  'restore-type'  'value-handler' ] hide-functions
 
 
 "arrays"
 [ 'source'  'results'  'filter' ] values
 
-[ "vp-"    slice-last-index over [ store ] dip #1 swap adjust-slice-length ] 'array-push' define
+"new array code"
+[ "vp-"  :p dup length? store ] 'array-push' define
+[ "p-v"  :p [ dup get-last-index fetch ] sip dup length? #2 - swap set-last-index ] 'array-pop' define
 
-[ "p-n"    #-1 over adjust-slice-length slice-last-index fetch ] 'array-pop' define
 
-[ "p-n"    get-last-index ] 'array-length' define
+"construct a new array from values returned by a quotation"
+'a' variable
+[ request &a ! invoke<depth?> #0 max [ &a @ array-push ] repeat &a @ #1 over length? subslice :p ] 'array-from-quote' define
+'a' hide-function
 
-[ "p-p"    a:from-quote ] 'array-from-quote<in-stack-order>' define
 
-[ "p-p"    array-from-quote<in-stack-order> reverse ] 'array-from-quote' define
+
+'f' variable
+[ "pnp-n"  &f ! over length? [ over array-pop &f @ invoke ] repeat nip ] 'array-reduce' define
+'f' hide-function
 
 [ "pp-?"   swap reverse slice-last-index [ dup-pair #1 - fetch swap [ swap ] dip [ [ over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each' define
 
 'f' variable
-[ &f ! slice-duplicate dup length? [ [ a:pop &f @ invoke ] sip ] repeat drop ]
+[ &f ! slice-duplicate dup length? [ [ array-pop &f @ invoke ] sip ] repeat drop ]
 'for-each' define
 'f' hide-function
 
@@ -288,21 +268,21 @@
 
 [ 'array<remap>'  'needs-remap?' ] hide-functions
 
-[ [ reverse ] dip request to results to filter [ to source ] [ length? ] bi results a:pop drop ] 'prepare' define
+[ [ reverse ] dip request to results to filter [ to source ] [ length? ] bi results array-pop drop ] 'prepare' define
 
-[ "pp-p"   prepare [ source a:pop dup filter invoke [ results a:push ] [ drop ] if ] repeat results request [ copy ] sip ] 'array-filter' define
+[ "pp-p"   prepare [ source array-pop dup filter invoke [ results array-push ] [ drop ] if ] repeat results request [ copy ] sip ] 'array-filter' define
 
-[ "pp-p"   prepare [ source a:pop filter invoke results a:push ] repeat results request [ copy ] sip ] 'array-map' define
+[ "pp-p"   prepare [ source array-pop filter invoke results array-push ] repeat results request [ copy ] sip ] 'array-map' define
 
-[ "pp-f"   dup-pair [ length? ] bi@ = [ dup length? true swap [ [ dup-pair [ a:pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define
+[ "pp-f"   dup-pair [ length? ] bi@ = [ dup length? true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define
 
 [ 'prepare'  'filter'  'source'  'results' ] hide-functions
 
 "routines for rendering an array into a string"
 '*array:conversions*' named-buffer
-[ "array  --  string"  '' [ :s '#' swap + + #32 :c :s + ] a:reduce ] buffer-store
-[ "array  --  string"  '' [ :p :s  $' :s swap + $' :s + + #32 :c :s + ] a:reduce ] buffer-store
-[ "array  --  string"  '' [ :c :s '$' swap + + #32 :c :s + ] a:reduce ] buffer-store
+[ "array  --  string"  '' [ :s '#' swap + + #32 :c :s + ] array-reduce ] buffer-store
+[ "array  --  string"  '' [ :p :s  $' :s swap + $' :s + + #32 :c :s + ] array-reduce ] buffer-store
+[ "array  --  string"  '' [ :c :s '$' swap + + #32 :c :s + ] array-reduce ] buffer-store
 [ "pointer:array number:type - string"  #100 / #1 - &*array:conversions* swap fetch :p invoke ] 'array-to-string' define
 
 "Conversion of strings to numbers"
@@ -331,19 +311,19 @@
 [ to types to data ] 'prepare' define
 [ #399 buffer-store &*CURRENT-BUFFER @ :p ] 'terminate' define
 [ types over fetch [ data over fetch ] dip compile-value ] 'process' define
-[ "pn-s" prepare new-buffer #0 data array-length [ process #1 + ] repeat drop terminate ] 'array-to-quote' define
+[ "pn-s" prepare new-buffer #0 data length? [ process #1 + ] repeat drop terminate ] 'array-to-quote' define
 [ 'reconstruct' 'compile-value' 'data' 'types' 'prepare' 'extract' 'terminate' ] hide-functions
 
 [ 'source' 'v' 'i' 'idx' ] values
 [ type? STRING = [ [ :p :s ] dip ] [ :n ] if ] 'resolve-types' define
-[ "vp-n"  to source to v #0 to i #-1 to idx source array-length [ source i fetch v resolve-types = [ i to idx ] if-true i #1 + to i ] repeat idx ] 'array-index-of' define
+[ "vp-n"  to source to v #0 to i #-1 to idx source length? [ source i fetch v resolve-types = [ i to idx ] if-true i #1 + to i ] repeat idx ] 'array-index-of' define
 [ 'source'  'v'  'i'  'idx'  'resolve-types' ] hide-functions
 
 
 "Text Output Buffer"
 'TOB' variable
 [ &TOB array-push ] 'append-value' define
-[ "-..." &TOB array-length [ &TOB array-pop :p :s ] repeat ] 'show-tob' define
+[ "-..." &TOB get-last-index [ &TOB array-pop :p :s ] repeat ] 'show-tob' define
 [ "-" #0 &TOB set-last-index ] 'clear-tob' define
 
 'TOB:Handlers' named-buffer
