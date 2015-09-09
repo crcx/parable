@@ -123,7 +123,7 @@ print """
 
 prepare_slices()
 prepare_dictionary()
-parse_bootstrap(open('bootstrap.p').readlines())
+parse_bootstrap(open('stdlib.p').readlines())
 collect_unused_slices()
 
 f = message.split("\n")

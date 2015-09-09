@@ -100,7 +100,7 @@ if __name__ == '__main__':
     sys.stdout.write('bye            exit listener\n')
     prepare_slices()
     prepare_dictionary()
-    parse_bootstrap(open('bootstrap.p').readlines())
+    parse_bootstrap(open('stdlib.p').readlines())
 
     interpret(compile("[ `9000 ] '?' define", request_slice()))
     interpret(compile("[ `9010 ] 'show-stack' define", request_slice()))

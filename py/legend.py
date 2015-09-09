@@ -203,7 +203,7 @@ if __name__ == '__main__':
     (width, height) = getTerminalSize()
     prepare_slices()
     prepare_dictionary()
-    parse_bootstrap(open('bootstrap.p').readlines())
+    parse_bootstrap(open('stdlib.p').readlines())
     collect_unused_slices()
 
     counter = 0
@@ -219,7 +219,7 @@ if __name__ == '__main__':
             exit()
         elif cmd == ':r' or cmd == ':restart':
             revert()
-            parse_bootstrap()
+            parse_bootstrap(open('stdlib.p').readlines())
             collect_unused_slices()
         elif cmd[0:2] == ':i':
             load_file(cmd[3:])

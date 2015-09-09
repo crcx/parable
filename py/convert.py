@@ -9,7 +9,7 @@ for line in f:
     print line.rstrip()
 
 print "bootstrap = []"
-f = open('bootstrap.p').readlines()
+f = open('stdlib.p').readlines()
 for line in f:
     if len(line) > 1:
         print 'bootstrap.append(""" ' + line.strip() + ' """)'
