@@ -236,28 +236,13 @@
 "arrays"
 [ 'source'  'results'  'filter' ] values
 
-"new array code"
+[ &source [ &results [ &filter [ invoke ] preserve ] preserve ] preserve ] 'localize' define
+
 [ "vp-"  :p dup length? store ] 'array-push' define
 [ "p-v"  :p [ dup get-last-index fetch ] sip dup length? #2 - swap set-last-index ] 'array-pop' define
-
-
-"construct a new array from values returned by a quotation"
-'a' variable
-[ request &a ! invoke<depth?> #0 max [ &a @ array-push ] repeat &a @ #1 over length? subslice :p ] 'array-from-quote' define
-'a' hide-function
-
-
-
-'f' variable
-[ "pnp-n"  &f ! over length? [ over array-pop &f @ invoke ] repeat nip ] 'array-reduce' define
-'f' hide-function
-
-[ "pp-?"   swap reverse slice-last-index [ dup-pair #1 - fetch swap [ swap ] dip [ [ over invoke ] dip ] dip #1 - dup #0 > ] while-true drop-pair drop ] 'for-each' define
-
-'f' variable
-[ &f ! slice-duplicate dup length? [ [ array-pop &f @ invoke ] sip ] repeat drop ]
-'for-each' define
-'f' hide-function
+[ "p-p"    [ request to results invoke<depth?> #0 max [ results array-push ] repeat results #1 over length? subslice :p ] localize ] 'array-from-quote' define
+[ "pnp-n"  [ to filter over length? [ over array-pop filter invoke ] repeat nip ] localize ] 'array-reduce' define
+[ "pp-?"   [ to filter slice-duplicate dup length? [ [ array-pop filter invoke ] sip ] repeat drop ] localize ] 'for-each' define
 
 
 [ ] 'array<remap>' define
@@ -276,7 +261,7 @@
 
 [ "pp-f"   dup-pair [ length? ] bi@ = [ dup length? true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define
 
-[ 'prepare'  'filter'  'source'  'results' ] hide-functions
+[ 'prepare'  'localize'  'filter'  'source'  'results' ] hide-functions
 
 "routines for rendering an array into a string"
 '*array:conversions*' named-buffer
