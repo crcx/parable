@@ -1,8 +1,6 @@
 # Overview
 
-Upon startup, the parable language consists of one function and the functionality
-exposed by the parser. The initial function is *define*. The standard libary is
-provided to make Parable into a useful language.
+Upon startup, the parable language consists of one function and the functionality exposed by the parser. The initial function is *define*. The standard libary is provided to make Parable into a useful language.
 
 # The Functions
 
@@ -602,6 +600,59 @@ Constant; value for the FLAG data type.
 
     -- number
 
+
+## variable
+
+Create a simple named variable
+
+    string --
+
+## @
+
+Fetch the value stored in a simple variable.
+
+    pointer -- number
+
+## !
+
+Store value into a simple variable.
+
+    value pointer --
+
+## length?
+
+Return the length of a slice.
+
+    pointer -- number
+
+This works with all pointers, including strings and arrays.
+
+## min
+
+Return the lesser of two numbers.
+
+    number number -- number
+
+## max
+
+Return the greater of two numbers.
+
+    number number -- number
+
+## abs
+
+Return the absolute value of a number.
+
+    number -- number
+
+## invoke<depth?>
+
+Return the results of executing a quote and a number indicating the change in stack depth.
+
+    pointer - ... number
+
+Note that this can be problematic if the executed quotation does extensive stack manipulations. Watch your inputs when using this, and make necessary adjustments manually as needed.
+
 ## bi*
 
 Apply pointer:a to value:a and pointer:b to value:b. Returns the results.
@@ -746,29 +797,27 @@ Return **true** if A is between B and C, inclusive. Or **false** otherwise.
 
     number:a number:b number:c -- flag
 
-## variable
 
-Create a simple named variable
 
-    string --
+
+
+
+
+
+
+
+
+
+# Old Docs Below
+
+
+
 
 ## variable!
 
 Create a simple named variable with an initial value.
 
     value string --
-
-## @
-
-Fetch the value stored in a simple variable.
-
-    pointer -- number
-
-## !
-
-Store value into a simple variable.
-
-    value pointer --
 
 ## on
 
@@ -956,23 +1005,6 @@ Trim all leading and trailing white space from a string.
 
     string -- string
 
-## abs
-
-Return the absolute value of a number.
-
-    number -- number
-
-## min
-
-Return the lesser of two numbers.
-
-    number number -- number
-
-## max
-
-Return the greater of two numbers.
-
-    number number -- number
 
 ## factorial
 
