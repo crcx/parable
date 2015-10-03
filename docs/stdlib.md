@@ -798,36 +798,21 @@ Return **true** if A is between B and C, inclusive. Or **false** otherwise.
     number:a number:b number:c -- flag
 
 
-
-
-
-
-
-
-
-
-
-
-# Old Docs Below
-
-
-
-
 ## variable!
 
 Create a simple named variable with an initial value.
 
     value string --
 
-## on
-
-Set a simple variable to a value of -1.
-
-    pointer --
-
 ## off
 
 Set a simple variable to a value of 0.
+
+    pointer --
+
+## on
+
+Set a simple variable to a value of -1.
 
     pointer --
 
@@ -891,23 +876,22 @@ Adjust the length of a slice. You can use this to shrink or grow slices as neede
 
     number pointer --
 
-## invoke-and-count-items-returned
-
-Execute the code at pointer, and return the results of execution, and a value indicating the number of items returned (or consumed) as a result.
-
-    pointer -- ? number
-
-## invoke-and-count-items-returned-with-adjustment
-
-Execute the code at pointer, and return the results of execution, and a value indicating the number of items returned (or consumed) as a result. Adds *number* to the results.
-
-    pointer number -- ? number
-
 ## drop-multiple
 
 Drop the specified number of values from the stack.
 
     ... number -- ?
+
+
+
+
+
+
+
+
+# Old Docs Below
+
+
 
 ## hide-functions
 
