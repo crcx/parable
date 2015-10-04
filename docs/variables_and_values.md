@@ -36,7 +36,7 @@ Consider the following, which is functionally equivilent to the example for *var
     temp
 
     "Multiply the value in temp by 1000 and update it with the new value:"
-    temp #1000 to temp
+    temp #1000 * to temp
 
 Values are cleaner to read than values, but have additional overhead since they need to decide whether they are being read or updated.
 

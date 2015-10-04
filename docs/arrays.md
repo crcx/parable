@@ -2,7 +2,7 @@
 
 I find the array functions in Parable to be incredibly useful. While I had previously implemented a vocabulary for arrays in Retro, I didn't actually use it for much.
 
-In Parable, arrays are stored in slices. The length is stored by the VM as the size of the slice, with the values stored sequentially in the slice. (I haven't implemented associative arrays yet). This is simplistic, but easy to understand and makes working with them at low level easy. The underlying VM is *not* aware of arrays as a data type, so conversions (via **:s**, **:c**, etc) are needed when working with the contents.
+In Parable, arrays are stored in slices. The length is stored by the VM as the size of the slice, with the values stored sequentially in the slice. This is simplistic, but easy to understand and makes working with them at low level easy. The underlying VM is *not* aware of arrays as a data type, so conversions (via **:s**, **:c**, etc) are needed when working with the contents.
 
 Arrays can be created with **array-from-quote**. Attaching a permanent name can be done with **define**.
 
@@ -57,12 +57,4 @@ Returning to more mundane functions, Parable also provides a function for checki
     #4 [ #1 #2 #3 #4 #5 ] array-contains?
     'pear' [ 'apple'  'banana'  'orange' ] array-contains?
 
-Parable also provide **array-compare** for comparing two arrays and **array-reverse** which flips the order of values in the array.
-
-The last function provided is **array-to-string**. This takes an array and a type constant and generates a string representation of the contents. So we could do:
-
-    [ $h $e $l $l $o ] array-from-quote
-    CHARACTER array-to-string
-    
-    [ #1 #3 #6 ] array-from-quote
-    NUMBER array-to-string
+Parable also provide **array-compare** for comparing two arrays and **reverse** which flips the order of values in the array.
