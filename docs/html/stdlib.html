@@ -1,9 +1,7 @@
 <link rel='stylesheet' href='stylesheet.css'>
 <h1>Overview</h1>
 
-<p>Upon startup, the parable language consists of one function and the functionality
-exposed by the parser. The initial function is <em>define</em>. The standard libary is
-provided to make Parable into a useful language.</p>
+<p>Upon startup, the parable language consists of one function and the functionality exposed by the parser. The initial function is <em>define</em>. The standard libary is provided to make Parable into a useful language.</p>
 
 <h1>The Functions</h1>
 
@@ -555,6 +553,13 @@ exists or <em>false</em> if it does not.</p>
 
 <p>This is a primitive corresponding to a byte code.</p>
 
+<h2>reverse</h2>
+
+<p>Reverse the order of values in a slice.</p>
+
+<pre><code>pointer -- pointer
+</code></pre>
+
 <h2>to-uppercase</h2>
 
 <p>Convert a CHARACTER or STRING to uppercase.</p>
@@ -677,6 +682,66 @@ exists or <em>false</em> if it does not.</p>
 
 <pre><code>-- number
 </code></pre>
+
+<h2>variable</h2>
+
+<p>Create a simple named variable</p>
+
+<pre><code>string --
+</code></pre>
+
+<h2>@</h2>
+
+<p>Fetch the value stored in a simple variable.</p>
+
+<pre><code>pointer -- number
+</code></pre>
+
+<h2>!</h2>
+
+<p>Store value into a simple variable.</p>
+
+<pre><code>value pointer --
+</code></pre>
+
+<h2>length?</h2>
+
+<p>Return the length of a slice.</p>
+
+<pre><code>pointer -- number
+</code></pre>
+
+<p>This works with all pointers, including strings and arrays.</p>
+
+<h2>min</h2>
+
+<p>Return the lesser of two numbers.</p>
+
+<pre><code>number number -- number
+</code></pre>
+
+<h2>max</h2>
+
+<p>Return the greater of two numbers.</p>
+
+<pre><code>number number -- number
+</code></pre>
+
+<h2>abs</h2>
+
+<p>Return the absolute value of a number.</p>
+
+<pre><code>number -- number
+</code></pre>
+
+<h2>invoke<depth?></h2>
+
+<p>Return the results of executing a quote and a number indicating the change in stack depth.</p>
+
+<pre><code>pointer - ... number
+</code></pre>
+
+<p>Note that this can be problematic if the executed quotation does extensive stack manipulations. Watch your inputs when using this, and make necessary adjustments manually as needed.</p>
 
 <h2>bi*</h2>
 
@@ -846,13 +911,6 @@ exists or <em>false</em> if it does not.</p>
 <pre><code>number:a number:b number:c -- flag
 </code></pre>
 
-<h2>variable</h2>
-
-<p>Create a simple named variable</p>
-
-<pre><code>string --
-</code></pre>
-
 <h2>variable!</h2>
 
 <p>Create a simple named variable with an initial value.</p>
@@ -860,30 +918,16 @@ exists or <em>false</em> if it does not.</p>
 <pre><code>value string --
 </code></pre>
 
-<h2>@</h2>
+<h2>off</h2>
 
-<p>Fetch the value stored in a simple variable.</p>
+<p>Set a simple variable to a value of 0.</p>
 
-<pre><code>pointer -- number
-</code></pre>
-
-<h2>!</h2>
-
-<p>Store value into a simple variable.</p>
-
-<pre><code>value pointer --
+<pre><code>pointer --
 </code></pre>
 
 <h2>on</h2>
 
 <p>Set a simple variable to a value of -1.</p>
-
-<pre><code>pointer --
-</code></pre>
-
-<h2>off</h2>
-
-<p>Set a simple variable to a value of 0.</p>
 
 <pre><code>pointer --
 </code></pre>
@@ -958,25 +1002,18 @@ exists or <em>false</em> if it does not.</p>
 <pre><code>number pointer --
 </code></pre>
 
-<h2>invoke-and-count-items-returned</h2>
-
-<p>Execute the code at pointer, and return the results of execution, and a value indicating the number of items returned (or consumed) as a result.</p>
-
-<pre><code>pointer -- ? number
-</code></pre>
-
-<h2>invoke-and-count-items-returned-with-adjustment</h2>
-
-<p>Execute the code at pointer, and return the results of execution, and a value indicating the number of items returned (or consumed) as a result. Adds <em>number</em> to the results.</p>
-
-<pre><code>pointer number -- ? number
-</code></pre>
-
 <h2>drop-multiple</h2>
 
 <p>Drop the specified number of values from the stack.</p>
 
 <pre><code>... number -- ?
+</code></pre>
+
+<h2>slice-duplicate</h2>
+
+<p>Make a copy of a slice.</p>
+
+<pre><code>pointer -- new-pointer
 </code></pre>
 
 <h2>hide-functions</h2>
@@ -1089,27 +1126,6 @@ exists or <em>false</em> if it does not.</p>
 <p>Trim all leading and trailing white space from a string.</p>
 
 <pre><code>string -- string
-</code></pre>
-
-<h2>abs</h2>
-
-<p>Return the absolute value of a number.</p>
-
-<pre><code>number -- number
-</code></pre>
-
-<h2>min</h2>
-
-<p>Return the lesser of two numbers.</p>
-
-<pre><code>number number -- number
-</code></pre>
-
-<h2>max</h2>
-
-<p>Return the greater of two numbers.</p>
-
-<pre><code>number number -- number
 </code></pre>
 
 <h2>factorial</h2>
@@ -1243,131 +1259,6 @@ allows the code in the slice to allocate a new buffer, and restores the old sett
 <pre><code>string --
 </code></pre>
 
-<h2>slice-duplicate</h2>
-
-<p>Make a copy of a slice.</p>
-
-<pre><code>pointer:original -- pointer:copy
-</code></pre>
-
-<h2>array-push</h2>
-
-<p>Push a value to the end of an array.</p>
-
-<pre><code>value pointer --
-</code></pre>
-
-<h2>array-pop</h2>
-
-<p>Pop a value off of an array.</p>
-
-<pre><code>pointer -- number
-</code></pre>
-
-<h2>array-length</h2>
-
-<p>Return the length of an array.</p>
-
-<pre><code>pointer -- number
-</code></pre>
-
-<h2>array-reduce</h2>
-
-<p>Reduce an array to a single value.</p>
-
-<pre><code>pointer:array number pointer:code -- number
-</code></pre>
-
-<p>Example:</p>
-
-<pre><code>[ #1 #2 #3 ] array-from-quote
-#0 [ + ] array-reduce
-</code></pre>
-
-<h2>array-from-quote<in-stack-order></h2>
-
-<p>Execute code in slice, and return an array constructed from the values in it.</p>
-
-<pre><code>pointer -- pointer
-</code></pre>
-
-<h2>array-reverse</h2>
-
-<p>Reverse the order of values in an array.</p>
-
-<pre><code>pointer -- pointer
-</code></pre>
-
-<h2>array-from-quote</h2>
-
-<p>Execute code in slice, and return an array constructed from the values in it. Like <strong>array-from-pointer<in-stack-order></strong>, but
-reverses the order of the elements.</p>
-
-<pre><code>pointer -- pointer
-</code></pre>
-
-<h2>for-each</h2>
-
-<p>Execute code in <strong>pointer:code</strong> once for each element in the array.</p>
-
-<pre><code>pointer:data pointer:code -- ?
-</code></pre>
-
-<h2>array-contains</h2>
-
-<p>[ "pv-f"   swap needs-remap? [ swap dup set-buffer array-length #0 swap [ over buffer-fetch array<remap> = or ] repeat ] preserve-buffer nip :f ] 'array-contains?' define</p>
-
-<h2>array-filter</h2>
-
-<p>[ "pp-p"   prepare [ &amp;source @ array-pop dup &amp;filter @ invoke [ &amp;results array-push ] [ drop ] if ] repeat &amp;results request [ copy ] sip ] 'array-filter' define</p>
-
-<h2>array-map</h2>
-
-<p>[ "pp-p"   prepare [ &amp;source @ array-pop &amp;filter @ invoke &amp;results array-push ] repeat &amp;results request [ copy ] sip ] 'array-map' define</p>
-
-<h2>array-compare</h2>
-
-<p>[ "pp-f"   dup-pair [ array-length ] bi@ = [ dup array-length true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define</p>
-
-<h2>array-to-string</h2>
-
-<p>[ "pointer:array number:type - string"  #100 / #1 - &amp;<em>array:conversions</em> swap fetch :p invoke ] 'array-to-string' define</p>
-
-<h2>convert-with-base</h2>
-
-<p>Convert string into a number using the current base.</p>
-
-<pre><code>string number -- number
-</code></pre>
-
-<h2>convert-from-binary</h2>
-
-<p>Convert a string containing a binary value into a number.</p>
-
-<pre><code>string -- number
-</code></pre>
-
-<h2>convert-from-octal</h2>
-
-<p>Convert a string containing a octal value into a number.</p>
-
-<pre><code>string -- number
-</code></pre>
-
-<h2>convert-from-decimal</h2>
-
-<p>Convert a string containing a decimal value into a number.</p>
-
-<pre><code>string -- number
-</code></pre>
-
-<h2>convert-from-hexadecimal</h2>
-
-<p>Convert a string containing a hexadecimal value into a number.</p>
-
-<pre><code>string -- number
-</code></pre>
-
 <h2>curry</h2>
 
 <p>Given a value and a quotation, return a new quotation that applies the original to the value.</p>
@@ -1403,11 +1294,80 @@ reverses the order of the elements.</p>
 <pre><code>pointer --
 </code></pre>
 
-<h2>array-to-quote</h2>
+<h2>array-push</h2>
 
-<p>Convert an array of values into a string. The number identifies the data type in the array.</p>
+<p>Push a value to the end of an array.</p>
 
-<pre><code>pointer number -- string
+<pre><code>value pointer --
+</code></pre>
+
+<h2>array-pop</h2>
+
+<p>Pop a value off of an array.</p>
+
+<pre><code>pointer -- number
+</code></pre>
+
+<h2>array-from-quote</h2>
+
+<p>Execute code in slice, and return an array constructed from the values in it.</p>
+
+<pre><code>pointer -- pointer
+</code></pre>
+
+<h2>array-reduce</h2>
+
+<p>Reduce an array to a single value.</p>
+
+<pre><code>pointer:array number pointer:code -- number
+</code></pre>
+
+<p>Example:</p>
+
+<pre><code>[ #1 #2 #3 ] array-from-quote
+#0 [ + ] array-reduce
+</code></pre>
+
+<h2>for-each</h2>
+
+<p>Execute a quote once for each element in an array.</p>
+
+<pre><code>pointer:data pointer:quote -- ?
+</code></pre>
+
+<h2>array-contains?</h2>
+
+<p>Check an array to see if it contains a value.</p>
+
+<pre><code>pointer:data value -- flag
+</code></pre>
+
+<h2>array-filter</h2>
+
+<p>Execute a quote for each item in an array. If the quote returns true, copy the corresponding value to a new quote.</p>
+
+<pre><code>pointer:data pointer:quote -- pointer:results
+</code></pre>
+
+<h2>array-map</h2>
+
+<p>Execute a quote for each item in an array. Construct a new array from the modified values.</p>
+
+<pre><code>pointer:data pointer:quote -- pointer:results
+</code></pre>
+
+<h2>array-compare</h2>
+
+<p>Compare two arrays to determine if they are identical.</p>
+
+<pre><code>pointer pointer -- flag
+</code></pre>
+
+<h2>array-to-string</h2>
+
+<p>Construct a string representation of an array.</p>
+
+<pre><code>pointer type -- string
 </code></pre>
 
 <h2>array-index-of</h2>
@@ -1485,123 +1445,4 @@ reverses the order of the elements.</p>
 <p>Invoke <strong>chosen-hash</strong>, then modulus against the <strong>hash-prime</strong>.</p>
 
 <pre><code>string -- number
-</code></pre>
-
-<h2>math:pi</h2>
-
-<p>Constant, value of PI (3.14159...)</p>
-
-<pre><code>-- number
-</code></pre>
-
-<h2>math:tau</h2>
-
-<p>Constant, value of Tau. (6.28318...)</p>
-
-<pre><code>-- number
-</code></pre>
-
-<h2>math:e</h2>
-
-<p>Constant, value of E (2.71828...)</p>
-
-<pre><code>-- number
-</code></pre>
-
-<h2>math:golden-ratio</h2>
-
-<p>Constant, value of golden ratio (1.61803...)</p>
-
-<pre><code>-- number
-</code></pre>
-
-<h2>math:euler-mascheroni</h2>
-
-<p>Constant, value of Euler-Mascheroni (0.57721...)</p>
-
-<pre><code>-- number
-</code></pre>
-
-<h2>math:pythagora</h2>
-
-<p>Constant, value of Pythagora (1.414213...)</p>
-
-<pre><code>-- number
-</code></pre>
-
-<h2>math:inverse-golden-ratio</h2>
-
-<p>Constant, value of inverse golden ratio (0.61803...)</p>
-
-<pre><code>-- number
-</code></pre>
-
-<h2>math:silver-ratio/mean</h2>
-
-<p>Constant, value of silver ration / mean (2.41421...)</p>
-
-<pre><code>-- number
-</code></pre>
-
-<h2>time:seconds/minute</h2>
-
-<p>Constant, value of seconds per minute</p>
-
-<pre><code>-- number
-</code></pre>
-
-<h2>time:minutes/hour</h2>
-
-<p>Constant, value of minutes per hour</p>
-
-<pre><code>-- number
-</code></pre>
-
-<h2>time:hours/day</h2>
-
-<p>Constant, value of hours per day</p>
-
-<pre><code>-- number
-</code></pre>
-
-<h2>time:days/week</h2>
-
-<p>Constant, value of days per week</p>
-
-<pre><code>-- number
-</code></pre>
-
-<h2>time:weeks/year</h2>
-
-<p>Constant, value of weeks per year</p>
-
-<pre><code>-- number
-</code></pre>
-
-<h2>time:months/year</h2>
-
-<p>Constant, value of months per year</p>
-
-<pre><code>-- number
-</code></pre>
-
-<h2>time:days/year</h2>
-
-<p>Constant, value of days per year</p>
-
-<pre><code>-- number
-</code></pre>
-
-<h2>time:days/julian-year</h2>
-
-<p>Constant, value of days per julian year</p>
-
-<pre><code>-- number
-</code></pre>
-
-<h2>time:greagorian/year</h2>
-
-<p>Constant, value of days per greagorian year</p>
-
-<pre><code>-- number
 </code></pre>
