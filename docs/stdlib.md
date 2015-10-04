@@ -797,7 +797,6 @@ Return **true** if A is between B and C, inclusive. Or **false** otherwise.
 
     number:a number:b number:c -- flag
 
-
 ## variable!
 
 Create a simple named variable with an initial value.
@@ -882,16 +881,11 @@ Drop the specified number of values from the stack.
 
     ... number -- ?
 
+## slice-duplicate
 
+Make a copy of a slice.
 
-
-
-
-
-
-# Old Docs Below
-
-
+    pointer -- new-pointer
 
 ## hide-functions
 
@@ -988,7 +982,6 @@ Trim trailing white space from a string.
 Trim all leading and trailing white space from a string.
 
     string -- string
-
 
 ## factorial
 
@@ -1103,11 +1096,35 @@ Create a new buffer, and attach a name to it.
 
     string --
 
-## slice-duplicate
+## curry
 
-Make a copy of a slice.
+Given a value and a quotation, return a new quotation that applies the original to the value.
 
-    pointer:original -- pointer:copy
+    value pointer -- pointer
+
+## to
+
+Set a flag so that the next value will update it's stored value rather than returing it.
+
+    --
+
+## value
+
+Create a new value.
+
+    string --
+
+## value!
+
+Create a new value with an initial value.
+
+    value string --
+
+## values
+
+Execute code in pointer, creating a new value for each name. The code should return a series of strings.
+
+    pointer --
 
 ## array-push
 
@@ -1121,11 +1138,11 @@ Pop a value off of an array.
 
     pointer -- number
 
-## array-length
+## array-from-quote
 
-Return the length of an array.
+Execute code in slice, and return an array constructed from the values in it.
 
-    pointer -- number
+    pointer -- pointer
 
 ## array-reduce
 
@@ -1138,50 +1155,60 @@ Example:
     [ #1 #2 #3 ] array-from-quote
     #0 [ + ] array-reduce
 
-## array-from-quote<in-stack-order>
-
-Execute code in slice, and return an array constructed from the values in it.
-
-    pointer -- pointer
-
-## array-reverse
-
-Reverse the order of values in an array.
-
-    pointer -- pointer
-
-## array-from-quote
-
-Execute code in slice, and return an array constructed from the values in it. Like **array-from-pointer<in-stack-order>**, but
-reverses the order of the elements.
-
-    pointer -- pointer
-
 ## for-each
 
-Execute code in **pointer:code** once for each element in the array.
+Execute a quote once for each element in an array.
 
-    pointer:data pointer:code -- ?
+    pointer:data pointer:quote -- ?
 
-## array-contains
+## array-contains?
 
-[ "pv-f"   swap needs-remap? [ swap dup set-buffer array-length #0 swap [ over buffer-fetch array<remap> = or ] repeat ] preserve-buffer nip :f ] 'array-contains?' define
+Check an array to see if it contains a value.
+
+    pointer:data value -- flag
 
 ## array-filter
 
-[ "pp-p"   prepare [ &source @ array-pop dup &filter @ invoke [ &results array-push ] [ drop ] if ] repeat &results request [ copy ] sip ] 'array-filter' define
+Execute a quote for each item in an array. If the quote returns true, copy the corresponding value to a new quote.
+
+    pointer:data pointer:quote -- pointer:results
 
 ## array-map
 
-[ "pp-p"   prepare [ &source @ array-pop &filter @ invoke &results array-push ] repeat &results request [ copy ] sip ] 'array-map' define
+Execute a quote for each item in an array. Construct a new array from the modified values.
+
+    pointer:data pointer:quote -- pointer:results
 
 ## array-compare
 
-[ "pp-f"   dup-pair [ array-length ] bi@ = [ dup array-length true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define
+Compare two arrays to determine if they are identical.
+
+    pointer pointer -- flag
 
 ## array-to-string
 
-[ "pointer:array number:type - string"  #100 / #1 - &*array:conversions* swap fetch :p invoke ] 'array-to-string' define
+Construct a string representation of an array.
+
+    pointer type -- string
+
+
+
+
+
+
+
+
+
+
+
+
+# Old Docs Below
+
+
+
+
+
+
 
 ## convert-with-base
 
@@ -1213,35 +1240,6 @@ Convert a string containing a hexadecimal value into a number.
 
     string -- number
 
-## curry
-
-Given a value and a quotation, return a new quotation that applies the original to the value.
-
-    value pointer -- pointer
-
-## to
-
-Set a flag so that the next value will update it's stored value rather than returing it.
-
-    --
-
-## value
-
-Create a new value.
-
-    string --
-
-## value!
-
-Create a new value with an initial value.
-
-    value string --
-
-## values
-
-Execute code in pointer, creating a new value for each name. The code should return a series of strings.
-
-    pointer --
 
 ## array-to-quote
 
