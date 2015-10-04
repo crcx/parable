@@ -6,11 +6,9 @@
 
 [ to-lowercase :p [ :c letter? ] array-filter :s count-frequency ] 'count-letters' define
 
-
 'apples! 12 are good' count-letters
 
 [ $a $z [ :n ] bi@ expand-range ] array-from-quote 'letters' define
 
 &letters #0 [ dup :c :s [ &character-counts swap fetch :s ] dip ' : ' + swap + . ] array-reduce drop
 show-tob
-
