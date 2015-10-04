@@ -263,47 +263,10 @@
 
 [ 'prepare'  'localize'  'filter'  'source'  'results' ] hide-functions
 
-"routines for rendering an array into a string"
-'*array:conversions*' named-buffer
-[ "array  --  string"  '' [ :s '#' swap + + #32 :c :s + ] array-reduce ] buffer-store
-[ "array  --  string"  '' [ :p :s  $' :s swap + $' :s + + #32 :c :s + ] array-reduce ] buffer-store
-[ "array  --  string"  '' [ :c :s '$' swap + + #32 :c :s + ] array-reduce ] buffer-store
-[ "pointer:array number:type - string"  #100 / #1 - &*array:conversions* swap fetch :p invoke ] 'array-to-string' define
-
-"Conversion of strings to numbers"
-'*conversion:base*' variable
-[ :n #48 - &*conversion:base* @ #16 = [ dup #16 > [ #7 - ] if-true ] if-true ] 'conversion:to-digit' define
-[ [ swap &*conversion:base* @ * + ] dip ] 'conversion:accumulate' define
-[ "sn-n" &*conversion:base* ! #0 swap [ :c conversion:to-digit swap conversion:accumulate ] for-each ] 'convert-with-base' define
-[ "s-n"  #2 convert-with-base ] 'convert-from-binary' define
-[ "s-n"  #8 convert-with-base ] 'convert-from-octal' define
-[ "s-n"  #10 convert-with-base ] 'convert-from-decimal' define
-[ "s-n"  #16 convert-with-base ] 'convert-from-hexadecimal' define
-[ '*conversion:base*'  'conversion:to-digit'  'conversion:accumulate' ] hide-functions
-
-
-"More Arrays"
-'reconstruct' named-buffer
-[ ] buffer-store
-[ "number"    #100 buffer-store buffer-store ] buffer-store
-[ "string"    #101 buffer-store buffer-store ] buffer-store
-[ "character" #102 buffer-store buffer-store ] buffer-store
-[ "pointer"   #103 buffer-store buffer-store ] buffer-store
-[ "flag"      #100 buffer-store buffer-store #114 buffer-store ] buffer-store
-[ #100 / &reconstruct swap fetch invoke ] 'compile-value' define
-
-[ 'data' 'types' ] values
-[ to types to data ] 'prepare' define
-[ #399 buffer-store &*CURRENT-BUFFER @ :p ] 'terminate' define
-[ types over fetch [ data over fetch ] dip compile-value ] 'process' define
-[ "pn-s" prepare new-buffer #0 data length? [ process #1 + ] repeat drop terminate ] 'array-to-quote' define
-[ 'reconstruct' 'compile-value' 'data' 'types' 'prepare' 'extract' 'terminate' ] hide-functions
-
 [ 'source' 'v' 'i' 'idx' ] values
 [ type? STRING = [ [ :p :s ] dip ] [ :n ] if ] 'resolve-types' define
 [ "vp-n"  to source to v #0 to i #-1 to idx source length? [ source i fetch v resolve-types = [ i to idx ] if-true i #1 + to i ] repeat idx ] 'array-index-of' define
 [ 'source'  'v'  'i'  'idx'  'resolve-types' ] hide-functions
-
 
 "Text Output Buffer"
 'TOB' variable
