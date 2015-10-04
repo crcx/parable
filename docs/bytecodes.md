@@ -1030,6 +1030,18 @@ Stack Effect:
 
 ----
 
+## BC_REVERSE
+
+Opcode: 703
+
+Reverse the order of values in a slice.
+
+Stack Effect:
+
+    pointer -- pointer
+
+----
+
 ## BC\_TO\_LOWER
 
 Opcode: 800

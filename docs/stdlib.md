@@ -492,6 +492,12 @@ Given a string, returns **true** if the string is a valid number, or **false** o
 
 This is a primitive corresponding to a byte code.
 
+## reverse
+
+Reverse the order of values in a slice.
+
+    pointer -- pointer
+
 ## to-uppercase
 
 Convert a CHARACTER or STRING to uppercase.
