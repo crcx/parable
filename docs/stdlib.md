@@ -1144,6 +1144,12 @@ Pop a value off of an array.
 
     pointer -- number
 
+## array-from-quote<in-stack-order>
+
+Execute code in slice and return an array constructed from the values returned. 
+
+    pointer -- pointer
+
 ## array-from-quote
 
 Execute code in slice, and return an array constructed from the values in it.

@@ -240,7 +240,8 @@
 
 [ "vp-"  :p dup length? store ] 'array-push' define
 [ "p-v"  :p [ dup get-last-index fetch ] sip dup length? #2 - swap set-last-index ] 'array-pop' define
-[ "p-p"    [ request to results invoke<depth?> #0 max [ results array-push ] repeat results #1 over length? subslice :p ] localize ] 'array-from-quote' define
+[ "p-p"    [ request to results invoke<depth?> #0 max [ results array-push ] repeat results #1 over length? subslice :p ] localize ] 'array-from-quote<in-stack-order>' define
+[ "p-p" array-from-quote<in-stack-order> reverse] 'array-from-stack' define
 [ "pnp-n"  [ to filter over length? [ over array-pop filter invoke ] repeat nip ] localize ] 'array-reduce' define
 [ "pp-?"   [ to filter slice-duplicate dup length? [ [ array-pop filter invoke ] sip ] repeat drop ] localize ] 'for-each' define
 
