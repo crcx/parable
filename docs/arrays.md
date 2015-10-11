@@ -19,7 +19,7 @@ New values can be added with **array-push** and removed with **array-pop**.
 
 The length can be obtained with **array-length**.
 
-You an use the standard **fetch** and **store** functions to access array elements.
+You can use the standard **fetch** and **store** functions to access array elements.
 
 All of this is good, but the array combinators are what make arrays useful to me. There are currently three of interest: **array-filter**, **array-map**, and **array-reduce**.
 
