@@ -544,7 +544,7 @@ def interpret(slice, more=None):
             if check_depth(2):
                 a = stack_pop()
                 b = stack_pop()
-                stack_push(fetch(b, a), TYPE_NUMBER)
+                stack_push(fetch(b, a), fetch_type(b, a))
             else:
                 offset = size
         elif opcode == BC_MEM_STORE:
@@ -1010,6 +1010,14 @@ def fetch(slice, offset):
     if get_last_index(slice) < offset:
         set_slice_last_index(slice, offset)
     return p_slices[int(slice)][int(offset)]
+
+
+def fetch_type(slice, offset):
+    """obtain a value stored in a slice"""
+    global p_types, p_map
+    if get_last_index(slice) < offset:
+        set_slice_last_index(slice, offset)
+    return p_types[int(slice)][int(offset)]
 
 
 def store(value, slice, offset, type=100):
