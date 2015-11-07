@@ -85,6 +85,8 @@ BC_MEM_RELEASE = 404
 BC_MEM_COLLECT = 405
 BC_MEM_GET_LAST = 406
 BC_MEM_SET_LAST = 407
+BC_MEM_SET_TYPE = 408
+BC_MEM_GET_TYPE = 409
 BC_STACK_DUP = 500
 BC_STACK_DROP = 501
 BC_STACK_SWAP = 502
@@ -579,6 +581,22 @@ def interpret(slice, more=None):
                 a = stack_pop()
                 b = stack_pop()
                 set_slice_last_index(a, b)
+            elif opcode == BC_MEM_SET_TYPE:
+                if check_depth(3):
+                    a = stack_pop()
+                    b = stack_pop()
+                    c = stack_pop()
+                    store_type(c, b, a)
+                else:
+                    offset = size
+            elif opcode == BC_MEM_GET_TYPE:
+                if check_depth(1):
+                    a = stack_pop()
+                    b = stack_pop()
+                    c = fetch_type(b, a)
+                    stack_push(int(c), TYPE_NUMBER)
+                else:
+                    offset = size
             elif opcode == BC_STACK_DUP:
                 if check_depth(1):
                     stack_dup()
@@ -1027,6 +1045,13 @@ def fetch_type(slice, offset):
     if get_last_index(slice) < offset:
         set_slice_last_index(slice, offset)
     return p_types[int(slice)][int(offset)]
+
+
+def store_type(slice, offset, type):
+    global p_slices, p_types, p_map
+    if get_last_index(slice) < offset:
+        set_slice_last_index(slice, offset)
+    p_types[int(slice)][int(offset)] = type
 
 
 def store(value, slice, offset, type=100):
