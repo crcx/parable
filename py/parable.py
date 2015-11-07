@@ -24,7 +24,8 @@ TYPE_STRING = 200
 TYPE_CHARACTER = 300
 TYPE_POINTER = 400
 TYPE_FLAG = 500
-
+TYPE_BYTECODE = 600
+TYPE_COMMENT = 700
 
 #
 # Constants for byte codes
@@ -550,8 +551,9 @@ def interpret(slice, more=None):
             if check_depth(3):
                 a = stack_pop()
                 b = stack_pop()
+                t = stack_type()
                 c = stack_pop()
-                store(c, b, a)
+                store(c, b, a, t)
             else:
                 offset = size
         elif opcode == BC_MEM_REQUEST:
@@ -653,6 +655,7 @@ def interpret(slice, more=None):
                 e = request_slice()
                 i  = 0
                 while i < len(d):
+# TODO: store TYPE information
                     store(d[i], e, i)
                     i = i + 1
                 stack_push(e, TYPE_POINTER)
@@ -986,6 +989,7 @@ def copy_slice(source, dest):
     l = p_sizes[int(source)]
     while i <= l:
         v = fetch(int(source), i)
+# TODO: store TYPE information
         store(v, int(dest), i)
         i += 1
     p_sizes[int(dest)] = p_sizes[int(source)]
@@ -1008,12 +1012,13 @@ def fetch(slice, offset):
     return p_slices[int(slice)][int(offset)]
 
 
-def store(value, slice, offset):
+def store(value, slice, offset, type=100):
     """store a value into a slice"""
-    global p_slices, p_map
+    global p_slices, p_types, p_map
     if get_last_index(slice) < offset:
         set_slice_last_index(slice, offset)
     p_slices[int(slice)][int(offset)] = value
+    p_types[int(slice)][int(offset)] = type
 
 
 def get_last_index(slice):
@@ -1043,6 +1048,7 @@ def string_to_slice(string):
     s = request_slice()
     i = 0
     for char in list(string):
+# TODO: store TYPE information
         store(ord(char.encode('utf-8')), s, i)
         i += 1
     return s
@@ -1154,67 +1160,67 @@ def collect_unused_slices():
 
 
 def compile_string(string, slice, offset):
-    store(BC_PUSH_S, slice, offset)
+    store(BC_PUSH_S, slice, offset, TYPE_BYTECODE)
     offset += 1
-    store(string_to_slice(string), slice, offset)
+    store(string_to_slice(string), slice, offset, TYPE_COMMENT)
     offset += 1
     return offset
 
 
 def compile_comment(string, slice, offset):
-    store(BC_PUSH_COMMENT, slice, offset)
+    store(BC_PUSH_COMMENT, slice, offset, TYPE_BYTECODE)
     offset += 1
-    store(string_to_slice(string), slice, offset)
+    store(string_to_slice(string), slice, offset, TYPE_COMMENT)
     offset += 1
     return offset
 
 
 def compile_character(character, slice, offset):
-    store(BC_PUSH_C, slice, offset)
+    store(BC_PUSH_C, slice, offset, TYPE_BYTECODE)
     offset += 1
-    store(character, slice, offset)
+    store(character, slice, offset, TYPE_CHARACTER)
     offset += 1
     return offset
 
 
 def compile_pointer(name, slice, offset):
-    store(BC_PUSH_F, slice, offset)
+    store(BC_PUSH_F, slice, offset, TYPE_BYTECODE)
     offset += 1
     if is_number(name):
-        store(float(name), slice, offset)
+        store(float(name), slice, offset, TYPE_POINTER)
     else:
         if lookup_pointer(name) != -1:
-            store(lookup_pointer(name), slice, offset)
+            store(lookup_pointer(name), slice, offset, TYPE_POINTER)
         else:
-            store(0, slice, offset)
+            store(0, slice, offset, TYPE_POINTER)
             report('Unable to map ' + name + ' to a pointer')
     offset += 1
     return offset
 
 
 def compile_number(number, slice, offset):
-    store(BC_PUSH_N, slice, offset)
+    store(BC_PUSH_N, slice, offset, TYPE_BYTECODE)
     offset += 1
     if is_number(number):
-        store(float(number), slice, offset)
+        store(float(number), slice, offset, TYPE_NUMBER)
     else:
-        store(0, slice, offset)
+        store(0, slice, offset, TYPE_NUMBER)
         report("# prefix expects a NUMBER, received " + number)
     offset += 1
     return offset
 
 
 def compile_bytecode(bytecode, slice, offset):
-    store(float(bytecode), slice, offset)
+    store(float(bytecode), slice, offset, TYPE_BYTECODE)
     offset += 1
     return offset
 
 
 def compile_function_call(name, slice, offset):
     if lookup_pointer(name) != -1:
-        store(BC_FLOW_CALL, slice, offset)
+        store(BC_FLOW_CALL, slice, offset, TYPE_BYTECODE)
         offset += 1
-        store(lookup_pointer(name), slice, offset)
+        store(lookup_pointer(name), slice, offset, TYPE_POINTER)
         offset += 1
     else:
         report('Unable to find ' + name + ' in dictionary')
@@ -1268,17 +1274,17 @@ def compile(str, slice):
             offset = 0
         elif tokens[i] == "]":
             old = slice
-            store(BC_FLOW_RETURN, slice, offset)
+            store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
             offset = nest.pop()
             slice = nest.pop()
-            store(BC_PUSH_F, slice, offset)
+            store(BC_PUSH_F, slice, offset, TYPE_BYTECODE)
             offset += 1
-            store(old, slice, offset)
+            store(old, slice, offset, TYPE_POINTER)
             offset += 1
         else:
             offset = compile_function_call(tokens[i], slice, offset)
         i += 1
-        store(BC_FLOW_RETURN, slice, offset)
+        store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
     return slice
 
 
