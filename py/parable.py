@@ -26,6 +26,7 @@ TYPE_POINTER = 400
 TYPE_FLAG = 500
 TYPE_BYTECODE = 600
 TYPE_COMMENT = 700
+TYPE_FUNCTION_CALL = 800
 
 #
 # Constants for byte codes
@@ -173,20 +174,13 @@ def interpret(slice, more=None):
         opcode = fetch(slice, offset)
         optype = fetch_type(slice, offset)
 
-        if optype == TYPE_NUMBER:
-            stack_push(opcode, TYPE_NUMBER)
-        elif optype == TYPE_STRING:
-            stack_push(opcode, TYPE_NUMBER)
-        elif optype == TYPE_CHARACTER:
-            stack_push(opcode, TYPE_CHARACTER)
-        elif optype == TYPE_POINTER:
-            stack_push(opcode, TYPE_POINTER)
-        elif optype == TYPE_FLAG:
-            stack_push(opcode, TYPE_FLAG)
-        elif optype == TYPE_COMMENT:
-            stack_push(opcode, TYPE_COMMENT)
-            stack_pop()
-        elif optype == TYPE_BYTECODE:
+        if optype != TYPE_BYTECODE:
+            stack_push(opcode, optype)
+            if optype == TYPE_COMMENT:
+                stack_pop()
+            if optype == TYPE_FUNCTION_CALL:
+                interpret(stack_pop(), more)
+        else:
             if opcode == BC_PUSH_N:
                 offset += 1
                 stack_push(fetch(slice, offset), TYPE_NUMBER)
@@ -1182,32 +1176,24 @@ def collect_unused_slices():
 
 
 def compile_string(string, slice, offset):
-    store(BC_PUSH_S, slice, offset, TYPE_BYTECODE)
-    offset += 1
-    store(string_to_slice(string), slice, offset, TYPE_COMMENT)
+    store(string_to_slice(string), slice, offset, TYPE_STRING)
     offset += 1
     return offset
 
 
 def compile_comment(string, slice, offset):
-    store(BC_PUSH_COMMENT, slice, offset, TYPE_BYTECODE)
-    offset += 1
     store(string_to_slice(string), slice, offset, TYPE_COMMENT)
     offset += 1
     return offset
 
 
 def compile_character(character, slice, offset):
-    store(BC_PUSH_C, slice, offset, TYPE_BYTECODE)
-    offset += 1
     store(character, slice, offset, TYPE_CHARACTER)
     offset += 1
     return offset
 
 
 def compile_pointer(name, slice, offset):
-    store(BC_PUSH_F, slice, offset, TYPE_BYTECODE)
-    offset += 1
     if is_number(name):
         store(float(name), slice, offset, TYPE_POINTER)
     else:
@@ -1221,8 +1207,6 @@ def compile_pointer(name, slice, offset):
 
 
 def compile_number(number, slice, offset):
-    store(BC_PUSH_N, slice, offset, TYPE_BYTECODE)
-    offset += 1
     if is_number(number):
         store(float(number), slice, offset, TYPE_NUMBER)
     else:
@@ -1240,9 +1224,7 @@ def compile_bytecode(bytecode, slice, offset):
 
 def compile_function_call(name, slice, offset):
     if lookup_pointer(name) != -1:
-        store(BC_FLOW_CALL, slice, offset, TYPE_BYTECODE)
-        offset += 1
-        store(lookup_pointer(name), slice, offset, TYPE_POINTER)
+        store(lookup_pointer(name), slice, offset, TYPE_FUNCTION_CALL)
         offset += 1
     else:
         report('Unable to find ' + name + ' in dictionary')
@@ -1299,8 +1281,6 @@ def compile(str, slice):
             store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
             offset = nest.pop()
             slice = nest.pop()
-            store(BC_PUSH_F, slice, offset, TYPE_BYTECODE)
-            offset += 1
             store(old, slice, offset, TYPE_POINTER)
             offset += 1
         else:
@@ -1322,6 +1302,8 @@ def parse_bootstrap(f):
 #            if len(errors) > 0:
 #                print line
 #                print errors
+#                print p_slices[s]
+#                print p_types[s]
 #                clear_errors()
 
 
