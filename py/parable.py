@@ -1282,7 +1282,10 @@ def compile(str, slice):
             store(old, slice, offset, TYPE_POINTER)
             offset += 1
         else:
-            offset = compile_function_call(tokens[i], slice, offset)
+            if is_number(tokens[i]):
+                offset = compile_number(tokens[i], slice, offset)
+            else:
+                offset = compile_function_call(tokens[i], slice, offset)
         i += 1
         store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
     return slice
