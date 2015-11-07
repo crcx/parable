@@ -953,17 +953,19 @@ def remove_name(name):
 #
 
 p_slices = []
+p_types = []
 p_map = []
 p_sizes = []
 
 def request_slice():
     """request a new memory slice"""
-    global p_slices, p_map, p_sizes, MAX_SLICES
+    global p_slices, p_types, p_map, p_sizes, MAX_SLICES
     i = 0
     while i < MAX_SLICES:
         if p_map[i] == 0:
             p_map[i] = 1
             p_slices[i] = [0]
+            p_types[i] = [0]
             p_sizes[i] = 0
             return i
         else:
@@ -991,9 +993,10 @@ def copy_slice(source, dest):
 
 def prepare_slices():
     """prepare the initial set of slices for use"""
-    global p_slices, p_map, p_sizes, MAX_SLICES
+    global p_slices, p_types, p_map, p_sizes, MAX_SLICES
     p_map = [0 for x in range(MAX_SLICES)]
     p_slices = [0 for x in range(MAX_SLICES)]
+    p_types = [0 for x in range(MAX_SLICES)]
     p_sizes = [0 for x in range(MAX_SLICES)]
 
 
@@ -1021,15 +1024,17 @@ def get_last_index(slice):
 
 def set_slice_last_index(slice, size):
     """set the length of a slice"""
-    global p_slices, p_sizes
+    global p_slices, p_types, p_sizes
     old_size = p_sizes[int(slice)]
     grow_by = size - old_size
     if grow_by > 0:
         p_slices[int(slice)].extend(range(int(grow_by)))
+        p_types[int(slice)].extend(range(int(grow_by)))
     if grow_by < 0:
         while grow_by < 0:
             grow_by = grow_by + 1
             del p_slices[int(slice)][-1]
+            del p_types[int(slice)][-1]
     p_sizes[int(slice)] = size
 
 
