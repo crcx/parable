@@ -221,15 +221,12 @@ def interpret(slice, more=None):
                 a = stack_pop()
                 y = stack_type()
                 b = stack_pop()
-                if x == TYPE_NUMBER and y == TYPE_NUMBER:
-                    stack_push(a + b, TYPE_NUMBER)
-                elif x == TYPE_STRING and y == TYPE_STRING:
+                if x == TYPE_STRING and y == TYPE_STRING:
                     a = slice_to_string(a)
                     b = slice_to_string(b)
                     stack_push(string_to_slice(b + a), TYPE_STRING)
                 else:
-                    offset = size
-                    report('BC_ADD only works with NUMBER and STRING')
+                    stack_push(a + b, TYPE_NUMBER)
             else:
                 offset = size
         elif opcode == BC_SUBTRACT:
@@ -650,13 +647,15 @@ def interpret(slice, more=None):
             if check_depth(3):
                 a = int(stack_pop())
                 b = int(stack_pop())
-                c = p_slices[int(stack_pop())]
+                s = int(stack_pop())
+                c = p_slices[s]
                 d = c[b:a]
+                dt = p_types[s]
+                dt = dt[b:a]
                 e = request_slice()
                 i  = 0
                 while i < len(d):
-# TODO: store TYPE information
-                    store(d[i], e, i)
+                    store(d[i], e, i, dt[i])
                     i = i + 1
                 stack_push(e, TYPE_POINTER)
             else:
@@ -989,8 +988,8 @@ def copy_slice(source, dest):
     l = p_sizes[int(source)]
     while i <= l:
         v = fetch(int(source), i)
-# TODO: store TYPE information
-        store(v, int(dest), i)
+        t = fetch_type(int(source), i)
+        store(v, int(dest), i, t)
         i += 1
     p_sizes[int(dest)] = p_sizes[int(source)]
 
@@ -1304,6 +1303,10 @@ def parse_bootstrap(f):
         if len(line) > 1:
             s = compile(line, request_slice())
             interpret(s)
+#            if len(errors) > 0:
+#                print line
+#                print errors
+#                clear_errors()
 
 
 #

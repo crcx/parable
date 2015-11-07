@@ -181,7 +181,7 @@
 
 "Slice as a linear buffer"
 [ '*CURRENT-BUFFER'  '*BUFFER-OFFSET' ] variables
-[ "-p"     &*CURRENT-BUFFER @ :p ] 'current-buffer' define
+[ "-p"     &*CURRENT-BUFFER @ ] 'current-buffer' define
 [ "-pn"    current-buffer &*BUFFER-OFFSET @ ] 'buffer-position' define
 [ "-"      &*BUFFER-OFFSET increment ] 'buffer-advance' define
 [ "-"      &*BUFFER-OFFSET decrement ] 'buffer-retreat' define
