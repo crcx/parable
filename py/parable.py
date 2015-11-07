@@ -171,573 +171,589 @@ def interpret(slice, more=None):
     size = get_last_index(int(slice))
     while offset < size:
         opcode = fetch(slice, offset)
-        if opcode == BC_PUSH_N:
-            offset += 1
-            stack_push(fetch(slice, offset), TYPE_NUMBER)
-        elif opcode == BC_PUSH_S:
-            offset += 1
-            stack_push(fetch(slice, offset), TYPE_STRING)
-        elif opcode == BC_PUSH_C:
-            offset += 1
-            stack_push(fetch(slice, offset), TYPE_CHARACTER)
-        elif opcode == BC_PUSH_F:
-            offset += 1
-            stack_push(fetch(slice, offset), TYPE_POINTER)
-        elif opcode == BC_PUSH_COMMENT:
-            offset += 1
-        elif opcode == BC_TYPE_N:
-            if check_depth(1):
-                stack_change_type(TYPE_NUMBER)
-            else:
-                offset = size
-        elif opcode == BC_TYPE_S:
-            if check_depth(1):
-                stack_change_type(TYPE_STRING)
-            else:
-                offset = size
-        elif opcode == BC_TYPE_C:
-            if check_depth(1):
-                stack_change_type(TYPE_CHARACTER)
-            else:
-                offset = size
-        elif opcode == BC_TYPE_F:
-            if check_depth(1):
-                stack_change_type(TYPE_POINTER)
-            else:
-                offset = size
-        elif opcode == BC_TYPE_FLAG:
-            if check_depth(1):
-                stack_change_type(TYPE_FLAG)
-            else:
-                offset = size
-        elif opcode == BC_GET_TYPE:
-            if check_depth(1):
-                stack_push(stack_type(), TYPE_NUMBER)
-            else:
-                offset = size
-        elif opcode == BC_ADD:
-            if check_depth(2):
-                x = stack_type()
-                a = stack_pop()
-                y = stack_type()
-                b = stack_pop()
-                if x == TYPE_STRING and y == TYPE_STRING:
-                    a = slice_to_string(a)
-                    b = slice_to_string(b)
-                    stack_push(string_to_slice(b + a), TYPE_STRING)
-                else:
-                    stack_push(a + b, TYPE_NUMBER)
-            else:
-                offset = size
-        elif opcode == BC_SUBTRACT:
-            if check_depth(2):
-                a = stack_pop()
-                b = stack_pop()
-                stack_push(b - a, TYPE_NUMBER)
-            else:
-                offset = size
-        elif opcode == BC_MULTIPLY:
-            if check_depth(2):
-                a = stack_pop()
-                b = stack_pop()
-                stack_push(a * b, TYPE_NUMBER)
-            else:
-                offset = size
-        elif opcode == BC_DIVIDE:
-            if check_depth(2):
-                a = stack_pop()
-                b = stack_pop()
-                stack_push(b / a, TYPE_NUMBER)
-            else:
-                offset = size
-        elif opcode == BC_REMAINDER:
-            if check_depth(2):
-                a = stack_pop()
-                b = stack_pop()
-                stack_push(b % a, TYPE_NUMBER)
-            else:
-                offset = size
-        elif opcode == BC_FLOOR:
-            if check_depth(1):
-                stack_push(math.floor(float(stack_pop())), TYPE_NUMBER)
-            else:
-                offset = size
-        elif opcode == BC_POW:
-            if check_depth(2):
-                a = stack_pop()
-                b = stack_pop()
-                stack_push(math.pow(b, a), TYPE_NUMBER)
-            else:
-                offset = size
-        elif opcode == BC_LOG:
-            if check_depth(1):
-                a = stack_pop()
-                stack_push(math.log(a), TYPE_NUMBER)
-            else:
-                offset = size
-        elif opcode == BC_LOG10:
-            if check_depth(1):
-                a = stack_pop()
-                stack_push(math.log10(a), TYPE_NUMBER)
-            else:
-                offset = size
-        elif opcode == BC_LOGN:
-            if check_depth(2):
-                a = stack_pop()
-                b = stack_pop()
-                stack_push(math.log(b, a), TYPE_NUMBER)
-            else:
-                offset = size
-        elif opcode == BC_BITWISE_SHIFT:
-            if check_depth(2):
-                a = int(stack_pop())
-                b = int(stack_pop())
-                if a < 0:
-                    stack_push(b << abs(a), TYPE_NUMBER)
-                else:
-                    stack_push(b >> a, TYPE_NUMBER)
-            else:
-                offset = size
-        elif opcode == BC_BITWISE_AND:
-            if check_depth(2):
-                a = int(stack_pop())
-                b = int(stack_pop())
-                stack_push(b & a, TYPE_NUMBER)
-            else:
-                offset = size
-        elif opcode == BC_BITWISE_OR:
-            if check_depth(2):
-                a = int(stack_pop())
-                b = int(stack_pop())
-                stack_push(b | a, TYPE_NUMBER)
-            else:
-                offset = size
-        elif opcode == BC_BITWISE_XOR:
-            if check_depth(2):
-                a = int(stack_pop())
-                b = int(stack_pop())
-                stack_push(b ^ a, TYPE_NUMBER)
-            else:
-                offset = size
-        elif opcode == BC_RANDOM:
-            stack_push(random.SystemRandom().random(), TYPE_NUMBER)
-        elif opcode == BC_SQRT:
-            if check_depth(1):
-                stack_push(math.sqrt(stack_pop()), TYPE_NUMBER)
-            else:
-                offset = size
-        elif opcode == BC_COMPARE_LT:
-            if check_depth(2):
-                x = stack_type()
-                a = stack_pop()
-                y = stack_type()
-                b = stack_pop()
-                if x == TYPE_NUMBER and y == TYPE_NUMBER:
-                    if b < a:
-                        stack_push(-1, TYPE_FLAG)
-                    else:
-                        stack_push(0, TYPE_FLAG)
-                else:
-                    offset = size
-                    report('BC_COMPARE_LT only recognizes NUMBER types')
-            else:
-                offset = size
-        elif opcode == BC_COMPARE_GT:
-            if check_depth(2):
-                x = stack_type()
-                a = stack_pop()
-                y = stack_type()
-                b = stack_pop()
-                if x == TYPE_NUMBER and y == TYPE_NUMBER:
-                    if b > a:
-                        stack_push(-1, TYPE_FLAG)
-                    else:
-                        stack_push(0, TYPE_FLAG)
-                else:
-                    offset = size
-                    report('BC_COMPARE_LT only recognizes NUMBER types')
-            else:
-                offset = size
-        elif opcode == BC_COMPARE_LTEQ:
-            if check_depth(2):
-                x = stack_type()
-                a = stack_pop()
-                y = stack_type()
-                b = stack_pop()
-                if x == TYPE_NUMBER and y == TYPE_NUMBER:
-                    if b <= a:
-                        stack_push(-1, TYPE_FLAG)
-                    else:
-                        stack_push(0, TYPE_FLAG)
-                else:
-                    offset = size
-                    report('BC_COMPARE_LTEQ only recognizes NUMBER')
-            else:
-                offset = size
-        elif opcode == BC_COMPARE_GTEQ:
-            if check_depth(2):
-                x = stack_type()
-                a = stack_pop()
-                y = stack_type()
-                b = stack_pop()
-                if x == TYPE_NUMBER and y == TYPE_NUMBER:
-                    if b >= a:
-                        stack_push(-1, TYPE_FLAG)
-                    else:
-                        stack_push(0, TYPE_FLAG)
-                else:
-                    offset = size
-                    report('BC_COMPARE_GTEQ only recognizes NUMBER')
-            else:
-                offset = size
-        elif opcode == BC_COMPARE_EQ:
-            if check_depth(2):
-                x = stack_type()
-                a = stack_pop()
-                y = stack_type()
-                b = stack_pop()
-                if x == y and x != TYPE_STRING:
-                    if b == a:
-                        stack_push(-1, TYPE_FLAG)
-                    else:
-                        stack_push(0, TYPE_FLAG)
-                elif x == y and x == TYPE_STRING:
-                    if slice_to_string(b) == slice_to_string(a):
-                        stack_push(-1, TYPE_FLAG)
-                    else:
-                        stack_push(0, TYPE_FLAG)
-                else:
-                    offset = size
-                    report('BC_COMPARE_EQ requires matched types')
-            else:
-                offset = size
-        elif opcode == BC_COMPARE_NEQ:
-            if check_depth(2):
-                x = stack_type()
-                a = stack_pop()
-                y = stack_type()
-                b = stack_pop()
-                if x == y and x != TYPE_STRING:
-                    if b != a:
-                        stack_push(-1, TYPE_FLAG)
-                    else:
-                        stack_push(0, TYPE_FLAG)
-                elif x == y and x == TYPE_STRING:
-                    if slice_to_string(b) != slice_to_string(a):
-                        stack_push(-1, TYPE_FLAG)
-                    else:
-                        stack_push(0, TYPE_FLAG)
-                else:
-                    offset = size
-                    report('BC_COMPARE_NEQ requires matched types')
-            else:
-                offset = size
-        elif opcode == BC_FLOW_IF:
-            if check_depth(3):
-                a = stack_pop()
-                b = stack_pop()
-                c = stack_pop()
-                if c == -1:
-                    interpret(b, more)
-                else:
-                    interpret(a, more)
-            else:
-                offset = size
-        elif opcode == BC_FLOW_WHILE:
-            if check_depth(1):
-                quote = stack_pop()
-                a = -1
-                while a == -1:
-                    interpret(quote, more)
-                    a = stack_pop()
-            else:
-                offset = size
-        elif opcode == BC_FLOW_UNTIL:
-            if check_depth(1):
-                quote = stack_pop()
-                a = 0
-                while a == 0:
-                    interpret(quote, more)
-                    a = stack_pop()
-            else:
-                offset = size
-        elif opcode == BC_FLOW_TIMES:
-            if check_depth(2):
-                quote = stack_pop()
-                count = stack_pop()
-                while count > 0:
-                    interpret(quote, more)
-                    count -= 1
-            else:
-                offset = size
-        elif opcode == BC_FLOW_CALL:
-            offset += 1
-            interpret(int(fetch(slice, offset)), more)
-        elif opcode == BC_FLOW_CALL_F:
-            if check_depth(1):
-                a = stack_pop()
-                interpret(a, more)
-            else:
-                offset = size
-        elif opcode == BC_FLOW_DIP:
-            if check_depth(2):
-                quote = stack_pop()
-                vtype = stack_type()
-                value = stack_pop()
-                interpret(quote, more)
-                stack_push(value, vtype)
-            else:
-                offset = size
-        elif opcode == BC_FLOW_SIP:
-            if check_depth(2):
-                quote = stack_pop()
-                stack_dup()
-                vtype = stack_type()
-                value = stack_pop()
-                interpret(quote, more)
-                stack_push(value, vtype)
-            else:
-                offset = size
-        elif opcode == BC_FLOW_BI:
-            if check_depth(3):
-                a = stack_pop()
-                b = stack_pop()
-                stack_dup()
-                x = stack_type()
-                y = stack_pop()
-                interpret(b, more)
-                stack_push(y, x)
-                interpret(a, more)
-            else:
-                offset = size
-        elif opcode == BC_FLOW_TRI:
-            if check_depth(4):
-                a = stack_pop()
-                b = stack_pop()
-                c = stack_pop()
-                stack_dup()
-                x = stack_type()
-                y = stack_pop()
-                stack_dup()
-                m = stack_type()
-                q = stack_pop()
-                interpret(c, more)
-                stack_push(q, m)
-                interpret(b, more)
-                stack_push(y, x)
-                interpret(a, more)
-            else:
-                offset = size
-        elif opcode == BC_FLOW_RETURN:
-            offset = size
-        elif opcode == BC_MEM_COPY:
-            if check_depth(2):
-                a = stack_pop()
-                b = stack_pop()
-                copy_slice(b, a)
-            else:
-                offset = size
-        elif opcode == BC_MEM_FETCH:
-            if check_depth(2):
-                a = stack_pop()
-                b = stack_pop()
-                stack_push(fetch(b, a), fetch_type(b, a))
-            else:
-                offset = size
-        elif opcode == BC_MEM_STORE:
-            if check_depth(3):
-                a = stack_pop()
-                b = stack_pop()
-                t = stack_type()
-                c = stack_pop()
-                store(c, b, a, t)
-            else:
-                offset = size
-        elif opcode == BC_MEM_REQUEST:
-            stack_push(request_slice(), TYPE_POINTER)
-        elif opcode == BC_MEM_RELEASE:
-            if check_depth(1):
-                release_slice(stack_pop())
-            else:
-                offset = size
-        elif opcode == BC_MEM_COLLECT:
-            collect_unused_slices()
-        elif opcode == BC_MEM_GET_LAST:
-            a = stack_pop()
-            stack_push(get_last_index(a), TYPE_NUMBER)
-        elif opcode == BC_MEM_SET_LAST:
-            a = stack_pop()
-            b = stack_pop()
-            set_slice_last_index(a, b)
-        elif opcode == BC_STACK_DUP:
-            if check_depth(1):
-                stack_dup()
-            else:
-                offset = size
-        elif opcode == BC_STACK_DROP:
-            if check_depth(1):
-                stack_drop()
-            else:
-                offset = size
-        elif opcode == BC_STACK_SWAP:
-            if check_depth(2):
-                stack_swap()
-            else:
-                offset = size
-        elif opcode == BC_STACK_OVER:
-            if check_depth(2):
-                stack_over()
-            else:
-                offset = size
-        elif opcode == BC_STACK_TUCK:
-            if check_depth(2):
-                stack_tuck()
-            else:
-                offset = size
-        elif opcode == BC_STACK_NIP:
-            if check_depth(2):
-                stack_swap()
-                stack_drop()
-            else:
-                offset = size
-        elif opcode == BC_STACK_DEPTH:
-            stack_push(len(stack), TYPE_NUMBER)
-        elif opcode == BC_STACK_CLEAR:
-            stack_clear()
-        elif opcode == BC_QUOTE_NAME:
-            if check_depth(2):
-                name = slice_to_string(stack_pop())
-                ptr = stack_pop()
-                add_definition(name, ptr)
-            else:
-                offset = size
-        elif opcode == BC_FUNCTION_EXISTS:
-            if check_depth(1):
-                name = slice_to_string(stack_pop())
-                if lookup_pointer(name) != -1:
-                    stack_push(-1, TYPE_FLAG)
-                else:
-                    stack_push(0, TYPE_FLAG)
-            else:
-                offset = size
-        elif opcode == BC_FUNCTION_LOOKUP:
-            if check_depth(1):
-                name = slice_to_string(stack_pop())
-                if lookup_pointer(name) != -1:
-                    stack_push(lookup_pointer(name), TYPE_POINTER)
-                else:
-                    stack_push(-1, TYPE_POINTER)
-            else:
-                offset = size
-        elif opcode == BC_FUNCTION_HIDE:
-            if check_depth(1):
-                name = slice_to_string(stack_pop())
-                if lookup_pointer(name) != -1:
-                    remove_name(name)
-            else:
-                offset = size
-        elif opcode == BC_STRING_SEEK:
-            if check_depth(2):
-                a = slice_to_string(stack_pop())
-                b = slice_to_string(stack_pop())
-                stack_push(b.find(a), TYPE_NUMBER)
-            else:
-                offset = size
-        elif opcode == BC_SLICE_SUBSLICE:
-            if check_depth(3):
-                a = int(stack_pop())
-                b = int(stack_pop())
-                s = int(stack_pop())
-                c = p_slices[s]
-                d = c[b:a]
-                dt = p_types[s]
-                dt = dt[b:a]
-                e = request_slice()
-                i  = 0
-                while i < len(d):
-                    store(d[i], e, i, dt[i])
-                    i = i + 1
-                stack_push(e, TYPE_POINTER)
-            else:
-                offset = size
-        elif opcode == BC_STRING_NUMERIC:
-            if check_depth(1):
-                a = slice_to_string(stack_pop())
-                if is_number(a):
-                    stack_push(-1, TYPE_FLAG)
-                else:
-                    stack_push(0, TYPE_FLAG)
-            else:
-                offset = size
-        elif opcode == BC_SLICE_REVERSE:
-            if check_depth(1):
-                a = stack_pop()
-                p_slices[int(a)] = p_slices[int(a)][::-1]
-                stack_push(a, TYPE_POINTER)
-            else:
-                offset = size
-        elif opcode == BC_TO_UPPER:
-            if check_depth(1):
-                t = stack_type()
-                if t == TYPE_STRING:
-                    ptr = stack_pop()
-                    a = slice_to_string(ptr).upper()
-                    stack_push(string_to_slice(a), TYPE_STRING)
-                elif t == TYPE_CHARACTER:
-                    a = stack_pop()
-                    b = ''.join(unichr(a))
-                    a = b.upper()
-                    stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
-                else:
-                    report('ERROR: BC_TO_UPPER requires STRING or CHARACTER')
-            else:
-                offset = size
-        elif opcode == BC_TO_LOWER:
-            if check_depth(1):
-                t = stack_type()
-                if t == TYPE_STRING:
-                    ptr = stack_pop()
-                    a = slice_to_string(ptr).lower()
-                    stack_push(string_to_slice(a), TYPE_STRING)
-                elif t == TYPE_CHARACTER:
-                    a = stack_pop()
-                    b = ''.join(unichr(a))
-                    a = b.lower()
-                    stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
-                else:
-                    report('ERROR: BC_TO_LOWER requires STRING or CHARACTER')
-            else:
-                offset = size
-        elif opcode == BC_REPORT:
-            if check_depth(1):
-                if stack_type() == TYPE_STRING:
-                    a = slice_to_string(stack_pop())
-                    report(a)
-            offset = size
-        elif opcode == BC_TRIG_SIN:
-            a = stack_pop()
-            stack_push(math.sin(a), TYPE_NUMBER)
-        elif opcode == BC_TRIG_COS:
-            a = stack_pop()
-            stack_push(math.cos(a), TYPE_NUMBER)
-        elif opcode == BC_TRIG_TAN:
-            a = stack_pop()
-            stack_push(math.tan(a), TYPE_NUMBER)
-        elif opcode == BC_TRIG_ASIN:
-            a = stack_pop()
-            stack_push(math.asin(a), TYPE_NUMBER)
-        elif opcode == BC_TRIG_ACOS:
-            a = stack_pop()
-            stack_push(math.acos(a), TYPE_NUMBER)
-        elif opcode == BC_TRIG_ATAN:
-            a = stack_pop()
-            stack_push(math.atan(a), TYPE_NUMBER)
-        elif opcode == BC_TRIG_ATAN2:
-            a = stack_pop()
-            b = stack_pop()
-            stack_push(math.atan2(b, a), TYPE_NUMBER)
-        if more is not None:
-            offset = more(slice, offset, opcode)
+        optype = fetch_type(slice, offset)
+
+        if optype == TYPE_NUMBER:
+            stack_push(opcode, TYPE_NUMBER)
+        elif optype == TYPE_STRING:
+            stack_push(opcode, TYPE_NUMBER)
+        elif optype == TYPE_CHARACTER:
+            stack_push(opcode, TYPE_CHARACTER)
+        elif optype == TYPE_POINTER:
+            stack_push(opcode, TYPE_POINTER)
+        elif optype == TYPE_FLAG:
+            stack_push(opcode, TYPE_FLAG)
+        elif optype == TYPE_COMMENT:
+            stack_push(opcode, TYPE_COMMENT)
+            stack_pop()
+        elif optype == TYPE_BYTECODE:
+	    if opcode == BC_PUSH_N:
+		offset += 1
+		stack_push(fetch(slice, offset), TYPE_NUMBER)
+	    elif opcode == BC_PUSH_S:
+		offset += 1
+		stack_push(fetch(slice, offset), TYPE_STRING)
+	    elif opcode == BC_PUSH_C:
+		offset += 1
+		stack_push(fetch(slice, offset), TYPE_CHARACTER)
+	    elif opcode == BC_PUSH_F:
+		offset += 1
+		stack_push(fetch(slice, offset), TYPE_POINTER)
+	    elif opcode == BC_PUSH_COMMENT:
+		offset += 1
+	    elif opcode == BC_TYPE_N:
+		if check_depth(1):
+		    stack_change_type(TYPE_NUMBER)
+		else:
+		    offset = size
+	    elif opcode == BC_TYPE_S:
+		if check_depth(1):
+		    stack_change_type(TYPE_STRING)
+		else:
+		    offset = size
+	    elif opcode == BC_TYPE_C:
+		if check_depth(1):
+		    stack_change_type(TYPE_CHARACTER)
+		else:
+		    offset = size
+	    elif opcode == BC_TYPE_F:
+		if check_depth(1):
+		    stack_change_type(TYPE_POINTER)
+		else:
+		    offset = size
+	    elif opcode == BC_TYPE_FLAG:
+		if check_depth(1):
+		    stack_change_type(TYPE_FLAG)
+		else:
+		    offset = size
+	    elif opcode == BC_GET_TYPE:
+		if check_depth(1):
+		    stack_push(stack_type(), TYPE_NUMBER)
+		else:
+		    offset = size
+	    elif opcode == BC_ADD:
+		if check_depth(2):
+		    x = stack_type()
+		    a = stack_pop()
+		    y = stack_type()
+		    b = stack_pop()
+		    if x == TYPE_STRING and y == TYPE_STRING:
+			a = slice_to_string(a)
+			b = slice_to_string(b)
+			stack_push(string_to_slice(b + a), TYPE_STRING)
+		    else:
+			stack_push(a + b, TYPE_NUMBER)
+		else:
+		    offset = size
+	    elif opcode == BC_SUBTRACT:
+		if check_depth(2):
+		    a = stack_pop()
+		    b = stack_pop()
+		    stack_push(b - a, TYPE_NUMBER)
+		else:
+		    offset = size
+	    elif opcode == BC_MULTIPLY:
+		if check_depth(2):
+		    a = stack_pop()
+		    b = stack_pop()
+		    stack_push(a * b, TYPE_NUMBER)
+		else:
+		    offset = size
+	    elif opcode == BC_DIVIDE:
+		if check_depth(2):
+		    a = stack_pop()
+		    b = stack_pop()
+		    stack_push(b / a, TYPE_NUMBER)
+		else:
+		    offset = size
+	    elif opcode == BC_REMAINDER:
+		if check_depth(2):
+		    a = stack_pop()
+		    b = stack_pop()
+		    stack_push(b % a, TYPE_NUMBER)
+		else:
+		    offset = size
+	    elif opcode == BC_FLOOR:
+		if check_depth(1):
+		    stack_push(math.floor(float(stack_pop())), TYPE_NUMBER)
+		else:
+		    offset = size
+	    elif opcode == BC_POW:
+		if check_depth(2):
+		    a = stack_pop()
+		    b = stack_pop()
+		    stack_push(math.pow(b, a), TYPE_NUMBER)
+		else:
+		    offset = size
+	    elif opcode == BC_LOG:
+		if check_depth(1):
+		    a = stack_pop()
+		    stack_push(math.log(a), TYPE_NUMBER)
+		else:
+		    offset = size
+	    elif opcode == BC_LOG10:
+		if check_depth(1):
+		    a = stack_pop()
+		    stack_push(math.log10(a), TYPE_NUMBER)
+		else:
+		    offset = size
+	    elif opcode == BC_LOGN:
+		if check_depth(2):
+		    a = stack_pop()
+		    b = stack_pop()
+		    stack_push(math.log(b, a), TYPE_NUMBER)
+		else:
+		    offset = size
+	    elif opcode == BC_BITWISE_SHIFT:
+		if check_depth(2):
+		    a = int(stack_pop())
+		    b = int(stack_pop())
+		    if a < 0:
+			stack_push(b << abs(a), TYPE_NUMBER)
+		    else:
+			stack_push(b >> a, TYPE_NUMBER)
+		else:
+		    offset = size
+	    elif opcode == BC_BITWISE_AND:
+		if check_depth(2):
+		    a = int(stack_pop())
+		    b = int(stack_pop())
+		    stack_push(b & a, TYPE_NUMBER)
+		else:
+		    offset = size
+	    elif opcode == BC_BITWISE_OR:
+		if check_depth(2):
+		    a = int(stack_pop())
+		    b = int(stack_pop())
+		    stack_push(b | a, TYPE_NUMBER)
+		else:
+		    offset = size
+	    elif opcode == BC_BITWISE_XOR:
+		if check_depth(2):
+		    a = int(stack_pop())
+		    b = int(stack_pop())
+		    stack_push(b ^ a, TYPE_NUMBER)
+		else:
+		    offset = size
+	    elif opcode == BC_RANDOM:
+		stack_push(random.SystemRandom().random(), TYPE_NUMBER)
+	    elif opcode == BC_SQRT:
+		if check_depth(1):
+		    stack_push(math.sqrt(stack_pop()), TYPE_NUMBER)
+		else:
+		    offset = size
+	    elif opcode == BC_COMPARE_LT:
+		if check_depth(2):
+		    x = stack_type()
+		    a = stack_pop()
+		    y = stack_type()
+		    b = stack_pop()
+		    if x == TYPE_NUMBER and y == TYPE_NUMBER:
+			if b < a:
+			    stack_push(-1, TYPE_FLAG)
+			else:
+			    stack_push(0, TYPE_FLAG)
+		    else:
+			offset = size
+			report('BC_COMPARE_LT only recognizes NUMBER types')
+		else:
+		    offset = size
+	    elif opcode == BC_COMPARE_GT:
+		if check_depth(2):
+		    x = stack_type()
+		    a = stack_pop()
+		    y = stack_type()
+		    b = stack_pop()
+		    if x == TYPE_NUMBER and y == TYPE_NUMBER:
+			if b > a:
+			    stack_push(-1, TYPE_FLAG)
+			else:
+			    stack_push(0, TYPE_FLAG)
+		    else:
+			offset = size
+			report('BC_COMPARE_LT only recognizes NUMBER types')
+		else:
+		    offset = size
+	    elif opcode == BC_COMPARE_LTEQ:
+		if check_depth(2):
+		    x = stack_type()
+		    a = stack_pop()
+		    y = stack_type()
+		    b = stack_pop()
+		    if x == TYPE_NUMBER and y == TYPE_NUMBER:
+			if b <= a:
+			    stack_push(-1, TYPE_FLAG)
+			else:
+			    stack_push(0, TYPE_FLAG)
+		    else:
+			offset = size
+			report('BC_COMPARE_LTEQ only recognizes NUMBER')
+		else:
+		    offset = size
+	    elif opcode == BC_COMPARE_GTEQ:
+		if check_depth(2):
+		    x = stack_type()
+		    a = stack_pop()
+		    y = stack_type()
+		    b = stack_pop()
+		    if x == TYPE_NUMBER and y == TYPE_NUMBER:
+			if b >= a:
+			    stack_push(-1, TYPE_FLAG)
+			else:
+			    stack_push(0, TYPE_FLAG)
+		    else:
+			offset = size
+			report('BC_COMPARE_GTEQ only recognizes NUMBER')
+		else:
+		    offset = size
+	    elif opcode == BC_COMPARE_EQ:
+		if check_depth(2):
+		    x = stack_type()
+		    a = stack_pop()
+		    y = stack_type()
+		    b = stack_pop()
+		    if x == y and x != TYPE_STRING:
+			if b == a:
+			    stack_push(-1, TYPE_FLAG)
+			else:
+			    stack_push(0, TYPE_FLAG)
+		    elif x == y and x == TYPE_STRING:
+			if slice_to_string(b) == slice_to_string(a):
+			    stack_push(-1, TYPE_FLAG)
+			else:
+			    stack_push(0, TYPE_FLAG)
+		    else:
+			offset = size
+			report('BC_COMPARE_EQ requires matched types')
+		else:
+		    offset = size
+	    elif opcode == BC_COMPARE_NEQ:
+		if check_depth(2):
+		    x = stack_type()
+		    a = stack_pop()
+		    y = stack_type()
+		    b = stack_pop()
+		    if x == y and x != TYPE_STRING:
+			if b != a:
+			    stack_push(-1, TYPE_FLAG)
+			else:
+			    stack_push(0, TYPE_FLAG)
+		    elif x == y and x == TYPE_STRING:
+			if slice_to_string(b) != slice_to_string(a):
+			    stack_push(-1, TYPE_FLAG)
+			else:
+			    stack_push(0, TYPE_FLAG)
+		    else:
+			offset = size
+			report('BC_COMPARE_NEQ requires matched types')
+		else:
+		    offset = size
+	    elif opcode == BC_FLOW_IF:
+		if check_depth(3):
+		    a = stack_pop()
+		    b = stack_pop()
+		    c = stack_pop()
+		    if c == -1:
+			interpret(b, more)
+		    else:
+			interpret(a, more)
+		else:
+		    offset = size
+	    elif opcode == BC_FLOW_WHILE:
+		if check_depth(1):
+		    quote = stack_pop()
+		    a = -1
+		    while a == -1:
+			interpret(quote, more)
+			a = stack_pop()
+		else:
+		    offset = size
+	    elif opcode == BC_FLOW_UNTIL:
+		if check_depth(1):
+		    quote = stack_pop()
+		    a = 0
+		    while a == 0:
+			interpret(quote, more)
+			a = stack_pop()
+		else:
+		    offset = size
+	    elif opcode == BC_FLOW_TIMES:
+		if check_depth(2):
+		    quote = stack_pop()
+		    count = stack_pop()
+		    while count > 0:
+			interpret(quote, more)
+			count -= 1
+		else:
+		    offset = size
+	    elif opcode == BC_FLOW_CALL:
+		offset += 1
+		interpret(int(fetch(slice, offset)), more)
+	    elif opcode == BC_FLOW_CALL_F:
+		if check_depth(1):
+		    a = stack_pop()
+		    interpret(a, more)
+		else:
+		    offset = size
+	    elif opcode == BC_FLOW_DIP:
+		if check_depth(2):
+		    quote = stack_pop()
+		    vtype = stack_type()
+		    value = stack_pop()
+		    interpret(quote, more)
+		    stack_push(value, vtype)
+		else:
+		    offset = size
+	    elif opcode == BC_FLOW_SIP:
+		if check_depth(2):
+		    quote = stack_pop()
+		    stack_dup()
+		    vtype = stack_type()
+		    value = stack_pop()
+		    interpret(quote, more)
+		    stack_push(value, vtype)
+		else:
+		    offset = size
+	    elif opcode == BC_FLOW_BI:
+		if check_depth(3):
+		    a = stack_pop()
+		    b = stack_pop()
+		    stack_dup()
+		    x = stack_type()
+		    y = stack_pop()
+		    interpret(b, more)
+		    stack_push(y, x)
+		    interpret(a, more)
+		else:
+		    offset = size
+	    elif opcode == BC_FLOW_TRI:
+		if check_depth(4):
+		    a = stack_pop()
+		    b = stack_pop()
+		    c = stack_pop()
+		    stack_dup()
+		    x = stack_type()
+		    y = stack_pop()
+		    stack_dup()
+		    m = stack_type()
+		    q = stack_pop()
+		    interpret(c, more)
+		    stack_push(q, m)
+		    interpret(b, more)
+		    stack_push(y, x)
+		    interpret(a, more)
+		else:
+		    offset = size
+	    elif opcode == BC_FLOW_RETURN:
+		offset = size
+	    elif opcode == BC_MEM_COPY:
+		if check_depth(2):
+		    a = stack_pop()
+		    b = stack_pop()
+		    copy_slice(b, a)
+		else:
+		    offset = size
+	    elif opcode == BC_MEM_FETCH:
+		if check_depth(2):
+		    a = stack_pop()
+		    b = stack_pop()
+		    stack_push(fetch(b, a), fetch_type(b, a))
+		else:
+		    offset = size
+	    elif opcode == BC_MEM_STORE:
+		if check_depth(3):
+		    a = stack_pop()
+		    b = stack_pop()
+		    t = stack_type()
+		    c = stack_pop()
+		    store(c, b, a, t)
+		else:
+		    offset = size
+	    elif opcode == BC_MEM_REQUEST:
+		stack_push(request_slice(), TYPE_POINTER)
+	    elif opcode == BC_MEM_RELEASE:
+		if check_depth(1):
+		    release_slice(stack_pop())
+		else:
+		    offset = size
+	    elif opcode == BC_MEM_COLLECT:
+		collect_unused_slices()
+	    elif opcode == BC_MEM_GET_LAST:
+		a = stack_pop()
+		stack_push(get_last_index(a), TYPE_NUMBER)
+	    elif opcode == BC_MEM_SET_LAST:
+		a = stack_pop()
+		b = stack_pop()
+		set_slice_last_index(a, b)
+	    elif opcode == BC_STACK_DUP:
+		if check_depth(1):
+		    stack_dup()
+		else:
+		    offset = size
+	    elif opcode == BC_STACK_DROP:
+		if check_depth(1):
+		    stack_drop()
+		else:
+		    offset = size
+	    elif opcode == BC_STACK_SWAP:
+		if check_depth(2):
+		    stack_swap()
+		else:
+		    offset = size
+	    elif opcode == BC_STACK_OVER:
+		if check_depth(2):
+		    stack_over()
+		else:
+		    offset = size
+	    elif opcode == BC_STACK_TUCK:
+		if check_depth(2):
+		    stack_tuck()
+		else:
+		    offset = size
+	    elif opcode == BC_STACK_NIP:
+		if check_depth(2):
+		    stack_swap()
+		    stack_drop()
+		else:
+		    offset = size
+	    elif opcode == BC_STACK_DEPTH:
+		stack_push(len(stack), TYPE_NUMBER)
+	    elif opcode == BC_STACK_CLEAR:
+		stack_clear()
+	    elif opcode == BC_QUOTE_NAME:
+		if check_depth(2):
+		    name = slice_to_string(stack_pop())
+		    ptr = stack_pop()
+		    add_definition(name, ptr)
+		else:
+		    offset = size
+	    elif opcode == BC_FUNCTION_EXISTS:
+		if check_depth(1):
+		    name = slice_to_string(stack_pop())
+		    if lookup_pointer(name) != -1:
+			stack_push(-1, TYPE_FLAG)
+		    else:
+			stack_push(0, TYPE_FLAG)
+		else:
+		    offset = size
+	    elif opcode == BC_FUNCTION_LOOKUP:
+		if check_depth(1):
+		    name = slice_to_string(stack_pop())
+		    if lookup_pointer(name) != -1:
+			stack_push(lookup_pointer(name), TYPE_POINTER)
+		    else:
+			stack_push(-1, TYPE_POINTER)
+		else:
+		    offset = size
+	    elif opcode == BC_FUNCTION_HIDE:
+		if check_depth(1):
+		    name = slice_to_string(stack_pop())
+		    if lookup_pointer(name) != -1:
+			remove_name(name)
+		else:
+		    offset = size
+	    elif opcode == BC_STRING_SEEK:
+		if check_depth(2):
+		    a = slice_to_string(stack_pop())
+		    b = slice_to_string(stack_pop())
+		    stack_push(b.find(a), TYPE_NUMBER)
+		else:
+		    offset = size
+	    elif opcode == BC_SLICE_SUBSLICE:
+		if check_depth(3):
+		    a = int(stack_pop())
+		    b = int(stack_pop())
+		    s = int(stack_pop())
+		    c = p_slices[s]
+		    d = c[b:a]
+		    dt = p_types[s]
+		    dt = dt[b:a]
+		    e = request_slice()
+		    i  = 0
+		    while i < len(d):
+			store(d[i], e, i, dt[i])
+			i = i + 1
+		    stack_push(e, TYPE_POINTER)
+		else:
+		    offset = size
+	    elif opcode == BC_STRING_NUMERIC:
+		if check_depth(1):
+		    a = slice_to_string(stack_pop())
+		    if is_number(a):
+			stack_push(-1, TYPE_FLAG)
+		    else:
+			stack_push(0, TYPE_FLAG)
+		else:
+		    offset = size
+	    elif opcode == BC_SLICE_REVERSE:
+		if check_depth(1):
+		    a = stack_pop()
+		    p_slices[int(a)] = p_slices[int(a)][::-1]
+		    stack_push(a, TYPE_POINTER)
+		else:
+		    offset = size
+	    elif opcode == BC_TO_UPPER:
+		if check_depth(1):
+		    t = stack_type()
+		    if t == TYPE_STRING:
+			ptr = stack_pop()
+			a = slice_to_string(ptr).upper()
+			stack_push(string_to_slice(a), TYPE_STRING)
+		    elif t == TYPE_CHARACTER:
+			a = stack_pop()
+			b = ''.join(unichr(a))
+			a = b.upper()
+			stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
+		    else:
+			report('ERROR: BC_TO_UPPER requires STRING or CHARACTER')
+		else:
+		    offset = size
+	    elif opcode == BC_TO_LOWER:
+		if check_depth(1):
+		    t = stack_type()
+		    if t == TYPE_STRING:
+			ptr = stack_pop()
+			a = slice_to_string(ptr).lower()
+			stack_push(string_to_slice(a), TYPE_STRING)
+		    elif t == TYPE_CHARACTER:
+			a = stack_pop()
+			b = ''.join(unichr(a))
+			a = b.lower()
+			stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
+		    else:
+			report('ERROR: BC_TO_LOWER requires STRING or CHARACTER')
+		else:
+		    offset = size
+	    elif opcode == BC_REPORT:
+		if check_depth(1):
+		    if stack_type() == TYPE_STRING:
+			a = slice_to_string(stack_pop())
+			report(a)
+		offset = size
+	    elif opcode == BC_TRIG_SIN:
+		a = stack_pop()
+		stack_push(math.sin(a), TYPE_NUMBER)
+	    elif opcode == BC_TRIG_COS:
+		a = stack_pop()
+		stack_push(math.cos(a), TYPE_NUMBER)
+	    elif opcode == BC_TRIG_TAN:
+		a = stack_pop()
+		stack_push(math.tan(a), TYPE_NUMBER)
+	    elif opcode == BC_TRIG_ASIN:
+		a = stack_pop()
+		stack_push(math.asin(a), TYPE_NUMBER)
+	    elif opcode == BC_TRIG_ACOS:
+		a = stack_pop()
+		stack_push(math.acos(a), TYPE_NUMBER)
+	    elif opcode == BC_TRIG_ATAN:
+		a = stack_pop()
+		stack_push(math.atan(a), TYPE_NUMBER)
+	    elif opcode == BC_TRIG_ATAN2:
+		a = stack_pop()
+		b = stack_pop()
+		stack_push(math.atan2(b, a), TYPE_NUMBER)
+	    if more is not None:
+		offset = more(slice, offset, opcode)
 
         offset += 1
 
@@ -1319,8 +1335,8 @@ def parse_bootstrap(f):
 def prepare_dictionary():
     """setup the initial dictionary"""
     s = request_slice()
-    store(BC_QUOTE_NAME, s, 0)
-    store(BC_FLOW_RETURN, s, 1)
+    store(BC_QUOTE_NAME, s, 0, TYPE_BYTECODE)
+    store(BC_FLOW_RETURN, s, 1, TYPE_BYTECODE)
     add_definition('define', s)
 
 
