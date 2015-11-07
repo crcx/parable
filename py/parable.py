@@ -1056,8 +1056,7 @@ def string_to_slice(string):
     s = request_slice()
     i = 0
     for char in list(string):
-# TODO: store TYPE information
-        store(ord(char.encode('utf-8')), s, i)
+        store(ord(char.encode('utf-8')), s, i, TYPE_CHARACTER)
         i += 1
     return s
 
