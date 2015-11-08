@@ -1,3 +1,4 @@
+[ "v-b"    `109 ] ':b' define
 [ "v-n"    `110 ] ':n' define
 [ "v-s"    `111 ] ':s' define
 [ "v-c"    `112 ] ':c' define
@@ -189,7 +190,7 @@
 [ "-"      &*BUFFER-OFFSET decrement ] 'buffer-retreat' define
 [ "n-"     buffer-position store ] 'buffer-store-current' define
 [ "-n"     buffer-position fetch ] 'buffer-fetch-current' define
-[ "v-"     buffer-position store buffer-advance #0 buffer-position store ] 'buffer-store' define
+[ "v-"     buffer-position store buffer-advance "#0 buffer-position store" ] 'buffer-store' define
 [ "-n"     buffer-position fetch buffer-advance ] 'buffer-fetch' define
 [ "v-"     buffer-retreat buffer-position store ] 'buffer-store-retreat' define
 [ "-n"     buffer-retreat buffer-position fetch ] 'buffer-fetch-retreat' define
@@ -201,38 +202,18 @@
 
 
 "Curry Combinator"
-'*curry:types*' named-buffer
-[ ] buffer-store
-[ "number"    #100 buffer-store buffer-store ] buffer-store
-[ "string"    #101 buffer-store buffer-store ] buffer-store
-[ "character" #102 buffer-store buffer-store ] buffer-store
-[ "pointer"   #103 buffer-store buffer-store ] buffer-store
-[ "flag"      #100 buffer-store buffer-store #114 buffer-store ] buffer-store
-
-[ type? #100 / &*curry:types* swap fetch invoke ] 'curry:compile-value' define
-[ #304 buffer-store buffer-store ] 'curry:compile-call' define
-
-[ "vp-p"  [ request set-buffer swap curry:compile-value curry:compile-call &*CURRENT-BUFFER @ :p ] preserve-buffer ] 'curry' define
-[ '*curry:types*'  'curry:compile-value'  'curry:compile-call' ] hide-functions
+[ #304 :b buffer-store buffer-store #399 :b buffer-store ] 'compile-call' define
+[ "vp-p"  [ request set-buffer swap buffer-store compile-call &*CURRENT-BUFFER @ :p ] preserve-buffer ] 'curry' define
+'compile-call' hide-function
 
 "Values"
-'*types*' named-buffer
-[ ] buffer-store
-[ "number"    :n ] buffer-store
-[ "string"    :p :s ] buffer-store
-[ "character" :c ] buffer-store
-[ "pointer"   :p ] buffer-store
-[ "flag"      :f ] buffer-store
-[ #100 / &*types* swap fetch invoke ] 'restore-stored-type' define
 '*state*' variable
 [ "-" &*state* on ] 'to' define
-[ [ type? ] dip [ #1 store ] sip ] 'preserve-type' define
-[ #1 fetch restore-stored-type ] 'restore-type' define
-[ &*state* @ :f [ preserve-type ! &*state* off ] [ dup @ swap restore-type ] if ] 'value-handler' define
-[ "s-" request #2 over set-last-index [ value-handler ] curry swap define ] 'value' define
+[ &*state* @ :f [ ! &*state* off ] [ @ ] if ] 'value-handler' define
+[ "s-" request "#2 over set-last-index" [ value-handler ] curry swap define ] 'value' define
 [ "ns-" [ value ] sip to lookup-function invoke ] 'value!' define
 [ "p-" invoke<depth?> [ value ] repeat ] 'values' define
-[ '*types*'  '*state*'  'restore-stored-type'  'preserve-type'  'restore-type'  'value-handler' ] hide-functions
+[ '*state*'  'value-handler' ] hide-functions
 
 
 "arrays"

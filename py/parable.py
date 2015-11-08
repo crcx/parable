@@ -38,6 +38,7 @@ BC_PUSH_S = 101
 BC_PUSH_C = 102
 BC_PUSH_F = 103
 BC_PUSH_COMMENT = 104
+BC_TYPE_B = 109
 BC_TYPE_N = 110
 BC_TYPE_S = 111
 BC_TYPE_C = 112
@@ -197,6 +198,11 @@ def interpret(slice, more=None):
                 stack_push(fetch(slice, offset), TYPE_POINTER)
             elif opcode == BC_PUSH_COMMENT:
                 offset += 1
+            elif opcode == BC_TYPE_B:
+                if check_depth(1):
+                    stack_change_type(TYPE_BYTECODE)
+                else:
+                    offset = size
             elif opcode == BC_TYPE_N:
                 if check_depth(1):
                     stack_change_type(TYPE_NUMBER)
@@ -877,7 +883,11 @@ def stack_tuck():
 def stack_change_type(type):
     """convert the type of an item on the stack to a different type"""
     global types, stack
-    if type == TYPE_NUMBER:
+    if type == TYPE_BYTECODE:
+        if stack_type() == TYPE_NUMBER:
+            a = stack_pop()
+            stack_push(a, TYPE_BYTECODE)
+    elif type == TYPE_NUMBER:
         if stack_type() == TYPE_STRING:
             if is_number(slice_to_string(stack_tos())):
                 stack_push(float(slice_to_string(stack_pop())), TYPE_NUMBER)

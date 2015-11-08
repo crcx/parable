@@ -40,6 +40,7 @@ BC_PUSH_S = 101
 BC_PUSH_C = 102
 BC_PUSH_F = 103
 BC_PUSH_COMMENT = 104
+BC_TYPE_B = 109
 BC_TYPE_N = 110
 BC_TYPE_S = 111
 BC_TYPE_C = 112
@@ -87,6 +88,8 @@ BC_MEM_RELEASE = 404
 BC_MEM_COLLECT = 405
 BC_MEM_GET_LAST = 406
 BC_MEM_SET_LAST = 407
+BC_MEM_SET_TYPE = 408
+BC_MEM_GET_TYPE = 409
 BC_STACK_DUP = 500
 BC_STACK_DROP = 501
 BC_STACK_SWAP = 502
@@ -197,6 +200,11 @@ def interpret(slice, more=None):
                 stack_push(fetch(slice, offset), TYPE_POINTER)
             elif opcode == BC_PUSH_COMMENT:
                 offset += 1
+            elif opcode == BC_TYPE_B:
+                if check_depth(1):
+                    stack_change_type(TYPE_BYTECODE)
+                else:
+                    offset = size
             elif opcode == BC_TYPE_N:
                 if check_depth(1):
                     stack_change_type(TYPE_NUMBER)
@@ -581,6 +589,22 @@ def interpret(slice, more=None):
                 a = stack_pop()
                 b = stack_pop()
                 set_slice_last_index(a, b)
+            elif opcode == BC_MEM_SET_TYPE:
+                if check_depth(3):
+                    a = stack_pop()
+                    b = stack_pop()
+                    c = stack_pop()
+                    store_type(c, b, a)
+                else:
+                    offset = size
+            elif opcode == BC_MEM_GET_TYPE:
+                if check_depth(1):
+                    a = stack_pop()
+                    b = stack_pop()
+                    c = fetch_type(b, a)
+                    stack_push(int(c), TYPE_NUMBER)
+                else:
+                    offset = size
             elif opcode == BC_STACK_DUP:
                 if check_depth(1):
                     stack_dup()
@@ -861,7 +885,11 @@ def stack_tuck():
 def stack_change_type(type):
     """convert the type of an item on the stack to a different type"""
     global types, stack
-    if type == TYPE_NUMBER:
+    if type == TYPE_BYTECODE:
+        if stack_type() == TYPE_NUMBER:
+            a = stack_pop()
+            stack_push(a, TYPE_BYTECODE)
+    elif type == TYPE_NUMBER:
         if stack_type() == TYPE_STRING:
             if is_number(slice_to_string(stack_tos())):
                 stack_push(float(slice_to_string(stack_pop())), TYPE_NUMBER)
@@ -1029,6 +1057,13 @@ def fetch_type(slice, offset):
     if get_last_index(slice) < offset:
         set_slice_last_index(slice, offset)
     return p_types[int(slice)][int(offset)]
+
+
+def store_type(slice, offset, type):
+    global p_slices, p_types, p_map
+    if get_last_index(slice) < offset:
+        set_slice_last_index(slice, offset)
+    p_types[int(slice)][int(offset)] = type
 
 
 def store(value, slice, offset, type=100):
@@ -1333,6 +1368,7 @@ def pointer_to_name(ptr):
         s = dictionary_names[dictionary_slices.index(ptr)]
     return s
 bootstrap = []
+bootstrap.append(""" [ "v-b"    `109 ] ':b' define """)
 bootstrap.append(""" [ "v-n"    `110 ] ':n' define """)
 bootstrap.append(""" [ "v-s"    `111 ] ':s' define """)
 bootstrap.append(""" [ "v-c"    `112 ] ':c' define """)
@@ -1378,6 +1414,8 @@ bootstrap.append(""" [ "p-"     `404 ] 'release' define """)
 bootstrap.append(""" [ "-"      `405 ] 'collect-garbage' define """)
 bootstrap.append(""" [ "p-n"    `406 ] 'get-last-index' define """)
 bootstrap.append(""" [ "np-"    `407 ] 'set-last-index' define """)
+bootstrap.append(""" [ "pn-"    `408 ] 'set-stored-type' define """)
+bootstrap.append(""" [ "p-n"    `409 ] 'get-stored-type' define """)
 bootstrap.append(""" [ "v-vv"   `500 ] 'dup' define """)
 bootstrap.append(""" [ "v-"     `501 ] 'drop' define """)
 bootstrap.append(""" [ "vV-Vv"  `502 ] 'swap' define """)
@@ -1498,7 +1536,7 @@ bootstrap.append(""" [ "-"      &*BUFFER-OFFSET increment ] 'buffer-advance' def
 bootstrap.append(""" [ "-"      &*BUFFER-OFFSET decrement ] 'buffer-retreat' define """)
 bootstrap.append(""" [ "n-"     buffer-position store ] 'buffer-store-current' define """)
 bootstrap.append(""" [ "-n"     buffer-position fetch ] 'buffer-fetch-current' define """)
-bootstrap.append(""" [ "v-"     buffer-position store buffer-advance #0 buffer-position store ] 'buffer-store' define """)
+bootstrap.append(""" [ "v-"     buffer-position store buffer-advance "#0 buffer-position store" ] 'buffer-store' define """)
 bootstrap.append(""" [ "-n"     buffer-position fetch buffer-advance ] 'buffer-fetch' define """)
 bootstrap.append(""" [ "v-"     buffer-retreat buffer-position store ] 'buffer-store-retreat' define """)
 bootstrap.append(""" [ "-n"     buffer-retreat buffer-position fetch ] 'buffer-fetch-retreat' define """)
@@ -1508,35 +1546,17 @@ bootstrap.append(""" [ "-"      request set-buffer ] 'new-buffer' define """)
 bootstrap.append(""" [ "p-"     &*CURRENT-BUFFER @ [ &*BUFFER-OFFSET @ [ invoke ] dip &*BUFFER-OFFSET ! ] dip &*CURRENT-BUFFER ! ] 'preserve-buffer' define """)
 bootstrap.append(""" [ "s-"     request [ swap define ] sip set-buffer ] 'named-buffer' define """)
 bootstrap.append(""" "Curry Combinator" """)
-bootstrap.append(""" '*curry:types*' named-buffer """)
-bootstrap.append(""" [ ] buffer-store """)
-bootstrap.append(""" [ "number"    #100 buffer-store buffer-store ] buffer-store """)
-bootstrap.append(""" [ "string"    #101 buffer-store buffer-store ] buffer-store """)
-bootstrap.append(""" [ "character" #102 buffer-store buffer-store ] buffer-store """)
-bootstrap.append(""" [ "pointer"   #103 buffer-store buffer-store ] buffer-store """)
-bootstrap.append(""" [ "flag"      #100 buffer-store buffer-store #114 buffer-store ] buffer-store """)
-bootstrap.append(""" [ type? #100 / &*curry:types* swap fetch invoke ] 'curry:compile-value' define """)
-bootstrap.append(""" [ #304 buffer-store buffer-store ] 'curry:compile-call' define """)
-bootstrap.append(""" [ "vp-p"  [ request set-buffer swap curry:compile-value curry:compile-call &*CURRENT-BUFFER @ :p ] preserve-buffer ] 'curry' define """)
-bootstrap.append(""" [ '*curry:types*'  'curry:compile-value'  'curry:compile-call' ] hide-functions """)
+bootstrap.append(""" [ #304 :b buffer-store buffer-store #399 :b buffer-store ] 'compile-call' define """)
+bootstrap.append(""" [ "vp-p"  [ request set-buffer swap buffer-store compile-call &*CURRENT-BUFFER @ :p ] preserve-buffer ] 'curry' define """)
+bootstrap.append(""" 'compile-call' hide-function """)
 bootstrap.append(""" "Values" """)
-bootstrap.append(""" '*types*' named-buffer """)
-bootstrap.append(""" [ ] buffer-store """)
-bootstrap.append(""" [ "number"    :n ] buffer-store """)
-bootstrap.append(""" [ "string"    :p :s ] buffer-store """)
-bootstrap.append(""" [ "character" :c ] buffer-store """)
-bootstrap.append(""" [ "pointer"   :p ] buffer-store """)
-bootstrap.append(""" [ "flag"      :f ] buffer-store """)
-bootstrap.append(""" [ #100 / &*types* swap fetch invoke ] 'restore-stored-type' define """)
 bootstrap.append(""" '*state*' variable """)
 bootstrap.append(""" [ "-" &*state* on ] 'to' define """)
-bootstrap.append(""" [ [ type? ] dip [ #1 store ] sip ] 'preserve-type' define """)
-bootstrap.append(""" [ #1 fetch restore-stored-type ] 'restore-type' define """)
-bootstrap.append(""" [ &*state* @ :f [ preserve-type ! &*state* off ] [ dup @ swap restore-type ] if ] 'value-handler' define """)
-bootstrap.append(""" [ "s-" request #2 over set-last-index [ value-handler ] curry swap define ] 'value' define """)
+bootstrap.append(""" [ &*state* @ :f [ ! &*state* off ] [ @ ] if ] 'value-handler' define """)
+bootstrap.append(""" [ "s-" request "#2 over set-last-index" [ value-handler ] curry swap define ] 'value' define """)
 bootstrap.append(""" [ "ns-" [ value ] sip to lookup-function invoke ] 'value!' define """)
 bootstrap.append(""" [ "p-" invoke<depth?> [ value ] repeat ] 'values' define """)
-bootstrap.append(""" [ '*types*'  '*state*'  'restore-stored-type'  'preserve-type'  'restore-type'  'value-handler' ] hide-functions """)
+bootstrap.append(""" [ '*state*'  'value-handler' ] hide-functions """)
 bootstrap.append(""" "arrays" """)
 bootstrap.append(""" [ 'source'  'results'  'filter' ] values """)
 bootstrap.append(""" [ &source [ &results [ &filter [ invoke ] preserve ] preserve ] preserve ] 'localize' define """)
