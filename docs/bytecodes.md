@@ -145,6 +145,19 @@ Stack Effect:
 
 ----
 
+## BC\_TYPE\_B
+
+Opcode: 109
+
+Convert the value on the stack to a BYTECODE.
+
+
+Stack Effect:
+
+    value -- bytecode
+
+----
+
 ## BC\_TYPE\_N
 
 Opcode: 110
