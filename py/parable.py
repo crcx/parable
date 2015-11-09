@@ -1313,7 +1313,7 @@ def compile(str, slice):
             offset = 0
         elif tokens[i] == "]":
             old = slice
-            store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
+#            store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
             offset = nest.pop()
             slice = nest.pop()
             store(old, slice, offset, TYPE_POINTER)
@@ -1324,7 +1324,7 @@ def compile(str, slice):
             else:
                 offset = compile_function_call(tokens[i], slice, offset)
         i += 1
-        store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
+#        store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
     return slice
 
 
@@ -1353,7 +1353,7 @@ def prepare_dictionary():
     """setup the initial dictionary"""
     s = request_slice()
     store(BC_QUOTE_NAME, s, 0, TYPE_BYTECODE)
-    store(BC_FLOW_RETURN, s, 1, TYPE_BYTECODE)
+#    store(BC_FLOW_RETURN, s, 1, TYPE_BYTECODE)
     add_definition('define', s)
 
 
