@@ -190,7 +190,7 @@
 [ "-"      &*BUFFER-OFFSET decrement ] 'buffer-retreat' define
 [ "n-"     buffer-position store ] 'buffer-store-current' define
 [ "-n"     buffer-position fetch ] 'buffer-fetch-current' define
-[ "v-"     buffer-position store buffer-advance "#0 buffer-position store" ] 'buffer-store' define
+[ "v-"     buffer-position store buffer-advance ] 'buffer-store' define
 [ "-n"     buffer-position fetch buffer-advance ] 'buffer-fetch' define
 [ "v-"     buffer-retreat buffer-position store ] 'buffer-store-retreat' define
 [ "-n"     buffer-retreat buffer-position fetch ] 'buffer-fetch-retreat' define
