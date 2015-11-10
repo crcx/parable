@@ -216,26 +216,26 @@
 [ '*state*'  'value-handler' ] hide-functions
 
 
+[ "vv-vvf"  [ type? ] dip type? swap [ = ] dip swap ] 'types-match?' define
+[ "q-v"  @ ] 'first' define
+[ "q-q"  #1 over length? subslice ] 'rest' define
+
+
 "arrays"
 [ 'source'  'results'  'filter' ] values
 
 [ &source [ &results [ &filter [ invoke ] preserve ] preserve ] preserve ] 'localize' define
 
-[ "vp-"  :p dup length? store ] 'array-push' define
-[ "p-v"  :p [ dup get-last-index fetch ] sip dup length? #2 - swap set-last-index ] 'array-pop' define
+[ "vp-"    :p dup length? store ] 'array-push' define
+[ "p-v"    :p [ dup get-last-index fetch ] sip dup length? #2 - swap set-last-index ] 'array-pop' define
 [ "p-p"    [ request to results invoke<depth?> #0 max [ results array-push ] repeat results #1 over length? subslice :p ] localize ] 'array-from-quote<in-stack-order>' define
-[ "p-p" array-from-quote<in-stack-order> reverse ] 'array-from-quote' define
+[ "p-p"    array-from-quote<in-stack-order> reverse ] 'array-from-quote' define
 [ "pnp-n"  [ to filter over length? [ over array-pop filter invoke ] repeat nip ] localize ] 'array-reduce' define
 [ "pp-?"   [ to filter slice-duplicate dup length? [ [ array-pop filter invoke ] sip ] repeat drop ] localize ] 'for-each' define
 
-
-[ ] 'array<remap>' define
-
-[ type? STRING <> [ [ ] ] [ [ [ :p :s ] bi@ ] ] if 'array<remap>' define ] 'needs-remap?' define
-
-[ "pv-f"   swap needs-remap? [ swap dup set-buffer slice-last-index #0 swap [ over buffer-fetch array<remap> = or ] repeat ] preserve-buffer nip :f ] 'array-contains?' define
-
-[ 'array<remap>'  'needs-remap?' ] hide-functions
+[ '*VALUE'  '*FOUND' ] values
+[ "pv-f"  false to *FOUND to *VALUE dup length? 0 swap [ dup-pair fetch *VALUE types-match? [ = *FOUND or :f to *FOUND ] [ drop-pair ] if #1 + ] repeat drop-pair *FOUND ] 'contains?' define
+[ '*VALUE'  '*FOUND' ] hide-functions
 
 [ [ reverse ] dip request to results to filter [ to source ] [ length? ] bi results array-pop drop ] 'prepare' define
 
@@ -268,4 +268,3 @@
 [ "s-b" hash:djb2 ] 'chosen-hash' define
 [ #389 ] 'hash-prime' define
 [ "s-n" chosen-hash hash-prime rem ] 'hash' define
-
