@@ -1,2 +1,0 @@
-default:
-	cp ../bootstrap.p .

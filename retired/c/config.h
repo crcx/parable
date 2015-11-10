@@ -1,6 +1,0 @@
-#define MAX_SLICES 20000
-#define SLICE_LEN  8192
-#define MAX_NAMES  2000
-#define STRING_LEN 8192
-#define NEST_LIMIT  512
-#define STACK_DEPTH 1000000

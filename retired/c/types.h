@@ -1,6 +1,0 @@
-#define TYPE_NUMBER 100
-#define TYPE_STRING 200
-#define TYPE_CHARACTER 300
-#define TYPE_FUNCTION 400
-#define TYPE_FLAG 500
-
