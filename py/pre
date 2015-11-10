@@ -1315,7 +1315,7 @@ def compile(str, slice):
             offset = 0
         elif tokens[i] == "]":
             old = slice
-            store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
+#            store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
             offset = nest.pop()
             slice = nest.pop()
             store(old, slice, offset, TYPE_POINTER)
@@ -1326,7 +1326,7 @@ def compile(str, slice):
             else:
                 offset = compile_function_call(tokens[i], slice, offset)
         i += 1
-        store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
+#        store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
     return slice
 
 
@@ -1355,7 +1355,7 @@ def prepare_dictionary():
     """setup the initial dictionary"""
     s = request_slice()
     store(BC_QUOTE_NAME, s, 0, TYPE_BYTECODE)
-    store(BC_FLOW_RETURN, s, 1, TYPE_BYTECODE)
+#    store(BC_FLOW_RETURN, s, 1, TYPE_BYTECODE)
     add_definition('define', s)
 
 
@@ -1536,7 +1536,7 @@ bootstrap.append(""" [ "-"      &*BUFFER-OFFSET increment ] 'buffer-advance' def
 bootstrap.append(""" [ "-"      &*BUFFER-OFFSET decrement ] 'buffer-retreat' define """)
 bootstrap.append(""" [ "n-"     buffer-position store ] 'buffer-store-current' define """)
 bootstrap.append(""" [ "-n"     buffer-position fetch ] 'buffer-fetch-current' define """)
-bootstrap.append(""" [ "v-"     buffer-position store buffer-advance "#0 buffer-position store" ] 'buffer-store' define """)
+bootstrap.append(""" [ "v-"     buffer-position store buffer-advance ] 'buffer-store' define """)
 bootstrap.append(""" [ "-n"     buffer-position fetch buffer-advance ] 'buffer-fetch' define """)
 bootstrap.append(""" [ "v-"     buffer-retreat buffer-position store ] 'buffer-store-retreat' define """)
 bootstrap.append(""" [ "-n"     buffer-retreat buffer-position fetch ] 'buffer-fetch-retreat' define """)
@@ -1580,19 +1580,10 @@ bootstrap.append(""" [ type? STRING = [ [ :p :s ] dip ] [ :n ] if ] 'resolve-typ
 bootstrap.append(""" [ "vp-n"  to source to v #0 to i #-1 to idx source length? [ source i fetch v resolve-types = [ i to idx ] if-true i #1 + to i ] repeat idx ] 'array-index-of' define """)
 bootstrap.append(""" [ 'source'  'v'  'i'  'idx'  'resolve-types' ] hide-functions """)
 bootstrap.append(""" "Text Output Buffer" """)
-bootstrap.append(""" 'TOB' variable """)
-bootstrap.append(""" [ &TOB array-push ] 'append-value' define """)
-bootstrap.append(""" [ "-..." &TOB get-last-index [ &TOB array-pop :p :s ] repeat ] 'show-tob' define """)
-bootstrap.append(""" [ "-" #0 &TOB set-last-index ] 'clear-tob' define """)
-bootstrap.append(""" 'TOB:Handlers' named-buffer """)
-bootstrap.append(""" [ ] buffer-store """)
-bootstrap.append(""" [ "number"     :s    append-value ] buffer-store """)
-bootstrap.append(""" [ "string"           append-value ] buffer-store """)
-bootstrap.append(""" [ "character"  :s    append-value ] buffer-store """)
-bootstrap.append(""" [ "pointer"    :n :s append-value ] buffer-store """)
-bootstrap.append(""" [ "flag"       :s    append-value ] buffer-store """)
-bootstrap.append(""" [ "v-"  type? #100 / &TOB:Handlers swap fetch invoke ] '.' define """)
-bootstrap.append(""" [ 'TOB' 'append-value' 'TOB:Handlers' ] hide-functions """)
+bootstrap.append(""" '*TOB' variable """)
+bootstrap.append(""" [ &*TOB array-push ] '.' define """)
+bootstrap.append(""" [ "-..." &*TOB get-last-index [ &*TOB array-pop ] repeat ] 'show-tob' define """)
+bootstrap.append(""" [ "-" #0 &*TOB set-last-index ] 'clear-tob' define """)
 bootstrap.append(""" "Hashing functions" """)
 bootstrap.append(""" [ "s-n" #5381 swap [ :n [ swap ] dip over #-5 shift + + swap ] for-each ] 'hash:djb2' define """)
 bootstrap.append(""" [ :n over #-6 shift + over #-16 shift + swap - ] 'hash:sdbm<n>' define """)
