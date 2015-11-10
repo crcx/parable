@@ -253,21 +253,10 @@
 [ 'source'  'v'  'i'  'idx'  'resolve-types' ] hide-functions
 
 "Text Output Buffer"
-'TOB' variable
-[ &TOB array-push ] 'append-value' define
-[ "-..." &TOB get-last-index [ &TOB array-pop :p :s ] repeat ] 'show-tob' define
-[ "-" #0 &TOB set-last-index ] 'clear-tob' define
-
-'TOB:Handlers' named-buffer
-[ ] buffer-store
-[ "number"     :s    append-value ] buffer-store
-[ "string"           append-value ] buffer-store
-[ "character"  :s    append-value ] buffer-store
-[ "pointer"    :n :s append-value ] buffer-store
-[ "flag"       :s    append-value ] buffer-store
-[ "v-"  type? #100 / &TOB:Handlers swap fetch invoke ] '.' define
-[ 'TOB' 'append-value' 'TOB:Handlers' ] hide-functions
-
+'*TOB' variable
+[ &*TOB array-push ] '.' define                                                                                                                 
+[ "-..." &*TOB get-last-index [ &*TOB array-pop ] repeat ] 'show-tob' define                                                                     
+[ "-" #0 &*TOB set-last-index ] 'clear-tob' define                                                                                               
 
 "Hashing functions"
 [ "s-n" #5381 swap [ :n [ swap ] dip over #-5 shift + + swap ] for-each ] 'hash:djb2' define
