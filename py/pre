@@ -46,6 +46,7 @@ BC_TYPE_S = 111
 BC_TYPE_C = 112
 BC_TYPE_F = 113
 BC_TYPE_FLAG = 114
+BC_TYPE_CALL = 115
 BC_GET_TYPE = 120
 BC_ADD = 200
 BC_SUBTRACT = 201
@@ -228,6 +229,11 @@ def interpret(slice, more=None):
             elif opcode == BC_TYPE_FLAG:
                 if check_depth(1):
                     stack_change_type(TYPE_FLAG)
+                else:
+                    offset = size
+            elif opcode == BC_TYPE_CALL:
+                if check_depth(1):
+                    stack_change_type(TYPE_FUNCTION_CALL)
                 else:
                     offset = size
             elif opcode == BC_GET_TYPE:
@@ -939,6 +945,10 @@ def stack_change_type(type):
         else:
             s = stack_pop()
             stack_push(s, TYPE_FLAG)
+    elif type == TYPE_FUNCTION_CALL:
+        if stack_type() == TYPE_NUMBER or stack_type() == TYPE_POINTER:
+            a = stack_pop()
+            stack_push(a, TYPE_FUNCTION_CALL)
     else:
         return
 
@@ -1374,6 +1384,7 @@ bootstrap.append(""" [ "v-s"    `111 ] ':s' define """)
 bootstrap.append(""" [ "v-c"    `112 ] ':c' define """)
 bootstrap.append(""" [ "v-p"    `113 ] ':p' define """)
 bootstrap.append(""" [ "v-f"    `114 ] ':f' define """)
+bootstrap.append(""" [ "v-f"    `115 ] ':call' define """)
 bootstrap.append(""" [ "v-vn"   `120 ] 'type?' define """)
 bootstrap.append(""" [ "nn-n"   `200 ] '+' define """)
 bootstrap.append(""" [ "nn-n"   `201 ] '-' define """)
@@ -1545,10 +1556,10 @@ bootstrap.append(""" [ "...n-"  [ buffer-store ] repeat ] 'buffer-store-items' d
 bootstrap.append(""" [ "-"      request set-buffer ] 'new-buffer' define """)
 bootstrap.append(""" [ "p-"     &*CURRENT-BUFFER @ [ &*BUFFER-OFFSET @ [ invoke ] dip &*BUFFER-OFFSET ! ] dip &*CURRENT-BUFFER ! ] 'preserve-buffer' define """)
 bootstrap.append(""" [ "s-"     request [ swap define ] sip set-buffer ] 'named-buffer' define """)
+bootstrap.append(""" "new" """)
+bootstrap.append(""" [ "vv-p"   swap request [ 0 store ] sip [ 1 store ] sip ] 'cons' define """)
 bootstrap.append(""" "Curry Combinator" """)
-bootstrap.append(""" [ #304 :b buffer-store buffer-store #399 :b buffer-store ] 'compile-call' define """)
-bootstrap.append(""" [ "vp-p"  [ request set-buffer swap buffer-store compile-call &*CURRENT-BUFFER @ :p ] preserve-buffer ] 'curry' define """)
-bootstrap.append(""" 'compile-call' hide-function """)
+bootstrap.append(""" [ "vp-p" :call cons ] 'curry' define """)
 bootstrap.append(""" "Values" """)
 bootstrap.append(""" '*state*' variable """)
 bootstrap.append(""" [ "-" &*state* on ] 'to' define """)
@@ -1557,19 +1568,21 @@ bootstrap.append(""" [ "s-" request "#2 over set-last-index" [ value-handler ] c
 bootstrap.append(""" [ "ns-" [ value ] sip to lookup-function invoke ] 'value!' define """)
 bootstrap.append(""" [ "p-" invoke<depth?> [ value ] repeat ] 'values' define """)
 bootstrap.append(""" [ '*state*'  'value-handler' ] hide-functions """)
+bootstrap.append(""" [ "vv-vvf"  [ type? ] dip type? swap [ = ] dip swap ] 'types-match?' define """)
+bootstrap.append(""" [ "q-v"  @ ] 'first' define """)
+bootstrap.append(""" [ "q-q"  #1 over length? subslice ] 'rest' define """)
 bootstrap.append(""" "arrays" """)
 bootstrap.append(""" [ 'source'  'results'  'filter' ] values """)
 bootstrap.append(""" [ &source [ &results [ &filter [ invoke ] preserve ] preserve ] preserve ] 'localize' define """)
-bootstrap.append(""" [ "vp-"  :p dup length? store ] 'array-push' define """)
-bootstrap.append(""" [ "p-v"  :p [ dup get-last-index fetch ] sip dup length? #2 - swap set-last-index ] 'array-pop' define """)
+bootstrap.append(""" [ "vp-"    :p dup length? store ] 'array-push' define """)
+bootstrap.append(""" [ "p-v"    :p [ dup get-last-index fetch ] sip dup length? #2 - swap set-last-index ] 'array-pop' define """)
 bootstrap.append(""" [ "p-p"    [ request to results invoke<depth?> #0 max [ results array-push ] repeat results #1 over length? subslice :p ] localize ] 'array-from-quote<in-stack-order>' define """)
-bootstrap.append(""" [ "p-p" array-from-quote<in-stack-order> reverse ] 'array-from-quote' define """)
+bootstrap.append(""" [ "p-p"    array-from-quote<in-stack-order> reverse ] 'array-from-quote' define """)
 bootstrap.append(""" [ "pnp-n"  [ to filter over length? [ over array-pop filter invoke ] repeat nip ] localize ] 'array-reduce' define """)
 bootstrap.append(""" [ "pp-?"   [ to filter slice-duplicate dup length? [ [ array-pop filter invoke ] sip ] repeat drop ] localize ] 'for-each' define """)
-bootstrap.append(""" [ ] 'array<remap>' define """)
-bootstrap.append(""" [ type? STRING <> [ [ ] ] [ [ [ :p :s ] bi@ ] ] if 'array<remap>' define ] 'needs-remap?' define """)
-bootstrap.append(""" [ "pv-f"   swap needs-remap? [ swap dup set-buffer slice-last-index #0 swap [ over buffer-fetch array<remap> = or ] repeat ] preserve-buffer nip :f ] 'array-contains?' define """)
-bootstrap.append(""" [ 'array<remap>'  'needs-remap?' ] hide-functions """)
+bootstrap.append(""" [ '*VALUE'  '*FOUND' ] values """)
+bootstrap.append(""" [ "pv-f"  false to *FOUND to *VALUE dup length? 0 swap [ dup-pair fetch *VALUE types-match? [ = *FOUND or :f to *FOUND ] [ drop-pair ] if #1 + ] repeat drop-pair *FOUND ] 'contains?' define """)
+bootstrap.append(""" [ '*VALUE'  '*FOUND' ] hide-functions """)
 bootstrap.append(""" [ [ reverse ] dip request to results to filter [ to source ] [ length? ] bi results array-pop drop ] 'prepare' define """)
 bootstrap.append(""" [ "pp-p"   prepare [ source array-pop dup filter invoke [ results array-push ] [ drop ] if ] repeat results request [ copy ] sip ] 'array-filter' define """)
 bootstrap.append(""" [ "pp-p"   prepare [ source array-pop filter invoke results array-push ] repeat results request [ copy ] sip ] 'array-map' define """)

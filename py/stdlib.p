@@ -202,10 +202,11 @@
 [ "s-"     request [ swap define ] sip set-buffer ] 'named-buffer' define
 
 
+"new"
+[ "vv-p"   swap request [ 0 store ] sip [ 1 store ] sip ] 'cons' define
+
 "Curry Combinator"
-[ #304 :b buffer-store buffer-store #399 :b buffer-store ] 'compile-call' define
-[ "vp-p"  [ request set-buffer swap buffer-store compile-call &*CURRENT-BUFFER @ :p ] preserve-buffer ] 'curry' define
-'compile-call' hide-function
+[ "vp-p" :call cons ] 'curry' define
 
 "Values"
 '*state*' variable
