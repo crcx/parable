@@ -1015,7 +1015,7 @@ def request_slice():
         if p_map[i] == 0:
             p_map[i] = 1
             p_slices[i] = [0]
-            p_types[i] = [0]
+            p_types[i] = [TYPE_NUMBER]
             p_sizes[i] = 0
             return i
         else:

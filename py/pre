@@ -1017,7 +1017,7 @@ def request_slice():
         if p_map[i] == 0:
             p_map[i] = 1
             p_slices[i] = [0]
-            p_types[i] = [0]
+            p_types[i] = [TYPE_NUMBER]
             p_sizes[i] = 0
             return i
         else:
@@ -1325,7 +1325,8 @@ def compile(str, slice):
             offset = 0
         elif tokens[i] == "]":
             old = slice
-#            store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
+            if offset == 0:
+                store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
             offset = nest.pop()
             slice = nest.pop()
             store(old, slice, offset, TYPE_POINTER)
@@ -1336,7 +1337,8 @@ def compile(str, slice):
             else:
                 offset = compile_function_call(tokens[i], slice, offset)
         i += 1
-#        store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
+        if offset == 0:
+            store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
     return slice
 
 
@@ -1572,14 +1574,14 @@ bootstrap.append(""" [ "vv-vvf"  [ type? ] dip type? swap [ = ] dip swap ] 'type
 bootstrap.append(""" [ "q-v"  @ ] 'first' define """)
 bootstrap.append(""" [ "q-q"  #1 over length? subslice ] 'rest' define """)
 bootstrap.append(""" "arrays" """)
-bootstrap.append(""" [ 'source'  'results'  'filter' ] values """)
-bootstrap.append(""" [ &source [ &results [ &filter [ invoke ] preserve ] preserve ] preserve ] 'localize' define """)
+bootstrap.append(""" [ 'xt'  'offset'  'source'  'results'  'filter' ] values """)
+bootstrap.append(""" [ &xt [ &offset [ &source [ &results [ &filter [ invoke ] preserve ] preserve ] preserve ] preserve ] preserve ] 'localize' define """)
 bootstrap.append(""" [ "vp-"    :p dup length? store ] 'array-push' define """)
 bootstrap.append(""" [ "p-v"    :p [ dup get-last-index fetch ] sip dup length? #2 - swap set-last-index ] 'array-pop' define """)
 bootstrap.append(""" [ "p-p"    [ request to results invoke<depth?> #0 max [ results array-push ] repeat results #1 over length? subslice :p ] localize ] 'array-from-quote<in-stack-order>' define """)
 bootstrap.append(""" [ "p-p"    array-from-quote<in-stack-order> reverse ] 'array-from-quote' define """)
 bootstrap.append(""" [ "pnp-n"  [ to filter over length? [ over array-pop filter invoke ] repeat nip ] localize ] 'array-reduce' define """)
-bootstrap.append(""" [ "pp-?"   [ to filter slice-duplicate dup length? [ [ array-pop filter invoke ] sip ] repeat drop ] localize ] 'for-each' define """)
+bootstrap.append(""" [ "pp-?"   [ to xt to source 0 to offset source length? [ source offset fetch xt invoke offset 1 + to offset ] repeat ] localize ] 'for-each' define """)
 bootstrap.append(""" [ '*VALUE'  '*FOUND' ] values """)
 bootstrap.append(""" [ "pv-f"  false to *FOUND to *VALUE dup length? 0 swap [ dup-pair fetch *VALUE types-match? [ = *FOUND or :f to *FOUND ] [ drop-pair ] if #1 + ] repeat drop-pair *FOUND ] 'contains?' define """)
 bootstrap.append(""" [ '*VALUE'  '*FOUND' ] hide-functions """)
@@ -1587,7 +1589,7 @@ bootstrap.append(""" [ [ reverse ] dip request to results to filter [ to source 
 bootstrap.append(""" [ "pp-p"   prepare [ source array-pop dup filter invoke [ results array-push ] [ drop ] if ] repeat results request [ copy ] sip ] 'array-filter' define """)
 bootstrap.append(""" [ "pp-p"   prepare [ source array-pop filter invoke results array-push ] repeat results request [ copy ] sip ] 'array-map' define """)
 bootstrap.append(""" [ "pp-f"   dup-pair [ length? ] bi@ = [ dup length? true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define """)
-bootstrap.append(""" [ 'prepare'  'localize'  'filter'  'source'  'results' ] hide-functions """)
+bootstrap.append(""" [ 'prepare'  'localize'  'filter'  'source'  'results'  'xt'  'offset' ] hide-functions """)
 bootstrap.append(""" [ 'source' 'v' 'i' 'idx' ] values """)
 bootstrap.append(""" [ type? STRING = [ [ :p :s ] dip ] [ :n ] if ] 'resolve-types' define """)
 bootstrap.append(""" [ "vp-n"  to source to v #0 to i #-1 to idx source length? [ source i fetch v resolve-types = [ i to idx ] if-true i #1 + to i ] repeat idx ] 'array-index-of' define """)
