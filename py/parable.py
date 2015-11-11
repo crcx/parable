@@ -44,6 +44,7 @@ BC_TYPE_S = 111
 BC_TYPE_C = 112
 BC_TYPE_F = 113
 BC_TYPE_FLAG = 114
+BC_TYPE_CALL = 115
 BC_GET_TYPE = 120
 BC_ADD = 200
 BC_SUBTRACT = 201
@@ -226,6 +227,11 @@ def interpret(slice, more=None):
             elif opcode == BC_TYPE_FLAG:
                 if check_depth(1):
                     stack_change_type(TYPE_FLAG)
+                else:
+                    offset = size
+            elif opcode == BC_TYPE_CALL:
+                if check_depth(1):
+                    stack_change_type(TYPE_FUNCTION_CALL)
                 else:
                     offset = size
             elif opcode == BC_GET_TYPE:
@@ -937,6 +943,10 @@ def stack_change_type(type):
         else:
             s = stack_pop()
             stack_push(s, TYPE_FLAG)
+    elif type == TYPE_FUNCTION_CALL:
+        if stack_type() == TYPE_NUMBER or stack_type() == TYPE_POINTER:
+            a = stack_pop()
+            stack_push(a, TYPE_FUNCTION_CALL)
     else:
         return
 

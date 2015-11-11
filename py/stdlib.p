@@ -4,6 +4,7 @@
 [ "v-c"    `112 ] ':c' define
 [ "v-p"    `113 ] ':p' define
 [ "v-f"    `114 ] ':f' define
+[ "v-f"    `115 ] ':call' define
 [ "v-vn"   `120 ] 'type?' define
 [ "nn-n"   `200 ] '+' define
 [ "nn-n"   `201 ] '-' define
