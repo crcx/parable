@@ -152,7 +152,7 @@ def display_stack():
             else:
                 write("\tmalformed flag", COLOR_STACK_FLAG)
         else:
-            write("\tunmatched type on stack!", COLOR_ERROR)
+            write("\tUNKNOWN\t" + str(stack[i]) + "\t" + str(types[i]), COLOR_ERROR)
         sys.stdout.write("\n")
         i += 1
         l += 1
