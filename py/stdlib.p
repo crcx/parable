@@ -73,11 +73,14 @@
 [ "n-n"    `1005 ] 'atan' define
 [ "n-n"    `1006 ] 'atan2' define
 
-[ #100 ] 'NUMBER' define
-[ #200 ] 'STRING' define
-[ #300 ] 'CHARACTER' define
-[ #400 ] 'POINTER' define
-[ #500 ] 'FLAG' define
+[ 100 ] 'NUMBER' define
+[ 200 ] 'STRING' define
+[ 300 ] 'CHARACTER' define
+[ 400 ] 'POINTER' define
+[ 500 ] 'FLAG' define
+[ 600 ] 'BYTECODE' define
+[ 700 ] 'COMMENT' define
+[ 800 ] 'FUNCTION-CALL' define
 
 
 "Stack Flow"
