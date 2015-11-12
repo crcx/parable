@@ -79,24 +79,36 @@
 [ #400 ] 'POINTER' define
 [ #500 ] 'FLAG' define
 
-"simple, forth-style variables"
+
+"Stack Flow"
+[ "vV-vVvV"  over over ] 'dup-pair' define
+[ "vv-"      drop drop ] 'drop-pair' define
+
+
+"Simple variables are just named slices, with functions to access the first element. They're useful for holding single values, but don't track data types."
 [ "s-"   request swap define ] 'variable' define
 [ "p-v"  #0 fetch ] '@' define
 [ "vp-"  #0 store ] '!' define
+[ "vs-"  request [ swap define ] sip #0 store ] 'variable!' define
+[ "p-"   #0 swap ! ] 'off' define
+[ "p-"   #-1 swap ! ] 'on' define
+[ "p-"   [ @ #1 + ] sip ! ] 'increment' define
+[ "p-"   [ @ #1 - ] sip ! ] 'decrement' define
+[ "p-"   request swap copy ] 'zero-out' define
+[ "pp-"  swap request dup-pair copy swap [ [ invoke ] dip ] dip copy ] 'preserve' define
 
 
-
-"returns the number of cells in a slice"
+"Returns the number of cells in a slice"
 [ "p-n"  get-last-index #1 + ] 'length?' define
 
 
-"number functions"
+"Number functions"
 [ "n-n"  over over < [ nip ] [ drop ] if ] 'max' define
 [ "n-n"  over over > [ nip ] [ drop ] if ] 'min' define
 [ "n-n"  dup #-1 * max ] 'abs' define
 
 
-"utility functions"
+"Utility functions"
 [ "q-...n"  depth [ invoke ] dip depth swap - ] 'invoke<depth?>' define
 
 
@@ -104,17 +116,16 @@
 "We consider the bi/tri variants to consist of one of three types."
 "Cleave combinators (bi, tri) apply multiple quotations to a single value (or set of values)."
 
+
 "Spread combinators (bi*, tri*) apply multiple quotations to multiple values."
 [ "vvpp-?"   [ dip ] dip invoke ] 'bi*' define
 [ "vvvppp-?" [ [ swap [ dip ] dip ] dip dip ] dip invoke ] 'tri*' define
+
 
 "Apply combinators (bi@, tri@) apply a single quotation to multiple values."
 [ "vvp-?"    dup bi* ] 'bi@' define
 [ "vvvp-?"   dup dup tri* ] 'tri@' define
 
-"Stack Flow"
-[ "vV-vVvV"  over over ] 'dup-pair' define
-[ "vv-"      drop drop ] 'drop-pair' define
 
 "Expand the basic conditionals into a more useful set."
 [ "-f"   #-1 :f ] 'true' define
@@ -135,15 +146,7 @@
 [ "pp-"  [ type? POINTER = ] dip if-true ] 'if-pointer' define
 [ "fp-"  [ type? FLAG = ] dip if-true ] 'if-flag' define
 [ "nnn-f"  [ [ :n ] bi@ ] dip :n dup-pair > [ swap ] if-true [ over ] dip <= [ >= ] dip and :f ] 'between?' define
-
-"Simple variables are just named slices, with functions to access the first element. They're useful for holding single values, but don't track data types."
-[ "vs-"  request [ swap define ] sip #0 store ] 'variable!' define
-[ "p-"   #0 swap ! ] 'off' define
-[ "p-"   #-1 swap ! ] 'on' define
-[ "p-"   [ @ #1 + ] sip ! ] 'increment' define
-[ "p-"   [ @ #1 - ] sip ! ] 'decrement' define
-[ "p-"   request swap copy ] 'zero-out' define
-[ "pp-"  swap request dup-pair copy swap [ [ invoke ] dip ] dip copy ] 'preserve' define
+[ "vv-vvf"  [ type? ] dip type? swap [ = ] dip swap ] 'types-match?' define
 
 
 "numeric ranges"
@@ -160,6 +163,7 @@
 [ "p-"   invoke<depth?> [ hide-function ] repeat ] 'hide-functions' define
 [ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap define ] [ drop ] if ] 'rename-function' define
 [ "p-"   invoke<depth?> [ variable ] repeat ] 'variables' define
+
 
 "String and Character"
 "Note that this is only supporting the basic ASCII character set presently."
@@ -202,11 +206,10 @@
 [ "s-"     request [ swap define ] sip set-buffer ] 'named-buffer' define
 
 
-"new"
-[ "vv-p"   swap request [ 0 store ] sip [ 1 store ] sip ] 'cons' define
+"Programatic Creation of Quotes"
+[ "vv-p"  swap request [ 0 store ] sip [ 1 store ] sip ] 'cons' define
+[ "vp-p"  :call cons ] 'curry' define
 
-"Curry Combinator"
-[ "vp-p" :call cons ] 'curry' define
 
 "Values"
 '*state*' variable
@@ -217,12 +220,11 @@
 [ "p-" invoke<depth?> [ value ] repeat ] 'values' define
 [ '*state*'  'value-handler' ] hide-functions
 
-[ "vv-vvf"  [ type? ] dip type? swap [ = ] dip swap ] 'types-match?' define
+
+
+"Arrays and Operations on Quotations"
 [ "q-v"  @ ] 'first' define
 [ "q-q"  #1 over length? subslice ] 'rest' define
-
-
-"new array functions"
 
 [ '*FOUND'  '*VALUE'  '*XT'  '*SOURCE'  '*TARGET'  '*OFFSET' ] values
 [ "q-"   &*FOUND [ &*VALUE [ &*XT [ &*SOURCE [ &*TARGET [ &*OFFSET [ invoke ] preserve ] preserve ] preserve ] preserve ] preserve ] preserve ] 'localize' define
@@ -230,7 +232,6 @@
 [ "vp-"    :p dup length? store ] 'array-push' define
 
 [ "p-v"    :p [ dup get-last-index fetch ] sip dup length? #2 - swap set-last-index ] 'array-pop' define
-
 
 [ "pnp-n"  [ to *XT over length? [ over array-pop *XT invoke ] repeat nip ] localize ] 'reduce' define
 
@@ -251,17 +252,18 @@
 [ "p-p"    array-from-quote<in-stack-order> reverse ] 'array-from-quote' define
 'results' hide-function
 
-
 [ 'source' 'v' 'i' 'idx' ] values
 [ type? STRING = [ [ :p :s ] dip ] [ :n ] if ] 'resolve-types' define
 [ "vp-n"  to source to v #0 to i #-1 to idx source length? [ source i fetch v resolve-types = [ i to idx ] if-true i #1 + to i ] repeat idx ] 'array-index-of' define
 [ 'source'  'v'  'i'  'idx'  'resolve-types' ] hide-functions
 
+
 "Text Output Buffer"
 '*TOB' variable
-[ &*TOB array-push ] '.' define
+[ "v-"   &*TOB array-push ] '.' define
 [ "-..." &*TOB get-last-index [ &*TOB array-pop ] repeat ] 'show-tob' define
-[ "-" #0 &*TOB set-last-index ] 'clear-tob' define
+[ "-"    #0 &*TOB set-last-index ] 'clear-tob' define
+
 
 "Hashing functions"
 [ "s-n" #5381 swap [ :n [ swap ] dip over #-5 shift + + swap ] for-each ] 'hash:djb2' define
