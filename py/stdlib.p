@@ -217,27 +217,38 @@
 [ "p-" invoke<depth?> [ value ] repeat ] 'values' define
 [ '*state*'  'value-handler' ] hide-functions
 
-
 [ "vv-vvf"  [ type? ] dip type? swap [ = ] dip swap ] 'types-match?' define
 [ "q-v"  @ ] 'first' define
 [ "q-q"  #1 over length? subslice ] 'rest' define
 
 
-"arrays"
-[ 'xt'  'offset'  'source'  'results'  'filter' ] values
+"new array functions"
 
-[ &xt [ &offset [ &source [ &results [ &filter [ invoke ] preserve ] preserve ] preserve ] preserve ] preserve ] 'localize' define
+[ '*FOUND'  '*VALUE'  '*XT'  '*SOURCE'  '*TARGET'  '*OFFSET' ] values
+[ "q-"   &*FOUND [ &*VALUE [ &*XT [ &*SOURCE [ &*TARGET [ &*OFFSET [ invoke ] preserve ] preserve ] preserve ] preserve ] preserve ] preserve ] 'localize' define
 
 [ "vp-"    :p dup length? store ] 'array-push' define
+
 [ "p-v"    :p [ dup get-last-index fetch ] sip dup length? #2 - swap set-last-index ] 'array-pop' define
+
+
+[ "pnp-n"  [ to *XT over length? [ over array-pop *XT invoke ] repeat nip ] localize ] 'reduce' define
+
+[ "pp-?"   [ to *XT to *SOURCE 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke *OFFSET 1 + to *OFFSET ] repeat ] localize ] 'for-each' define
+
+[ "pv-f"  false to *FOUND to *VALUE dup length? 0 swap [ dup-pair fetch *VALUE types-match? [ = *FOUND or :f to *FOUND ] [ drop-pair ] if #1 + ] repeat drop-pair *FOUND ] 'contains?' define
+
+[ "pq-p" to *XT to *SOURCE request to *TARGET *TARGET array-pop drop 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke [ *SOURCE *OFFSET fetch *TARGET array-push ] if-true *OFFSET 1 + to *OFFSET ] repeat *TARGET ] 'filter' define
+
+[ '*FOUND'  '*VALUE'  '*XT'  '*SOURCE'  '*TARGET'  '*OFFSET'  'localize' ] hide-functions
+
+
+
+
+"old array functions"
+[ 'xt'  'offset'  'source'  'results'  'filter' ] values
 [ "p-p"    [ request to results invoke<depth?> #0 max [ results array-push ] repeat results #1 over length? subslice :p ] localize ] 'array-from-quote<in-stack-order>' define
 [ "p-p"    array-from-quote<in-stack-order> reverse ] 'array-from-quote' define
-[ "pnp-n"  [ to filter over length? [ over array-pop filter invoke ] repeat nip ] localize ] 'array-reduce' define
-[ "pp-?"   [ to xt to source 0 to offset source length? [ source offset fetch xt invoke offset 1 + to offset ] repeat ] localize ] 'for-each' define
-
-[ '*VALUE'  '*FOUND' ] values
-[ "pv-f"  false to *FOUND to *VALUE dup length? 0 swap [ dup-pair fetch *VALUE types-match? [ = *FOUND or :f to *FOUND ] [ drop-pair ] if #1 + ] repeat drop-pair *FOUND ] 'contains?' define
-[ '*VALUE'  '*FOUND' ] hide-functions
 
 [ [ reverse ] dip request to results to filter [ to source ] [ length? ] bi results array-pop drop ] 'prepare' define
 
@@ -245,12 +256,9 @@
 
 [ "pp-f"   dup-pair [ length? ] bi@ = [ dup length? true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define
 
-[ 'prepare'  'localize'  'filter'  'source'  'results'  'xt'  'offset' ] hide-functions
+[ 'prepare'  'filter'  'source'  'results'  'xt'  'offset' ] hide-functions
 
-[ '*XT'  '*SOURCE'  '*TARGET'  '*OFFSET' ] values
-[ "q-"   &*XT [ &*SOURCE [ &*TARGET [ &*OFFSET [ invoke ] preserve ] preserve ] preserve ] preserve ] 'localize' define
-[ "pq-p" to *XT to *SOURCE request to *TARGET *TARGET array-pop drop 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke [ *SOURCE *OFFSET fetch *TARGET array-push ] if-true *OFFSET 1 + to *OFFSET ] repeat *TARGET ] 'filter' define
-[ '*XT'  '*SOURCE'  '*TARGET'  '*OFFSET'  'localize' ] hide-functions
+
 
 [ 'source' 'v' 'i' 'idx' ] values
 [ type? STRING = [ [ :p :s ] dip ] [ :n ] if ] 'resolve-types' define
