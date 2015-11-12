@@ -246,18 +246,10 @@
 
 
 "old array functions"
-[ 'xt'  'offset'  'source'  'results'  'filter' ] values
-[ "p-p"    [ request to results invoke<depth?> #0 max [ results array-push ] repeat results #1 over length? subslice :p ] localize ] 'array-from-quote<in-stack-order>' define
+'results' value
+[ "p-p"    request to results invoke<depth?> #0 max [ results array-push ] repeat results #1 over length? subslice :p ] 'array-from-quote<in-stack-order>' define
 [ "p-p"    array-from-quote<in-stack-order> reverse ] 'array-from-quote' define
-
-[ [ reverse ] dip request to results to filter [ to source ] [ length? ] bi results array-pop drop ] 'prepare' define
-
-[ "pp-p"   prepare [ source array-pop filter invoke results array-push ] repeat results request [ copy ] sip ] 'array-map' define
-
-[ "pp-f"   dup-pair [ length? ] bi@ = [ dup length? true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define
-
-[ 'prepare'  'filter'  'source'  'results'  'xt'  'offset' ] hide-functions
-
+'results' hide-function
 
 
 [ 'source' 'v' 'i' 'idx' ] values
