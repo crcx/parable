@@ -90,25 +90,25 @@
 
 "Simple variables are just named slices, with functions to access the first element. They're useful for holding single values, but don't track data types."
 [ "s-"   request swap define ] 'variable' define
-[ "p-v"  #0 fetch ] '@' define
-[ "vp-"  #0 store ] '!' define
-[ "vs-"  request [ swap define ] sip #0 store ] 'variable!' define
-[ "p-"   #0 swap ! ] 'off' define
-[ "p-"   #-1 swap ! ] 'on' define
-[ "p-"   [ @ #1 + ] sip ! ] 'increment' define
-[ "p-"   [ @ #1 - ] sip ! ] 'decrement' define
+[ "p-v"  0 fetch ] '@' define
+[ "vp-"  0 store ] '!' define
+[ "vs-"  request [ swap define ] sip 0 store ] 'variable!' define
+[ "p-"   0 swap ! ] 'off' define
+[ "p-"   -1 swap ! ] 'on' define
+[ "p-"   [ @ 1 + ] sip ! ] 'increment' define
+[ "p-"   [ @ 1 - ] sip ! ] 'decrement' define
 [ "p-"   request swap copy ] 'zero-out' define
 [ "pp-"  swap request dup-pair copy swap [ [ invoke ] dip ] dip copy ] 'preserve' define
 
 
 "Returns the number of cells in a slice"
-[ "p-n"  get-last-index #1 + ] 'length?' define
+[ "p-n"  get-last-index 1 + ] 'length?' define
 
 
 "Number functions"
 [ "n-n"  over over < [ nip ] [ drop ] if ] 'max' define
 [ "n-n"  over over > [ nip ] [ drop ] if ] 'min' define
-[ "n-n"  dup #-1 * max ] 'abs' define
+[ "n-n"  dup -1 * max ] 'abs' define
 
 
 "Utility functions"
@@ -131,18 +131,18 @@
 
 
 "Expand the basic conditionals into a more useful set."
-[ "-f"   #-1 :f ] 'true' define
-[ "-f"   #0  :f ] 'false' define
-[ "f-f"  :f :n #-1 xor :f ] 'not' define
+[ "-f"   -1 :f ] 'true' define
+[ "-f"   0  :f ] 'false' define
+[ "f-f"  :f :n -1 xor :f ] 'not' define
 [ "fp-"  [ ] if ] 'if-true' define
 [ "fp-"  [ ] swap if ] 'if-false' define
-[ "v-f"  #0 = ] 'zero?' define
+[ "v-f"  0 = ] 'zero?' define
 [ "v-f"  :f :n zero? not ] 'true?' define
 [ "v-f"  :f :n zero? ] 'false?' define
-[ "n-f"  #2 rem zero? ] 'even?' define
-[ "n-f"  #2 rem zero? not ] 'odd?' define
-[ "n-f"  #0 < ] 'negative?' define
-[ "n-f"  #0 >= ] 'positive?' define
+[ "n-f"  2 rem zero? ] 'even?' define
+[ "n-f"  2 rem zero? not ] 'odd?' define
+[ "n-f"  0 < ] 'negative?' define
+[ "n-f"  0 >= ] 'positive?' define
 [ "cp-"  [ type? CHARACTER = ] dip if-true ] 'if-character' define
 [ "sp-"  [ type? STRING = ] dip if-true ] 'if-string' define
 [ "np-"  [ type? NUMBER = ] dip if-true ] 'if-number' define
@@ -153,13 +153,13 @@
 
 
 "numeric ranges"
-[ "nn-..."  dup-pair < [ [ [ dup #1 + ] dip dup-pair = ] while-false ] [ [ [ dup #1 - ] dip dup-pair = ] while-false ] if drop ] 'expand-range' define
-[ "...n-n"   #1 - [ + ] repeat ] 'sum-range' define
+[ "nn-..."  dup-pair < [ [ [ dup 1 + ] dip dup-pair = ] while-false ] [ [ [ dup 1 - ] dip dup-pair = ] while-false ] if drop ] 'expand-range' define
+[ "...n-n"   1 - [ + ] repeat ] 'sum-range' define
 
 
 "Misc"
 [ "p-pn"  dup get-last-index ] 'slice-last-index' define
-[ "p-pn"  slice-last-index #1 + ] 'slice-length' define
+[ "p-pn"  slice-last-index 1 + ] 'slice-length' define
 [ "np-"   [ get-last-index + ] sip set-last-index ] 'adjust-slice-length' define
 [ "?n-"   [ drop ] repeat ] 'drop-multiple' define
 [ "p-p"   request [ copy ] sip ] 'slice-duplicate' define
@@ -179,16 +179,16 @@
 [ "v-f"  to-lowercase 'aeiou'                                string-contains? ] 'vowel?' define
 [ "v-f"  dup to-lowercase = ] 'lowercase?' define
 [ "v-f"  dup to-uppercase = ] 'uppercase?' define
-[ "p-s"  invoke<depth?> #1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define
+[ "p-s"  invoke<depth?> 1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define
 
 "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
-[ "s-s"  :s #0 [ dup-pair fetch #32 = [ #1 + ] dip ] while-true #1 - [ slice-last-index ] dip swap subslice :s ] 'trim-left' define
+[ "s-s"  :s #0 [ dup-pair fetch 32 = [ 1 + ] dip ] while-true 1 - [ slice-last-index ] dip swap subslice :s ] 'trim-left' define
 [ ] 'trim-right' define
-[ "s-s"  :s slice-last-index dup-pair #1 - fetch nip #32 = [ slice-last-index #1 - #0 swap subslice :s trim-right ] if-true ] 'trim-right' define
+[ "s-s"  :s slice-last-index dup-pair 1 - fetch nip 32 = [ slice-last-index 1 - 0 swap subslice :s trim-right ] if-true ] 'trim-right' define
 [ "s-s"  trim-left trim-right ] 'trim' define
 
 "Helpful Math"
-[ "n-"    #1 swap [ [ * ] sip #1 - dup #1 <> ] while-true drop ] 'factorial' define
+[ "n-"    1 swap [ [ * ] sip 1 - dup 1 <> ] while-true drop ] 'factorial' define
 
 "Slice as a linear buffer"
 [ '*CURRENT-BUFFER'  '*BUFFER-OFFSET' ] variables
@@ -218,7 +218,7 @@
 '*state*' variable
 [ "-" &*state* on ] 'to' define
 [ &*state* @ :f [ ! &*state* off ] [ @ ] if ] 'value-handler' define
-[ "s-" request "#2 over set-last-index" [ value-handler ] curry swap define ] 'value' define
+[ "s-" request [ value-handler ] curry swap define ] 'value' define
 [ "ns-" [ value ] sip to lookup-function invoke ] 'value!' define
 [ "p-" invoke<depth?> [ value ] repeat ] 'values' define
 [ '*state*'  'value-handler' ] hide-functions
@@ -227,20 +227,20 @@
 
 "Arrays and Operations on Quotations"
 [ "q-v"  @ ] 'first' define
-[ "q-q"  #1 over length? subslice ] 'rest' define
+[ "q-q"  1 over length? subslice ] 'rest' define
 
 [ '*FOUND'  '*VALUE'  '*XT'  '*SOURCE'  '*TARGET'  '*OFFSET' ] values
 [ "q-"   &*FOUND [ &*VALUE [ &*XT [ &*SOURCE [ &*TARGET [ &*OFFSET [ invoke ] preserve ] preserve ] preserve ] preserve ] preserve ] preserve ] 'localize' define
 
 [ "vp-"    :p dup length? store ] 'array-push' define
 
-[ "p-v"    :p [ dup get-last-index fetch ] sip dup length? #2 - swap set-last-index ] 'array-pop' define
+[ "p-v"    :p [ dup get-last-index fetch ] sip dup length? 2 - swap set-last-index ] 'array-pop' define
 
 [ "pnp-n"  [ to *XT over length? [ over array-pop *XT invoke ] repeat nip ] localize ] 'reduce' define
 
 [ "pp-?"   [ to *XT to *SOURCE 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke *OFFSET 1 + to *OFFSET ] repeat ] localize ] 'for-each' define
 
-[ "pv-f"  false to *FOUND to *VALUE dup length? 0 swap [ dup-pair fetch *VALUE types-match? [ = *FOUND or :f to *FOUND ] [ drop-pair ] if #1 + ] repeat drop-pair *FOUND ] 'contains?' define
+[ "pv-f"  false to *FOUND to *VALUE dup length? 0 swap [ dup-pair fetch *VALUE types-match? [ = *FOUND or :f to *FOUND ] [ drop-pair ] if 1 + ] repeat drop-pair *FOUND ] 'contains?' define
 
 [ "pq-p" to *XT to *SOURCE request to *TARGET *TARGET array-pop drop 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke [ *SOURCE *OFFSET fetch *TARGET array-push ] if-true *OFFSET 1 + to *OFFSET ] repeat *TARGET ] 'filter' define
 
@@ -251,13 +251,13 @@
 
 "old array functions"
 'results' value
-[ "p-p"    request to results invoke<depth?> #0 max [ results array-push ] repeat results #1 over length? subslice :p ] 'array-from-quote<in-stack-order>' define
+[ "p-p"    request to results invoke<depth?> 0 max [ results array-push ] repeat results 1 over length? subslice :p ] 'array-from-quote<in-stack-order>' define
 [ "p-p"    array-from-quote<in-stack-order> reverse ] 'array-from-quote' define
 'results' hide-function
 
 [ 'source' 'v' 'i' 'idx' ] values
 [ type? STRING = [ [ :p :s ] dip ] [ :n ] if ] 'resolve-types' define
-[ "vp-n"  to source to v #0 to i #-1 to idx source length? [ source i fetch v resolve-types = [ i to idx ] if-true i #1 + to i ] repeat idx ] 'array-index-of' define
+[ "vp-n"  to source to v 0 to i -1 to idx source length? [ source i fetch v resolve-types = [ i to idx ] if-true i 1 + to i ] repeat idx ] 'array-index-of' define
 [ 'source'  'v'  'i'  'idx'  'resolve-types' ] hide-functions
 
 
@@ -265,16 +265,16 @@
 '*TOB' variable
 [ "v-"   &*TOB array-push ] '.' define
 [ "-..." &*TOB get-last-index [ &*TOB array-pop ] repeat ] 'show-tob' define
-[ "-"    #0 &*TOB set-last-index ] 'clear-tob' define
+[ "-"    0 &*TOB set-last-index ] 'clear-tob' define
 
 
 "Hashing functions"
-[ "s-n" #5381 swap [ :n [ swap ] dip over #-5 shift + + swap ] for-each ] 'hash:djb2' define
-[ :n over #-6 shift + over #-16 shift + swap - ] 'hash:sdbm<n>' define
-[ "s-n" #0 swap [ :c [ swap ] dip hash:sdbm<n> swap ] for-each ] 'hash:sdbm' define
+[ "s-n" 5381 swap [ :n [ swap ] dip over -5 shift + + swap ] for-each ] 'hash:djb2' define
+[ :n over -6 shift + over -16 shift + swap - ] 'hash:sdbm<n>' define
+[ "s-n" 0 swap [ :c [ swap ] dip hash:sdbm<n> swap ] for-each ] 'hash:sdbm' define
 'hash-sdbm<n>' hide-function
-[ "s-n" #0 swap [ :n [ swap ] dip + #255 and swap ] for-each #255 xor #1 + #255 and ] 'hash:lrc' define
-[ "s-n" #0 swap [ :n [ swap ] dip xor swap ] for-each ] 'hash:xor' define
+[ "s-n" 0 swap [ :n [ swap ] dip + 255 and swap ] for-each 255 xor 1 + 255 and ] 'hash:lrc' define
+[ "s-n" 0 swap [ :n [ swap ] dip xor swap ] for-each ] 'hash:xor' define
 [ "s-b" hash:djb2 ] 'chosen-hash' define
-[ #389 ] 'hash-prime' define
+[ 389 ] 'hash-prime' define
 [ "s-n" chosen-hash hash-prime rem ] 'hash' define
