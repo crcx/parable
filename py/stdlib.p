@@ -241,13 +241,16 @@
 
 [ [ reverse ] dip request to results to filter [ to source ] [ length? ] bi results array-pop drop ] 'prepare' define
 
-[ "pp-p"   prepare [ source array-pop dup filter invoke [ results array-push ] [ drop ] if ] repeat results request [ copy ] sip ] 'array-filter' define
-
 [ "pp-p"   prepare [ source array-pop filter invoke results array-push ] repeat results request [ copy ] sip ] 'array-map' define
 
 [ "pp-f"   dup-pair [ length? ] bi@ = [ dup length? true swap [ [ dup-pair [ array-pop ] bi@ = ] dip and ] repeat [ drop-pair ] dip :f ] [ drop-pair false ] if ] 'array-compare' define
 
 [ 'prepare'  'localize'  'filter'  'source'  'results'  'xt'  'offset' ] hide-functions
+
+[ '*XT'  '*SOURCE'  '*TARGET'  '*OFFSET' ] values
+[ "q-"   &*XT [ &*SOURCE [ &*TARGET [ &*OFFSET [ invoke ] preserve ] preserve ] preserve ] preserve ] 'localize' define
+[ "pq-p" to *XT to *SOURCE request to *TARGET *TARGET array-pop drop 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke [ *SOURCE *OFFSET fetch *TARGET array-push ] if-true *OFFSET 1 + to *OFFSET ] repeat *TARGET ] 'filter' define
+[ '*XT'  '*SOURCE'  '*TARGET'  '*OFFSET'  'localize' ] hide-functions
 
 [ 'source' 'v' 'i' 'idx' ] values
 [ type? STRING = [ [ :p :s ] dip ] [ :n ] if ] 'resolve-types' define
