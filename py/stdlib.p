@@ -1,3 +1,4 @@
+"Name the byte codes"
 [ "v-b"    `109 ] ':b' define
 [ "v-n"    `110 ] ':n' define
 [ "v-s"    `111 ] ':s' define
@@ -73,6 +74,8 @@
 [ "n-n"    `1005 ] 'atan' define
 [ "n-n"    `1006 ] 'atan2' define
 
+
+"Symbolic names for data types"
 [ 100 ] 'NUMBER' define
 [ 200 ] 'STRING' define
 [ 300 ] 'CHARACTER' define
@@ -86,6 +89,15 @@
 "Stack Flow"
 [ "vV-vVvV"  over over ] 'dup-pair' define
 [ "vv-"      drop drop ] 'drop-pair' define
+[ "?n-"      [ drop ] repeat ] 'drop-multiple' define
+
+
+"Slice Functions"
+[ "p-pn"  dup get-last-index ] 'slice-last-index' define
+[ "p-pn"  slice-last-index 1 + ] 'slice-length' define
+[ "np-"   [ get-last-index + ] sip set-last-index ] 'adjust-slice-length' define
+[ "p-p"   request [ copy ] sip ] 'slice-duplicate' define
+[ "p-n"   get-last-index 1 + ] 'length?' define
 
 
 "Simple variables are just named slices, with functions to access the first element. They're useful for holding single values, but don't track data types."
@@ -99,10 +111,6 @@
 [ "p-"   [ @ 1 - ] sip ! ] 'decrement' define
 [ "p-"   request swap copy ] 'zero-out' define
 [ "pp-"  swap request dup-pair copy swap [ [ invoke ] dip ] dip copy ] 'preserve' define
-
-
-"Returns the number of cells in a slice"
-[ "p-n"  get-last-index 1 + ] 'length?' define
 
 
 "Number functions"
@@ -158,11 +166,6 @@
 
 
 "Misc"
-[ "p-pn"  dup get-last-index ] 'slice-last-index' define
-[ "p-pn"  slice-last-index 1 + ] 'slice-length' define
-[ "np-"   [ get-last-index + ] sip set-last-index ] 'adjust-slice-length' define
-[ "?n-"   [ drop ] repeat ] 'drop-multiple' define
-[ "p-p"   request [ copy ] sip ] 'slice-duplicate' define
 [ "p-"   invoke<depth?> [ hide-function ] repeat ] 'hide-functions' define
 [ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap define ] [ drop ] if ] 'rename-function' define
 [ "p-"   invoke<depth?> [ variable ] repeat ] 'variables' define
