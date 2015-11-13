@@ -90,6 +90,7 @@
 [ "vV-vVvV"  over over ] 'dup-pair' define
 [ "vv-"      drop drop ] 'drop-pair' define
 [ "?n-"      [ drop ] repeat ] 'drop-multiple' define
+[ "q-...n"  depth [ invoke ] dip depth swap - ] 'invoke<depth?>' define
 
 
 "Slice Functions"
@@ -117,10 +118,6 @@
 [ "n-n"  over over < [ nip ] [ drop ] if ] 'max' define
 [ "n-n"  over over > [ nip ] [ drop ] if ] 'min' define
 [ "n-n"  dup -1 * max ] 'abs' define
-
-
-"Utility functions"
-[ "q-...n"  depth [ invoke ] dip depth swap - ] 'invoke<depth?>' define
 
 
 "The basic bi/tri combinators provided as part of the primitives allow application of multiple quotes to a single data element. Here we add new forms that are very useful."
@@ -162,7 +159,7 @@
 
 "numeric ranges"
 [ "nn-..."  dup-pair < [ [ [ dup 1 + ] dip dup-pair = ] while-false ] [ [ [ dup 1 - ] dip dup-pair = ] while-false ] if drop ] 'expand-range' define
-[ "...n-n"   1 - [ + ] repeat ] 'sum-range' define
+[ "...n-n"  1 - [ + ] repeat ] 'sum-range' define
 
 
 "Misc"
@@ -190,8 +187,10 @@
 [ "s-s"  :s slice-last-index dup-pair 1 - fetch nip 32 = [ slice-last-index 1 - 0 swap subslice :s trim-right ] if-true ] 'trim-right' define
 [ "s-s"  trim-left trim-right ] 'trim' define
 
+
 "Helpful Math"
 [ "n-"    1 swap [ [ * ] sip 1 - dup 1 <> ] while-true drop ] 'factorial' define
+
 
 "Slice as a linear buffer"
 [ '*CURRENT-BUFFER'  '*BUFFER-OFFSET' ] variables
@@ -227,7 +226,6 @@
 [ '*state*'  'value-handler' ] hide-functions
 
 
-
 "Arrays and Operations on Quotations"
 [ "q-v"  @ ] 'first' define
 [ "q-q"  1 over length? subslice ] 'rest' define
@@ -236,28 +234,17 @@
 [ "q-"   &*FOUND [ &*VALUE [ &*XT [ &*SOURCE [ &*TARGET [ &*OFFSET [ invoke ] preserve ] preserve ] preserve ] preserve ] preserve ] preserve ] 'localize' define
 
 [ "vp-"    :p dup length? store ] 'array-push' define
-
 [ "p-v"    :p [ dup get-last-index fetch ] sip dup length? 2 - swap set-last-index ] 'array-pop' define
-
 [ "pnp-n"  [ to *XT over length? [ over array-pop *XT invoke ] repeat nip ] localize ] 'reduce' define
-
 [ "pp-?"   [ to *XT to *SOURCE 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke *OFFSET 1 + to *OFFSET ] repeat ] localize ] 'for-each' define
-
-[ "pv-f"  false to *FOUND to *VALUE dup length? 0 swap [ dup-pair fetch *VALUE types-match? [ = *FOUND or :f to *FOUND ] [ drop-pair ] if 1 + ] repeat drop-pair *FOUND ] 'contains?' define
-
-[ "pq-p" to *XT to *SOURCE request to *TARGET *TARGET array-pop drop 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke [ *SOURCE *OFFSET fetch *TARGET array-push ] if-true *OFFSET 1 + to *OFFSET ] repeat *TARGET ] 'filter' define
+[ "pv-f"   false to *FOUND to *VALUE dup length? 0 swap [ dup-pair fetch *VALUE types-match? [ = *FOUND or :f to *FOUND ] [ drop-pair ] if 1 + ] repeat drop-pair *FOUND ] 'contains?' define
+[ "pq-p"   to *XT to *SOURCE request to *TARGET *TARGET array-pop drop 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke [ *SOURCE *OFFSET fetch *TARGET array-push ] if-true *OFFSET 1 + to *OFFSET ] repeat *TARGET ] 'filter' define
+[ "p-p"    [ request to *TARGET invoke<depth?> 0 max [ *TARGET array-push ] repeat *TARGET 1 over length? subslice :p ] localize ] 'capture-results' define
 
 [ '*FOUND'  '*VALUE'  '*XT'  '*SOURCE'  '*TARGET'  '*OFFSET'  'localize' ] hide-functions
 
 
-
-
 "old array functions"
-'results' value
-[ "p-p"    request to results invoke<depth?> 0 max [ results array-push ] repeat results 1 over length? subslice :p ] 'array-from-quote<in-stack-order>' define
-[ "p-p"    array-from-quote<in-stack-order> reverse ] 'array-from-quote' define
-'results' hide-function
-
 [ 'source' 'v' 'i' 'idx' ] values
 [ type? STRING = [ [ :p :s ] dip ] [ :n ] if ] 'resolve-types' define
 [ "vp-n"  to source to v 0 to i -1 to idx source length? [ source i fetch v resolve-types = [ i to idx ] if-true i 1 + to i ] repeat idx ] 'array-index-of' define
