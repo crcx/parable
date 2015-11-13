@@ -2,19 +2,24 @@
 
 Parable code consists of whitespace separated tokens. Each token can recieve a single character prefix, which tells the compiler how to process it. Tokens without a prefix are treated as function calls. All code is compiled before being run, with each physical source line being compiled and run separately.
 
-You can use any characters except for whitespace in a function name, but the use of $, &, #, [, ], ', and " as single character function names is not allowed. (However you may use these if the name is three characters or longer)
+## Function Naming
+
+* You can use any characters except for whitespace in a function name
+* Function names can not start with the following characters: $ & # [ ] ' " `
 
 ----
 
 ## Data Types
 
-Parable supports five primary data types:
+Parable supports seven primary data types:
 
 * Numbers
 * Characters
 * Strings
 * Pointers
 * Flags
+* Bytecode
+* Function Calls
 
 ----
 
@@ -26,6 +31,8 @@ You can tell Parable how to treat a token by giving it a prefix:
 
     #100
     #-40.76
+
+Parable also attempts to recognize numbers without the # prefix.
 
 ### Characters
 
@@ -55,6 +62,14 @@ Flags are returned by various functions. you can push them to the stack with:
 Comments get enclosed in double quotes:
 
     "this is a comment"
+
+### Bytecode
+
+Bytecodes are prefixed by a single backtick (`) character.
+
+    `399
+
+*In most cases you will not need to use this. The bytecode is mapped to symbolic names by the standard library.*
 
 ----
 
@@ -122,13 +137,19 @@ Any other string or number results in a malformed flag.
 
 The results for pointers and characters are not defined.
 
+### :b
+
+Convert a value to a bytecode.
+
+### :call
+
+Convert a value to a function call.
+
 ----
 
 ## Quotations
 
-A quote is an anonymous block of code. These form the basis of function
-definition, flow control, and various stack operations. to create a new
-quote, wrap the code in a pair of square brackets:
+A quote is an anonymous block of code or data. These form the basis of function definition, flow control, and various stack operations. to create a new quote, wrap the code in a pair of square brackets:
 
     [ ]
 
@@ -215,4 +236,3 @@ Parable does not provide a secondary stack, but some common Forth idioms can be 
 
     base @ >r ... r> base !
     &base [ ... ] preserve
-
