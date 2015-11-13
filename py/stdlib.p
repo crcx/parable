@@ -97,7 +97,7 @@
 [ "p-pn"  dup get-last-index ] 'slice-last-index' define
 [ "p-pn"  slice-last-index 1 + ] 'slice-length' define
 [ "np-"   [ get-last-index + ] sip set-last-index ] 'adjust-slice-length' define
-[ "p-p"   request [ copy ] sip ] 'slice-duplicate' define
+[ "p-p"   request [ copy ] sip ] 'duplicate-slice' define
 [ "p-n"   get-last-index 1 + ] 'length?' define
 
 
