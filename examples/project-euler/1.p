@@ -2,6 +2,6 @@
 
 "Find the sum of all the multiples of 3 or 5 below 1000."
 
-[ #1 #999 expand-range ] array-from-quote
-[ [ #3 rem zero? ] [ #5 rem zero? ] bi or :f ] array-filter
-#0 [ + ] array-reduce
+[ #1 #999 expand-range ] capture-results
+[ [ #3 rem zero? ] [ #5 rem zero? ] bi or :f ] filter
+#0 [ + ] reduce
