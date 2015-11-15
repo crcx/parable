@@ -267,5 +267,5 @@
 [ :n over -6 shift + over -16 shift + swap - ] 'hash:sdbm<n>' define
 [ "s-n" 0 swap [ :c swap hash:sdbm<n> ] for-each ] 'hash:sdbm' define
 'hash-sdbm<n>' hide-function
-[ "s-b" hash:sdbm ] 'chosen-hash' define
+[ "s-b" hash:djb2 ] 'chosen-hash' define
 [ "s-n" chosen-hash hash-prime rem ] 'hash' define
