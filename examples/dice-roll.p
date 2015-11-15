@@ -19,6 +19,6 @@
 [ [ [ roll<d12> ] repeat ] sip #1 - [ + ] repeat ] 'd12' define
 [ [ [ roll<d20> ] repeat ] sip #1 - [ + ] repeat ] 'd20' define
 
-[ array-from-quote #0 [ + ] array-reduce ] 'roll-dice' define
+[ capture-results #0 [ + ] reduce ] 'roll-dice' define
 
 [ #2 d6 #5 ] roll-dice
