@@ -260,14 +260,12 @@
 
 
 "Hashing functions"
-'hash-prime' value
-389 to hash-prime
+389 'hash-prime' value!
 
-[ "s-n" 5381 swap [ :n [ swap ] dip over -5 shift + + swap ] for-each ] 'hash:djb2' define
+[ "s-n" 0 swap [ :n xor ] for-each ] 'hash:xor' define
+[ "s-n" 5381 swap [ over -5 shift + + ] for-each ] 'hash:djb2' define
 [ :n over -6 shift + over -16 shift + swap - ] 'hash:sdbm<n>' define
-[ "s-n" 0 swap [ :c [ swap ] dip hash:sdbm<n> swap ] for-each ] 'hash:sdbm' define
+[ "s-n" 0 swap [ :c swap hash:sdbm<n> ] for-each ] 'hash:sdbm' define
 'hash-sdbm<n>' hide-function
-[ "s-n" 0 swap [ :n [ swap ] dip + 255 and swap ] for-each 255 xor 1 + 255 and ] 'hash:lrc' define
-[ "s-n" 0 swap [ :n [ swap ] dip xor swap ] for-each ] 'hash:xor' define
-[ "s-b" hash:djb2 ] 'chosen-hash' define
+[ "s-b" hash:sdbm ] 'chosen-hash' define
 [ "s-n" chosen-hash hash-prime rem ] 'hash' define
