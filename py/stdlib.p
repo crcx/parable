@@ -241,15 +241,9 @@
 [ "pq-p"   [ to *XT to *SOURCE request to *TARGET *TARGET array-pop drop 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke [ *SOURCE *OFFSET fetch *TARGET array-push ] if-true *OFFSET 1 + to *OFFSET ] repeat *TARGET ] localize ] 'filter' define
 [ "pq-"    [ to *XT duplicate-slice to *SOURCE 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke *SOURCE *OFFSET store *OFFSET 1 + to *OFFSET ] repeat *SOURCE ] localize ] 'map' define
 [ "p-p"    [ request to *TARGET invoke<depth?> 0 max [ *TARGET array-push ] repeat *TARGET 1 over length? subslice :p ] localize ] 'capture-results' define
+[ "pv-n"   [ to *TARGET to *SOURCE 0 to *OFFSET -1 to *FOUND *SOURCE length? [ *SOURCE *OFFSET fetch *TARGET = [ *OFFSET to *FOUND ] if-true *OFFSET 1 + to *OFFSET ] repeat *FOUND ] localize ] 'index-of' define
 
 [ '*FOUND'  '*VALUE'  '*XT'  '*SOURCE'  '*TARGET'  '*OFFSET'  'localize' ] hide-functions
-
-
-"old array functions"
-[ 'source' 'v' 'i' 'idx' ] values
-[ type? STRING = [ [ :p :s ] dip ] [ :n ] if ] 'resolve-types' define
-[ "vp-n"  to source to v 0 to i -1 to idx source length? [ source i fetch v resolve-types = [ i to idx ] if-true i 1 + to i ] repeat idx ] 'array-index-of' define
-[ 'source'  'v'  'i'  'idx'  'resolve-types' ] hide-functions
 
 
 "Text Output Buffer"
