@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (c) 2013, Charles Childers
+# Copyright (c) 2013-2015, Charles Childers
 #
 # legend is a full screen console interface to the parable language.
 # interaction is done by typing in short commands (prefixed by a
@@ -199,6 +199,18 @@ def load_file(file):
             interpret(s)
 
 
+def get_input():
+    done = 0
+    s = ''
+    while done == 0:
+        s = s + sys.stdin.readline()
+        if s.endswith(' \\\n'):
+            s = s[:-2].strip() + ' '
+        else:
+            done = 1
+    return s
+
+
 if __name__ == '__main__':
     (width, height) = getTerminalSize()
     prepare_slices()
@@ -211,7 +223,7 @@ if __name__ == '__main__':
     while 1 == 1:
 
         display(height, width)
-        src = sys.stdin.readline()
+        src = get_input()
 
         cmd = ' '.join(src.split())
 
