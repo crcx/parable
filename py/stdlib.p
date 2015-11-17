@@ -76,21 +76,21 @@
 
 
 "Symbolic names for data types"
-[ 100 ] 'NUMBER' define
-[ 200 ] 'STRING' define
-[ 300 ] 'CHARACTER' define
-[ 400 ] 'POINTER' define
-[ 500 ] 'FLAG' define
-[ 600 ] 'BYTECODE' define
-[ 700 ] 'COMMENT' define
-[ 800 ] 'FUNCTION-CALL' define
+[ "-n"  100 ] 'NUMBER' define
+[ "-n"  200 ] 'STRING' define
+[ "-n"  300 ] 'CHARACTER' define
+[ "-n"  400 ] 'POINTER' define
+[ "-n"  500 ] 'FLAG' define
+[ "-n"  600 ] 'BYTECODE' define
+[ "-n"  700 ] 'COMMENT' define
+[ "-n"  800 ] 'FUNCTION-CALL' define
 
 
 "Stack Flow"
 [ "vV-vVvV"  over over ] 'dup-pair' define
 [ "vv-"      drop drop ] 'drop-pair' define
 [ "?n-"      [ drop ] repeat ] 'drop-multiple' define
-[ "q-...n"  depth [ invoke ] dip depth swap - ] 'invoke<depth?>' define
+[ "q-...n"   depth [ invoke ] dip depth swap - ] 'invoke<depth?>' define
 
 
 "Slice Functions"
