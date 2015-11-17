@@ -1,5 +1,26 @@
 import sys, os
 
+def condenseLines(code):
+    m = len(code)
+    s = ''
+    r = []
+    i = 0
+    c = 0
+    while i < m:
+        if code[i].endswith(' \\\n'):
+            s = s + ' ' + code[i][:-2].strip()
+            c = 1
+        else:
+            c = 0
+            s = s + ' ' + code[i]
+        if c == 0:
+            if s != '' and s != ' \n':
+                r.append(s.strip())
+            s = ''
+        i = i + 1
+    return r
+
+
 def display_stack(verbose):
     global stack, types
     i = 0
@@ -48,7 +69,7 @@ def display():
 
 
 def load_file(file):
-    f = open(file).readlines()
+    f = condenseLines(open(file).readlines())
     for line in f:
         if len(line) > 1:
             if not line.startswith("#!"):

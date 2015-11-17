@@ -1456,19 +1456,19 @@ bootstrap.append(""" [ "n-n"    `1004 ] 'acos' define """)
 bootstrap.append(""" [ "n-n"    `1005 ] 'atan' define """)
 bootstrap.append(""" [ "n-n"    `1006 ] 'atan2' define """)
 bootstrap.append(""" "Symbolic names for data types" """)
-bootstrap.append(""" [ 100 ] 'NUMBER' define """)
-bootstrap.append(""" [ 200 ] 'STRING' define """)
-bootstrap.append(""" [ 300 ] 'CHARACTER' define """)
-bootstrap.append(""" [ 400 ] 'POINTER' define """)
-bootstrap.append(""" [ 500 ] 'FLAG' define """)
-bootstrap.append(""" [ 600 ] 'BYTECODE' define """)
-bootstrap.append(""" [ 700 ] 'COMMENT' define """)
-bootstrap.append(""" [ 800 ] 'FUNCTION-CALL' define """)
+bootstrap.append(""" [ "-n"  100 ] 'NUMBER' define """)
+bootstrap.append(""" [ "-n"  200 ] 'STRING' define """)
+bootstrap.append(""" [ "-n"  300 ] 'CHARACTER' define """)
+bootstrap.append(""" [ "-n"  400 ] 'POINTER' define """)
+bootstrap.append(""" [ "-n"  500 ] 'FLAG' define """)
+bootstrap.append(""" [ "-n"  600 ] 'BYTECODE' define """)
+bootstrap.append(""" [ "-n"  700 ] 'COMMENT' define """)
+bootstrap.append(""" [ "-n"  800 ] 'FUNCTION-CALL' define """)
 bootstrap.append(""" "Stack Flow" """)
 bootstrap.append(""" [ "vV-vVvV"  over over ] 'dup-pair' define """)
 bootstrap.append(""" [ "vv-"      drop drop ] 'drop-pair' define """)
 bootstrap.append(""" [ "?n-"      [ drop ] repeat ] 'drop-multiple' define """)
-bootstrap.append(""" [ "q-...n"  depth [ invoke ] dip depth swap - ] 'invoke<depth?>' define """)
+bootstrap.append(""" [ "q-...n"   depth [ invoke ] dip depth swap - ] 'invoke<depth?>' define """)
 bootstrap.append(""" "Slice Functions" """)
 bootstrap.append(""" [ "p-pn"  dup get-last-index ] 'slice-last-index' define """)
 bootstrap.append(""" [ "p-pn"  slice-last-index 1 + ] 'slice-length' define """)
@@ -1604,6 +1604,27 @@ bootstrap.append(""" [ "s-b" hash:djb2 ] 'chosen-hash' define """)
 bootstrap.append(""" [ "s-n" chosen-hash hash-prime rem ] 'hash' define """)
 import sys, os
 
+def condenseLines(code):
+    m = len(code)
+    s = ''
+    r = []
+    i = 0
+    c = 0
+    while i < m:
+        if code[i].endswith(' \\\n'):
+            s = s + ' ' + code[i][:-2].strip()
+            c = 1
+        else:
+            c = 0
+            s = s + ' ' + code[i]
+        if c == 0:
+            if s != '' and s != ' \n':
+                r.append(s.strip())
+            s = ''
+        i = i + 1
+    return r
+
+
 def display_stack(verbose):
     global stack, types
     i = 0
@@ -1652,7 +1673,7 @@ def display():
 
 
 def load_file(file):
-    f = open(file).readlines()
+    f = condenseLines(open(file).readlines())
     for line in f:
         if len(line) > 1:
             if not line.startswith("#!"):
