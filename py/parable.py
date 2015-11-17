@@ -130,6 +130,27 @@ def is_number(s):
         return False
 
 
+def condense_lines(code):
+    m = len(code)
+    s = ''
+    r = []
+    i = 0
+    c = 0
+    while i < m:
+        if code[i].endswith(' \\\n'):
+            s = s + ' ' + code[i][:-2].strip()
+            c = 1
+        else:
+            c = 0
+            s = s + ' ' + code[i]
+        if c == 0:
+            if s != '' and s != ' \n':
+                r.append(s.strip())
+            s = ''
+        i = i + 1
+    return r
+
+
 #
 # logging of errors
 #
@@ -1342,6 +1363,7 @@ def compile(str, slice):
 
 def parse_bootstrap(f):
     """compile the bootstrap package it into memory"""
+    f = condense_lines(f)
     for line in f:
         if len(line) > 1:
             s = compile(line, request_slice())
