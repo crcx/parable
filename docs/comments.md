@@ -6,5 +6,4 @@ Examples:
 
     [ "this is a comment" #33 ] '33' define
 
-Comments get compiled into the functions, but are ignored at runtime. (This is wasteful of space,
-but makes it possible to decompile back to a form much closer to the original source).
+Comments get compiled into the functions, but are ignored at runtime. (This is wasteful of space, but makes it possible to decompile back to a form much closer to the original source).
