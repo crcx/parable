@@ -8,6 +8,8 @@ a very rigid syntax.
 
 - source string gets leading and tailing whitespace (space, tab, cr, lf)
   stripped.
+- some interfaces will join strings ending with \ to allow for multiline
+  definitions
 - the string is broken into tokens, with each token separated by a
   space.
 
@@ -21,16 +23,19 @@ code generated is dependent on the first character of the token.
   If the token does not parse as a number, the compiler will set the value to 0
   before generating code and report an error. This will lay down:
 
-        BC_PUSH_N
         value
+
+  With a stored type of TYPE_NUMBER
 
 - if the first character is a $, then the token is a character
 
   If more than one character follows the initial $, then only the first is
   compiled. All others are discarded. This will lay down:
 
-        BC_PUSH_C
         character value
+
+  With a stored type of TYPE_CHARACTER
+
 
 - if the first character is a &, then the token is a pointer
 
@@ -38,8 +43,9 @@ code generated is dependent on the first character of the token.
   fails, it will look up the token in the dictionary and compile the
   corresponding slice. This generates the following code:
 
-        BC_PUSH_F
         pointer
+
+  With a stored type of TYPE_POINTER
 
   If the token does not correspond to a slot number or named item,
   the compiler will compile a pointer to slot 0, and report an error.
@@ -56,16 +62,18 @@ code generated is dependent on the first character of the token.
   Once the string is built, the internal text is extracted, and stored into
   a newly allocated slice. Then the compiler generates:
 
-        BC_PUSH_S
         pointer to new slice
+
+  With a stored type of TYPE_STRING
 
 - if the first character is a ", then the token is the start of a comment
 
   This behaves like the ' prefix, but looks for a double quote. The generated
   code will be:
 
-        BC_PUSH_COMMENT
         pointer
+
+  With a stored type of TYPE_COMMENT
 
 - if the first character is a `, then the token is a numeric bytecode
 
@@ -73,6 +81,8 @@ code generated is dependent on the first character of the token.
   generated code. As an example, `300 will compile as:
 
         300
+
+  With a stored type of TYPE_BYTECODE
 
 - if the token is a [, compilation of a new quote begins
 
@@ -87,18 +97,25 @@ code generated is dependent on the first character of the token.
 
   Then, it returns to the prior slice and offset and compiles:
 
-        BC_PUSH_F
         pointer to new slice
+
+  With a stored type of TYPE_POINTER
+
+  NOTE: the new slice will only be appended with a BC_FLOW_RETURN if the
+  slice is otherwise empty.
 
 - if none of the prefixes match, compile a call to a function.
 
   If the token is not matched to a name in the dictionary, the
-  compiler will report an error.
+  compiler will report an error unless the value appears to be a
+  number, in which case it will be compiled as in the case of the
+  # prefix.
 
   If it is found, the following code is generated:
 
-        BC_FLOW_CALL
         pointer
+
+  With a stored type of TYPE_FUNCTION_CALL
 
 ## Other Notes
 
