@@ -134,6 +134,32 @@ For numbers, the number is treated as the ASCII character code.
 
 **:call** converts the top item on the stack to a function call.
 
+# Variables and Values
+
+Parable provides two simple data structures: variables and values.
+
+Variables are a quick and dirty way to store single values in a slice. Typically access to values is done by using **fetch** and **store**. This can get messy. For instance:
+
+    request 'a' define
+    100 &a 0 store
+    &a 0 fetch 1 + &a 0 store
+
+The need to reference the offsets obscures the intent. Variables simplify this to:
+
+    'a' variable
+    100 &a !
+    &a @ 1 + &a !
+
+The **@** replaces the **0 fetch** and **!** replaces **0 store**. It's a small, but useful improvement. 
+
+Values take this a step further. A value provides a named function that either returns or updates a single value. The above example can become:
+
+    'a' value
+    100 to a
+    a 1 + to a
+
+In this, referencing the function itself returns the stored value. Using **to** sets an internal flag that tells the function to replace its stored value with the top value on the stack.
+
 # Arrays
 
 All slices are effectively usable as arrays. The length is stored by the VM as the size of the slice, with the values stored sequentially in the slice. This is simplistic, but easy to understand and makes working with them at low level easy.
