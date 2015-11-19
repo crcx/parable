@@ -134,6 +134,98 @@ For numbers, the number is treated as the ASCII character code.
 
 **:call** converts the top item on the stack to a function call.
 
+# Data Types
+
+Parable recognizes a variety of data types. These have been briefly covered earlier, this section aims to expand on them.
+
+## Numbers
+
+Numbers are signed, floating point values. They can be specified using the **#** prefix or Parable will attempt to recognize them automatically.
+
+Examples:
+
+    #1
+    #-40
+    #3.14159
+    #inf
+    #-inf
+    #nan
+
+Some notes:
+
+* Numbers are only recognized in base 10.
+* All numbers are floating point and suffer from the inaccuracies that implies
+
+## Characters
+
+A character is a single symbol prefixed by **$**. Parable only guarantees recognition of the ASCII character set; but work on Unicode support is being performed.
+
+Examples:
+
+    $a
+    $1
+    $$
+    $?
+    $~
+
+Notes:
+
+* Unicode support is being worked on, but should not be considered reliable at this point
+
+## Strings and Comments
+
+A string is a slice containing a sequence of characters. They are denoted using a single quote at the beginning and end.
+
+A comment is a string that is ignored by the language. It is denoted using a double quote at the beginning and end.
+
+Examples:
+
+    'hello, world'
+    'this is a string'
+    'yet another, much longer string containing a bunch of data'
+    
+    "this is a comment"
+    "(and so is this)"
+
+Each string is stored in a separate slice. String length is the same as the corresponding slice length.
+
+Notes:
+
+* Make sure to use use single quotes (') for strings. Double quotes are used for comments.
+* All restrictions on characters apply to strings (and comments)
+  
+## Pointers
+
+In Parable, a pointer is a numeric value that points to a slice. They do not point to any specific offset (offsets are numbers). Pointers are created using the **&** prefix or via the **:p** function. The **&** prefix can be used with a symbol name, in which case it will lookup the corresponding slice in the dictionary.
+
+Some examples:
+
+    &100
+    &50
+    &capture-results
+
+## Comments
+
+Comments are strings which are ignored by the language. They start and end with a quotation mark.
+
+Examples:
+
+    [ "this is a comment" #33 ] '33' define
+
+Comments get compiled into the functions, but are ignored at runtime. (This is wasteful of space, but makes it possible to decompile back to a form much closer to the original source).
+
+## Flags
+
+A boolean flag represents one of two states: **true** or **false**.
+
+## Bytecode
+
+A bytecode corresponds to an instruction understood by the bytecode interpreter. When compiling, they are prefixed by a single backtick (**`**). In normal circumstances you should not need to use this. If you are storing bytecodes, use **:b** to convert a number to the *bytecode* type prior to storing.
+
+## Function Calls
+
+A function call corresponds to a compiled call to a function. When compiling, there is no prefix for this: just refer to a function by name. If you are storing function calls use **:call** to convert the pointer to a function call prior to storing.
+
 # Variables and Values
 
 Parable provides two simple data structures: variables and values.
