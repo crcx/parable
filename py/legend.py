@@ -51,6 +51,9 @@ COLOR_STACK_S = 'white'
 COLOR_STACK_F = 'yellow'
 COLOR_STACK_C = 'bright green'
 COLOR_STACK_FLAG = 'bright gray'
+COLOR_STACK_COMMENT = 'dark gray'
+COLOR_STACK_FUN_CALL = 'bright red'
+COLOR_STACK_BYTECODE = 'cyan'
 COLOR_ERROR = 'bright purple'
 COLOR_BAR = 'red'
 
@@ -151,6 +154,14 @@ def display_stack():
                 write("\tfalse", COLOR_STACK_FLAG)
             else:
                 write("\tmalformed flag", COLOR_STACK_FLAG)
+        elif types[i] == TYPE_BYTECODE:
+            write("\t`" + unicode(stack[i]), COLOR_STACK_BYTECODE)
+        elif types[i] == TYPE_COMMENT:
+            write("\t\"" + slice_to_string(stack[i]) + "\"", COLOR_STACK_COMMENT)
+            write("\n\t\tstored at: " + unicode(stack[i]), 'normal')
+            l += 1
+        elif types[i] == TYPE_FUNCTION_CALL:
+            write("\tCALL: " + unicode(stack[i]), COLOR_STACK_FUN_CALL)
         else:
             write("\tUNKNOWN\t" + str(stack[i]) + "\t" + str(types[i]), COLOR_ERROR)
         sys.stdout.write("\n")
