@@ -33,11 +33,6 @@ TYPE_FUNCTION_CALL = 800
 # These are loosely grouped by type
 #
 
-BC_PUSH_N = 100
-BC_PUSH_S = 101
-BC_PUSH_C = 102
-BC_PUSH_F = 103
-BC_PUSH_COMMENT = 104
 BC_TYPE_B = 109
 BC_TYPE_N = 110
 BC_TYPE_S = 111
@@ -206,21 +201,7 @@ def interpret(slice, more=None):
             if optype == TYPE_FUNCTION_CALL:
                 interpret(stack_pop(), more)
         else:
-            if opcode == BC_PUSH_N:
-                offset += 1
-                stack_push(fetch(slice, offset), TYPE_NUMBER)
-            elif opcode == BC_PUSH_S:
-                offset += 1
-                stack_push(fetch(slice, offset), TYPE_STRING)
-            elif opcode == BC_PUSH_C:
-                offset += 1
-                stack_push(fetch(slice, offset), TYPE_CHARACTER)
-            elif opcode == BC_PUSH_F:
-                offset += 1
-                stack_push(fetch(slice, offset), TYPE_POINTER)
-            elif opcode == BC_PUSH_COMMENT:
-                offset += 1
-            elif opcode == BC_TYPE_B:
+            if opcode == BC_TYPE_B:
                 if check_depth(1):
                     stack_change_type(TYPE_BYTECODE)
                 else:
@@ -1219,14 +1200,15 @@ def collect_unused_slices():
 #
 # the bytecode forms are kept simple:
 #
-# type           compiled as
-# ==========     ===========================
-# Functions      BC_FLOW_CALL   pointer
-# Strings        BC_PUSH_S      pointer
-# Numbers        BC_PUSH_N      VALUE
-# Characters     BC_PUSH_C      ASCII_VALUE
-# Pointers       BC_PUSH_F      pointer
-# Bytecodes      bytecode value
+# type           stored         type
+# ==========     ============================
+# Functions      pointer        function call
+# Strings        pointer        string
+# Numbers        VALUE          number
+# Characters     ASCII_VALUE    character
+# Pointers       pointer        pointer
+# Bytecodes      bytecode       bytecode
+# Comments       pointer        comment
 #
 # for two functions ([ and ]), new quotes are started or closed. These are
 # the only case where the corresponding action is run automatically rather
