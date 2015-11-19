@@ -156,6 +156,13 @@ Some notes:
 * Numbers are only recognized in base 10.
 * All numbers are floating point and suffer from the inaccuracies that implies
 
+Conversions:
+
+* Strings are parsed as signed, decimal, floating point values.
+* Characters are converted to their character code (normally an ASCII value).
+* For flags, **true** is -1, **false** is 0, and any other value returns the flag value.
+* For other types, change the internal type to number.
+
 ## Characters
 
 A character is a single symbol prefixed by **$**. Parable only guarantees recognition of the ASCII character set; but work on Unicode support is being performed.
@@ -171,6 +178,11 @@ Examples:
 Notes:
 
 * Unicode support is being worked on, but should not be considered reliable at this point
+
+Conversion rules:
+
+* If the source value is a number, treat the number as the character code
+* If the source is a string, return the first character
 
 ## Strings and Comments
 
@@ -193,7 +205,16 @@ Notes:
 
 * Make sure to use use single quotes (') for strings. Double quotes are used for comments.
 * All restrictions on characters apply to strings (and comments)
-  
+
+Conversions:
+
+* For strings, convert to a string and store in a new slice.
+* For characters, return a new string containing the character as the only value.
+* For flags, return *'true'* for **true**, *'false'* for **false**, and *'malformed flag'* for invalid flag.
+* For pointer, convert the internal type to string.
+* If the value is any other type, silently ignore the request.
+* No conversions to or from the comment type are possible.
+
 ## Pointers
 
 In Parable, a pointer is a numeric value that points to a slice. They do not point to any specific offset (offsets are numbers). Pointers are created using the **&** prefix or via the **:p** function. The **&** prefix can be used with a symbol name, in which case it will lookup the corresponding slice in the dictionary.
@@ -204,15 +225,10 @@ Some examples:
     &50
     &capture-results
 
-## Comments
+Conversions:
 
-Comments are strings which are ignored by the language. They start and end with a quotation mark.
-
-Examples:
-
-    [ "this is a comment" #33 ] '33' define
-
-Comments get compiled into the functions, but are ignored at runtime. (This is wasteful of space, but makes it possible to decompile back to a form much closer to the original source).
+* For all types, change the internal type to pointer.
+* This really only has meaning for numbers and strings.
 
 ## Flags
 
@@ -226,13 +242,29 @@ Flags have three states:
 
 A **true** flag corresponds to a numeric value of -1. A **false** flag corresponds to a value of 0. Any other value is considered invalid.
 
+Conversions:
+
+* For numbers, -1 is **true**, 0 is **false**, and any other value is *invalid*.
+* For strings, a value of *true* is **true**, *false* is **false**, and other values are *invalid*.
+* For other types, the raw value is treated as a conversion from the *number* type.
+
 ## Bytecode
 
 A bytecode corresponds to an instruction understood by the bytecode interpreter. When compiling, they are prefixed by a single backtick (**`**). In normal circumstances you should not need to use this. If you are storing bytecodes, use **:b** to convert a number to the *bytecode* type prior to storing.
 
+Conversions:
+
+* Only numbers can be converted to bytecode type.
+* Calling **:b** with any other type will be silently ignored.
+
 ## Function Calls
 
 A function call corresponds to a compiled call to a function. When compiling, there is no prefix for this: just refer to a function by name. If you are storing function calls use **:call** to convert the pointer to a function call prior to storing.
+
+Conversions:
+
+* Only numbers and pointers can be converted to function calls.
+* Calling **:call** with any other type will be silently ignored.
 
 # Variables and Values
 
