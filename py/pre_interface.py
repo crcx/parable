@@ -50,6 +50,14 @@ def display_stack(verbose):
                 sys.stdout.write("\tfalse")
             else:
                 sys.stdout.write("\tmalformed flag")
+        elif types[i] == TYPE_BYTECODE:
+            sys.stdout.write("\t`" + unicode(stack[i]))
+        elif types[i] == TYPE_COMMENT:
+            sys.stdout.write(("\t\"" + slice_to_string(stack[i]) + "\"").encode('utf-8'))
+            if verbose == True:
+                sys.stdout.write("\n\t\tstored at: " + unicode(stack[i]))
+        elif types[i] == TYPE_FUNCTION_CALL:
+            sys.stdout.write("\tCALL: " + unicode(stack[i]))
         else:
             sys.stdout.write("\tunmatched type on stack!")
         sys.stdout.write("\n")
@@ -62,8 +70,8 @@ def display_errors():
     sys.stdout.write("\n")
 
 
-def display():
-    display_stack(False)
+def display(verbose):
+    display_stack(verbose)
     display_errors()
     clear_errors()
 
@@ -85,6 +93,8 @@ if __name__ == '__main__':
     parse_bootstrap(bootstrap)
     collect_unused_slices()
 
+    verbose = False
+
     if len(sys.argv) < 2:
         if os.path.exists('source.p'):
             load_file('source.p')
@@ -92,10 +102,13 @@ if __name__ == '__main__':
             sys.exit('Usage: %s filename(s)' % sys.argv[0])
     else:
         for source in sys.argv:
-            if not os.path.exists(source):
+            if not os.path.exists(source) and source != "-v":
                 sys.exit('ERROR: source file "%s" was not found!' % source)
             if source != sys.argv[0]:
-                load_file(source)
+                if source == "-v":
+                    verbose = True
+                else:
+                    load_file(source)
 
-    display()
+    display(verbose)
     sys.stdout.flush()
