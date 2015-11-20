@@ -263,3 +263,15 @@
 'hash-sdbm<n>' hide-function
 [ "s-b" hash:djb2 ] 'chosen-hash' define
 [ "s-n" chosen-hash hash-prime rem ] 'hash' define
+
+
+"when: a conditional combinator"
+"[ [ condition ] [ code to execute if true ] \"
+"  [ condition ] [ code to execute if true ] \"
+"  [ condition ] [ code to execute if true ] ] when"
+
+[ '*CASES'  '*OFFSET' ] values
+[ "-"    *OFFSET 1 + to *OFFSET ] 'next' define
+[ "-v"   *CASES *OFFSET fetch next ] 'fetch-value' define
+[ "q-"   0 to *OFFSET to *CASES *CASES length? 2 / floor [ fetch-value invoke fetch-value if-true ] repeat ] 'when' define
+[ '*CASES'  '*OFFSET'  'next'  'fetch-value'  ] hide-functions
