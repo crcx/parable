@@ -6,6 +6,7 @@
 [ "v-p"    `104 ] ':p' define
 [ "v-f"    `105 ] ':f' define
 [ "v-f"    `106 ] ':call' define
+[ "vt-v"   `109 ] 'set-type' define
 [ "v-vn"   `110 ] 'type?' define
 [ "nn-n"   `200 ] '+' define
 [ "nn-n"   `201 ] '-' define
