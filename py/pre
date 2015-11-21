@@ -1432,7 +1432,7 @@ bootstrap.append(""" [ "p-"     `404 ] 'release' define """)
 bootstrap.append(""" [ "-"      `405 ] 'collect-garbage' define """)
 bootstrap.append(""" [ "p-n"    `406 ] 'get-last-index' define """)
 bootstrap.append(""" [ "np-"    `407 ] 'set-last-index' define """)
-bootstrap.append(""" [ "pn-"    `408 ] 'set-stored-type' define """)
+bootstrap.append(""" [ "pnt-"   `408 ] 'set-stored-type' define """)
 bootstrap.append(""" [ "p-n"    `409 ] 'get-stored-type' define """)
 bootstrap.append(""" [ "v-vv"   `500 ] 'dup' define """)
 bootstrap.append(""" [ "v-"     `501 ] 'drop' define """)
@@ -1677,6 +1677,9 @@ def display_stack(verbose):
             sys.stdout.write("\tCALL: " + unicode(stack[i]))
         else:
             sys.stdout.write("\tunmatched type on stack!")
+            if verbose == True:
+                sys.stdout.write("\n\tRaw value: " + unicode(stack[i]))
+                sys.stdout.write("\n\tType code: " + unicode(types[i]))
         sys.stdout.write("\n")
         i += 1
 

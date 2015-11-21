@@ -60,6 +60,9 @@ def display_stack(verbose):
             sys.stdout.write("\tCALL: " + unicode(stack[i]))
         else:
             sys.stdout.write("\tunmatched type on stack!")
+            if verbose == True:
+                sys.stdout.write("\n\tRaw value: " + unicode(stack[i]))
+                sys.stdout.write("\n\tType code: " + unicode(types[i]))
         sys.stdout.write("\n")
         i += 1
 
