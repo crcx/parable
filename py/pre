@@ -1622,8 +1622,9 @@ bootstrap.append(""" "  [ condition ] [ code to execute if true ] ] when" """)
 bootstrap.append(""" [ '*CASES'  '*OFFSET' ] values """)
 bootstrap.append(""" [ "-"    *OFFSET 1 + to *OFFSET ] 'next' define """)
 bootstrap.append(""" [ "-v"   *CASES *OFFSET fetch next ] 'fetch-value' define """)
-bootstrap.append(""" [ "q-"   0 to *OFFSET to *CASES *CASES length? 2 / floor [ fetch-value invoke fetch-value if-true ] repeat ] 'when' define """)
-bootstrap.append(""" [ '*CASES'  '*OFFSET'  'next'  'fetch-value'  ] hide-functions """)
+bootstrap.append(""" [ "q-"   0 to *OFFSET to *CASES *CASES length? 2 / floor [ fetch-value invoke fetch-value if-true ] repeat ] '<when>' define """)
+bootstrap.append(""" [ "q-"   &*CASES [ &*OFFSET [ <when> ] preserve ] preserve ] 'when' define """)
+bootstrap.append(""" [ '*CASES'  '*OFFSET'  'next'  'fetch-value'  '<when>' ] hide-functions """)
 import sys, os
 
 def condenseLines(code):

@@ -274,5 +274,6 @@
 [ '*CASES'  '*OFFSET' ] values
 [ "-"    *OFFSET 1 + to *OFFSET ] 'next' define
 [ "-v"   *CASES *OFFSET fetch next ] 'fetch-value' define
-[ "q-"   0 to *OFFSET to *CASES *CASES length? 2 / floor [ fetch-value invoke fetch-value if-true ] repeat ] 'when' define
-[ '*CASES'  '*OFFSET'  'next'  'fetch-value'  ] hide-functions
+[ "q-"   0 to *OFFSET to *CASES *CASES length? 2 / floor [ fetch-value invoke fetch-value if-true ] repeat ] '<when>' define
+[ "q-"   &*CASES [ &*OFFSET [ <when> ] preserve ] preserve ] 'when' define
+[ '*CASES'  '*OFFSET'  'next'  'fetch-value'  '<when>' ] hide-functions
