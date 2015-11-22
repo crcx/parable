@@ -95,6 +95,9 @@ def get_results():
                 sequence.append("false")
             else:
                 sequence.append("malformed flag")
+#        elif types[i] == TYPE_BYTECODE:
+#        elif types[i] == TYPE_COMMENT:
+#        elif types[i] == TYPE_FUNCTION_CALL:
         else:
             sequence.append("unmatched type on stack!")
         i = i + 1
@@ -124,7 +127,7 @@ def get_results():
 
     discardInternals = form.getvalue("discardInternals", "false")
     if discardInternals == "false":
-        return json.dumps({"symbols": dictionary_names, "symbol_map": dictionary_slices, "errors": errors, "parsed_stack": sequence, "types": types, "code": message, "slices": p_slices, "typetags": parable.p_types, "memory_map": p_map})
+        return json.dumps({"symbols": dictionary_names, "symbol_map": dictionary_slices, "errors": errors, "parsed_stack": sequence, "types": types, "code": message, "slices": parable.p_slices, "typetags": parable.p_types, "memory_map": p_map})
     else:
         return json.dumps({"symbols": dictionary_names, "symbol_map": dictionary_slices, "errors": errors, "parsed_stack": sequence, "types": types, "code": message, "slices": [], "typetags": [], "memory_map": []})
 
