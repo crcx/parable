@@ -1147,51 +1147,42 @@ def slice_to_string(slice):
 
 def find_references(s):
     """given a slice, return a list of all references in it"""
-    global dictionary_slices
     ptrs = []
     i = 0
     while i < get_last_index(s):
-        if fetch(s, i) >= 0:
+        type = fetch_type(s, i)
+        if type == TYPE_POINTER or type == TYPE_STRING or type == TYPE_COMMENT or type == TYPE_FUNCTION_CALL:
             ptrs.append(int(fetch(s, i)))
+        if type == TYPE_POINTER or type == TYPE_FUNCTION_CALL:
+            for xt in find_references(int(fetch(s, i))):
+                ptrs.append(int(xt))
         i += 1
     return ptrs
 
 
 def seek_all_references():
     """return a list of all references in all named slices"""
-    global MAX_SLICES, dictionary_slices, p_map
-    maybe = []
-    deps = []
+    global dictionary_slices
     refs = []
     for s in dictionary_slices:
-        maybe.append(s)
-        deps.append(find_references(s))
-    maybe += sum(deps, [])
-    maybe = list(set(maybe))
-    for s in sorted(maybe):
-        if s < MAX_SLICES:
-            if p_map[s] == 1:
-                refs.append(s)
+        refs.append(s)
+        for x in find_references(s):
+            refs.append(x)
     return refs
-
-
-def find_unused():
-    """scan memory and return a list of all slices that are not referenced"""
-    global p_slices, MAX_SLICES
-    i = 0
-    map = []
-    while i < MAX_SLICES:
-        map.append(i)
-        i += 1
-    refs = seek_all_references()
-    unused = list(set(map) ^ set(refs))
-    return unused
 
 
 def collect_unused_slices():
     """scan memory, and collect unused slices"""
-    for i in find_unused():
-        release_slice(i)
+    global MAX_SLICES, p_map
+    i = 0
+    refs = seek_all_references()
+    while i < MAX_SLICES:
+        if p_map[i] == 1:
+            try:
+                x = refs.index(i)
+            except:
+                release_slice(i)
+        i = i + 1
 
 
 #
