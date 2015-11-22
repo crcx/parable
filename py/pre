@@ -1153,8 +1153,12 @@ def find_references(s):
     ptrs = []
     i = 0
     while i < get_last_index(s):
-        if fetch(s, i) >= 0:
+        type = fetch_type(s, i)
+        if type == TYPE_POINTER or type == TYPE_STRING or type == TYPE_COMMENT or type == TYPE_FUNCTION_CALL:
             ptrs.append(int(fetch(s, i)))
+        if type == TYPE_POINTER or type == TYPE_FUNCTION_CALL:
+            for xt in find_references(int(fetch(s, i))):
+                ptrs.append(int(xt))
         i += 1
     return ptrs
 
@@ -1167,14 +1171,16 @@ def seek_all_references():
     refs = []
     for s in dictionary_slices:
         maybe.append(s)
-        deps.append(find_references(s))
-    maybe += sum(deps, [])
-    maybe = list(set(maybe))
-    for s in sorted(maybe):
-        if s < MAX_SLICES:
-            if p_map[s] == 1:
-                refs.append(s)
-    return refs
+        for x in find_references(s):
+            maybe.append(x)
+#        deps.append(find_references(s))
+#    maybe += sum(deps, [])
+#    maybe = list(set(maybe))
+#    for s in sorted(maybe):
+#        if s < MAX_SLICES:
+#            if p_map[s] == 1:
+#                refs.append(s)
+    return maybe
 
 
 def find_unused():
@@ -1624,7 +1630,7 @@ bootstrap.append(""" [ "-"    *OFFSET 1 + to *OFFSET ] 'next' define """)
 bootstrap.append(""" [ "-v"   *CASES *OFFSET fetch next ] 'fetch-value' define """)
 bootstrap.append(""" [ "q-"   0 to *OFFSET to *CASES *CASES length? 2 / floor [ fetch-value invoke fetch-value if-true ] repeat ] '<when>' define """)
 bootstrap.append(""" [ "q-"   *CASES [ *OFFSET [ <when> ] dip to *OFFSET ] dip to *CASES ] 'when' define """)
-bootstrap.append(""" [ '*CASES'  '*OFFSET'  'next'  'fetch-value' ] hide-functions """)
+bootstrap.append(""" [ '*CASES'  '*OFFSET'  'next'  'fetch-value'  '<when>' ] hide-functions """)
 import sys, os
 
 def condenseLines(code):
