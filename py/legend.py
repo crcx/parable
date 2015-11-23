@@ -252,8 +252,7 @@ if __name__ == '__main__':
 
         counter += 1
         if counter > 100:
-            if len(stack) == 0:
-                collect_unused_slices()
-                counter = 0
+            collect_unused_slices()
+            counter = 0
 
         sys.stdout.flush()

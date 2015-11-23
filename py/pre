@@ -1143,9 +1143,6 @@ def slice_to_string(slice):
 # or parable can attempt to identify them and reclaim them automatically.
 # the code here implements the garbage collector.
 #
-# note: this does not scan the stack contents. only invoke it if the
-#       stack is empty, or problems may arise.
-#
 
 def find_references(s):
     """given a slice, return a list of all references in it"""
@@ -1171,13 +1168,20 @@ def find_references(s):
 
 
 def seek_all_references():
-    """return a list of all references in all named slices"""
-    global dictionary_slices
+    """return a list of all references in all named slices and stack items"""
+    global dictionary_slices, stack, types
     refs = []
     for s in dictionary_slices:
         refs.append(s)
         for x in find_references(s):
             refs.append(x)
+    i = tos()
+    while i > 0:
+        if types[i] == TYPE_STRING or types[i] == TYPE_COMMENT or types[i] == TYPE_POINTER or types[i] == TYPE_FUNCTION_CALL:
+            refs.append(stack[i])
+            for x in find_references(stack[i]):
+                refs.append(x)
+        i -= 1
     return list(set(refs))
 
 
