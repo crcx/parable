@@ -1156,15 +1156,16 @@ def find_references(s):
         if type == TYPE_POINTER or type == TYPE_FUNCTION_CALL:
             for xt in find_references(int(fetch(s, 0))):
                 ptrs.append(int(xt))
-    while i < get_last_index(s):
-        type = fetch_type(s, i)
-        if type == TYPE_POINTER or type == TYPE_STRING or type == TYPE_COMMENT or type == TYPE_FUNCTION_CALL:
-            ptrs.append(int(fetch(s, i)))
-        if type == TYPE_POINTER or type == TYPE_FUNCTION_CALL:
-            for xt in find_references(int(fetch(s, i))):
-                ptrs.append(int(xt))
-        i += 1
-    return ptrs
+    else:
+        while i < get_last_index(s):
+            type = fetch_type(s, i)
+            if type == TYPE_POINTER or type == TYPE_STRING or type == TYPE_COMMENT or type == TYPE_FUNCTION_CALL:
+                ptrs.append(int(fetch(s, i)))
+            if type == TYPE_POINTER or type == TYPE_FUNCTION_CALL:
+                for xt in find_references(int(fetch(s, i))):
+                    ptrs.append(int(xt))
+            i += 1
+    return list(set(ptrs))
 
 
 def seek_all_references():
@@ -1175,7 +1176,7 @@ def seek_all_references():
         refs.append(s)
         for x in find_references(s):
             refs.append(x)
-    return refs
+    return list(set(refs))
 
 
 def collect_unused_slices():
@@ -1189,7 +1190,7 @@ def collect_unused_slices():
                 x = refs.index(i)
             except:
                 release_slice(i)
-        i = i + 1
+        i += 1
 
 
 #
