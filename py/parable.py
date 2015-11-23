@@ -1149,6 +1149,13 @@ def find_references(s):
     """given a slice, return a list of all references in it"""
     ptrs = []
     i = 0
+    if get_last_index(s) == 0:
+        type = fetch_type(s, 0)
+        if type == TYPE_POINTER or type == TYPE_STRING or type == TYPE_COMMENT or type == TYPE_FUNCTION_CALL:
+            ptrs.append(int(fetch(s, 0)))
+        if type == TYPE_POINTER or type == TYPE_FUNCTION_CALL:
+            for xt in find_references(int(fetch(s, 0))):
+                ptrs.append(int(xt))
     while i < get_last_index(s):
         type = fetch_type(s, i)
         if type == TYPE_POINTER or type == TYPE_STRING or type == TYPE_COMMENT or type == TYPE_FUNCTION_CALL:
