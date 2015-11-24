@@ -14,7 +14,7 @@ After compilation is completed, the bytecode interpreter will execute the code i
 
 The language is rigidly built around reverse polish structure and the data stack. The language does not provide access to the parser and no facilities exist for modifying the compiler behaviour from user level code.
 
-*The compiler and bytecode interpreter can be extended, but only by the _user interface layer_, not in Parable itself.*
+*The compiler and bytecode interpreter can be extended, but only by the user interface layer, not in Parable itself.*
 
 Parable itself has no user interface. The interface is defined as a separate layer, and can be adapted for specific platform(s) as desired. The user interfaces should provide the *standard library* which defines names for the bytecodes and various commonly used functions.
 
@@ -369,6 +369,8 @@ The quotation should return a single value; this will replace the original value
 
 *Dictionary*: a map of names to slices.
 
+*Offset*: a location within a slice.
+
 *Quotation*: a *slice* used as a function.
 
 *Slice*: a linear collection of memory cells.
@@ -376,5 +378,47 @@ The quotation should return a single value; this will replace the original value
 *Stack*: a last in, first out (*LIFO*) buffer that is used for passing data between functions.
 
 *Word*: a named slice.
+
+# Appendix: Compiler Forms
+
+Parable's compiler lays down very simple forms for each data type. It does not do any optimizations. This is intentional, to allow for easier decompilation and debugging. *It is possible to write an optimizer that scans the compiled bytecode and generates more optimal code prior to running, but this is left as an exercise for the interface layer developer.*
+
+### Bytecode
+
+The compiler lays down the numeric value of the bytecode, and set the type to *TYPE_BYTECODE*.
+
+### Flags
+
+The compiler lays down the numeric value of the flag, and set the type to *TYPE_FLAG*.
+
+### Numbers
+
+The compiler lays down the numeric value of the token, and set the type to *TYPE_NUMBER*.
+
+### Character
+
+The compiler lays down the numeric value (normally ASCII code) of the token, and set the type to *TYPE_CHARACTER*.
+
+### Strings
+
+The parser concatenates tokens until it encounters one ending in a single quote. It then stores the character codes into a new slice and stores a pointer to this slice into the current one. When done, it sets the type to *TYPE_STRING*.
+
+### Comments
+
+The parser concatenates tokens until it encounters one ending in a double quote. It then stores the character codes into a new slice and stores a pointer to this slice into the current one. When done, it sets the type to *TYPE_COMMENT*.
+
+### Pointers
+
+If the token maps to a name in the dictionary, this will store a pointer to the slice that corresponds to it. Otherwise, the token is converted to a number, and the type is set to *TYPE_POINTER*. 
+
+### Function Calls
+
+If the token maps to a name in the dictionary, this will store a pointer to the slice that corresponds to it and the type is set to *TYPE_FUNCTION_CALL*. If the dictionary search fails, report an error and compiles nothing.
+
+### Nested Quotations
+
+A new slice is allocated, and compilation switches to this slice. When the ending ] is encountered, switch back to the previous slice and compile a pointer into the original slice. The pointer has a *TYPE_POINTER* assigned.
+
+A special case exists if the quotation is empty (a **[ ]** pair). In this case a return instruction is compiled into the otherwise empty quote and then the pointer is compiled.
 
 # Appendix: A List of Words
