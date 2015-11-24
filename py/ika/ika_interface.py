@@ -2,7 +2,7 @@ import sys, os
 
 def dump_stack():
     """display the stack"""
-    global stack
+    global stack, types
     i = 0
     while i < len(stack):
         sys.stdout.write("\t" + unicode(i))
@@ -12,6 +12,7 @@ def dump_stack():
             sys.stdout.write("\t$" + unicode(unichr(stack[i])))
         elif types[i] == TYPE_STRING:
             sys.stdout.write(("\t'" + slice_to_string(stack[i]) +"'").encode('utf-8'))
+            sys.stdout.write("\n\t\tstored at: " + unicode(stack[i]))
         elif types[i] == TYPE_POINTER:
             sys.stdout.write("\t&" + unicode(stack[i]))
         elif types[i] == TYPE_FLAG:
@@ -21,8 +22,17 @@ def dump_stack():
                 sys.stdout.write("\tfalse")
             else:
                 sys.stdout.write("\tmalformed flag")
+        elif types[i] == TYPE_BYTECODE:
+            sys.stdout.write("\t`" + unicode(stack[i]))
+        elif types[i] == TYPE_COMMENT:
+            sys.stdout.write(("\t\"" + slice_to_string(stack[i]) + "\"").encode('utf-8'))
+            sys.stdout.write("\n\t\tstored at: " + unicode(stack[i]))
+        elif types[i] == TYPE_FUNCTION_CALL:
+            sys.stdout.write("\tCALL: " + unicode(stack[i]))
         else:
-            sys.stdout.write("unmatched type on stack!")
+            sys.stdout.write("\tunmatched type on stack!")
+            sys.stdout.write("\n\tRaw value: " + unicode(stack[i]))
+            sys.stdout.write("\n\tType code: " + unicode(types[i]))
         sys.stdout.write("\n")
         i += 1
 
@@ -45,6 +55,14 @@ def display_value():
             sys.stdout.write("false")
         else:
             sys.stdout.write("malformed flag")
+    elif types[i] == TYPE_COMMENT:
+        sys.stdout.write(slice_to_string(stack[i]))
+    elif types[i] == TYPE_BYTECODE:
+        sys.stdout.write('`' + unicode(stack[i]))
+    elif types[i] == TYPE_FUNCTION_CALL:
+        sys.stdout.write('CALL: ' + unicode(stack[i]))
+    else:
+       sys.stdout.write("unknown type")
 
 
 def display_errors():
@@ -115,7 +133,7 @@ def opcodes(slice, offset, opcode):
 
 def load_file(file):
     f = open(file).readlines()
-    for line in f:
+    for line in condense_lines(f):
         if len(line) > 1:
             if not line.startswith("#!"):
                 s = compile(line, request_slice())

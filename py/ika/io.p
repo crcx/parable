@@ -1,6 +1,6 @@
-[ "value -"  `2000 ] '.' define
-[ #10 :c . ] 'show:cr' define
-[ #32 :c . ] 'show:space' define
+[ "value -"  `2000 ] 'print' define
+[ #10 :c print ] 'show:cr' define
+[ #32 :c print ] 'show:space' define
 
 "File Operations"
 [ "string:name string:mode - number:file-id"  `3000 ] 'open-file' define
@@ -11,7 +11,11 @@
 [ "number:offset number:file-id -"  `3005 ] 'file-seek' define
 [ "number:file-id - number:length"  `3006 ] 'file-size' define
 [ "string:name -"  `3007 ] 'delete-file' define
-[ "string:name - string:contents"  [ new-slice 'r' open-file dup file-size [ [ read-file slice-store ] sip ] repeat close-file &*slice:current* @ :p :s ] preserve-slice ] 'slurp-file' define
+
+'*FID' value
+[ "string:name - string:contents"  'r' open-file to *FID  request :s *FID file-size [ *FID read-file :c :s + ] repeat   *FID close-file ] 'slurp-file' define
+'*FID' hide-function
+
 [ "string:name - flag"  `3008 ] 'file-exists?' define
 
 "Command Line Arguments"

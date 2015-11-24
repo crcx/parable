@@ -1,6 +1,6 @@
 pre: clean
 	cp ../parable.py .
-	cp ../bootstrap.p .
+	cp ../stdlib.p bootstrap.p
 	python convert.py > ika
 	chmod +x ika
 
