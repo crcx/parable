@@ -267,13 +267,13 @@
 
 
 "when: a conditional combinator"
-"[ [ condition ] [ code to execute if true ] \"
-"  [ condition ] [ code to execute if true ] \"
-"  [ condition ] [ code to execute if true ] ] when"
+"[ [ [ condition ] [ code to execute if true ] ] \"
+"  [ [ condition ] [ code to execute if true ] ] \"
+"  [ [ true ]      [ default case ] ] \"
+"] when"
 
-[ '*CASES'  '*OFFSET' ] values
-[ "-"    *OFFSET 1 + to *OFFSET ] 'next' define
-[ "-v"   *CASES *OFFSET fetch next ] 'fetch-value' define
-[ "q-"   0 to *OFFSET to *CASES *CASES length? 2 / floor [ fetch-value invoke fetch-value if-true ] repeat ] '<when>' define
-[ "q-"   *CASES [ *OFFSET [ <when> ] dip to *OFFSET ] dip to *CASES ] 'when' define
 [ '*CASES'  '*OFFSET'  'next'  'fetch-value'  '<when>' ] hide-functions
+[ '*TESTS'  '*DONE'  '*OFFSET' ] values
+[ *OFFSET 1 + to *OFFSET ] '<next>' define
+[ *OFFSET [ *DONE [ *TESTS [ to *TESTS false to *DONE 0 to *OFFSET [ *TESTS *OFFSET fetch @ invoke [ true to *DONE *TESTS *OFFSET fetch 1 fetch invoke ] if-true <next> *DONE ] while-false ] dip to *TESTS ] dip to *DONE ] dip to *OFFSET ] 'when' define
+[ '*TESTS'  '*DONE'  '*OFFSET'  '<next>' ] hide-functions
