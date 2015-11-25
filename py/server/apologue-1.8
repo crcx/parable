@@ -8,27 +8,25 @@
 #
 # Fields:
 #
-# code                    field set to the code you want to run.
-# multipleLineDefinitons  allow definitions to span multiple lines
-#                         * requires a blank line between definitions
-# discardInternals        do not return the memory map or consumed slices
-#                         * saves a considerable amount of space from the
-#                           result set
+# Paramter         Notes
+# ---------------  ----------------------------------------------------------
+# code             A string containing the code you want Apologue to process.
+#                  This is mandatory.
 #
-# "code" is mandatory, the others can be set to "true", "false", or left out.
+# Setup:
+#
+# Copy this file, *parable.py*, and *stdlib.p* to the *cgi-bin* directory. Make
+# this executable, and setup your server of choice to allow running it.
+#
 
-
-import sys
 import cgi
 import cgitb
-import signal
 import json
 import parable
-from parable import *
+import signal
+import sys
 
 cgitb.enable()  # for troubleshooting
-
-form = cgi.FieldStorage()
 
 def handler(signum, frame):
     print "Content-Type: application/json"
@@ -37,9 +35,13 @@ def handler(signum, frame):
     print get_results()
     sys.exit('fatal error: execution runtime exceeded')
 
+# Cap max run time at 60 seconds
+# (This seems satisfactory so far, and keeps server load managable)
 signal.signal(signal.SIGALRM, handler)
 signal.alarm(60)
-parable.MAX_SLICES = 32000
+
+form = cgi.FieldStorage()
+
 
 message = ""
 
@@ -52,56 +54,35 @@ def is_number(s):
         return False
 
 
-def condenseLines(code):
-    m = len(code)
-    s = ''
-    r = []
-    i = 0
-    c = 0
-    while i < m:
-        if code[i].endswith(' \\\n'):
-            s = s + ' ' + code[i][:-2].strip()
-            c = 1
-        else:
-            c = 0
-            s = s + ' ' + code[i]
-        if c == 0:
-            if s != '' and s != ' \n':
-                r.append(s.strip())
-            s = ''
-        i = i + 1
-    return r
-
-
 def get_results():
     """export a parable session to the specified format"""
-    global errors, stack, types, message
+    global message
     global form
     sequence = []
     i = 0
-    while i < len(stack):
-        if types[i] == TYPE_NUMBER:
-            sequence.append("#" + unicode(stack[i]))
-        elif types[i] == TYPE_CHARACTER:
-            sequence.append("$" + unicode(unichr(stack[i])))
-        elif types[i] == TYPE_STRING:
-            sequence.append("'" + unicode(slice_to_string(stack[i])) + "'")
-        elif types[i] == TYPE_POINTER:
-            sequence.append("&" + unicode(stack[i]))
-        elif types[i] == TYPE_FLAG:
-            if stack[i] == -1:
+    while i < len(parable.stack):
+        if parable.types[i] == parable.TYPE_NUMBER:
+            sequence.append("#" + unicode(parable.stack[i]))
+        elif parable.types[i] == parable.TYPE_CHARACTER:
+            sequence.append("$" + unicode(unichr(parable.stack[i])))
+        elif parable.types[i] == parable.TYPE_STRING:
+            sequence.append("'" + unicode(parable.slice_to_string(parable.stack[i])) + "'")
+        elif parable.types[i] == parable.TYPE_POINTER:
+            sequence.append("&" + unicode(parable.stack[i]))
+        elif parable.types[i] == parable.TYPE_FLAG:
+            if parable.stack[i] == -1:
                 sequence.append("true")
-            elif stack[i] == 0:
+            elif parable.stack[i] == 0:
                 sequence.append("false")
             else:
                 sequence.append("malformed flag")
-#        elif types[i] == TYPE_BYTECODE:
-#        elif types[i] == TYPE_COMMENT:
-#        elif types[i] == TYPE_FUNCTION_CALL:
+#        elif parable.types[i] == parable.TYPE_BYTECODE:
+#        elif parable.types[i] == parable.TYPE_COMMENT:
+#        elif parable.types[i] == parable.TYPE_FUNCTION_CALL:
         else:
             sequence.append("unmatched type on stack!")
         i = i + 1
-    collect_unused_slices()
+    parable.collect_unused_slices()
 
     p_map = []
     i = 0
@@ -125,37 +106,32 @@ def get_results():
             p_slices.append([])
         i = i + 1
 
-    discardInternals = form.getvalue("discardInternals", "false")
-    if discardInternals == "false":
-        return json.dumps({"symbols": dictionary_names, "symbol_map": dictionary_slices, "errors": errors, "parsed_stack": sequence, "types": types, "code": message, "slices": parable.p_slices, "typetags": parable.p_types, "memory_map": p_map})
-    else:
-        return json.dumps({"symbols": dictionary_names, "symbol_map": dictionary_slices, "errors": errors, "parsed_stack": sequence, "types": types, "code": message, "slices": [], "typetags": [], "memory_map": []})
+    return json.dumps({"symbols": parable.dictionary_names, "symbol_map": parable.dictionary_slices, "errors": parable.errors, "parsed_stack": sequence, "types": parable.types, "code": message, "slices": parable.p_slices, "typetags": parable.p_types, "memory_map": p_map})
+
 
 def process_input():
     global message
     global form
     message = form.getvalue("code", " ")
-    ld = form.getvalue("multipleLineDefinitions", "false")
-    prepare_slices()
-    prepare_dictionary()
-    parse_bootstrap(open('stdlib.p').readlines())
-    collect_unused_slices()
+    parable.MAX_SLICES = 32000
+    parable.prepare_slices()
+    parable.prepare_dictionary()
+    parable.parse_bootstrap(open('stdlib.p').readlines())
+    parable.collect_unused_slices()
     f = message.split("\n")
     counter = 0
 
-    if ld == "true":
-        f = condenseLines(f)
-        print f
+    f = parable.condense_lines(f)
 
     for line in f:
         line = line.strip()
         if len(line) >= 1 and line != '':
-            s = compile(line, request_slice())
-            interpret(s)
+            s = parable.compile(line, parable.request_slice())
+            parable.interpret(s)
             counter += 1
-            if counter > 100:
+            if counter > 200:
                 if len(stack) == 0:
-                    collect_unused_slices()
+                    parable.collect_unused_slices()
                     counter = 0
 
 if __name__ == '__main__':
