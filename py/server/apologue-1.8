@@ -32,32 +32,12 @@ def handler(signum, frame):
     print "Content-Type: application/json"
     print
     report('FATAL ERROR: Execution exceed max runtime permitted')
-    print get_results()
     sys.exit('fatal error: execution runtime exceeded')
 
-# Cap max run time at 60 seconds
-# (This seems satisfactory so far, and keeps server load managable)
-signal.signal(signal.SIGALRM, handler)
-signal.alarm(60)
-
-form = cgi.FieldStorage()
 
 
-message = ""
-
-def is_number(s):
-    """return True if s is a number, or False otherwise"""
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
-
-
-def get_results():
+def get_results(message):
     """export a parable session to the specified format"""
-    global message
-    global form
     sequence = []
     i = 0
     while i < len(parable.stack):
@@ -90,29 +70,11 @@ def get_results():
         if parable.p_map[i] != 0:
             p_map.append(i)
         i = i + 1
-    p_slices = []
-    i = 0
-    while i < parable.MAX_SLICES:
-        if parable.p_map[i] != 0:
-            n = parable.p_sizes[i]
-            s = []
-            m = 0
-            while n >= 0:
-                s.append(parable.fetch(i, m))
-                m = m + 1
-                n = n - 1
-            p_slices.append(s)
-        else:
-            p_slices.append([])
-        i = i + 1
 
     return json.dumps({"symbols": parable.dictionary_names, "symbol_map": parable.dictionary_slices, "errors": parable.errors, "parsed_stack": sequence, "types": parable.types, "code": message, "slices": parable.p_slices, "typetags": parable.p_types, "memory_map": p_map})
 
 
-def process_input():
-    global message
-    global form
-    message = form.getvalue("code", " ")
+def process_input(message):
     parable.MAX_SLICES = 32000
     parable.prepare_slices()
     parable.prepare_dictionary()
@@ -135,7 +97,15 @@ def process_input():
                     counter = 0
 
 if __name__ == '__main__':
-     process_input()
-     print "Content-Type: application/json"
-     print
-     print get_results()
+    # Cap max run time at 60 seconds
+    # (This seems satisfactory so far, and keeps server load managable)
+    signal.signal(signal.SIGALRM, handler)
+    signal.alarm(60)
+
+    form = cgi.FieldStorage()
+    message = form.getvalue("code", " ")
+
+    process_input(message)
+    print "Content-Type: application/json"
+    print
+    print get_results(message)
