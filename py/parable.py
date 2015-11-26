@@ -5,9 +5,7 @@
 #
 # Dependencies
 #
-import sys
-import math
-import random
+import sys, math, random
 
 #
 # Memory Configuration
@@ -171,13 +169,12 @@ def report(text):
     global errors
     errors.append(text)
 
-
-def check_depth(cells):
+def check_depth(slice, offset, cells):
     """returns True if the stack has at least *cells* number of items, or"""
     """False otherwise. If False, reports an underflow error."""
     global stack
     if len(stack) < cells:
-        report('Stack underflow: ' + unicode(cells) + ' values required')
+        report('Stack underflow in slice ' + str(slice) + ' at offset ' + str(offset) + ': ' + unicode(cells) + ' values required')
         return False
     else:
         return True
@@ -203,54 +200,54 @@ def interpret(slice, more=None):
                 interpret(stack_pop(), more)
         else:
             if opcode == BC_TYPE_B:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     stack_change_type(TYPE_BYTECODE)
                 else:
                     offset = size
             elif opcode == BC_TYPE_N:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     stack_change_type(TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_TYPE_S:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     stack_change_type(TYPE_STRING)
                 else:
                     offset = size
             elif opcode == BC_TYPE_C:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     stack_change_type(TYPE_CHARACTER)
                 else:
                     offset = size
             elif opcode == BC_TYPE_F:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     stack_change_type(TYPE_POINTER)
                 else:
                     offset = size
             elif opcode == BC_TYPE_FLAG:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     stack_change_type(TYPE_FLAG)
                 else:
                     offset = size
             elif opcode == BC_TYPE_CALL:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     stack_change_type(TYPE_FUNCTION_CALL)
                 else:
                     offset = size
             elif opcode == BC_SET_TYPE:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     a = stack_pop() # type
                     b = stack_pop() # value
                     stack_push(b, a)
                 else:
                     offset = size
             elif opcode == BC_GET_TYPE:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     stack_push(stack_type(), TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_ADD:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     x = stack_type()
                     a = stack_pop()
                     y = stack_type()
@@ -264,66 +261,66 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_SUBTRACT:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(b - a, TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_MULTIPLY:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(a * b, TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_DIVIDE:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(b / a, TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_REMAINDER:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(b % a, TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_FLOOR:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     stack_push(math.floor(float(stack_pop())), TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_POW:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(math.pow(b, a), TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_LOG:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     a = stack_pop()
                     stack_push(math.log(a), TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_LOG10:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     a = stack_pop()
                     stack_push(math.log10(a), TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_LOGN:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(math.log(b, a), TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_BITWISE_SHIFT:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     a = int(stack_pop())
                     b = int(stack_pop())
                     if a < 0:
@@ -333,21 +330,21 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_BITWISE_AND:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     a = int(stack_pop())
                     b = int(stack_pop())
                     stack_push(b & a, TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_BITWISE_OR:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     a = int(stack_pop())
                     b = int(stack_pop())
                     stack_push(b | a, TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_BITWISE_XOR:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     a = int(stack_pop())
                     b = int(stack_pop())
                     stack_push(b ^ a, TYPE_NUMBER)
@@ -356,12 +353,12 @@ def interpret(slice, more=None):
             elif opcode == BC_RANDOM:
                 stack_push(random.SystemRandom().random(), TYPE_NUMBER)
             elif opcode == BC_SQRT:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     stack_push(math.sqrt(stack_pop()), TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_COMPARE_LT:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     x = stack_type()
                     a = stack_pop()
                     y = stack_type()
@@ -377,7 +374,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_COMPARE_GT:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     x = stack_type()
                     a = stack_pop()
                     y = stack_type()
@@ -393,7 +390,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_COMPARE_LTEQ:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     x = stack_type()
                     a = stack_pop()
                     y = stack_type()
@@ -409,7 +406,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_COMPARE_GTEQ:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     x = stack_type()
                     a = stack_pop()
                     y = stack_type()
@@ -425,7 +422,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_COMPARE_EQ:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     x = stack_type()
                     a = stack_pop()
                     y = stack_type()
@@ -446,7 +443,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_COMPARE_NEQ:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     x = stack_type()
                     a = stack_pop()
                     y = stack_type()
@@ -467,7 +464,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_FLOW_IF:
-                if check_depth(3):
+                if check_depth(slice, offset, 3):
                     a = stack_pop()
                     b = stack_pop()
                     c = stack_pop()
@@ -478,7 +475,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_FLOW_WHILE:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     quote = stack_pop()
                     a = -1
                     while a == -1:
@@ -487,7 +484,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_FLOW_UNTIL:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     quote = stack_pop()
                     a = 0
                     while a == 0:
@@ -496,7 +493,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_FLOW_TIMES:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     quote = stack_pop()
                     count = stack_pop()
                     while count > 0:
@@ -508,13 +505,13 @@ def interpret(slice, more=None):
                 offset += 1
                 interpret(int(fetch(slice, offset)), more)
             elif opcode == BC_FLOW_CALL_F:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     a = stack_pop()
                     interpret(a, more)
                 else:
                     offset = size
             elif opcode == BC_FLOW_DIP:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     quote = stack_pop()
                     vtype = stack_type()
                     value = stack_pop()
@@ -523,7 +520,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_FLOW_SIP:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     quote = stack_pop()
                     stack_dup()
                     vtype = stack_type()
@@ -533,7 +530,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_FLOW_BI:
-                if check_depth(3):
+                if check_depth(slice, offset, 3):
                     a = stack_pop()
                     b = stack_pop()
                     stack_dup()
@@ -545,7 +542,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_FLOW_TRI:
-                if check_depth(4):
+                if check_depth(slice, offset, 4):
                     a = stack_pop()
                     b = stack_pop()
                     c = stack_pop()
@@ -565,21 +562,21 @@ def interpret(slice, more=None):
             elif opcode == BC_FLOW_RETURN:
                 offset = size
             elif opcode == BC_MEM_COPY:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     a = stack_pop()
                     b = stack_pop()
                     copy_slice(b, a)
                 else:
                     offset = size
             elif opcode == BC_MEM_FETCH:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(fetch(b, a), fetch_type(b, a))
                 else:
                     offset = size
             elif opcode == BC_MEM_STORE:
-                if check_depth(3):
+                if check_depth(slice, offset, 3):
                     a = stack_pop()
                     b = stack_pop()
                     t = stack_type()
@@ -590,21 +587,27 @@ def interpret(slice, more=None):
             elif opcode == BC_MEM_REQUEST:
                 stack_push(request_slice(), TYPE_POINTER)
             elif opcode == BC_MEM_RELEASE:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     release_slice(stack_pop())
                 else:
                     offset = size
             elif opcode == BC_MEM_COLLECT:
-                collect_unused_slices()
+                collect_garbage()
             elif opcode == BC_MEM_GET_LAST:
-                a = stack_pop()
-                stack_push(get_last_index(a), TYPE_NUMBER)
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    stack_push(get_last_index(a), TYPE_NUMBER)
+                else:
+                    offset = size
             elif opcode == BC_MEM_SET_LAST:
-                a = stack_pop()
-                b = stack_pop()
-                set_slice_last_index(a, b)
+                if check_depth(slice, offset, 2):
+                    a = stack_pop()
+                    b = stack_pop()
+                    set_slice_last_index(a, b)
+                else:
+                    offset = size
             elif opcode == BC_MEM_SET_TYPE:
-                if check_depth(3):
+                if check_depth(slice, offset, 3):
                     a = stack_pop()
                     b = stack_pop()
                     c = stack_pop()
@@ -612,7 +615,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_MEM_GET_TYPE:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     a = stack_pop()
                     b = stack_pop()
                     c = fetch_type(b, a)
@@ -620,32 +623,32 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_STACK_DUP:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     stack_dup()
                 else:
                     offset = size
             elif opcode == BC_STACK_DROP:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     stack_drop()
                 else:
                     offset = size
             elif opcode == BC_STACK_SWAP:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     stack_swap()
                 else:
                     offset = size
             elif opcode == BC_STACK_OVER:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     stack_over()
                 else:
                     offset = size
             elif opcode == BC_STACK_TUCK:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     stack_tuck()
                 else:
                     offset = size
             elif opcode == BC_STACK_NIP:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     stack_swap()
                     stack_drop()
                 else:
@@ -655,14 +658,14 @@ def interpret(slice, more=None):
             elif opcode == BC_STACK_CLEAR:
                 stack_clear()
             elif opcode == BC_QUOTE_NAME:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     name = slice_to_string(stack_pop())
                     ptr = stack_pop()
                     add_definition(name, ptr)
                 else:
                     offset = size
             elif opcode == BC_FUNCTION_EXISTS:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     name = slice_to_string(stack_pop())
                     if lookup_pointer(name) != -1:
                         stack_push(-1, TYPE_FLAG)
@@ -671,7 +674,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_FUNCTION_LOOKUP:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     name = slice_to_string(stack_pop())
                     if lookup_pointer(name) != -1:
                         stack_push(lookup_pointer(name), TYPE_POINTER)
@@ -680,21 +683,21 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_FUNCTION_HIDE:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     name = slice_to_string(stack_pop())
                     if lookup_pointer(name) != -1:
                         remove_name(name)
                 else:
                     offset = size
             elif opcode == BC_STRING_SEEK:
-                if check_depth(2):
+                if check_depth(slice, offset, 2):
                     a = slice_to_string(stack_pop())
                     b = slice_to_string(stack_pop())
                     stack_push(b.find(a), TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_SLICE_SUBSLICE:
-                if check_depth(3):
+                if check_depth(slice, offset, 3):
                     a = int(stack_pop())
                     b = int(stack_pop())
                     s = int(stack_pop())
@@ -711,7 +714,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_STRING_NUMERIC:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     a = slice_to_string(stack_pop())
                     if is_number(a):
                         stack_push(-1, TYPE_FLAG)
@@ -720,14 +723,14 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_SLICE_REVERSE:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     a = stack_pop()
                     p_slices[int(a)] = p_slices[int(a)][::-1]
                     stack_push(a, TYPE_POINTER)
                 else:
                     offset = size
             elif opcode == BC_TO_UPPER:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     t = stack_type()
                     if t == TYPE_STRING:
                         ptr = stack_pop()
@@ -743,7 +746,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_TO_LOWER:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     t = stack_type()
                     if t == TYPE_STRING:
                         ptr = stack_pop()
@@ -759,33 +762,54 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_REPORT:
-                if check_depth(1):
+                if check_depth(slice, offset, 1):
                     if stack_type() == TYPE_STRING:
                         a = slice_to_string(stack_pop())
                         report(a)
                 offset = size
             elif opcode == BC_TRIG_SIN:
-                a = stack_pop()
-                stack_push(math.sin(a), TYPE_NUMBER)
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    stack_push(math.sin(a), TYPE_NUMBER)
+                else:
+                    offset = size
             elif opcode == BC_TRIG_COS:
-                a = stack_pop()
-                stack_push(math.cos(a), TYPE_NUMBER)
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    stack_push(math.cos(a), TYPE_NUMBER)
+                else:
+                    offset = size
             elif opcode == BC_TRIG_TAN:
-                a = stack_pop()
-                stack_push(math.tan(a), TYPE_NUMBER)
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    stack_push(math.tan(a), TYPE_NUMBER)
+                else:
+                    offset = size
             elif opcode == BC_TRIG_ASIN:
-                a = stack_pop()
-                stack_push(math.asin(a), TYPE_NUMBER)
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    stack_push(math.asin(a), TYPE_NUMBER)
+                else:
+                    offset = size
             elif opcode == BC_TRIG_ACOS:
-                a = stack_pop()
-                stack_push(math.acos(a), TYPE_NUMBER)
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    stack_push(math.acos(a), TYPE_NUMBER)
+                else:
+                    offset = size
             elif opcode == BC_TRIG_ATAN:
-                a = stack_pop()
-                stack_push(math.atan(a), TYPE_NUMBER)
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    stack_push(math.atan(a), TYPE_NUMBER)
+                else:
+                    offset = size
             elif opcode == BC_TRIG_ATAN2:
-                a = stack_pop()
-                b = stack_pop()
-                stack_push(math.atan2(b, a), TYPE_NUMBER)
+                if check_depth(slice, offset, 2):
+                    a = stack_pop()
+                    b = stack_pop()
+                    stack_push(math.atan2(b, a), TYPE_NUMBER)
+                else:
+                    offset = size
             if more is not None:
                 offset = more(slice, offset, opcode)
 
@@ -1183,7 +1207,7 @@ def seek_all_references():
     return list(set(refs))
 
 
-def collect_unused_slices():
+def collect_garbage():
     """scan memory, and collect unused slices"""
     global MAX_SLICES, p_map
     i = 0

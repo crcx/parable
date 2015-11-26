@@ -227,7 +227,7 @@ if __name__ == '__main__':
     prepare_slices()
     prepare_dictionary()
     parse_bootstrap(open('stdlib.p').readlines())
-    collect_unused_slices()
+    collect_garbage()
 
     counter = 0
 
@@ -243,7 +243,7 @@ if __name__ == '__main__':
         elif cmd == ':r' or cmd == ':restart':
             revert()
             parse_bootstrap(open('stdlib.p').readlines())
-            collect_unused_slices()
+            collect_garbage()
         elif cmd[0:2] == ':i':
             load_file(cmd[3:])
         else:

@@ -103,7 +103,7 @@ def setup_environment():
     parable.prepare_slices()
     parable.prepare_dictionary()
     parable.parse_bootstrap(open('stdlib.p').readlines())
-    parable.collect_unused_slices()
+    parable.collect_garbage()
 
 
 if __name__ == '__main__':
@@ -151,7 +151,7 @@ if __name__ == '__main__':
             counter += 1
             if counter > 100:
                 if len(parable.stack) == 0:
-                    parable.collect_unused_slices()
+                    parable.collect_garbage()
                     counter = 0
     dump_errors()
     dump_stack()

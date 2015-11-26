@@ -58,7 +58,7 @@ def get_results(message):
         else:
             sequence.append("unmatched type on stack!")
         i = i + 1
-    parable.collect_unused_slices()
+    parable.collect_garbage()
 
     p_map = []
     i = 0
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     parable.prepare_slices()
     parable.prepare_dictionary()
     parable.parse_bootstrap(open('stdlib.p').readlines())
-    parable.collect_unused_slices()
+    parable.collect_garbage()
 
     # process input
     process_input(source)
