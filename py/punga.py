@@ -7,53 +7,56 @@ import cgi, cgitb, signal, sys
 import parable
 
 
+def stack_item(i, text):
+    row = "<tr>"
+    if i == len(parable.stack) - 1:
+        row = row + "<td><strong>" + str(i) + "</strong></td>"
+    else:
+        row = row + "<td>" + str(i) + "</td>"
+    row = row + "<td>" + text + "</td>"
+    row = row + "</tr>"
+    return row
+
 def dump_stack():
     """display the stack"""
     i = 0
+    s = ""
     sys.stdout.write("<table class='table table-bordered'>")
     while i < len(parable.stack):
-        if i == len(parable.stack) - 1:
-            sys.stdout.write("<tr><td><strong>" + str(i) + "</strong>")
-        else:
-            sys.stdout.write("<tr><td>" + str(i))
+        tos = parable.stack[i]
         if parable.types[i] == parable.TYPE_NUMBER:
-            sys.stdout.write("</td><td>#" + str(parable.stack[i]) + "</td></tr>")
+            sys.stdout.write(stack_item(i, "#" + str(tos)))
         elif parable.types[i] == parable.TYPE_CHARACTER:
-            sys.stdout.write("</td><td>$" + unicode(unichr(parable.stack[i])).encode('utf-8') + "</td></tr>")
+            sys.stdout.write(stack_item(i, "$" + unicode(unichr(tos)).encode('utf-8')))
         elif parable.types[i] == parable.TYPE_STRING:
-            sys.stdout.write("</td><td>'" + parable.slice_to_string(parable.stack[i]))
-            sys.stdout.write("'" + "<br><span style='color: #D3D3D3;'>Stored ")
-            sys.stdout.write("at: " + str(parable.stack[i]) + "</span></td></tr>")
+            s = "'" + parable.slice_to_string(tos) + "'"
+            s = s + "<br>Store at: " + str(tos)
+            sys.stdout.write(stack_item(i, s))
         elif parable.types[i] == parable.TYPE_POINTER:
-            sys.stdout.write("</td><td>&" + str(parable.stack[i]))
-            if parable.pointer_to_name(parable.stack[i]) != "":
-                sys.stdout.write("<br><span style='color: #D3D3D3;'>Pointer ")
-                sys.stdout.write("to: " + parable.pointer_to_name(parable.stack[i]))
-                sys.stdout.write("</span>")
-            sys.stdout.write("</td></tr>")
+            s = "&amp;" + str(tos)
+            if parable.pointer_to_name(tos) != "":
+                s = s + "<br>Pointer to: " + parable.pointer_to_name(tos)
+            sys.stdout.write(stack_item(i, s))
         elif parable.types[i] == parable.TYPE_FLAG:
-            if parable.stack[i] == -1:
-                sys.stdout.write("</td><td>true" + "</td></tr>")
-            elif parable.stack[i] == 0:
-                sys.stdout.write("</td><td>false" + "</td></tr>")
+            if tos == -1:
+                sys.stdout.write(stack_item(i, "true"))
+            elif tos == 0:
+                sys.stdout.write(stack_item(i, "false"))
             else:
-                sys.stdout.write("</td><td>malformed flag" + "</td></tr>")
+                sys.stdout.write(stack_item(i, "malformed flag"))
         elif parable.types[i] == parable.TYPE_BYTECODE:
-            sys.stdout.write("</td><td>`" + str(parable.stack[i]) + "</td></tr>")
+            sys.stdout.write(stack_item(i, "`" + str(tos)))
         elif parable.types[i] == parable.TYPE_COMMENT:
-            sys.stdout.write("</td><td>\"" + parable.slice_to_string(parable.stack[i]))
-            sys.stdout.write("\"" + "<br><span style='color: #D3D3D3;'>Stored ")
-            sys.stdout.write("at: " + str(parable.stack[i]) + "</span></td></tr>")
+            s = "\"" + parable.slice_to_string(tos) + "\""
+            s = s + "<br>Store at: " + str(tos)
+            sys.stdout.write(stack_item(i, s))
         elif parable.types[i] == parable.TYPE_FUNCTION_CALL:
-            sys.stdout.write("</td><td>CALL: " + str(parable.stack[i]))
-            if parable.pointer_to_name(parable.stack[i]) != "":
-                sys.stdout.write("<br><span style='color: #D3D3D3;'>Call ")
-                sys.stdout.write("to: " + parable.pointer_to_name(parable.stack[i]))
-                sys.stdout.write("</span>")
-            sys.stdout.write("</td></tr>")
+            s = "Call: " + str(tos)
+            if parable.pointer_to_name(tos) != "":
+                s = s + "<br>Pointer to: " + parable.pointer_to_name(tos)
+            sys.stdout.write(stack_item(i, s))
         else:
-            sys.stdout.write("</td><td>unmatched type on stack!")
-            sys.stdout.write("</td></tr>")
+            sys.stdout.write(stack_item(i, "unmatched type on stack!"))
         i += 1
     sys.stdout.write("</table>")
 
