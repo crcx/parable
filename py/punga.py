@@ -2,12 +2,28 @@
 
 # Parable, Copyright (c) 2012 - 2015  Charles Childers
 #
+# This is *Punga*, a browser based interface layer for Parable.
+# 
+# Punga is a CGI script that presents a simple form based editor. When the user
+# submits the form, Parable processes the code, and the refereshed page has the
+# original code and execution results.
+#
+# Setup:
+#
+# Copy punga.py, parable.py, stdlib.p to your *cgi-bin* location.
+# Configure your server to allow running punga.py
+#
+# Notes:
+#
+# * This uses Bootstrap CSS (loaded from a CDN) to simplify layout
+#
 
 import cgi, cgitb, signal, sys
 import parable
 
 
 def stack_item(i, text):
+    """return a HTML row for stack item *i* (which is represented by *text*)"""
     row = "<tr>"
     if i == len(parable.stack) - 1:
         row = row + "<td><strong>" + str(i) + "</strong></td>"
@@ -17,40 +33,43 @@ def stack_item(i, text):
     row = row + "</tr>"
     return row
 
+
 def dump_stack():
     """display the stack"""
     i = 0
     s = ""
+    depth = len(parable.stack)
     sys.stdout.write("<table class='table table-bordered'>")
-    while i < len(parable.stack):
+    while i < depth:
         tos = parable.stack[i]
-        if parable.types[i] == parable.TYPE_NUMBER:
+        type = parable.types[i]
+        if type == parable.TYPE_NUMBER:
             sys.stdout.write(stack_item(i, "#" + str(tos)))
-        elif parable.types[i] == parable.TYPE_CHARACTER:
+        elif type == parable.TYPE_CHARACTER:
             sys.stdout.write(stack_item(i, "$" + unicode(unichr(tos)).encode('utf-8')))
-        elif parable.types[i] == parable.TYPE_STRING:
+        elif type == parable.TYPE_STRING:
             s = "'" + parable.slice_to_string(tos) + "'"
             s = s + "<br>Store at: " + str(tos)
             sys.stdout.write(stack_item(i, s))
-        elif parable.types[i] == parable.TYPE_POINTER:
+        elif type == parable.TYPE_POINTER:
             s = "&amp;" + str(tos)
             if parable.pointer_to_name(tos) != "":
                 s = s + "<br>Pointer to: " + parable.pointer_to_name(tos)
             sys.stdout.write(stack_item(i, s))
-        elif parable.types[i] == parable.TYPE_FLAG:
+        elif type == parable.TYPE_FLAG:
             if tos == -1:
                 sys.stdout.write(stack_item(i, "true"))
             elif tos == 0:
                 sys.stdout.write(stack_item(i, "false"))
             else:
                 sys.stdout.write(stack_item(i, "malformed flag"))
-        elif parable.types[i] == parable.TYPE_BYTECODE:
+        elif type == parable.TYPE_BYTECODE:
             sys.stdout.write(stack_item(i, "`" + str(tos)))
-        elif parable.types[i] == parable.TYPE_COMMENT:
+        elif type == parable.TYPE_COMMENT:
             s = "\"" + parable.slice_to_string(tos) + "\""
             s = s + "<br>Store at: " + str(tos)
             sys.stdout.write(stack_item(i, s))
-        elif parable.types[i] == parable.TYPE_FUNCTION_CALL:
+        elif type == parable.TYPE_FUNCTION_CALL:
             s = "Call: " + str(tos)
             if parable.pointer_to_name(tos) != "":
                 s = s + "<br>Pointer to: " + parable.pointer_to_name(tos)
@@ -64,10 +83,8 @@ def dump_stack():
 def dump_errors():
     if parable.errors:
         sys.stdout.write("<div class='alert alert-error'>")
-        i = 0
-        while i <= len(parable.errors):
-            sys.stdout.write("<tt>" + parable.errors.pop() + "</tt><br>")
-            i += 1
+        for error in parable.errors:
+            sys.stdout.write("<tt>" + error + "</tt><br>")
         sys.stdout.write("</div>")
 
 
