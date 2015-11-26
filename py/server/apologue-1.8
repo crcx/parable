@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-# parable
-# copyright (c) 2013 - 2015 charles childers
+# Parable,  Copyright (c) 2013 - 2015 Charles Childers
 #
 # Perform a POST to this script. The resulting stack, stack types, provided
 # code, and any errors will be returned as a JSON object.
@@ -19,21 +18,15 @@
 # this executable, and setup your server of choice to allow running it.
 #
 
-import cgi
-import cgitb
-import json
+import cgi, cgitb, json, signal, sys
 import parable
-import signal
-import sys
 
-cgitb.enable()  # for troubleshooting
 
 def handler(signum, frame):
     print "Content-Type: application/json"
     print
     report('FATAL ERROR: Execution exceed max runtime permitted')
     sys.exit('fatal error: execution runtime exceeded')
-
 
 
 def get_results(message):
@@ -56,9 +49,12 @@ def get_results(message):
                 sequence.append("false")
             else:
                 sequence.append("malformed flag")
-#        elif parable.types[i] == parable.TYPE_BYTECODE:
-#        elif parable.types[i] == parable.TYPE_COMMENT:
-#        elif parable.types[i] == parable.TYPE_FUNCTION_CALL:
+        elif parable.types[i] == parable.TYPE_BYTECODE:
+            sequence.append("`" + unicode(parable.stack[i]))
+        elif parable.types[i] == parable.TYPE_COMMENT:
+            sequence.append("\"" + unicode(parable.slice_to_string(parable.stack[i])) + "\"")
+        elif parable.types[i] == parable.TYPE_FUNCTION_CALL:
+            sequence.append("Call to: " + unicode(parable.stack[i]))
         else:
             sequence.append("unmatched type on stack!")
         i = i + 1
@@ -74,38 +70,39 @@ def get_results(message):
     return json.dumps({"symbols": parable.dictionary_names, "symbol_map": parable.dictionary_slices, "errors": parable.errors, "parsed_stack": sequence, "types": parable.types, "code": message, "slices": parable.p_slices, "typetags": parable.p_types, "memory_map": p_map})
 
 
-def process_input(message):
-    parable.MAX_SLICES = 32000
-    parable.prepare_slices()
-    parable.prepare_dictionary()
-    parable.parse_bootstrap(open('stdlib.p').readlines())
-    parable.collect_unused_slices()
-    f = message.split("\n")
-    counter = 0
+def process_input(source):
+    lines = parable.condense_lines(source.split("\n"))
 
-    f = parable.condense_lines(f)
-
-    for line in f:
+    for line in lines:
         line = line.strip()
         if len(line) >= 1 and line != '':
-            s = parable.compile(line, parable.request_slice())
-            parable.interpret(s)
-            counter += 1
-            if counter > 200:
-                if len(stack) == 0:
-                    parable.collect_unused_slices()
-                    counter = 0
+            slice = parable.compile(line, parable.request_slice())
+            parable.interpret(slice)
+
 
 if __name__ == '__main__':
+    cgitb.enable()  # for troubleshooting
+
     # Cap max run time at 60 seconds
     # (This seems satisfactory so far, and keeps server load managable)
     signal.signal(signal.SIGALRM, handler)
     signal.alarm(60)
 
+    # get input (in "code" field)
     form = cgi.FieldStorage()
-    message = form.getvalue("code", " ")
+    source = form.getvalue("code", " ")
 
-    process_input(message)
+    # setup Parable
+    parable.MAX_SLICES = 32000
+    parable.prepare_slices()
+    parable.prepare_dictionary()
+    parable.parse_bootstrap(open('stdlib.p').readlines())
+    parable.collect_unused_slices()
+
+    # process input
+    process_input(source)
+
+    # return results as a JSON object
     print "Content-Type: application/json"
     print
-    print get_results(message)
+    print get_results(source)
