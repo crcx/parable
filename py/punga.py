@@ -140,6 +140,8 @@ if __name__ == '__main__':
                 <div class="span6">
     """
 
+    message = message.replace("\\\r\n", " ")
+    message = message.replace("\\\n", " ")
     f = parable.condense_lines(message.split("\n"))
     counter = 0
     for line in f:
