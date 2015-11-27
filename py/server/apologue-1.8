@@ -71,7 +71,9 @@ def get_results(message):
 
 
 def process_input(source):
-    lines = parable.condense_lines(source.split("\n"))
+    filtered = source.replace("\\\r\n", " ")
+    filtered = filtered.replace("\\\n", " ")
+    lines = filtered.split("\n")
 
     for line in lines:
         line = line.strip()
