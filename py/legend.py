@@ -34,9 +34,7 @@
 # ===================================================================
 
 # Dependencies
-import sys
-import os
-from subprocess import call
+import os, sys
 import parable
 
 
@@ -77,17 +75,12 @@ def write(text, color):
 
 
 def getTerminalSize():
-    import os
     env = os.environ
 
     def ioctl_GWINSZ(fd):
         try:
-            import fcntl
-            import termios
-            import struct
-            import os
-            cr = struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ,
-        '1234'))
+            import fcntl, termios, struct
+            cr = struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
         except:
             return
         return cr
@@ -128,11 +121,13 @@ def display_stack():
         tos = parable.stack[i]
         type = parable.types[i]
 
+        # display the stack item number
         if i == len(parable.stack) - 1:
             write("TOS\t" + unicode(i), COLOR_STACK_LINE)
         else:
             write("\t" + unicode(i), COLOR_STACK_LINE)
 
+        # display the stack item
         if type == parable.TYPE_NUMBER:
             write("\t#" + unicode(tos), COLOR_STACK_N)
         elif type == parable.TYPE_CHARACTER:
@@ -165,8 +160,11 @@ def display_stack():
         else:
             write("\tUNKNOWN\t" + str(tos) + "\t" + str(type), COLOR_ERROR)
         sys.stdout.write("\n")
+
+        # increase "l" so we know how many lines have been displayed so far
         i += 1
         l += 1
+
     return l
 
 
@@ -204,6 +202,7 @@ def display(height, width):
 
 def load_file(file):
     f = open(file).readlines()
+    f = parable.condense_lines(f)
     for line in f:
         if len(line) > 1:
             s = parable.compile(line, parable.request_slice())
@@ -230,15 +229,13 @@ if __name__ == '__main__':
     parable.collect_garbage()
 
     while 1 == 1:
-
         display(height, width)
         src = get_input()
-
         cmd = ' '.join(src.split())
 
-        if cmd == ':q' or cmd == ':quit':
+        if cmd == ':q':
             exit()
-        elif cmd == ':r' or cmd == ':restart':
+        elif cmd == ':r':
             revert()
             parable.parse_bootstrap(open('stdlib.p').readlines())
             parable.collect_garbage()
