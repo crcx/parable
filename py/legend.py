@@ -37,7 +37,7 @@
 import sys
 import os
 from subprocess import call
-from parable import *
+import parable
 
 
 #
@@ -108,62 +108,62 @@ def getTerminalSize():
 
 def revert():
     """revert the session to a clean state (does not load bootstrap)"""
-    global p_slices, p_dict, dictionary_slices, dictionary_names
-
-    for i in p_slices:
-        p_slices.pop()
-    for i in p_map:
-        p_map.pop()
-    for i in dictionary_slices:
-        dictionary_slices.pop()
-    for i in dictionary_names:
-        dictionary_names.pop()
-    prepare_slices()
-    prepare_dictionary()
+    for i in parable.p_slices:
+        parable.p_slices.pop()
+    for i in parable.p_map:
+        parable.p_map.pop()
+    for i in parable.dictionary_slices:
+        parable.dictionary_slices.pop()
+    for i in parable.dictionary_names:
+        parable.dictionary_names.pop()
+    parable.prepare_slices()
+    parable.prepare_dictionary()
 
 
 def display_stack():
     """display the stack contents. returns the number of lines rendered"""
-    global stack, types
     i = 0
     l = 1
-    while i < len(stack):
-        if i == len(stack) - 1:
+    while i < len(parable.stack):
+        tos = parable.stack[i]
+        type = parable.types[i]
+
+        if i == len(parable.stack) - 1:
             write("TOS\t" + unicode(i), COLOR_STACK_LINE)
         else:
             write("\t" + unicode(i), COLOR_STACK_LINE)
 
-        if types[i] == TYPE_NUMBER:
-            write("\t#" + unicode(stack[i]), COLOR_STACK_N)
-        elif types[i] == TYPE_CHARACTER:
-            write("\t$" + unicode(unichr(stack[i])), COLOR_STACK_C)
-        elif types[i] == TYPE_STRING:
-            write("\t'" + slice_to_string(stack[i]) + "'", COLOR_STACK_S)
-            write("\n\t\tstored at: " + unicode(stack[i]), 'normal')
+        if type == parable.TYPE_NUMBER:
+            write("\t#" + unicode(tos), COLOR_STACK_N)
+        elif type == parable.TYPE_CHARACTER:
+            write("\t$" + unicode(unichr(tos)), COLOR_STACK_C)
+        elif type == parable.TYPE_STRING:
+            write("\t'" + parable.slice_to_string(tos) + "'", COLOR_STACK_S)
+            write("\n\t\tstored at: " + unicode(tos), 'normal')
             l += 1
-        elif types[i] == TYPE_POINTER:
-            write("\t&" + unicode(stack[i]), COLOR_STACK_F)
-            if pointer_to_name(stack[i]) != "":
+        elif type == parable.TYPE_POINTER:
+            write("\t&" + unicode(tos), COLOR_STACK_F)
+            if parable.pointer_to_name(tos) != "":
                 write("\n\t\tpointer to: ", 'normal')
-                write(pointer_to_name(stack[i]), 'normal')
+                write(parable.pointer_to_name(tos), 'normal')
                 l += 1
-        elif types[i] == TYPE_FLAG:
-            if stack[i] == -1:
+        elif type == parable.TYPE_FLAG:
+            if tos == -1:
                 write("\ttrue", COLOR_STACK_FLAG)
-            elif stack[i] == 0:
+            elif tos == 0:
                 write("\tfalse", COLOR_STACK_FLAG)
             else:
                 write("\tmalformed flag", COLOR_STACK_FLAG)
-        elif types[i] == TYPE_BYTECODE:
-            write("\t`" + unicode(stack[i]), COLOR_STACK_BYTECODE)
-        elif types[i] == TYPE_COMMENT:
-            write("\t\"" + slice_to_string(stack[i]) + "\"", COLOR_STACK_COMMENT)
-            write("\n\t\tstored at: " + unicode(stack[i]), 'normal')
+        elif type == parable.TYPE_BYTECODE:
+            write("\t`" + unicode(tos), COLOR_STACK_BYTECODE)
+        elif type == parable.TYPE_COMMENT:
+            write("\t\"" + parable.slice_to_string(tos) + "\"", COLOR_STACK_COMMENT)
+            write("\n\t\tstored at: " + unicode(tos), 'normal')
             l += 1
-        elif types[i] == TYPE_FUNCTION_CALL:
-            write("\tCALL: " + unicode(stack[i]), COLOR_STACK_FUN_CALL)
+        elif type == parable.TYPE_FUNCTION_CALL:
+            write("\tCALL: " + unicode(tos), COLOR_STACK_FUN_CALL)
         else:
-            write("\tUNKNOWN\t" + str(stack[i]) + "\t" + str(types[i]), COLOR_ERROR)
+            write("\tUNKNOWN\t" + str(tos) + "\t" + str(type), COLOR_ERROR)
         sys.stdout.write("\n")
         i += 1
         l += 1
@@ -172,9 +172,9 @@ def display_stack():
 
 def display_errors():
     """display any error messages. returns number of lines rendered"""
-    for e in errors:
+    for e in parable.errors:
         write("\n" + e, COLOR_ERROR)
-    return len(errors)
+    return len(parable.errors)
 
 
 def draw_separator(width):
@@ -193,7 +193,7 @@ def display(height, width):
     clear_display()
     l = display_stack()
     l += display_errors()
-    clear_errors()
+    parable.clear_errors()
     while l < (height - 1):
         sys.stdout.write("\n")
         l += 1
@@ -206,8 +206,8 @@ def load_file(file):
     f = open(file).readlines()
     for line in f:
         if len(line) > 1:
-            s = compile(line, request_slice())
-            interpret(s)
+            s = parable.compile(line, parable.request_slice())
+            parable.interpret(s)
 
 
 def get_input():
@@ -224,10 +224,10 @@ def get_input():
 
 if __name__ == '__main__':
     (width, height) = getTerminalSize()
-    prepare_slices()
-    prepare_dictionary()
-    parse_bootstrap(open('stdlib.p').readlines())
-    collect_garbage()
+    parable.prepare_slices()
+    parable.prepare_dictionary()
+    parable.parse_bootstrap(open('stdlib.p').readlines())
+    parable.collect_garbage()
 
     while 1 == 1:
 
@@ -240,12 +240,12 @@ if __name__ == '__main__':
             exit()
         elif cmd == ':r' or cmd == ':restart':
             revert()
-            parse_bootstrap(open('stdlib.p').readlines())
-            collect_garbage()
+            parable.parse_bootstrap(open('stdlib.p').readlines())
+            parable.collect_garbage()
         elif cmd[0:2] == ':i':
             load_file(cmd[3:])
         else:
             if len(src) > 1:
-                interpret(compile(src, request_slice()))
+                parable.interpret(parable.compile(src, parable.request_slice()))
 
         sys.stdout.flush()
