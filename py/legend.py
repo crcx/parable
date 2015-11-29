@@ -229,8 +229,6 @@ if __name__ == '__main__':
     parse_bootstrap(open('stdlib.p').readlines())
     collect_garbage()
 
-    counter = 0
-
     while 1 == 1:
 
         display(height, width)
@@ -249,10 +247,5 @@ if __name__ == '__main__':
         else:
             if len(src) > 1:
                 interpret(compile(src, request_slice()))
-
-        counter += 1
-        if counter > 100:
-            collect_unused_slices()
-            counter = 0
 
         sys.stdout.flush()
