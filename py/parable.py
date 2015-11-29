@@ -1041,7 +1041,8 @@ p_types = []
 p_map = []
 p_sizes = []
 
-def request_slice():
+
+def request_slice(attempts=1):
     """request a new memory slice"""
     global p_slices, p_types, p_map, p_sizes, MAX_SLICES
     i = 0
@@ -1054,7 +1055,11 @@ def request_slice():
             return i
         else:
             i += 1
-    return -1
+    if attempts == 1:
+        collect_garbage()
+        return request_slice(2)
+    else:
+        return -1
 
 
 def release_slice(slice):
