@@ -76,13 +76,32 @@ Two special cases exist: [ and ]. When the compiler encounters a [ it begins com
 
 Parable's memory model consists of an array of variable sized regions called *slices*.  Each slice contains one or more values. Both the value and data type are stored.
 
-New slices are allocated by the compiler and bytecode interpreter as needed, and can be allocated on demand using the **request** function. When done with a slice, it can be safely discarded using **release**, or the user interface layer will attempt to reclaim it once no remaining references are found. (This can also be done manually, using **collect-garbage**).
+New slices are allocated by the compiler and bytecode interpreter as needed, and can be allocated on demand using the **request** function. When done with a slice, it can be safely discarded using **release**, or Parable will attempt to reclaim it once no remaining references are found. (This can also be done manually, using **collect-garbage**).
 
 Accessing stored values can be done using **fetch**, and modifications can be made using **store**. Specific values within a slice are referenced using a slice pointer and offset number. Indexing is zero based.
 
 The number of items in a slice can be returned using **length?**.
 
 When a slice is used as a function it is called a *quotation*. Functions operating on *quotations* are called *combinators*.
+
+# Garbage Collection
+
+Parable's memory model leads to a lot of slices being allocated and used for short periods of time. While it's possible to manually track and release these, this is not something that is normally needed. The memory manager in Parable includes a *garbage collector* which is capable of finding slices that are no longer in use and reclaiming them when necessary.
+
+The garbage collector scans all named slices and pointers on the stack (including strings and comments) for references to other slices. Each reference is added to a list of slices to be kept. When all slices have been scanned, any allocated slices that are not referenced are released.
+
+This process occurs in the following circumstances:
+
+* When a **request** fails initially garbage will be collected and the request will be reattempted.
+* When **collect-garbage** is manually called.
+* Some interfaces will collect garbage periodically as well. E.g., many will perform a collection after initial processing of *stdlib.p* or at the end of a long execution cycle.
+
+The following are considered references:
+
+* Pointers
+* Strings
+* Comments
+* Function Calls
 
 # The Stack
 
