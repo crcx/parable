@@ -171,6 +171,7 @@ def report(text):
     global errors
     errors.append(text)
 
+
 def check_depth(slice, offset, cells):
     """returns True if the stack has at least *cells* number of items, or"""
     """False otherwise. If False, reports an underflow error."""
@@ -1177,6 +1178,8 @@ def find_references(s):
     """given a slice, return a list of all references in it"""
     ptrs = []
     i = 0
+    if s < 0:
+        return []
     if get_last_index(s) == 0:
         type = fetch_type(s, 0)
         if type == TYPE_POINTER or type == TYPE_STRING or type == TYPE_COMMENT or type == TYPE_FUNCTION_CALL:
@@ -1224,7 +1227,8 @@ def collect_garbage():
             try:
                 x = refs.index(i)
             except:
-                release_slice(i)
+                if i > 0:
+                    release_slice(i)
         i += 1
 
 
@@ -1390,14 +1394,7 @@ def parse_bootstrap(f):
     f = condense_lines(f)
     for line in f:
         if len(line) > 1:
-            s = compile(line, request_slice())
-            interpret(s)
-#            if len(errors) > 0:
-#                print line
-#                print errors
-#                print p_slices[s]
-#                print p_types[s]
-#                clear_errors()
+            interpret(compile(line, request_slice()))
 
 
 #
@@ -1411,7 +1408,6 @@ def prepare_dictionary():
     """setup the initial dictionary"""
     s = request_slice()
     store(BC_QUOTE_NAME, s, 0, TYPE_BYTECODE)
-#    store(BC_FLOW_RETURN, s, 1, TYPE_BYTECODE)
     add_definition('define', s)
 
 
@@ -1653,8 +1649,14 @@ bootstrap.append(""" "] when" """)
 bootstrap.append(""" [ '*CASES'  '*OFFSET'  'next'  'fetch-value'  '<when>' ] hide-functions """)
 bootstrap.append(""" [ '*TESTS'  '*DONE'  '*OFFSET' ] values """)
 bootstrap.append(""" [ *OFFSET 1 + to *OFFSET ] '<next>' define """)
-bootstrap.append(""" [ *OFFSET [ *DONE [ *TESTS [ to *TESTS false to *DONE 0 to *OFFSET [ *TESTS *OFFSET fetch @ invoke [ true to *DONE *TESTS *OFFSET fetch 1 fetch invoke ] if-true <next> *DONE ] while-false ] dip to *TESTS ] dip to *DONE ] dip to *OFFSET ] 'when' define """)
+bootstrap.append(""" [ "q-"  *OFFSET [ *DONE [ *TESTS [ to *TESTS false to *DONE 0 to *OFFSET [ *TESTS *OFFSET fetch @ invoke [ true to *DONE *TESTS *OFFSET fetch 1 fetch invoke ] if-true <next> *DONE ] while-false ] dip to *TESTS ] dip to *DONE ] dip to *OFFSET ] 'when' define """)
 bootstrap.append(""" [ '*TESTS'  '*DONE'  '*OFFSET'  '<next>' ] hide-functions """)
+bootstrap.append(""" "apropos" """)
+bootstrap.append(""" [ "s-s" \ """)
+bootstrap.append(""" dup function-exists? \ """)
+bootstrap.append(""" [ lookup-function @ ] \ """)
+bootstrap.append(""" [ drop 'function not found' report-error ] if \ """)
+bootstrap.append(""" ] 'apropos' define """)
 import sys, os
 
 def condenseLines(code):
