@@ -95,8 +95,8 @@
 
 
 "Slice Functions"
-[ "p-pn"  dup get-last-index ] 'slice-last-index' define
-[ "p-pn"  slice-last-index 1 + ] 'slice-length' define
+[ "p-pn"  dup get-last-index ] 'last-index?' define
+[ "p-pn"  last-index? 1 + ] 'slice-length?' define
 [ "np-"   [ get-last-index + ] sip set-last-index ] 'adjust-slice-length' define
 [ "p-p"   request [ copy ] sip ] 'duplicate-slice' define
 [ "p-n"   get-last-index 1 + ] 'length?' define
@@ -183,14 +183,10 @@
 [ "p-s"  invoke<depth?> 1 - [ [ :s ] bi@ + ] times ] 'build-string' define
 
 "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
-[ "s-s"  :s #0 [ dup-pair fetch 32 = [ 1 + ] dip ] while-true 1 - [ slice-last-index ] dip swap subslice :s ] 'trim-left' define
+[ "s-s"  :s #0 [ dup-pair fetch 32 = [ 1 + ] dip ] while-true 1 - [ last-index? ] dip swap subslice :s ] 'trim-left' define
 [ ] 'trim-right' define
-[ "s-s"  :s slice-last-index dup-pair 1 - fetch nip 32 = [ slice-last-index 1 - 0 swap subslice :s trim-right ] if-true ] 'trim-right' define
+[ "s-s"  :s last-index? dup-pair 1 - fetch nip 32 = [ last-index? 1 - 0 swap subslice :s trim-right ] if-true ] 'trim-right' define
 [ "s-s"  trim-left trim-right ] 'trim' define
-
-
-"Helpful Math"
-[ "n-"    1 swap [ [ * ] sip 1 - dup 1 <> ] while-true drop ] 'factorial' define
 
 
 "Slice as a linear buffer"
@@ -219,32 +215,32 @@
 
 "Values"
 '*state*' variable
-[ "-" &*state* on ] 'to' define
-[ &*state* @ :f [ ! &*state* off ] [ @ ] if ] 'value-handler' define
-[ "s-" request [ value-handler ] curry swap define ] 'value' define
-[ "ns-" [ value ] sip to lookup-function invoke ] 'value!' define
-[ "p-" invoke<depth?> [ value ] times ] 'values' define
-[ '*state*' ] hide-functions
+[ "-"    &*state* on ] 'to' define
+[ "?p-"  &*state* @ :f [ ! &*state* off ] [ @ ] if ] 'value-handler' define
+[ "s-"   request [ value-handler ] curry swap define ] 'value' define
+[ "ns-"  [ value ] sip to lookup-function invoke ] 'value!' define
+[ "p-"   invoke<depth?> [ value ] times ] 'values' define
+'*state*' hide-function
 
 
 "Arrays and Operations on Quotations"
 [ "q-v"  @ ] 'first' define
 [ "q-q"  1 over length? subslice ] 'rest' define
 
-[ '*FOUND'  '*VALUE'  '*XT'  '*SOURCE'  '*TARGET'  '*OFFSET' ] values
-[ "q-"   &*FOUND [ &*VALUE [ &*XT [ &*SOURCE [ &*TARGET [ &*OFFSET [ invoke ] preserve ] preserve ] preserve ] preserve ] preserve ] preserve ] 'localize' define
+[ '*Found'  '*Value'  '*XT'  '*Source'  '*Target'  '*Offset' ] values
+[ "q-"   &*Found [ &*Value [ &*XT [ &*Source [ &*Target [ &*Offset [ invoke ] preserve ] preserve ] preserve ] preserve ] preserve ] preserve ] 'localize' define
 
 [ "vp-"    :p dup length? store ] 'array-push' define
 [ "p-v"    :p [ dup get-last-index fetch ] sip dup length? 2 - swap set-last-index ] 'array-pop' define
 [ "pnp-n"  [ to *XT over length? [ over array-pop *XT invoke ] times nip ] localize ] 'reduce' define
-[ "pp-?"   [ to *XT to *SOURCE 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke *OFFSET 1 + to *OFFSET ] times ] localize ] 'for-each' define
-[ "pv-f"   false to *FOUND to *VALUE dup length? 0 swap [ dup-pair fetch *VALUE types-match? [ = *FOUND or :f to *FOUND ] [ drop-pair ] if 1 + ] times drop-pair *FOUND ] 'contains?' define
-[ "pq-p"   [ to *XT to *SOURCE request to *TARGET *TARGET array-pop drop 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke [ *SOURCE *OFFSET fetch *TARGET array-push ] if-true *OFFSET 1 + to *OFFSET ] times *TARGET ] localize ] 'filter' define
-[ "pq-"    [ to *XT duplicate-slice to *SOURCE 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke *SOURCE *OFFSET store *OFFSET 1 + to *OFFSET ] times *SOURCE ] localize ] 'map' define
-[ "p-p"    [ request to *TARGET invoke<depth?> 0 max [ *TARGET array-push ] times *TARGET 1 over length? subslice :p ] localize ] 'capture-results' define
-[ "pv-n"   [ to *TARGET to *SOURCE 0 to *OFFSET -1 to *FOUND *SOURCE length? [ *SOURCE *OFFSET fetch *TARGET = [ *OFFSET to *FOUND ] if-true *OFFSET 1 + to *OFFSET ] times *FOUND ] localize ] 'index-of' define
+[ "pp-?"   [ to *XT to *Source 0 to *Offset *Source length? [ *Source *Offset fetch *XT invoke *Offset 1 + to *Offset ] times ] localize ] 'for-each' define
+[ "pv-f"   false to *Found to *Value dup length? 0 swap [ dup-pair fetch *Value types-match? [ = *Found or :f to *Found ] [ drop-pair ] if 1 + ] times drop-pair *Found ] 'contains?' define
+[ "pq-p"   [ to *XT to *Source request to *Target *Target array-pop drop 0 to *Offset *Source length? [ *Source *Offset fetch *XT invoke [ *Source *Offset fetch *Target array-push ] if-true *Offset 1 + to *Offset ] times *Target ] localize ] 'filter' define
+[ "pq-"    [ to *XT duplicate-slice to *Source 0 to *Offset *Source length? [ *Source *Offset fetch *XT invoke *Source *Offset store *Offset 1 + to *Offset ] times *Source ] localize ] 'map' define
+[ "p-p"    [ request to *Target invoke<depth?> 0 max [ *Target array-push ] times *Target 1 over length? subslice :p ] localize ] 'capture-results' define
+[ "pv-n"   [ to *Target to *Source 0 to *Offset -1 to *Found *Source length? [ *Source *Offset fetch *Target = [ *Offset to *Found ] if-true *Offset 1 + to *Offset ] times *Found ] localize ] 'index-of' define
 
-[ '*FOUND'  '*VALUE'  '*XT'  '*SOURCE'  '*TARGET'  '*OFFSET'  'localize' ] hide-functions
+[ '*Found'  '*Value'  '*XT'  '*Source'  '*Target'  '*Offset'  'localize' ] hide-functions
 
 
 "Text Output Buffer"
@@ -255,7 +251,7 @@
 
 
 "Hashing functions"
-389 'hash-prime' value!
+389 '*Hash-Prime' value!
 
 [ "s-n" 0 swap [ :n xor ] for-each ] 'hash:xor' define
 [ "s-n" 5381 swap [ over -5 shift + + ] for-each ] 'hash:djb2' define
@@ -263,7 +259,7 @@
 [ "s-n" 0 swap [ :c swap hash:sdbm<n> ] for-each ] 'hash:sdbm' define
 'hash-sdbm<n>' hide-function
 [ "s-b" hash:djb2 ] 'chosen-hash' define
-[ "s-n" chosen-hash hash-prime rem ] 'hash' define
+[ "s-n" chosen-hash *Hash-Prime rem ] 'hash' define
 
 
 "when: a conditional combinator"
