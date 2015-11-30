@@ -1175,6 +1175,8 @@ def find_references(s):
     """given a slice, return a list of all references in it"""
     ptrs = []
     i = 0
+    if s < 0:
+        return []
     if get_last_index(s) == 0:
         type = fetch_type(s, 0)
         if type == TYPE_POINTER or type == TYPE_STRING or type == TYPE_COMMENT or type == TYPE_FUNCTION_CALL:
@@ -1222,7 +1224,8 @@ def collect_garbage():
             try:
                 x = refs.index(i)
             except:
-                release_slice(i)
+                if i > 0:
+                    release_slice(i)
         i += 1
 
 
