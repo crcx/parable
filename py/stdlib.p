@@ -33,7 +33,7 @@
 [ "fpp-"   `300 ] 'if' define
 [ "p-"     `301 ] 'while-true' define
 [ "p-"     `302 ] 'while-false' define
-[ "np-"    `303 ] 'repeat' define
+[ "np-"    `303 ] 'times' define
 [ "p-"     `305 ] 'invoke' define
 [ "vp-v"   `306 ] 'dip' define
 [ "vp-v"   `307 ] 'sip' define
@@ -90,7 +90,7 @@
 "Stack Flow"
 [ "vV-vVvV"  over over ] 'dup-pair' define
 [ "vv-"      drop drop ] 'drop-pair' define
-[ "?n-"      [ drop ] repeat ] 'drop-multiple' define
+[ "?n-"      [ drop ] times ] 'drop-multiple' define
 [ "q-...n"   depth [ invoke ] dip depth swap - ] 'invoke<depth?>' define
 
 
@@ -160,13 +160,13 @@
 
 "numeric ranges"
 [ "nn-..."  dup-pair < [ [ [ dup 1 + ] dip dup-pair = ] while-false ] [ [ [ dup 1 - ] dip dup-pair = ] while-false ] if drop ] 'expand-range' define
-[ "...n-n"  1 - [ + ] repeat ] 'sum-range' define
+[ "...n-n"  1 - [ + ] times ] 'sum-range' define
 
 
 "Misc"
-[ "p-"   invoke<depth?> [ hide-function ] repeat ] 'hide-functions' define
+[ "p-"   invoke<depth?> [ hide-function ] times ] 'hide-functions' define
 [ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap define ] [ drop ] if ] 'rename-function' define
-[ "p-"   invoke<depth?> [ variable ] repeat ] 'variables' define
+[ "p-"   invoke<depth?> [ variable ] times ] 'variables' define
 
 
 "String and Character"
@@ -180,7 +180,7 @@
 [ "v-f"  to-lowercase 'aeiou'                                string-contains? ] 'vowel?' define
 [ "v-f"  dup to-lowercase = ] 'lowercase?' define
 [ "v-f"  dup to-uppercase = ] 'uppercase?' define
-[ "p-s"  invoke<depth?> 1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define
+[ "p-s"  invoke<depth?> 1 - [ [ :s ] bi@ + ] times ] 'build-string' define
 
 "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
 [ "s-s"  :s #0 [ dup-pair fetch 32 = [ 1 + ] dip ] while-true 1 - [ slice-last-index ] dip swap subslice :s ] 'trim-left' define
@@ -206,7 +206,7 @@
 [ "v-"     buffer-retreat buffer-position store ] 'buffer-store-retreat' define
 [ "-n"     buffer-retreat buffer-position fetch ] 'buffer-fetch-retreat' define
 [ "p-"     &*CURRENT-BUFFER ! &*BUFFER-OFFSET zero-out ] 'set-buffer' define
-[ "...n-"  [ buffer-store ] repeat ] 'buffer-store-items' define
+[ "...n-"  [ buffer-store ] times ] 'buffer-store-items' define
 [ "-"      request set-buffer ] 'new-buffer' define
 [ "p-"     &*CURRENT-BUFFER @ [ &*BUFFER-OFFSET @ [ invoke ] dip &*BUFFER-OFFSET ! ] dip &*CURRENT-BUFFER ! ] 'preserve-buffer' define
 [ "s-"     request [ swap define ] sip set-buffer ] 'named-buffer' define
@@ -223,8 +223,8 @@
 [ &*state* @ :f [ ! &*state* off ] [ @ ] if ] 'value-handler' define
 [ "s-" request [ value-handler ] curry swap define ] 'value' define
 [ "ns-" [ value ] sip to lookup-function invoke ] 'value!' define
-[ "p-" invoke<depth?> [ value ] repeat ] 'values' define
-[ '*state*'  'value-handler' ] hide-functions
+[ "p-" invoke<depth?> [ value ] times ] 'values' define
+[ '*state*' ] hide-functions
 
 
 "Arrays and Operations on Quotations"
@@ -236,13 +236,13 @@
 
 [ "vp-"    :p dup length? store ] 'array-push' define
 [ "p-v"    :p [ dup get-last-index fetch ] sip dup length? 2 - swap set-last-index ] 'array-pop' define
-[ "pnp-n"  [ to *XT over length? [ over array-pop *XT invoke ] repeat nip ] localize ] 'reduce' define
-[ "pp-?"   [ to *XT to *SOURCE 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke *OFFSET 1 + to *OFFSET ] repeat ] localize ] 'for-each' define
-[ "pv-f"   false to *FOUND to *VALUE dup length? 0 swap [ dup-pair fetch *VALUE types-match? [ = *FOUND or :f to *FOUND ] [ drop-pair ] if 1 + ] repeat drop-pair *FOUND ] 'contains?' define
-[ "pq-p"   [ to *XT to *SOURCE request to *TARGET *TARGET array-pop drop 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke [ *SOURCE *OFFSET fetch *TARGET array-push ] if-true *OFFSET 1 + to *OFFSET ] repeat *TARGET ] localize ] 'filter' define
-[ "pq-"    [ to *XT duplicate-slice to *SOURCE 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke *SOURCE *OFFSET store *OFFSET 1 + to *OFFSET ] repeat *SOURCE ] localize ] 'map' define
-[ "p-p"    [ request to *TARGET invoke<depth?> 0 max [ *TARGET array-push ] repeat *TARGET 1 over length? subslice :p ] localize ] 'capture-results' define
-[ "pv-n"   [ to *TARGET to *SOURCE 0 to *OFFSET -1 to *FOUND *SOURCE length? [ *SOURCE *OFFSET fetch *TARGET = [ *OFFSET to *FOUND ] if-true *OFFSET 1 + to *OFFSET ] repeat *FOUND ] localize ] 'index-of' define
+[ "pnp-n"  [ to *XT over length? [ over array-pop *XT invoke ] times nip ] localize ] 'reduce' define
+[ "pp-?"   [ to *XT to *SOURCE 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke *OFFSET 1 + to *OFFSET ] times ] localize ] 'for-each' define
+[ "pv-f"   false to *FOUND to *VALUE dup length? 0 swap [ dup-pair fetch *VALUE types-match? [ = *FOUND or :f to *FOUND ] [ drop-pair ] if 1 + ] times drop-pair *FOUND ] 'contains?' define
+[ "pq-p"   [ to *XT to *SOURCE request to *TARGET *TARGET array-pop drop 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke [ *SOURCE *OFFSET fetch *TARGET array-push ] if-true *OFFSET 1 + to *OFFSET ] times *TARGET ] localize ] 'filter' define
+[ "pq-"    [ to *XT duplicate-slice to *SOURCE 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke *SOURCE *OFFSET store *OFFSET 1 + to *OFFSET ] times *SOURCE ] localize ] 'map' define
+[ "p-p"    [ request to *TARGET invoke<depth?> 0 max [ *TARGET array-push ] times *TARGET 1 over length? subslice :p ] localize ] 'capture-results' define
+[ "pv-n"   [ to *TARGET to *SOURCE 0 to *OFFSET -1 to *FOUND *SOURCE length? [ *SOURCE *OFFSET fetch *TARGET = [ *OFFSET to *FOUND ] if-true *OFFSET 1 + to *OFFSET ] times *FOUND ] localize ] 'index-of' define
 
 [ '*FOUND'  '*VALUE'  '*XT'  '*SOURCE'  '*TARGET'  '*OFFSET'  'localize' ] hide-functions
 
@@ -250,7 +250,7 @@
 "Text Output Buffer"
 '*TOB' variable
 [ "v-"   &*TOB array-push ] '.' define
-[ "-..." &*TOB get-last-index [ &*TOB array-pop ] repeat ] 'show-tob' define
+[ "-..." &*TOB get-last-index [ &*TOB array-pop ] times ] 'show-tob' define
 [ "-"    0 &*TOB set-last-index ] 'clear-tob' define
 
 

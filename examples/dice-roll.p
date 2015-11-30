@@ -12,12 +12,12 @@
 [ #12 roll-n-sided-die ] 'roll<d12>' define
 [ #20 roll-n-sided-die ] 'roll<d20>' define
 
-[ [ [ roll<d4> ] repeat ] sip #1 - [ + ] repeat ] 'd4' define
-[ [ [ roll<d6> ] repeat ] sip #1 - [ + ] repeat ] 'd6' define
-[ [ [ roll<d8> ] repeat ] sip #1 - [ + ] repeat ] 'd8' define
-[ [ [ roll<d10> ] repeat ] sip #1 - [ + ] repeat ] 'd10' define
-[ [ [ roll<d12> ] repeat ] sip #1 - [ + ] repeat ] 'd12' define
-[ [ [ roll<d20> ] repeat ] sip #1 - [ + ] repeat ] 'd20' define
+[ [ [ roll<d4> ] times ] sip #1 - [ + ] times ] 'd4' define
+[ [ [ roll<d6> ] times ] sip #1 - [ + ] times ] 'd6' define
+[ [ [ roll<d8> ] times ] sip #1 - [ + ] times ] 'd8' define
+[ [ [ roll<d10> ] times ] sip #1 - [ + ] times ] 'd10' define
+[ [ [ roll<d12> ] times ] sip #1 - [ + ] times ] 'd12' define
+[ [ [ roll<d20> ] times ] sip #1 - [ + ] times ] 'd20' define
 
 [ capture-results #0 [ + ] reduce ] 'roll-dice' define
 

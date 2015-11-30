@@ -1043,7 +1043,8 @@ p_types = []
 p_map = []
 p_sizes = []
 
-def request_slice():
+
+def request_slice(attempts=1):
     """request a new memory slice"""
     global p_slices, p_types, p_map, p_sizes, MAX_SLICES
     i = 0
@@ -1056,7 +1057,11 @@ def request_slice():
             return i
         else:
             i += 1
-    return -1
+    if attempts == 1:
+        collect_garbage()
+        return request_slice(2)
+    else:
+        return -1
 
 
 def release_slice(slice):
@@ -1454,7 +1459,7 @@ bootstrap.append(""" [ "vv-f"   `225 ] '<>' define """)
 bootstrap.append(""" [ "fpp-"   `300 ] 'if' define """)
 bootstrap.append(""" [ "p-"     `301 ] 'while-true' define """)
 bootstrap.append(""" [ "p-"     `302 ] 'while-false' define """)
-bootstrap.append(""" [ "np-"    `303 ] 'repeat' define """)
+bootstrap.append(""" [ "np-"    `303 ] 'times' define """)
 bootstrap.append(""" [ "p-"     `305 ] 'invoke' define """)
 bootstrap.append(""" [ "vp-v"   `306 ] 'dip' define """)
 bootstrap.append(""" [ "vp-v"   `307 ] 'sip' define """)
@@ -1507,7 +1512,7 @@ bootstrap.append(""" [ "-n"  800 ] 'FUNCTION-CALL' define """)
 bootstrap.append(""" "Stack Flow" """)
 bootstrap.append(""" [ "vV-vVvV"  over over ] 'dup-pair' define """)
 bootstrap.append(""" [ "vv-"      drop drop ] 'drop-pair' define """)
-bootstrap.append(""" [ "?n-"      [ drop ] repeat ] 'drop-multiple' define """)
+bootstrap.append(""" [ "?n-"      [ drop ] times ] 'drop-multiple' define """)
 bootstrap.append(""" [ "q-...n"   depth [ invoke ] dip depth swap - ] 'invoke<depth?>' define """)
 bootstrap.append(""" "Slice Functions" """)
 bootstrap.append(""" [ "p-pn"  dup get-last-index ] 'slice-last-index' define """)
@@ -1561,11 +1566,11 @@ bootstrap.append(""" [ "nnn-f"  [ [ :n ] bi@ ] dip :n dup-pair > [ swap ] if-tru
 bootstrap.append(""" [ "vv-vvf"  [ type? ] dip type? swap [ = ] dip swap ] 'types-match?' define """)
 bootstrap.append(""" "numeric ranges" """)
 bootstrap.append(""" [ "nn-..."  dup-pair < [ [ [ dup 1 + ] dip dup-pair = ] while-false ] [ [ [ dup 1 - ] dip dup-pair = ] while-false ] if drop ] 'expand-range' define """)
-bootstrap.append(""" [ "...n-n"  1 - [ + ] repeat ] 'sum-range' define """)
+bootstrap.append(""" [ "...n-n"  1 - [ + ] times ] 'sum-range' define """)
 bootstrap.append(""" "Misc" """)
-bootstrap.append(""" [ "p-"   invoke<depth?> [ hide-function ] repeat ] 'hide-functions' define """)
+bootstrap.append(""" [ "p-"   invoke<depth?> [ hide-function ] times ] 'hide-functions' define """)
 bootstrap.append(""" [ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap define ] [ drop ] if ] 'rename-function' define """)
-bootstrap.append(""" [ "p-"   invoke<depth?> [ variable ] repeat ] 'variables' define """)
+bootstrap.append(""" [ "p-"   invoke<depth?> [ variable ] times ] 'variables' define """)
 bootstrap.append(""" "String and Character" """)
 bootstrap.append(""" "Note that this is only supporting the basic ASCII character set presently." """)
 bootstrap.append(""" [ "vs-f" swap :s find not true? ] 'string-contains?' define """)
@@ -1577,7 +1582,7 @@ bootstrap.append(""" [ "v-f"  to-lowercase 'bcdfghjklmnpqrstvwxyz'              
 bootstrap.append(""" [ "v-f"  to-lowercase 'aeiou'                                string-contains? ] 'vowel?' define """)
 bootstrap.append(""" [ "v-f"  dup to-lowercase = ] 'lowercase?' define """)
 bootstrap.append(""" [ "v-f"  dup to-uppercase = ] 'uppercase?' define """)
-bootstrap.append(""" [ "p-s"  invoke<depth?> 1 - [ [ :s ] bi@ + ] repeat ] 'build-string' define """)
+bootstrap.append(""" [ "p-s"  invoke<depth?> 1 - [ [ :s ] bi@ + ] times ] 'build-string' define """)
 bootstrap.append(""" "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive." """)
 bootstrap.append(""" [ "s-s"  :s #0 [ dup-pair fetch 32 = [ 1 + ] dip ] while-true 1 - [ slice-last-index ] dip swap subslice :s ] 'trim-left' define """)
 bootstrap.append(""" [ ] 'trim-right' define """)
@@ -1598,7 +1603,7 @@ bootstrap.append(""" [ "-n"     buffer-position fetch buffer-advance ] 'buffer-f
 bootstrap.append(""" [ "v-"     buffer-retreat buffer-position store ] 'buffer-store-retreat' define """)
 bootstrap.append(""" [ "-n"     buffer-retreat buffer-position fetch ] 'buffer-fetch-retreat' define """)
 bootstrap.append(""" [ "p-"     &*CURRENT-BUFFER ! &*BUFFER-OFFSET zero-out ] 'set-buffer' define """)
-bootstrap.append(""" [ "...n-"  [ buffer-store ] repeat ] 'buffer-store-items' define """)
+bootstrap.append(""" [ "...n-"  [ buffer-store ] times ] 'buffer-store-items' define """)
 bootstrap.append(""" [ "-"      request set-buffer ] 'new-buffer' define """)
 bootstrap.append(""" [ "p-"     &*CURRENT-BUFFER @ [ &*BUFFER-OFFSET @ [ invoke ] dip &*BUFFER-OFFSET ! ] dip &*CURRENT-BUFFER ! ] 'preserve-buffer' define """)
 bootstrap.append(""" [ "s-"     request [ swap define ] sip set-buffer ] 'named-buffer' define """)
@@ -1611,8 +1616,8 @@ bootstrap.append(""" [ "-" &*state* on ] 'to' define """)
 bootstrap.append(""" [ &*state* @ :f [ ! &*state* off ] [ @ ] if ] 'value-handler' define """)
 bootstrap.append(""" [ "s-" request [ value-handler ] curry swap define ] 'value' define """)
 bootstrap.append(""" [ "ns-" [ value ] sip to lookup-function invoke ] 'value!' define """)
-bootstrap.append(""" [ "p-" invoke<depth?> [ value ] repeat ] 'values' define """)
-bootstrap.append(""" [ '*state*'  'value-handler' ] hide-functions """)
+bootstrap.append(""" [ "p-" invoke<depth?> [ value ] times ] 'values' define """)
+bootstrap.append(""" [ '*state*' ] hide-functions """)
 bootstrap.append(""" "Arrays and Operations on Quotations" """)
 bootstrap.append(""" [ "q-v"  @ ] 'first' define """)
 bootstrap.append(""" [ "q-q"  1 over length? subslice ] 'rest' define """)
@@ -1620,18 +1625,18 @@ bootstrap.append(""" [ '*FOUND'  '*VALUE'  '*XT'  '*SOURCE'  '*TARGET'  '*OFFSET
 bootstrap.append(""" [ "q-"   &*FOUND [ &*VALUE [ &*XT [ &*SOURCE [ &*TARGET [ &*OFFSET [ invoke ] preserve ] preserve ] preserve ] preserve ] preserve ] preserve ] 'localize' define """)
 bootstrap.append(""" [ "vp-"    :p dup length? store ] 'array-push' define """)
 bootstrap.append(""" [ "p-v"    :p [ dup get-last-index fetch ] sip dup length? 2 - swap set-last-index ] 'array-pop' define """)
-bootstrap.append(""" [ "pnp-n"  [ to *XT over length? [ over array-pop *XT invoke ] repeat nip ] localize ] 'reduce' define """)
-bootstrap.append(""" [ "pp-?"   [ to *XT to *SOURCE 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke *OFFSET 1 + to *OFFSET ] repeat ] localize ] 'for-each' define """)
-bootstrap.append(""" [ "pv-f"   false to *FOUND to *VALUE dup length? 0 swap [ dup-pair fetch *VALUE types-match? [ = *FOUND or :f to *FOUND ] [ drop-pair ] if 1 + ] repeat drop-pair *FOUND ] 'contains?' define """)
-bootstrap.append(""" [ "pq-p"   [ to *XT to *SOURCE request to *TARGET *TARGET array-pop drop 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke [ *SOURCE *OFFSET fetch *TARGET array-push ] if-true *OFFSET 1 + to *OFFSET ] repeat *TARGET ] localize ] 'filter' define """)
-bootstrap.append(""" [ "pq-"    [ to *XT duplicate-slice to *SOURCE 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke *SOURCE *OFFSET store *OFFSET 1 + to *OFFSET ] repeat *SOURCE ] localize ] 'map' define """)
-bootstrap.append(""" [ "p-p"    [ request to *TARGET invoke<depth?> 0 max [ *TARGET array-push ] repeat *TARGET 1 over length? subslice :p ] localize ] 'capture-results' define """)
-bootstrap.append(""" [ "pv-n"   [ to *TARGET to *SOURCE 0 to *OFFSET -1 to *FOUND *SOURCE length? [ *SOURCE *OFFSET fetch *TARGET = [ *OFFSET to *FOUND ] if-true *OFFSET 1 + to *OFFSET ] repeat *FOUND ] localize ] 'index-of' define """)
+bootstrap.append(""" [ "pnp-n"  [ to *XT over length? [ over array-pop *XT invoke ] times nip ] localize ] 'reduce' define """)
+bootstrap.append(""" [ "pp-?"   [ to *XT to *SOURCE 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke *OFFSET 1 + to *OFFSET ] times ] localize ] 'for-each' define """)
+bootstrap.append(""" [ "pv-f"   false to *FOUND to *VALUE dup length? 0 swap [ dup-pair fetch *VALUE types-match? [ = *FOUND or :f to *FOUND ] [ drop-pair ] if 1 + ] times drop-pair *FOUND ] 'contains?' define """)
+bootstrap.append(""" [ "pq-p"   [ to *XT to *SOURCE request to *TARGET *TARGET array-pop drop 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke [ *SOURCE *OFFSET fetch *TARGET array-push ] if-true *OFFSET 1 + to *OFFSET ] times *TARGET ] localize ] 'filter' define """)
+bootstrap.append(""" [ "pq-"    [ to *XT duplicate-slice to *SOURCE 0 to *OFFSET *SOURCE length? [ *SOURCE *OFFSET fetch *XT invoke *SOURCE *OFFSET store *OFFSET 1 + to *OFFSET ] times *SOURCE ] localize ] 'map' define """)
+bootstrap.append(""" [ "p-p"    [ request to *TARGET invoke<depth?> 0 max [ *TARGET array-push ] times *TARGET 1 over length? subslice :p ] localize ] 'capture-results' define """)
+bootstrap.append(""" [ "pv-n"   [ to *TARGET to *SOURCE 0 to *OFFSET -1 to *FOUND *SOURCE length? [ *SOURCE *OFFSET fetch *TARGET = [ *OFFSET to *FOUND ] if-true *OFFSET 1 + to *OFFSET ] times *FOUND ] localize ] 'index-of' define """)
 bootstrap.append(""" [ '*FOUND'  '*VALUE'  '*XT'  '*SOURCE'  '*TARGET'  '*OFFSET'  'localize' ] hide-functions """)
 bootstrap.append(""" "Text Output Buffer" """)
 bootstrap.append(""" '*TOB' variable """)
 bootstrap.append(""" [ "v-"   &*TOB array-push ] '.' define """)
-bootstrap.append(""" [ "-..." &*TOB get-last-index [ &*TOB array-pop ] repeat ] 'show-tob' define """)
+bootstrap.append(""" [ "-..." &*TOB get-last-index [ &*TOB array-pop ] times ] 'show-tob' define """)
 bootstrap.append(""" [ "-"    0 &*TOB set-last-index ] 'clear-tob' define """)
 bootstrap.append(""" "Hashing functions" """)
 bootstrap.append(""" 389 'hash-prime' value! """)
