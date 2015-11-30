@@ -18,5 +18,5 @@ if __name__ == '__main__':
     parable.parse_bootstrap(open('stdlib.p').readlines())
 
     print 'Slices used by stdlib (no GC):   \t' + vm_slices_used()
-    parable.collect_unused_slices()
+    parable.collect_garbage()
     print 'Slices used by stdlib (after GC):\t' + vm_slices_used()
