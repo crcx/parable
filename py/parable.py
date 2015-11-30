@@ -175,7 +175,7 @@ def check_depth(slice, offset, cells):
     """False otherwise. If False, reports an underflow error."""
     global stack
     if len(stack) < cells:
-        report('Stack underflow in slice ' + str(slice) + ' at offset ' + str(offset) + ': ' + unicode(cells) + ' values required')
+        report('E__: Stack underflow: Slice ' + str(slice) + ' Offset: ' + str(offset) + ': ' + unicode(cells) + ' values required')
         return False
     else:
         return True
@@ -371,7 +371,7 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('BC_COMPARE_LT only recognizes NUMBER types')
+                        report('E__: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
                 else:
                     offset = size
             elif opcode == BC_COMPARE_GT:
@@ -387,7 +387,7 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('BC_COMPARE_LT only recognizes NUMBER types')
+                        report('E__: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
                 else:
                     offset = size
             elif opcode == BC_COMPARE_LTEQ:
@@ -403,7 +403,7 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('BC_COMPARE_LTEQ only recognizes NUMBER')
+                        report('E__: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
                 else:
                     offset = size
             elif opcode == BC_COMPARE_GTEQ:
@@ -419,7 +419,7 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('BC_COMPARE_GTEQ only recognizes NUMBER')
+                        report('E__: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
                 else:
                     offset = size
             elif opcode == BC_COMPARE_EQ:
@@ -440,7 +440,7 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('BC_COMPARE_EQ requires matched types')
+                        report('E__: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
                 else:
                     offset = size
             elif opcode == BC_COMPARE_NEQ:
@@ -461,7 +461,7 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('BC_COMPARE_NEQ requires matched types')
+                        report('E__: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
                 else:
                     offset = size
             elif opcode == BC_FLOW_IF:
@@ -743,7 +743,7 @@ def interpret(slice, more=None):
                         a = b.upper()
                         stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                     else:
-                        report('ERROR: BC_TO_UPPER requires STRING or CHARACTER')
+                        report('E__: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
                 else:
                     offset = size
             elif opcode == BC_TO_LOWER:
@@ -759,7 +759,7 @@ def interpret(slice, more=None):
                         a = b.lower()
                         stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                     else:
-                        report('ERROR: BC_TO_LOWER requires STRING or CHARACTER')
+                        report('E__: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
                 else:
                     offset = size
             elif opcode == BC_REPORT:
@@ -1293,7 +1293,7 @@ def compile_pointer(name, slice, offset):
             store(lookup_pointer(name), slice, offset, TYPE_POINTER)
         else:
             store(0, slice, offset, TYPE_POINTER)
-            report('Unable to map ' + name + ' to a pointer')
+            report('E__: Unable to map ' + name + ' to a pointer')
     offset += 1
     return offset
 
@@ -1303,7 +1303,7 @@ def compile_number(number, slice, offset):
         store(float(number), slice, offset, TYPE_NUMBER)
     else:
         store(0, slice, offset, TYPE_NUMBER)
-        report("# prefix expects a NUMBER, received " + number)
+        report("E__: # prefix expects a NUMBER, received " + number)
     offset += 1
     return offset
 
@@ -1319,7 +1319,7 @@ def compile_function_call(name, slice, offset):
         store(lookup_pointer(name), slice, offset, TYPE_FUNCTION_CALL)
         offset += 1
     else:
-        report('Unable to find ' + name + ' in dictionary')
+        report('E__: Unable to find ' + name + ' in dictionary')
     return offset
 
 
