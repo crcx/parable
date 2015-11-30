@@ -169,6 +169,7 @@ def report(text):
     global errors
     errors.append(text)
 
+
 def check_depth(slice, offset, cells):
     """returns True if the stack has at least *cells* number of items, or"""
     """False otherwise. If False, reports an underflow error."""
@@ -1391,14 +1392,7 @@ def parse_bootstrap(f):
     f = condense_lines(f)
     for line in f:
         if len(line) > 1:
-            s = compile(line, request_slice())
-            interpret(s)
-#            if len(errors) > 0:
-#                print line
-#                print errors
-#                print p_slices[s]
-#                print p_types[s]
-#                clear_errors()
+            interpret(compile(line, request_slice()))
 
 
 #
@@ -1412,7 +1406,6 @@ def prepare_dictionary():
     """setup the initial dictionary"""
     s = request_slice()
     store(BC_QUOTE_NAME, s, 0, TYPE_BYTECODE)
-#    store(BC_FLOW_RETURN, s, 1, TYPE_BYTECODE)
     add_definition('define', s)
 
 
