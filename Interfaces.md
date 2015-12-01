@@ -22,6 +22,9 @@ The minimal skeleton to initialize the Parable environment is:
         parable.prepare_slices()
         parable.prepare_dictionary()
         parable.parse_bootstrap(open('stdlib.p').readlines())
+
+While optional, it's also useful to collect garbage after loading the standard library:
+
         parable.collect_garbage()
 
 ## Processing Code
@@ -37,42 +40,42 @@ To display a stack dump is more difficult as you need to account for the various
     def stack_item(i, s):
         return str(i) + ':' + str(s)
 
-	def dump_stack():
-	    """display the stack"""
-	    i = 0
-	    s = ""
-	    depth = len(parable.stack)
-	    while i < depth:
-	        tos = parable.stack[i]
-	        type = parable.types[i]
-	        if type == parable.TYPE_NUMBER:
-	            sys.stdout.write(stack_item(i, "#" + str(tos)))
-	        elif type == parable.TYPE_CHARACTER:
-	            sys.stdout.write(stack_item(i, "$" + unicode(unichr(tos)).encode('utf-8')))
-	        elif type == parable.TYPE_STRING:
-	            s = "'" + parable.slice_to_string(tos) + "'"
-	        elif type == parable.TYPE_POINTER:
-	            s = "&" + str(tos)
-	            if parable.pointer_to_name(tos) != "":
-	                s = s + "\nPointer to: " + parable.pointer_to_name(tos)
-	            sys.stdout.write(stack_item(i, s))
-	        elif type == parable.TYPE_FLAG:
-	            if tos == -1:
-	                sys.stdout.write(stack_item(i, "true"))
-	            elif tos == 0:
-	                sys.stdout.write(stack_item(i, "false"))
-	            else:
-	                sys.stdout.write(stack_item(i, "malformed flag"))
-	        elif type == parable.TYPE_BYTECODE:
-	            sys.stdout.write(stack_item(i, "`" + str(tos)))
-	        elif type == parable.TYPE_COMMENT:
-	            s = "\"" + parable.slice_to_string(tos) + "\""
-	        elif type == parable.TYPE_FUNCTION_CALL:
-	            s = "Call: " + str(tos)
-	            sys.stdout.write(stack_item(i, s))
-	        else:
-	            sys.stdout.write(stack_item(i, "unmatched type on stack!"))
-	        i += 1
+    def dump_stack():
+        """display the stack"""
+        i = 0
+        s = ""
+        depth = len(parable.stack)
+        while i < depth:
+            tos = parable.stack[i]
+            type = parable.types[i]
+            if type == parable.TYPE_NUMBER:
+                sys.stdout.write(stack_item(i, "#" + str(tos)))
+            elif type == parable.TYPE_CHARACTER:
+                sys.stdout.write(stack_item(i, "$" + unicode(unichr(tos)).encode('utf-8')))
+            elif type == parable.TYPE_STRING:
+                s = "'" + parable.slice_to_string(tos) + "'"
+            elif type == parable.TYPE_POINTER:
+                s = "&" + str(tos)
+                if parable.pointer_to_name(tos) != "":
+                    s = s + "\nPointer to: " + parable.pointer_to_name(tos)
+                sys.stdout.write(stack_item(i, s))
+            elif type == parable.TYPE_FLAG:
+                if tos == -1:
+                    sys.stdout.write(stack_item(i, "true"))
+                elif tos == 0:
+                    sys.stdout.write(stack_item(i, "false"))
+                else:
+                    sys.stdout.write(stack_item(i, "malformed flag"))
+            elif type == parable.TYPE_BYTECODE:
+                sys.stdout.write(stack_item(i, "`" + str(tos)))
+            elif type == parable.TYPE_COMMENT:
+                s = "\"" + parable.slice_to_string(tos) + "\""
+            elif type == parable.TYPE_FUNCTION_CALL:
+                s = "Call: " + str(tos)
+                sys.stdout.write(stack_item(i, s))
+            else:
+                sys.stdout.write(stack_item(i, "unmatched type on stack!"))
+            i += 1
             sys.stdout.write('\n')
 
 ## Extending the VM
@@ -83,11 +86,10 @@ Parable provides hooks for the interface layer to add extensions to the byte cod
 
 A sample opcode processor:
 
-	def opcodes(slice, offset, opcode):
-	    if opcode == 2000:
-	        # do something here
-	    else:
-	        return offset
+    def opcodes(slice, offset, opcode):
+        if opcode == 2000:
+            # do something here
+        else:
+            return offset
 
 If you extend the byte codes your interface code should also bind them to names.
-
