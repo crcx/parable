@@ -440,4 +440,24 @@ A new slice is allocated, and compilation switches to this slice. When the endin
 
 A special case exists if the quotation is empty (a **[ ]** pair). In this case a return instruction is compiled into the otherwise empty quote and then the pointer is compiled.
 
+# Appendix: Error Messages
+
+Parable provides several standard error messages for various cases. These are currently:
+
+## E01: Stack Underflow
+
+This will also report the slice and offset where the error occurred.
+
+## E02: Type Mismatch
+
+This will also report the slice and offset where the error occurred.
+
+## E03: Compile Error
+
+This can be thrown in the following conditions:
+
+* A non-numeric pointer does not correspond to a name in the dictionary
+* When using #, the token is not a valid base 10 number
+* When compiling a function call, the token does not correspond to a name in the dictionary
+
 # Appendix: A List of Words
