@@ -13,7 +13,7 @@
 [ "string:name -"  `3007 ] 'delete-file' define
 
 '*FID' value
-[ "string:name - string:contents"  'r' open-file to *FID  request :s *FID file-size [ *FID read-file :c :s + ] repeat   *FID close-file ] 'slurp-file' define
+[ "string:name - string:contents"  'r' open-file to *FID  request :s *FID file-size [ *FID read-file :c :s + ] times   *FID close-file ] 'slurp-file' define
 '*FID' hide-function
 
 [ "string:name - flag"  `3008 ] 'file-exists?' define

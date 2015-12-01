@@ -178,7 +178,7 @@ def check_depth(slice, offset, cells):
     """False otherwise. If False, reports an underflow error."""
     global stack
     if len(stack) < cells:
-        report('Stack underflow in slice ' + str(slice) + ' at offset ' + str(offset) + ': ' + unicode(cells) + ' values required')
+        report('E01: Stack underflow: Slice ' + str(slice) + ' Offset: ' + str(offset) + ': ' + unicode(cells) + ' values required')
         return False
     else:
         return True
@@ -374,7 +374,7 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('BC_COMPARE_LT only recognizes NUMBER types')
+                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
                 else:
                     offset = size
             elif opcode == BC_COMPARE_GT:
@@ -390,7 +390,7 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('BC_COMPARE_LT only recognizes NUMBER types')
+                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
                 else:
                     offset = size
             elif opcode == BC_COMPARE_LTEQ:
@@ -406,7 +406,7 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('BC_COMPARE_LTEQ only recognizes NUMBER')
+                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
                 else:
                     offset = size
             elif opcode == BC_COMPARE_GTEQ:
@@ -422,7 +422,7 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('BC_COMPARE_GTEQ only recognizes NUMBER')
+                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
                 else:
                     offset = size
             elif opcode == BC_COMPARE_EQ:
@@ -443,7 +443,7 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('BC_COMPARE_EQ requires matched types')
+                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
                 else:
                     offset = size
             elif opcode == BC_COMPARE_NEQ:
@@ -464,7 +464,7 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('BC_COMPARE_NEQ requires matched types')
+                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
                 else:
                     offset = size
             elif opcode == BC_FLOW_IF:
@@ -746,7 +746,7 @@ def interpret(slice, more=None):
                         a = b.upper()
                         stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                     else:
-                        report('ERROR: BC_TO_UPPER requires STRING or CHARACTER')
+                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
                 else:
                     offset = size
             elif opcode == BC_TO_LOWER:
@@ -762,7 +762,7 @@ def interpret(slice, more=None):
                         a = b.lower()
                         stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                     else:
-                        report('ERROR: BC_TO_LOWER requires STRING or CHARACTER')
+                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
                 else:
                     offset = size
             elif opcode == BC_REPORT:
@@ -1296,7 +1296,7 @@ def compile_pointer(name, slice, offset):
             store(lookup_pointer(name), slice, offset, TYPE_POINTER)
         else:
             store(0, slice, offset, TYPE_POINTER)
-            report('Unable to map ' + name + ' to a pointer')
+            report('E03: Compile Error: Unable to map ' + name + ' to a pointer')
     offset += 1
     return offset
 
@@ -1306,7 +1306,7 @@ def compile_number(number, slice, offset):
         store(float(number), slice, offset, TYPE_NUMBER)
     else:
         store(0, slice, offset, TYPE_NUMBER)
-        report("# prefix expects a NUMBER, received " + number)
+        report("E03: Compile Error: Unable to convert " + number + " to a number")
     offset += 1
     return offset
 
@@ -1322,7 +1322,7 @@ def compile_function_call(name, slice, offset):
         store(lookup_pointer(name), slice, offset, TYPE_FUNCTION_CALL)
         offset += 1
     else:
-        report('Unable to find ' + name + ' in dictionary')
+        report('E03: Compile Error: Unable to map ' + name + ' to a pointer')
     return offset
 
 
@@ -1655,11 +1655,7 @@ bootstrap.append(""" [ *OFFSET 1 + to *OFFSET ] '<next>' define """)
 bootstrap.append(""" [ "q-"  *OFFSET [ *DONE [ *TESTS [ to *TESTS false to *DONE 0 to *OFFSET [ *TESTS *OFFSET fetch @ invoke [ true to *DONE *TESTS *OFFSET fetch 1 fetch invoke ] if-true <next> *DONE ] while-false ] dip to *TESTS ] dip to *DONE ] dip to *OFFSET ] 'when' define """)
 bootstrap.append(""" [ '*TESTS'  '*DONE'  '*OFFSET'  '<next>' ] hide-functions """)
 bootstrap.append(""" "apropos" """)
-bootstrap.append(""" [ "s-s" \ """)
-bootstrap.append(""" dup function-exists? \ """)
-bootstrap.append(""" [ lookup-function @ ] \ """)
-bootstrap.append(""" [ drop 'function not found' report-error ] if \ """)
-bootstrap.append(""" ] 'apropos' define """)
+bootstrap.append(""" [ "s-s" dup function-exists? [ lookup-function @ ] [ drop 'function not found' report-error ] if ] 'apropos' define """)
 # i/o functions
 bootstrap.append(""" [ "value -"  `2000 ] 'print' define """)
 bootstrap.append(""" [ #10 :c print ] 'show:cr' define """)
@@ -1674,7 +1670,7 @@ bootstrap.append(""" [ "number:offset number:file-id -"  `3005 ] 'file-seek' def
 bootstrap.append(""" [ "number:file-id - number:length"  `3006 ] 'file-size' define """)
 bootstrap.append(""" [ "string:name -"  `3007 ] 'delete-file' define """)
 bootstrap.append(""" '*FID' value """)
-bootstrap.append(""" [ "string:name - string:contents"  'r' open-file to *FID  request :s *FID file-size [ *FID read-file :c :s + ] repeat   *FID close-file ] 'slurp-file' define """)
+bootstrap.append(""" [ "string:name - string:contents"  'r' open-file to *FID  request :s *FID file-size [ *FID read-file :c :s + ] times   *FID close-file ] 'slurp-file' define """)
 bootstrap.append(""" '*FID' hide-function """)
 bootstrap.append(""" [ "string:name - flag"  `3008 ] 'file-exists?' define """)
 bootstrap.append(""" "Command Line Arguments" """)
@@ -1828,7 +1824,7 @@ if __name__ == '__main__':
     prepare_slices()
     prepare_dictionary()
     parse_bootstrap(bootstrap)
-    collect_unused_slices()
+    collect_garbage()
 
     files.append(0)
     files.append(0)

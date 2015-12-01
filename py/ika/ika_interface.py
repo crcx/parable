@@ -145,7 +145,7 @@ if __name__ == '__main__':
     prepare_slices()
     prepare_dictionary()
     parse_bootstrap(bootstrap)
-    collect_unused_slices()
+    collect_garbage()
 
     files.append(0)
     files.append(0)
