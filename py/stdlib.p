@@ -271,5 +271,13 @@
 [ '*CASES'  '*OFFSET'  'next'  'fetch-value'  '<when>' ] hide-functions
 [ '*TESTS'  '*DONE'  '*OFFSET' ] values
 [ *OFFSET 1 + to *OFFSET ] '<next>' define
-[ *OFFSET [ *DONE [ *TESTS [ to *TESTS false to *DONE 0 to *OFFSET [ *TESTS *OFFSET fetch @ invoke [ true to *DONE *TESTS *OFFSET fetch 1 fetch invoke ] if-true <next> *DONE ] while-false ] dip to *TESTS ] dip to *DONE ] dip to *OFFSET ] 'when' define
+[ "q-"  *OFFSET [ *DONE [ *TESTS [ to *TESTS false to *DONE 0 to *OFFSET [ *TESTS *OFFSET fetch @ invoke [ true to *DONE *TESTS *OFFSET fetch 1 fetch invoke ] if-true <next> *DONE ] while-false ] dip to *TESTS ] dip to *DONE ] dip to *OFFSET ] 'when' define
 [ '*TESTS'  '*DONE'  '*OFFSET'  '<next>' ] hide-functions
+
+
+"apropos"
+[ "s-s" \
+  dup function-exists? \
+  [ lookup-function @ ] \
+  [ drop 'function not found' report-error ] if \
+] 'apropos' define
