@@ -45,7 +45,7 @@ def display_value():
     elif types[i] == TYPE_CHARACTER:
         sys.stdout.write(unicode(unichr(stack[i])))
     elif types[i] == TYPE_STRING:
-        sys.stdout.write(slice_to_string(stack[i]))
+        sys.stdout.write(slice_to_string(stack[i]).encode('utf-8'))
     elif types[i] == TYPE_POINTER:
         sys.stdout.write('&' + unicode(stack[i]))
     elif types[i] == TYPE_FLAG:
@@ -56,7 +56,7 @@ def display_value():
         else:
             sys.stdout.write("malformed flag")
     elif types[i] == TYPE_COMMENT:
-        sys.stdout.write(slice_to_string(stack[i]))
+        sys.stdout.write(slice_to_string(stack[i]).encode('utf-8'))
     elif types[i] == TYPE_BYTECODE:
         sys.stdout.write('`' + unicode(stack[i]))
     elif types[i] == TYPE_FUNCTION_CALL:
