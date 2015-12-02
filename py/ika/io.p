@@ -12,9 +12,15 @@
 [ "number:file-id - number:length"  `3006 ] 'file-size' define
 [ "string:name -"  `3007 ] 'delete-file' define
 
-'*FID' value
-[ "string:name - string:contents"  'r' open-file to *FID  request :s *FID file-size [ *FID read-file :c :s + ] times   *FID close-file ] 'slurp-file' define
-'*FID' hide-function
+[ '*FID'  '*S' ] values
+[ "string:name - string:contents" \
+  'r' open-file to *FID \
+  request to *S *S array-pop drop \
+  *FID file-size [ *FID read-file *S array-push ] times \
+  *FID close-file \
+  *S :s \
+] 'slurp-file' define
+[ '*FID'  '*S' ] hide-functions
 
 [ "string:name - flag"  `3008 ] 'file-exists?' define
 

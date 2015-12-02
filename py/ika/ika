@@ -1669,9 +1669,9 @@ bootstrap.append(""" [ "number:file-id - number:position"  `3004 ] 'file-positio
 bootstrap.append(""" [ "number:offset number:file-id -"  `3005 ] 'file-seek' define """)
 bootstrap.append(""" [ "number:file-id - number:length"  `3006 ] 'file-size' define """)
 bootstrap.append(""" [ "string:name -"  `3007 ] 'delete-file' define """)
-bootstrap.append(""" '*FID' value """)
-bootstrap.append(""" [ "string:name - string:contents"  'r' open-file to *FID  request :s *FID file-size [ *FID read-file :c :s + ] times   *FID close-file ] 'slurp-file' define """)
-bootstrap.append(""" '*FID' hide-function """)
+bootstrap.append(""" [ '*FID'  '*S' ] values """)
+bootstrap.append(""" [ "string:name - string:contents" 'r' open-file to *FID request to *S *S array-pop drop *FID file-size [ *FID read-file *S array-push ] times *FID close-file *S :s ] 'slurp-file' define """)
+bootstrap.append(""" [ '*FID'  '*S' ] hide-functions """)
 bootstrap.append(""" [ "string:name - flag"  `3008 ] 'file-exists?' define """)
 bootstrap.append(""" "Command Line Arguments" """)
 bootstrap.append(""" [ "- number"  `4000 ] 'arg-count' define """)
@@ -1724,7 +1724,7 @@ def display_value():
     elif types[i] == TYPE_CHARACTER:
         sys.stdout.write(unicode(unichr(stack[i])))
     elif types[i] == TYPE_STRING:
-        sys.stdout.write(slice_to_string(stack[i]))
+        sys.stdout.write(slice_to_string(stack[i]).encode('utf-8'))
     elif types[i] == TYPE_POINTER:
         sys.stdout.write('&' + unicode(stack[i]))
     elif types[i] == TYPE_FLAG:
@@ -1735,7 +1735,7 @@ def display_value():
         else:
             sys.stdout.write("malformed flag")
     elif types[i] == TYPE_COMMENT:
-        sys.stdout.write(slice_to_string(stack[i]))
+        sys.stdout.write(slice_to_string(stack[i]).encode('utf-8'))
     elif types[i] == TYPE_BYTECODE:
         sys.stdout.write('`' + unicode(stack[i]))
     elif types[i] == TYPE_FUNCTION_CALL:
