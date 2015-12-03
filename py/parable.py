@@ -185,10 +185,15 @@ def check_depth(slice, offset, cells):
 # Byte code interpreter
 #
 
+current_slice = 0
+
 def interpret(slice, more=None):
     """Interpret the byte codes contained in a slice."""
+    global current_slice
     offset = 0
     size = get_last_index(int(slice))
+    if current_slice == 0:
+        current_slice = slice
     while offset <= size:
         opcode = fetch(slice, offset)
         optype = fetch_type(slice, offset)
@@ -815,6 +820,7 @@ def interpret(slice, more=None):
                 offset = more(slice, offset, opcode)
 
         offset += 1
+    current_slice = 0
 
 
 #
@@ -1199,12 +1205,14 @@ def find_references(s):
 
 def seek_all_references():
     """return a list of all references in all named slices and stack items"""
-    global dictionary_slices, stack, types
+    global dictionary_slices, stack, types, current_slice
     refs = []
     for s in dictionary_slices:
         refs.append(s)
         for x in find_references(s):
             refs.append(x)
+    for x in find_references(current_slice):
+        refs.append(x)
     i = tos()
     while i > 0:
         if types[i] == TYPE_STRING or types[i] == TYPE_COMMENT or types[i] == TYPE_POINTER or types[i] == TYPE_FUNCTION_CALL:
