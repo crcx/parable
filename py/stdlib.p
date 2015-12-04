@@ -183,9 +183,9 @@
 [ "p-s"  invoke<depth?> 1 - [ [ :s ] bi@ + ] times ] 'build-string' define
 
 "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
-[ "s-s"  :s #0 [ dup-pair fetch 32 = [ 1 + ] dip ] while-true 1 - [ last-index? ] dip swap subslice :s ] 'trim-left' define
+[ "s-s"  :s #0 [ dup-pair fetch :n 32 = [ 1 + ] dip ] while-true 1 - [ last-index? ] dip swap subslice :s ] 'trim-left' define
 [ ] 'trim-right' define
-[ "s-s"  :s last-index? dup-pair 1 - fetch nip 32 = [ last-index? 1 - 0 swap subslice :s trim-right ] if-true ] 'trim-right' define
+[ "s-s"  :s last-index? dup-pair 1 - fetch :n nip 32 = [ last-index? 1 - 0 swap subslice :s trim-right ] if-true ] 'trim-right' define
 [ "s-s"  trim-left trim-right ] 'trim' define
 
 
