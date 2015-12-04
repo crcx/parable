@@ -5,7 +5,9 @@
 #
 # Dependencies
 #
-import sys, math, random
+import math
+import random
+import sys
 
 #
 # Memory Configuration
@@ -125,6 +127,8 @@ def is_number(s):
 
 
 def condense_lines(code):
+    """Take an array of code, join lines ending with a \, and return"""
+    """the new array"""
     m = len(code)
     s = ''
     r = []
@@ -175,7 +179,9 @@ def check_depth(slice, offset, cells):
     """False otherwise. If False, reports an underflow error."""
     global stack
     if len(stack) < cells:
-        report('E01: Stack underflow: Slice ' + str(slice) + ' Offset: ' + str(offset) + ': ' + unicode(cells) + ' values required')
+        details = 'Slice ' + str(slice) + ' Offset: ' + str(offset)
+        expected = str(cells) + ' values required'
+        report('E01: Stack underflow: ' + details + ': ' + expected)
         return False
     else:
         return True
@@ -186,6 +192,7 @@ def check_depth(slice, offset, cells):
 #
 
 current_slice = 0
+
 
 def interpret(slice, more=None):
     """Interpret the byte codes contained in a slice."""
@@ -242,8 +249,8 @@ def interpret(slice, more=None):
                     offset = size
             elif opcode == BC_SET_TYPE:
                 if check_depth(slice, offset, 2):
-                    a = stack_pop() # type
-                    b = stack_pop() # value
+                    a = stack_pop()  # type
+                    b = stack_pop()  # value
                     stack_push(b, a)
                 else:
                     offset = size
@@ -376,7 +383,9 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
                 else:
                     offset = size
             elif opcode == BC_COMPARE_GT:
@@ -392,7 +401,9 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
                 else:
                     offset = size
             elif opcode == BC_COMPARE_LTEQ:
@@ -408,7 +419,9 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
                 else:
                     offset = size
             elif opcode == BC_COMPARE_GTEQ:
@@ -424,7 +437,9 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
                 else:
                     offset = size
             elif opcode == BC_COMPARE_EQ:
@@ -445,7 +460,9 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
                 else:
                     offset = size
             elif opcode == BC_COMPARE_NEQ:
@@ -466,7 +483,9 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
                 else:
                     offset = size
             elif opcode == BC_FLOW_IF:
@@ -712,7 +731,7 @@ def interpret(slice, more=None):
                     dt = p_types[s]
                     dt = dt[b:a]
                     e = request_slice()
-                    i  = 0
+                    i = 0
                     while i < len(d):
                         store(d[i], e, i, dt[i])
                         i = i + 1
@@ -748,7 +767,9 @@ def interpret(slice, more=None):
                         a = b.upper()
                         stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                     else:
-                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
                 else:
                     offset = size
             elif opcode == BC_TO_LOWER:
@@ -764,7 +785,9 @@ def interpret(slice, more=None):
                         a = b.lower()
                         stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                     else:
-                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
                 else:
                     offset = size
             elif opcode == BC_REPORT:
@@ -948,7 +971,8 @@ def stack_change_type(type):
         if stack_type() == TYPE_NUMBER:
             stack_push(string_to_slice(unicode(stack_pop())), TYPE_STRING)
         elif stack_type() == TYPE_CHARACTER:
-            stack_push(string_to_slice(''.join(unichr(stack_pop()))), TYPE_STRING)
+            a = stack_pop()
+            stack_push(string_to_slice(''.join(unichr(a))), TYPE_STRING)
         elif stack_type() == TYPE_FLAG:
             s = stack_pop()
             if s == -1:
@@ -1010,7 +1034,7 @@ def in_dictionary(s):
 def lookup_pointer(name):
     global dictionary_names, dictionary_slices
     name = name.lower()
-    if in_dictionary(name) == False:
+    if in_dictionary(name) is False:
         return -1
     else:
         return dictionary_slices[dictionary_names.index(name)]
@@ -1019,7 +1043,7 @@ def lookup_pointer(name):
 def add_definition(name, slice):
     global dictionary_names, dictionary_slices
     name = name.lower()
-    if in_dictionary(name) == False:
+    if in_dictionary(name) is False:
         dictionary_names.append(name)
         dictionary_slices.append(slice)
     else:
@@ -1031,7 +1055,7 @@ def add_definition(name, slice):
 def remove_name(name):
     global dictionary_names, dictionary_slices
     name = name.lower()
-    if in_dictionary(name) != False:
+    if in_dictionary(name) is not False:
         i = dictionary_names.index(name)
         del dictionary_names[i]
         del dictionary_slices[i]
@@ -1364,7 +1388,8 @@ def compile(str, slice):
             i, s = parse_string(tokens, i, count, '\'')
             offset = compile_string(s[1:-1], slice, offset)
         elif tokens[i].startswith("$"):
-            offset = compile_character(ord(tokens[i][1:].encode('utf-8')), slice, offset)
+            v = ord(tokens[i][1:].encode('utf-8'))
+            offset = compile_character(v, slice, offset)
         elif tokens[i].startswith("&"):
             offset = compile_pointer(tokens[i][1:], slice, offset)
         elif tokens[i].startswith("#"):
