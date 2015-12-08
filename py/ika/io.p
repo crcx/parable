@@ -15,8 +15,8 @@
 [ '*FID'  '*S' ] values
 [ "string:name - string:contents" \
   'r' open-file to *FID \
-  request to *S *S array-pop drop \
-  *FID file-size [ *FID read-file *S array-push ] times \
+  request to *S *S pop drop \
+  *FID file-size [ *FID read-file *S push ] times \
   *FID close-file \
   *S :s \
 ] 'slurp-file' define

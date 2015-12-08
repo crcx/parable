@@ -8,7 +8,9 @@
 #
 # Dependencies
 #
-import sys, math, random
+import math
+import random
+import sys
 
 #
 # Memory Configuration
@@ -128,6 +130,8 @@ def is_number(s):
 
 
 def condense_lines(code):
+    """Take an array of code, join lines ending with a \, and return"""
+    """the new array"""
     m = len(code)
     s = ''
     r = []
@@ -178,7 +182,9 @@ def check_depth(slice, offset, cells):
     """False otherwise. If False, reports an underflow error."""
     global stack
     if len(stack) < cells:
-        report('E01: Stack underflow: Slice ' + str(slice) + ' Offset: ' + str(offset) + ': ' + unicode(cells) + ' values required')
+        details = 'Slice ' + str(slice) + ' Offset: ' + str(offset)
+        expected = str(cells) + ' values required'
+        report('E01: Stack underflow: ' + details + ': ' + expected)
         return False
     else:
         return True
@@ -188,10 +194,16 @@ def check_depth(slice, offset, cells):
 # Byte code interpreter
 #
 
+current_slice = 0
+
+
 def interpret(slice, more=None):
     """Interpret the byte codes contained in a slice."""
+    global current_slice
     offset = 0
     size = get_last_index(int(slice))
+    if current_slice == 0:
+        current_slice = slice
     while offset <= size:
         opcode = fetch(slice, offset)
         optype = fetch_type(slice, offset)
@@ -240,8 +252,8 @@ def interpret(slice, more=None):
                     offset = size
             elif opcode == BC_SET_TYPE:
                 if check_depth(slice, offset, 2):
-                    a = stack_pop() # type
-                    b = stack_pop() # value
+                    a = stack_pop()  # type
+                    b = stack_pop()  # value
                     stack_push(b, a)
                 else:
                     offset = size
@@ -374,7 +386,9 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
                 else:
                     offset = size
             elif opcode == BC_COMPARE_GT:
@@ -390,7 +404,9 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
                 else:
                     offset = size
             elif opcode == BC_COMPARE_LTEQ:
@@ -406,7 +422,9 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
                 else:
                     offset = size
             elif opcode == BC_COMPARE_GTEQ:
@@ -422,7 +440,9 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
                 else:
                     offset = size
             elif opcode == BC_COMPARE_EQ:
@@ -443,7 +463,9 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
                 else:
                     offset = size
             elif opcode == BC_COMPARE_NEQ:
@@ -464,7 +486,9 @@ def interpret(slice, more=None):
                             stack_push(0, TYPE_FLAG)
                     else:
                         offset = size
-                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
                 else:
                     offset = size
             elif opcode == BC_FLOW_IF:
@@ -710,7 +734,7 @@ def interpret(slice, more=None):
                     dt = p_types[s]
                     dt = dt[b:a]
                     e = request_slice()
-                    i  = 0
+                    i = 0
                     while i < len(d):
                         store(d[i], e, i, dt[i])
                         i = i + 1
@@ -746,7 +770,9 @@ def interpret(slice, more=None):
                         a = b.upper()
                         stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                     else:
-                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
                 else:
                     offset = size
             elif opcode == BC_TO_LOWER:
@@ -762,7 +788,9 @@ def interpret(slice, more=None):
                         a = b.lower()
                         stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                     else:
-                        report('E02: Type mismatch: Slice ' + str(slice) + ' Offset: ' + str(offset))
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
                 else:
                     offset = size
             elif opcode == BC_REPORT:
@@ -818,6 +846,7 @@ def interpret(slice, more=None):
                 offset = more(slice, offset, opcode)
 
         offset += 1
+    current_slice = 0
 
 
 #
@@ -945,7 +974,8 @@ def stack_change_type(type):
         if stack_type() == TYPE_NUMBER:
             stack_push(string_to_slice(unicode(stack_pop())), TYPE_STRING)
         elif stack_type() == TYPE_CHARACTER:
-            stack_push(string_to_slice(''.join(unichr(stack_pop()))), TYPE_STRING)
+            a = stack_pop()
+            stack_push(string_to_slice(''.join(unichr(a))), TYPE_STRING)
         elif stack_type() == TYPE_FLAG:
             s = stack_pop()
             if s == -1:
@@ -1007,7 +1037,7 @@ def in_dictionary(s):
 def lookup_pointer(name):
     global dictionary_names, dictionary_slices
     name = name.lower()
-    if in_dictionary(name) == False:
+    if in_dictionary(name) is False:
         return -1
     else:
         return dictionary_slices[dictionary_names.index(name)]
@@ -1016,7 +1046,7 @@ def lookup_pointer(name):
 def add_definition(name, slice):
     global dictionary_names, dictionary_slices
     name = name.lower()
-    if in_dictionary(name) == False:
+    if in_dictionary(name) is False:
         dictionary_names.append(name)
         dictionary_slices.append(slice)
     else:
@@ -1028,7 +1058,7 @@ def add_definition(name, slice):
 def remove_name(name):
     global dictionary_names, dictionary_slices
     name = name.lower()
-    if in_dictionary(name) != False:
+    if in_dictionary(name) is not False:
         i = dictionary_names.index(name)
         del dictionary_names[i]
         del dictionary_slices[i]
@@ -1202,12 +1232,14 @@ def find_references(s):
 
 def seek_all_references():
     """return a list of all references in all named slices and stack items"""
-    global dictionary_slices, stack, types
+    global dictionary_slices, stack, types, current_slice
     refs = []
     for s in dictionary_slices:
         refs.append(s)
         for x in find_references(s):
             refs.append(x)
+    for x in find_references(current_slice):
+        refs.append(x)
     i = tos()
     while i > 0:
         if types[i] == TYPE_STRING or types[i] == TYPE_COMMENT or types[i] == TYPE_POINTER or types[i] == TYPE_FUNCTION_CALL:
@@ -1359,7 +1391,8 @@ def compile(str, slice):
             i, s = parse_string(tokens, i, count, '\'')
             offset = compile_string(s[1:-1], slice, offset)
         elif tokens[i].startswith("$"):
-            offset = compile_character(ord(tokens[i][1:].encode('utf-8')), slice, offset)
+            v = ord(tokens[i][1:].encode('utf-8'))
+            offset = compile_character(v, slice, offset)
         elif tokens[i].startswith("&"):
             offset = compile_pointer(tokens[i][1:], slice, offset)
         elif tokens[i].startswith("#"):
@@ -1583,9 +1616,9 @@ bootstrap.append(""" [ "v-f"  dup to-lowercase = ] 'lowercase?' define """)
 bootstrap.append(""" [ "v-f"  dup to-uppercase = ] 'uppercase?' define """)
 bootstrap.append(""" [ "p-s"  invoke<depth?> 1 - [ [ :s ] bi@ + ] times ] 'build-string' define """)
 bootstrap.append(""" "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive." """)
-bootstrap.append(""" [ "s-s"  :s #0 [ dup-pair fetch 32 = [ 1 + ] dip ] while-true 1 - [ last-index? ] dip swap subslice :s ] 'trim-left' define """)
+bootstrap.append(""" [ "s-s"  :s #0 [ dup-pair fetch :n 32 = [ 1 + ] dip ] while-true 1 - [ last-index? ] dip swap subslice :s ] 'trim-left' define """)
 bootstrap.append(""" [ ] 'trim-right' define """)
-bootstrap.append(""" [ "s-s"  :s last-index? dup-pair 1 - fetch nip 32 = [ last-index? 1 - 0 swap subslice :s trim-right ] if-true ] 'trim-right' define """)
+bootstrap.append(""" [ "s-s"  :s last-index? dup-pair 1 - fetch :n nip 32 = [ last-index? 1 - 0 swap subslice :s trim-right ] if-true ] 'trim-right' define """)
 bootstrap.append(""" [ "s-s"  trim-left trim-right ] 'trim' define """)
 bootstrap.append(""" "Slice as a linear buffer" """)
 bootstrap.append(""" [ '*CURRENT-BUFFER'  '*BUFFER-OFFSET' ] variables """)
@@ -1620,20 +1653,20 @@ bootstrap.append(""" [ "q-v"  @ ] 'first' define """)
 bootstrap.append(""" [ "q-q"  1 over length? subslice ] 'rest' define """)
 bootstrap.append(""" [ '*Found'  '*Value'  '*XT'  '*Source'  '*Target'  '*Offset' ] values """)
 bootstrap.append(""" [ "q-"   &*Found [ &*Value [ &*XT [ &*Source [ &*Target [ &*Offset [ invoke ] preserve ] preserve ] preserve ] preserve ] preserve ] preserve ] 'localize' define """)
-bootstrap.append(""" [ "vp-"    :p dup length? store ] 'array-push' define """)
-bootstrap.append(""" [ "p-v"    :p [ dup get-last-index fetch ] sip dup length? 2 - swap set-last-index ] 'array-pop' define """)
-bootstrap.append(""" [ "pnp-n"  [ to *XT over length? [ over array-pop *XT invoke ] times nip ] localize ] 'reduce' define """)
+bootstrap.append(""" [ "vp-"    :p dup length? store ] 'push' define """)
+bootstrap.append(""" [ "p-v"    :p [ dup get-last-index fetch ] sip dup length? 2 - swap set-last-index ] 'pop' define """)
+bootstrap.append(""" [ "pnp-n"  [ to *XT over length? [ over pop *XT invoke ] times nip ] localize ] 'reduce' define """)
 bootstrap.append(""" [ "pp-?"   [ to *XT to *Source 0 to *Offset *Source length? [ *Source *Offset fetch *XT invoke *Offset 1 + to *Offset ] times ] localize ] 'for-each' define """)
 bootstrap.append(""" [ "pv-f"   false to *Found to *Value dup length? 0 swap [ dup-pair fetch *Value types-match? [ = *Found or :f to *Found ] [ drop-pair ] if 1 + ] times drop-pair *Found ] 'contains?' define """)
-bootstrap.append(""" [ "pq-p"   [ to *XT to *Source request to *Target *Target array-pop drop 0 to *Offset *Source length? [ *Source *Offset fetch *XT invoke [ *Source *Offset fetch *Target array-push ] if-true *Offset 1 + to *Offset ] times *Target ] localize ] 'filter' define """)
+bootstrap.append(""" [ "pq-p"   [ to *XT to *Source request to *Target *Target pop drop 0 to *Offset *Source length? [ *Source *Offset fetch *XT invoke [ *Source *Offset fetch *Target push ] if-true *Offset 1 + to *Offset ] times *Target ] localize ] 'filter' define """)
 bootstrap.append(""" [ "pq-"    [ to *XT duplicate-slice to *Source 0 to *Offset *Source length? [ *Source *Offset fetch *XT invoke *Source *Offset store *Offset 1 + to *Offset ] times *Source ] localize ] 'map' define """)
-bootstrap.append(""" [ "p-p"    [ request to *Target invoke<depth?> 0 max [ *Target array-push ] times *Target 1 over length? subslice :p ] localize ] 'capture-results' define """)
+bootstrap.append(""" [ "p-p"    [ request to *Target invoke<depth?> 0 max [ *Target push ] times *Target 1 over length? subslice :p ] localize ] 'capture-results' define """)
 bootstrap.append(""" [ "pv-n"   [ to *Target to *Source 0 to *Offset -1 to *Found *Source length? [ *Source *Offset fetch *Target = [ *Offset to *Found ] if-true *Offset 1 + to *Offset ] times *Found ] localize ] 'index-of' define """)
 bootstrap.append(""" [ '*Found'  '*Value'  '*XT'  '*Source'  '*Target'  '*Offset'  'localize' ] hide-functions """)
 bootstrap.append(""" "Text Output Buffer" """)
 bootstrap.append(""" '*TOB' variable """)
-bootstrap.append(""" [ "v-"   &*TOB array-push ] '.' define """)
-bootstrap.append(""" [ "-..." &*TOB get-last-index [ &*TOB array-pop ] times ] 'show-tob' define """)
+bootstrap.append(""" [ "v-"   &*TOB push ] '.' define """)
+bootstrap.append(""" [ "-..." &*TOB get-last-index [ &*TOB pop ] times ] 'show-tob' define """)
 bootstrap.append(""" [ "-"    0 &*TOB set-last-index ] 'clear-tob' define """)
 bootstrap.append(""" "Hashing functions" """)
 bootstrap.append(""" 389 '*Hash-Prime' value! """)
@@ -1670,7 +1703,7 @@ bootstrap.append(""" [ "number:offset number:file-id -"  `3005 ] 'file-seek' def
 bootstrap.append(""" [ "number:file-id - number:length"  `3006 ] 'file-size' define """)
 bootstrap.append(""" [ "string:name -"  `3007 ] 'delete-file' define """)
 bootstrap.append(""" [ '*FID'  '*S' ] values """)
-bootstrap.append(""" [ "string:name - string:contents" 'r' open-file to *FID request to *S *S array-pop drop *FID file-size [ *FID read-file *S array-push ] times *FID close-file *S :s ] 'slurp-file' define """)
+bootstrap.append(""" [ "string:name - string:contents" 'r' open-file to *FID request to *S *S pop drop *FID file-size [ *FID read-file *S push ] times *FID close-file *S :s ] 'slurp-file' define """)
 bootstrap.append(""" [ '*FID'  '*S' ] hide-functions """)
 bootstrap.append(""" [ "string:name - flag"  `3008 ] 'file-exists?' define """)
 bootstrap.append(""" "Command Line Arguments" """)

@@ -34,8 +34,8 @@
 [ dup ] 'ngaro.dup' define
 [ drop ] 'ngaro.drop' define
 [ swap ] 'ngaro.swap' define
-[ &addresses array-push ] 'ngaro.push' define
-[ &addresses array-pop ] 'ngaro.pop' define
+[ &addresses push ] 'ngaro.push' define
+[ &addresses pop ] 'ngaro.pop' define
 [ ] 'ngaro.loop' define
 [ ip+ [ip] #1 - to ip ] 'ngaro.jump' define
 [ ngaro.pop to ip ] 'ngaro.return' define
