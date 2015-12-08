@@ -40,8 +40,8 @@
 [ "vpp-?"  `308 ] 'bi' define
 [ "vppp-?" `309 ] 'tri' define
 [ "pp-"    `400 ] 'copy' define
-[ "pn-n"   `401 ] 'fetch' define
-[ "npn-"   `402 ] 'store' define
+[ "pn-v"   `401 ] 'fetch' define
+[ "vpn-"   `402 ] 'store' define
 [ "-p"     `403 ] 'request' define
 [ "p-"     `404 ] 'release' define
 [ "-"      `405 ] 'collect-garbage' define
@@ -116,8 +116,8 @@
 
 
 "Number functions"
-[ "n-n"  over over < [ nip ] [ drop ] if ] 'max' define
-[ "n-n"  over over > [ nip ] [ drop ] if ] 'min' define
+[ "nn-n"  over over < [ nip ] [ drop ] if ] 'max' define
+[ "nn-n"  over over > [ nip ] [ drop ] if ] 'min' define
 [ "n-n"  dup -1 * max ] 'abs' define
 
 
