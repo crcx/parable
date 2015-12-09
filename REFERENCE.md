@@ -545,25 +545,37 @@ Constant. Type for function calls.
 
     value - flag
 
+Return **true** if value corresponds to a true flag, or **false** otherwise.
+
 ## false?
 
     value - flag
+
+Return **true** if value corresponds to a false flag, or **false** otherwise.
 
 ## even?
 
     number - flag
 
+Return **true** if the number is even or **false** otherwise.
+
 ## odd?
 
     number - flag
+
+Return **true** if the number is odd or **false** otherwise.
 
 ## negative?
 
     number - flag
 
+Return **true** if the number is negative or **false** otherwise.
+
 ## positive?
 
     number - flag
+
+Return **true** if the number is positive or **false** otherwise.
 
 ## if-character
 
@@ -621,25 +633,37 @@ Constant. Type for function calls.
 
     value - flag
 
+Return **true** if the value is a numeric digit or **false** otherwise.
+
 ## symbol?
 
     value - flag
+
+Return **true** if the value is an ASCII symbol or **false** otherwise.
 
 ## letter?
 
     value - flag
 
+Return **true** if the value is an ASCII letter or **false** otherwise.
+
 ## alphanumeric?
 
     value - flag
+
+Return **true** if the value is an ASCII letter or number or **false** otherwise.
 
 ## consonant?
 
     value - flag
 
+Return **true** if the value is an ASCII consonant or **false** otherwise.
+
 ## vowel?
 
     value - flag
+
+Return **true** if the value is an ASCII vowel or **false** otherwise.
 
 ## lowercase?
 
@@ -652,6 +676,8 @@ Constant. Type for function calls.
 ## build-string
 
     quote - string
+
+Execute a quotation, constructing a string from the values it returns.
 
 ## trim-left
 
