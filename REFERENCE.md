@@ -765,17 +765,25 @@ Constant. Type for function calls.
 
     pointer - value
 
+Return the first value in a slice.
+
 ## rest
 
     pointer - pointer
+
+Given a slice, construct a new slice with all but the first element and return a pointer to this.
 
 ## push
 
     value pointer -
 
+Append a value to the specified slice. This modifies the original slice.
+
 ## pop
 
     pointer - value
+
+Remove and return the last value from a slice. This modifies the original slice.
 
 ## reduce
 
@@ -789,6 +797,8 @@ Constant. Type for function calls.
 
     pointer value - flag
 
+Given a slice and a value, return **true** if the value is found in the slice, or **false** otherwise.
+
 ## filter
 
     pointer pointer - pointer
@@ -799,63 +809,94 @@ Constant. Type for function calls.
 
 ## capture-results
 
-    pointer - pointer
+    quote - pointer
+
+Execute the code in the provided quotation, constructing a new slice with the returned values.
+
+Exercise some caution using this: you may need to manually append values if the stack depth changes in unexpected ways during execution of the source quotation.
 
 ## index-of
 
     pointer value - number
 
+Given a slice and a value, return the offset that the value is located at. If the value is not found, returns an offset of -1.
+
 ## *TOB
 
     N/A - Variable
+
+Variable. This is an array that contains values intended for later display.
 
 ## .
 
     value -
 
+Append a value to the *text output buffer*.
+
 ## show-tob
 
     - ...
+
+Push the values in the *text output buffer* to the stack.
 
 ## clear-tob
 
     -
 
+Remove all entries from the *text output buffer*.
+
 ## *Hash-Prime
 
     - value
+
+Value. Holds the prime number used to salt the raw hash. This is used by **hash**.
 
 ## hash:xor
 
     string - number
 
+Hash a string using the XOR algorithm.
+
 ## hash:djb2
 
     string - number
+
+Hash a string using the DJB2 algorithm.
 
 ## hash:sdbm
 
     string - number
 
+Hash a string using the SDBM algorithm.
+
 ## chosen-hash
 
     string - number
+
+A function that calls the preferred hash algorithm. This should be redefined as desired.
 
 ## hash
 
     string - number
 
+Hash a string (using **chosen-hash**) and **\*Hash-Prime**.
+
 ## when
 
     quote -
 
-"when: a conditional combinator"
-"[ [ [ condition ] [ code to execute if true ] ] \"
-"  [ [ condition ] [ code to execute if true ] ] \"
-"  [ [ true ]      [ default case ] ] \"
-"] when"
+Takes a pointer to a set of quotations. Each quote in the set should consist of two other quotes: one that returns a flag, and one to be executed if the condition returns true. Executes each until one returns true, then exits.
 
+Example:
+
+    [ \
+      [ [ dup even? ] [ 'number is even!' ] ] \
+      [ [ dup odd? ] [ 'number is odd!' ] ] \
+      [ [ true ] [ 'hmm, this is a strange number!' ] ] \
+    ] when
 
 ## apropos
 
     string - string
+
+Given a function name, return the stack comment for it as a string.
