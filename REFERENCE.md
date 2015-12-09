@@ -669,9 +669,13 @@ Return **true** if the value is an ASCII vowel or **false** otherwise.
 
     value - flag
 
+Return **true** if the value is lowercase or **false** otherwise.
+
 ## uppercase?
 
     value - flag
+
+Return **true** if the value is uppercase or **false** otherwise.
 
 ## build-string
 
@@ -683,77 +687,115 @@ Execute a quotation, constructing a string from the values it returns.
 
     string - string
 
+Remove leading whitespace from a string.
+
 ## trim-right
 
     string - string
+
+Remove trailing whitespace from a string.
 
 ## trim
 
     string - string
 
+Remove both leading and trailing whitespace from a string.
+
 ## *CURRENT-BUFFER
 
     N/A - Variable
+
+Variable. Holds a pointer to the current buffer.
 
 ## *BUFFER-OFFSET
 
     N/A - Variable
 
+Variable. Holds the current location in the buffer for reading/writing.
+
 ## current-buffer
 
     - pointer
+
+Return the current buffer.
 
 ## buffer-position
 
     - pointer number
 
+Return the current buffer slice and location.
+
 ## buffer-advance
 
     -
+
+Increment the buffer location index by 1.
 
 ## buffer-retreat
 
     -
 
+Decrement the buffer location index by 1.
+
 ## buffer-store-current
 
     value -
+
+Store the value into the current location in the buffer. Does not alter the location.
 
 ## buffer-fetch-current
 
     - value
 
+Fetch a value from the current location in the buffer. Does not alter the location.
+
 ## buffer-store
 
     value -
+
+Store the value into the current location in the buffer and increment the location.
 
 ## buffer-fetch
 
     - value
 
+Return the current value in the buffer and increment the location.
+
 ## buffer-store-retreat
 
     value -
+
+Store the value into the current location in the buffer and decrement the location.
 
 ## buffer-fetch-retreat
 
     - value
 
+Return the current value in the buffer and decrement the location.
+
 ## set-buffer
 
     pointer -
+
+Set the current buffer to the specified slice and set the current location to 0.
 
 ## buffer-store-items
 
     ... number -
 
+Store an arbitrary number of items into the current buffer.
+
 ## new-buffer
 
     -
 
+Create a new buffer.
+
 ## preserve-buffer
 
     pointer -
+
+Executes the specified quote while saving the current buffer and location. Restores the buffer and location after execution of the quote completes.
 
 ## named-buffer
 
@@ -763,29 +805,57 @@ Execute a quotation, constructing a string from the values it returns.
 
     value value - pointer
 
+Bind two values into a new slice.
+
 ## curry
 
     value quote - quote
+
+Bind a value and a quote, returning a new quote which will execute the original quote on the stored value.
+
+Example:
+
+    "Use this to create a counting function"
+    [ "s-q" request [ dup @ 1 + over ! @ ] curry ] 'counter' define
+
+    counter 'c' define
+    5 [ c ] times
+ 
 
 ## to
 
     -
 
+Sets an internal flag telling the next value encountered to update the stored value instead of returning it.
+
 ## (value-handler)
 
     ? pointer -
+
+Internal helper function used by values. This will either return the stored value or update it, depending on the value state set by **to**. If the state requires an update, toggle it back to returning the value instead.
 
 ## value
 
     string -
 
+Create a new value with the specified name.
+
 ## value!
 
     value string -
 
+Create a new value with the specified name and set its initial contents to the specified value.
+
 ## values
 
     quote -
+
+Given an array of strings, create a new value for each one.
+
+Example:
+
+    "Creates new values named a, b, and c:"
+    [ 'a'  'b'  'c' ] values
 
 ## first
 
@@ -813,11 +883,20 @@ Remove and return the last value from a slice. This modifies the original slice.
 
 ## reduce
 
-    pointer value pointer
+    pointer value pointer - value
+
+**reduce** takes a slice, a starting value, and a quote. It executes the quote once for each item in the slice, passing the item and the value to the quote. The quote should consume both and return a new value.
+
+Example:
+
+    "Sum even numbers in an array"
+    [ 1 2 3 4 5 6 7 8 9 10 ] [ even?] filter 0 [ + ] reduce
 
 ## for-each
 
     pointer pointer - ?
+
+**for-each** takes a slice and a quotation. It then executes the quote once for each item in the slice, passing the individual items to the quote.
 
 ## contains?
 
@@ -828,6 +907,13 @@ Given a slice and a value, return **true** if the value is found in the slice, o
 ## filter
 
     pointer pointer - pointer
+
+Given a slice and a quotation, this will pass each value to the quotation (executing it once per item in the slice). The quotation should return a Boolean flag. If the flag is **true**, copy the value to a new slice. Otherwise discard it.
+
+Example:
+
+    'The quick brown fox jumped over the lazy dogs'
+    [ vowel? ] filter :s
 
 ## map
 
