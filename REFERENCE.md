@@ -2,49 +2,77 @@
 
     value - bytecode
 
+Primitive. Convert value on stack to a bytecode.
+
 ## :n
 
     value - number
+
+Primitive. Convert value on stack to a number.
 
 ## :s
 
     value - string
 
+Primitive. Convert value on stack to a string.
+
 ## :c
 
     value - character
+
+Primitive. Convert value on stack to a character.
 
 ## :p
 
     value - pointer
 
+Primitive. Convert value on stack to a pointer.
+
 ## :f
 
     value - flag
+
+Primitive. Convert value on stack to a flag.
 
 ## :call
 
     value - function-call
 
+Primitive. Convert value on stack to a function call.
+
 ## set-type
 
     value number:type - value
+
+Primitive. Set the value to a specific type.
 
 ## type?
 
     value - value number:type
 
+Primitive. Given a value, return the value and its corresponding type.
+
 ## +
 
     value value - value
+
+Primitive.
+
+For numbers, add them and return the results.
+
+For strings, append the second string to the first one and return the new string.
 
 ## -
 
     number number - number
 
+Primitive. Subtract the second number from the first one, returning the result.
+
 ## *
 
     number number - number
+
+Primitive. Multiply two numbers and return the result.
 
 ## /
 
@@ -94,9 +122,13 @@
 
     - number
 
+Primitive. Return a random number.
+
 ## sqrt
 
     number - number
+
+Primitive. Return the square root of a number.
 
 ## <
 
@@ -138,17 +170,25 @@
 
     number quote -
 
+Primitive. Execute the specified quotation the specified number of times.
+
 ## invoke
 
     quote -
+
+Primitive. Execute the specified quotation.
 
 ## dip
 
     value quote - value
 
+Primitive. Remove value from the stack and execute the quotation. When execution completes restore the value.
+
 ## sip
 
     value quote - value
+
+Primitive. Execute the quotation. When execution completes, restore a copy of the value to the stack.
 
 ## bi
 
@@ -162,25 +202,38 @@
 
     pointer:source pointer:dest -
 
+Primitive. Copy the content of the first slice to the second one.
+
 ## fetch
 
     pointer number:offset - value
+
+Primitive. Fetch a value stored in a slice.
 
 ## store
 
     value pointer number:offset -
 
+Primitive. Store a value into a slice.
+
 ## request
 
     - pointer
+
+Primitive. Request a new memory slice. Returns a pointer to it.
 
 ## release
 
     pointer -
 
+Primitive. Tell Parable that a slice is no longer in use.
+
 ## collect-garbage
 
     -
+
+Primitive. Search memory for unused slices and recover them.
+
 ## get-last-index
 
     pointer - number
@@ -205,9 +258,13 @@
 
     value -
 
+Primitive. Remove a value from the stack.
+
 ## swap
 
     value:a value:b - value:b value:a
+
+Primitive. Switch the positions of the top two items on the stack.
 
 ## over
 
@@ -221,13 +278,19 @@
 
     value:a value:b - value:b
 
+Primitive. Remove the second value on the stack.
+
 ## depth
 
     - number
 
+Primitive. Return the number of items on the stack.
+
 ## reset
 
     ... -
+
+Primitive. Remove all values from the stack.
 
 ## function-exists?
 
@@ -252,6 +315,8 @@
 ## numeric?
 
     string - flag
+
+Primitive. If string can be converted to a number using **:n** return **true**. Otherwise return **false**.
 
 ## reverse
 
@@ -301,33 +366,50 @@
 
     - number
 
+Constant. Type for numbers.
+
 ## STRING
 
     - number
+
+Constant. Type for strings.
 
 ## CHARACTER
 
     - number
 
+Constant. Type for characters.
+
 ## POINTER
 
     - number
+
+Constant. Type for pointers.
 
 ## FLAG
 
     - number
 
+Constant. Type for Boolean flag.
+
 ## BYTECODE
 
     - number
+
+Constant. Type for bytecides.
 
 ## COMMENT
 
     - number
 
+Constant. Type for comments.
+
+
 ## FUNCTION-CALL
 
     - number
+
+Constant. Type for function calls.
 
 ## dup-pair
 
