@@ -683,6 +683,12 @@ Execute the quotation if the flag is true.
 
 Execute the quotation if the flag is false.
 
+## nan?
+
+    number - flag
+
+Return **true** if number is not valid (#nan) or **false** otherwise.
+
 ## zero?
 
     number - flag
