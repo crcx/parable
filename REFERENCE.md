@@ -802,6 +802,9 @@ Remove the old name for a function and assign a new one.
 
 Given an array of strings, create a new named value for each item.
 
+    "Creates new variables named a, b, and c:"
+    [ 'a'  'b'  'c' ] variables
+
 ## string-contains?
 
     value string - flag
@@ -986,6 +989,10 @@ Executes the specified quote while saving the current buffer and location. Resto
 
 Bind two values into a new slice.
 
+Example:
+
+    $a $b cons :s
+
 ## curry
 
     value quote - quote
@@ -1024,6 +1031,10 @@ Create a new value with the specified name.
 
 Create a new value with the specified name and set its initial contents to the specified value.
 
+Example:
+
+    100 'test' value!
+
 ## values
 
     quote -
@@ -1041,17 +1052,27 @@ Example:
 
 Return the first value in a slice.
 
+Example:
+
+    [ 1 2 3 4 5 ] first
+
 ## rest
 
     pointer - pointer
 
 Given a slice, construct a new slice with all but the first element and return a pointer to this.
 
+Example:
+
+    'Eggs Are Tasty' rest :s
+
 ## push
 
     value pointer -
 
 Append a value to the specified slice. This modifies the original slice.
+
+Tip: If you are trying to append characters to a string, this is much faster than using **+** for concatenation.
 
 ## pop
 
@@ -1068,7 +1089,7 @@ Remove and return the last value from a slice. This modifies the original slice.
 Example:
 
     "Sum even numbers in an array"
-    [ 1 2 3 4 5 6 7 8 9 10 ] [ even?] filter 0 [ + ] reduce
+    [ 1 2 3 4 5 6 7 8 9 10 ] [ even? ] filter 0 [ + ] reduce
 
 ## for-each
 
@@ -1111,6 +1132,12 @@ Example:
 Execute the code in the provided quotation, constructing a new slice with the returned values.
 
 Exercise some caution using this: you may need to manually append values if the stack depth changes in unexpected ways during execution of the source quotation.
+
+Example:
+
+    [ $a $z [ :n ] bi@ expand-range ] capture-results reverse :s
+
+Tip: the results will be appended in the order they are encountered on the stack. So the last result will be the first one in quote. Use **reverse** to alter the order if necessary.
 
 ## index-of
 
