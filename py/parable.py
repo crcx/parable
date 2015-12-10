@@ -963,7 +963,7 @@ def stack_change_type(type):
                 stack_push(float(slice_to_string(stack_pop())), TYPE_NUMBER)
             else:
                 stack_pop()
-                stack_push(0, TYPE_NUMBER)
+                stack_push(float('nan'), TYPE_NUMBER)
         else:
             types.pop()
             types.append(TYPE_NUMBER)
@@ -1334,7 +1334,7 @@ def compile_number(number, slice, offset):
     if is_number(number):
         store(float(number), slice, offset, TYPE_NUMBER)
     else:
-        store(0, slice, offset, TYPE_NUMBER)
+        store(float('nan'), slice, offset, TYPE_NUMBER)
         report("E03: Compile Error: Unable to convert " + number + " to a number")
     offset += 1
     return offset
