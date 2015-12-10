@@ -605,10 +605,10 @@ def interpret(slice, more=None):
                     offset = size
             elif opcode == BC_MEM_STORE:
                 if check_depth(slice, offset, 3):
-                    a = stack_pop()
-                    b = stack_pop()
-                    t = stack_type()
-                    c = stack_pop()
+                    a = stack_pop()   # offset
+                    b = stack_pop()   # slice
+                    t = stack_type()  # type
+                    c = stack_pop()   # value
                     store(c, b, a, t)
                 else:
                     offset = size
@@ -636,10 +636,10 @@ def interpret(slice, more=None):
                     offset = size
             elif opcode == BC_MEM_SET_TYPE:
                 if check_depth(slice, offset, 3):
-                    a = stack_pop()
-                    b = stack_pop()
-                    c = stack_pop()
-                    store_type(c, b, a)
+                    a = stack_pop()  # offset
+                    b = stack_pop()  # slice
+                    c = stack_pop()  # type
+                    store_type(b, a, c)
                 else:
                     offset = size
             elif opcode == BC_MEM_GET_TYPE:
@@ -1498,15 +1498,15 @@ bootstrap.append(""" [ "vp-v"   `307 ] 'sip' define """)
 bootstrap.append(""" [ "vpp-?"  `308 ] 'bi' define """)
 bootstrap.append(""" [ "vppp-?" `309 ] 'tri' define """)
 bootstrap.append(""" [ "pp-"    `400 ] 'copy' define """)
-bootstrap.append(""" [ "pn-n"   `401 ] 'fetch' define """)
-bootstrap.append(""" [ "npn-"   `402 ] 'store' define """)
+bootstrap.append(""" [ "pn-v"   `401 ] 'fetch' define """)
+bootstrap.append(""" [ "vpn-"   `402 ] 'store' define """)
 bootstrap.append(""" [ "-p"     `403 ] 'request' define """)
 bootstrap.append(""" [ "p-"     `404 ] 'release' define """)
 bootstrap.append(""" [ "-"      `405 ] 'collect-garbage' define """)
 bootstrap.append(""" [ "p-n"    `406 ] 'get-last-index' define """)
 bootstrap.append(""" [ "np-"    `407 ] 'set-last-index' define """)
-bootstrap.append(""" [ "pnt-"   `408 ] 'set-stored-type' define """)
-bootstrap.append(""" [ "p-n"    `409 ] 'get-stored-type' define """)
+bootstrap.append(""" [ "tpn-"   `408 ] 'set-stored-type' define """)
+bootstrap.append(""" [ "pn-n"   `409 ] 'get-stored-type' define """)
 bootstrap.append(""" [ "v-vv"   `500 ] 'dup' define """)
 bootstrap.append(""" [ "v-"     `501 ] 'drop' define """)
 bootstrap.append(""" [ "vV-Vv"  `502 ] 'swap' define """)
@@ -1564,8 +1564,8 @@ bootstrap.append(""" [ "p-"   [ @ 1 - ] sip ! ] 'decrement' define """)
 bootstrap.append(""" [ "p-"   request swap copy ] 'zero-out' define """)
 bootstrap.append(""" [ "pp-"  swap request dup-pair copy swap [ [ invoke ] dip ] dip copy ] 'preserve' define """)
 bootstrap.append(""" "Number functions" """)
-bootstrap.append(""" [ "n-n"  over over < [ nip ] [ drop ] if ] 'max' define """)
-bootstrap.append(""" [ "n-n"  over over > [ nip ] [ drop ] if ] 'min' define """)
+bootstrap.append(""" [ "nn-n"  over over < [ nip ] [ drop ] if ] 'max' define """)
+bootstrap.append(""" [ "nn-n"  over over > [ nip ] [ drop ] if ] 'min' define """)
 bootstrap.append(""" [ "n-n"  dup -1 * max ] 'abs' define """)
 bootstrap.append(""" "The basic bi/tri combinators provided as part of the primitives allow application of multiple quotes to a single data element. Here we add new forms that are very useful." """)
 bootstrap.append(""" "We consider the bi/tri variants to consist of one of three types." """)
@@ -1643,8 +1643,8 @@ bootstrap.append(""" [ "vp-p"  :call cons ] 'curry' define """)
 bootstrap.append(""" "Values" """)
 bootstrap.append(""" '*state*' variable """)
 bootstrap.append(""" [ "-"    &*state* on ] 'to' define """)
-bootstrap.append(""" [ "?p-"  &*state* @ :f [ ! &*state* off ] [ @ ] if ] 'value-handler' define """)
-bootstrap.append(""" [ "s-"   request [ value-handler ] curry swap define ] 'value' define """)
+bootstrap.append(""" [ "?p-"  &*state* @ :f [ ! &*state* off ] [ @ ] if ] '(value-handler)' define """)
+bootstrap.append(""" [ "s-"   request [ (value-handler) ] curry swap define ] 'value' define """)
 bootstrap.append(""" [ "ns-"  [ value ] sip to lookup-function invoke ] 'value!' define """)
 bootstrap.append(""" [ "p-"   invoke<depth?> [ value ] times ] 'values' define """)
 bootstrap.append(""" '*state*' hide-function """)

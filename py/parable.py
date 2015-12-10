@@ -602,10 +602,10 @@ def interpret(slice, more=None):
                     offset = size
             elif opcode == BC_MEM_STORE:
                 if check_depth(slice, offset, 3):
-                    a = stack_pop()
-                    b = stack_pop()
-                    t = stack_type()
-                    c = stack_pop()
+                    a = stack_pop()   # offset
+                    b = stack_pop()   # slice
+                    t = stack_type()  # type
+                    c = stack_pop()   # value
                     store(c, b, a, t)
                 else:
                     offset = size
@@ -633,10 +633,10 @@ def interpret(slice, more=None):
                     offset = size
             elif opcode == BC_MEM_SET_TYPE:
                 if check_depth(slice, offset, 3):
-                    a = stack_pop()
-                    b = stack_pop()
-                    c = stack_pop()
-                    store_type(c, b, a)
+                    a = stack_pop()  # offset
+                    b = stack_pop()  # slice
+                    c = stack_pop()  # type
+                    store_type(b, a, c)
                 else:
                     offset = size
             elif opcode == BC_MEM_GET_TYPE:
