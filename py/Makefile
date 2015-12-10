@@ -1,9 +1,10 @@
-pre: clean
-	python convert.py > pre
-	chmod +x pre
+default: clean interfaces
+
+interfaces:
+	cd scripting && make
 
 clean:
-	rm -f *.pyc *.py3
+	rm -f *.pyc *.py3 *~
 
 
 python3:
@@ -26,9 +27,7 @@ update:
 	cp parable.py ~/www/api.forthworks.com/apologue/1.8
 	cp server/apologue-1.8 ~/www/api.forthworks.com/apologue/1.8/0
 	cp stdlib.p ~/www/api.forthworks.com/apologue/1.8
-	cd ika && make
-	cp ika/ika `which ika`
+	cp ika `which ika`
 	cp pre `which pre`
 	cp parable.py stdlib.p ~/active/cyanide
 	cd ~/www/api.forthworks.com/apologue/parable && git pull
-
