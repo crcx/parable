@@ -78,45 +78,67 @@ Primitive. Multiply two numbers and return the result.
 
     number number - number
 
+Primitive. Divide the first number by the second returning the result.
+
 ## rem
 
     number number - number
+
+Primitive. Divide the first number by the second returning the remainder.
 
 ## floor
 
     number - number
 
+Primitive. Return the largest integer value less than or equal to the specified number.
+
 ## ^
 
     number number - number
+
+Primitive. Return the first value raised to the power of the second number.
 
 ## log
 
     number - number
 
+Primitive. Return the natural logarithm of the number (to base *e*).
+
 ## log10
 
     number - number
+
+Primitive. Return the natural logarithm of the number (to base *10*).
 
 ## log<n>
 
     number number - number
 
+Primitive. Return the natural logarithm of the number to a specified base (this is calculated as [log(first) / log(second)]).
+
 ## shift
 
     number number - number
+
+Primitive. Perform a bit wise shift of the first number the specified number of bits (in the second number). Use a negative value for the second to shift left. A positive value will shift right.
 
 ## and
 
     number number - number
 
+Primitive. Perform a bitwise AND operation on the two values and return the result.
+
 ## or
 
     number number - number
 
+Primitive. Perform a bitwise OR operation on the two values and return the result.
+
 ## xor
 
     number number - number
+
+Primitive. Perform a bitwise XOR operation on the two values and return the result.
 
 ## random
 
@@ -210,11 +232,15 @@ Primitive. Execute the quotation. When execution completes, restore a copy of th
 
 ## bi
 
-    vpp-?
+    value pointer pointer - ?
+
+Primitive. Apply each quotation to a copy of the value.
 
 ## tri
 
-    vppp-?
+    value pointer pointer pointer - ?
+
+Primitive. Apply each quotation to a copy of the value.
 
 ## copy
 
@@ -256,17 +282,25 @@ Primitive. Search memory for unused slices and recover them.
 
     pointer - number
 
+Primitive. Return the last offset in a specified slice.
+
 ## set-last-index
 
     number pointer -
 
+Primitive. Set the last index in a slice to the specified offset.
+
 ## set-stored-type
 
-    number pointer -
+    number pointer offset -
+
+Primitive. Set the stored type for the value at offset within the specified slice to the specified type.
 
 ## get-stored-type
 
-    pointer - number
+    pointer offset - number
+
+Primitive. Get the stored type for the value at offset within the specified slice.
 
 ## dup
 
@@ -336,11 +370,15 @@ Primitive. Remove the named function from the dictionary. This removes the name,
 
 ## find
 
-    string string - number
+    string:haystack string:needle - number
+
+Primitive. Search for the substring *needle* in the *haystack*. Returns the starting offset of -1 if no match is found.
 
 ## subslice
 
-    pointer number number - pointer
+    pointer number:start number:end - pointer
+
+Primitive. Return a new slice containing the contents of the original slice, starting from the specified offset and ending at (but not including) the ending offset.
 
 ## numeric?
 
@@ -691,53 +729,84 @@ Return **true** if the number is positive or **false** otherwise.
 
     value quote -
 
+Execute the specified quote if the value is a Character.
+
 ## if-string
 
     value quote -
+
+Execute the specified quote if the value is a String.
 
 ## if-number
 
     value quote -
 
+Execute the specified quote if the value is a Number.
+
 ## if-pointer
 
     value quote -
+
+Execute the specified quote if the value is a pointer.
 
 ## if-flag
 
     value quote -
 
+Execute the specified quote if the value is a Boolean flag.
+
 ## between?
 
-    number number number - flag
+    number:check number:lower number:upper - flag
+
+Return **true** if the number to check is within the bounds specified or **false** otherwise. The check is inclusive of the bounds.
 
 ## types-match?
 
     value value - value value flag
 
+Return **true** if the types of the two values match or **false** otherwise.
+
 ## expand-range
 
     number number - ...
+
+Given two values, expand the range. 
 
 ## sum-range
 
     ... number - number
 
+Add an arbitrary number of values. The range will include the limits.
+
+Example:
+
+   1 2 3 4 5
+   5 sum-range
+
 ## hide-functions
 
     quote -
 
+Given an array of strings, hide the function each names.
+
 ## rename-function
 
-    string string -
+    string:old string:new -
+
+Remove the old name for a function and assign a new one.
 
 ## variables
 
     quote -
 
+Given an array of strings, create a new named value for each item.
+
 ## string-contains?
 
     value string - flag
+
+Return **true** if the specified character is found in the string or **false** otherwise.
 
 ## digit?
 
@@ -1028,6 +1097,13 @@ Example:
 ## map
 
     pointer pointer - pointer
+
+Given a pointer to an array and a quotation, execute the quotation once for each item in the array. Construct a new array from the value returned by the quotation and return a pointer to it.
+
+Example:
+
+    "Multiply all values in the array by 10"
+    [ 1 2 3 4 ] [ 10 * ] map
 
 ## capture-results
 
