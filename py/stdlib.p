@@ -142,6 +142,7 @@
 [ "f-f"  :f :n -1 xor :f ] 'not' define
 [ "fp-"  [ ] if ] 'if-true' define
 [ "fp-"  [ ] swap if ] 'if-false' define
+[ "v-f"  :s 'nan' = ] 'nan?' define
 [ "v-f"  0 = ] 'zero?' define
 [ "v-f"  :f :n zero? not ] 'true?' define
 [ "v-f"  :f :n zero? ] 'false?' define
