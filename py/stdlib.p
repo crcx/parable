@@ -102,7 +102,7 @@
 [ "p-n"   get-last-index 1 + ] 'length?' define
 
 
-"Simple variables are just named slices, with functions to access the first element. They're useful for holding single values, but don't track data types."
+"Simple variables are just named slices, with functions to access the first element. They're useful for holding single values."
 [ "s-"   request swap define ] 'variable' define
 [ "p-v"  0 fetch ] '@' define
 [ "vp-"  0 store ] '!' define
@@ -215,13 +215,13 @@
 
 
 "Values"
-'*state*' variable
-[ "-"    &*state* on ] 'to' define
-[ "?p-"  &*state* @ :f [ ! &*state* off ] [ @ ] if ] '(value-handler)' define
+'_STATE' variable
+[ "-"    &_STATE on ] 'to' define
+[ "?p-"  &_STATE @ :f [ ! &_STATE off ] [ @ ] if ] '(value-handler)' define
 [ "s-"   request [ (value-handler) ] curry swap define ] 'value' define
 [ "ns-"  [ value ] sip to lookup-function invoke ] 'value!' define
 [ "p-"   invoke<depth?> [ value ] times ] 'values' define
-'*state*' hide-function
+'_STATE' hide-function
 
 
 "Arrays and Operations on Quotations"
