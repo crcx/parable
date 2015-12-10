@@ -1,8 +1,8 @@
-# This is a short tool to convert bootstrap.p, io.p and ika_interface.py
-# into a standalone script named 'ika'
+# This is a short tool to convert bootstrap.p and pre_interface.py into
+# a standalone script named 'pre'
 
 print "#!/usr/bin/env python"
-print "# Copyright (c)2012-2013, Charles Childers"
+print "# Copyright (c)2012-2015, Charles Childers"
 
 def condense_lines(code):
     m = len(code)
@@ -24,27 +24,16 @@ def condense_lines(code):
         i = i + 1
     return r
 
-
-print ""
 f = open('parable.py').readlines()
 for line in f:
     print line.rstrip()
 
-print ""
 print "bootstrap = []"
-print "# core language functions"
-f = condense_lines(open('bootstrap.p').readlines())
+f = condense_lines(open('stdlib.p').readlines())
 for line in f:
     if len(line) > 1:
         print 'bootstrap.append(""" ' + line.strip() + ' """)'
 
-print "# i/o functions"
-f = condense_lines(open('io.p').readlines())
-for line in f:
-    if len(line) > 1:
-        print 'bootstrap.append(""" ' + line.strip() + ' """)'
-
-print ""
-f = open('ika_interface.py').readlines()
+f = open('pre_interface.py').readlines()
 for line in f:
     print line.rstrip()
