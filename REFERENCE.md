@@ -132,39 +132,57 @@ Primitive. Return the square root of a number.
 
 ## <
 
-    number number - flag
+    number:a number:b - flag
+
+Primitive. Compare two numbers. Returns **true** if the first number (a) is less than the second (b) or **false** otherwise.
 
 ## >
 
-    number number - flag
+    number:a number:b - flag
+
+Primitive. Compare two numbers. Returns **true** if the first number (a) is greater than the second (b) or **false** otherwise.
 
 ## <=
 
-    number number - flag
+    number:a number:b - flag
+
+Primitive. Compare two numbers. Returns **true** if the first number (a) is less than or equal to the second (b) or **false** otherwise.
 
 ## >=
 
-    number number - flag
+    number:a number:b - flag
+
+Primitive. Compare two numbers. Returns **true** if the first number (a) is greater than or equal to the second (b) or **false** otherwise.
 
 ## =
 
     value value - flag
 
+Primitive. Compare two values for equality, returns a Boolean flag.
+
 ## <>
 
     value value - flag
+
+Primitive. Compare two values for inequality, returns a Boolean flag.
 
 ## if
 
     flag quote:true quote:false -
 
+Primitive. Given a flag, execute the first quote if the flag is **true** or the second if the flag is **false**.
+
 ## while-true
 
     quote -
 
+Takes a quote which returns a flag. If the flag is **true**, execute the quote again. Repeat until the quote returns **false**.
+
 ## while-false
 
     quote -
+
+Takes a quote which returns a flag. If the flag is **false**, execute the quote again. Repeat until the quote returns **true**.
 
 ## times
 
@@ -254,6 +272,8 @@ Primitive. Search memory for unused slices and recover them.
 
     value - value value
 
+Primitive. Duplicate the top value on the stack. If the value is a string, make a new copy of the string.
+
 ## drop
 
     value -
@@ -270,9 +290,13 @@ Primitive. Switch the positions of the top two items on the stack.
 
     value:a value:b - value:a value:b value:a
 
+Primitive. Put a copy of value a over value b.
+
 ## tuck
 
     value:a value:b - value:b value:a value:b
+
+Primitive. Put a copy of value b under value a.
 
 ## nip
 
@@ -296,13 +320,19 @@ Primitive. Remove all values from the stack.
 
     string - flag
 
-## lookup-functiomn
+Primitive. Return **true** if the named function exists or **false** otherwise.
+
+## lookup-function
 
     string - pointer
+
+Primitive. Return a pointer to the function if the function exists or a pointer to -1 (an invalid slice) if it does not.
 
 ## hide-function
 
     string -
+
+Primitive. Remove the named function from the dictionary. This removes the name, but not the definition: existing references to it will continue to work.
 
 ## find
 
@@ -326,37 +356,55 @@ Primitive. If string can be converted to a number using **:n** return **true**. 
 
     value - value
 
+Primitive. Given a string or character, return the lowercase equivalent.
+
 ## to-uppercase
 
     value - value
+
+Primitive. Given a string or character, return the uppercase equivalent.
 
 ## report-error
 
     string -
 
+Primitive. Send a string to the Parable error log.
+
 ## sin
 
     number - number
+
+Primitive. Return the sine of a number.
 
 ## cos
 
     number - number
 
+Primitive. Return the cosine of a number.
+
 ## tan
 
     number - number
+
+Primitive. Return the tangent of a number.
 
 ## asin
 
     number - number
 
+Primitive. Return the arc sine of a number.
+
 ## acos
 
     number - number
 
+Primitive. Return the arc cosine of a number.
+
 ## atan
 
     number - number
+
+Primitive. Return the arc tangent of a number.
 
 ## atan2
 
@@ -415,131 +463,193 @@ Constant. Type for function calls.
 
     value:a value:v - value:a value:b value:a value:b
 
+Duplicate the top two values on the stack.
+
 ## drop-pair
 
     value value -
+
+Remove the top two values from the stack.
 
 ## drop-multiple
 
     ? number -
 
+Remove an arbitrary number of values from the stack.
+
 ## invoke<depth?>
 
     quote - ... number
+
+Execute a quotation, returning a value indicating the stack depth change resulting from the execution.
 
 ## last-index?
 
     pointer - pointer number
 
+Return the last offset in a slice. This does not consume the pointer.
+
 ## slice-length?
 
     pointer - pointer number
+
+Return the length of a slice. This does not consume the pointer.
 
 ## adjust-slice-length
 
     number pointer -
 
+Given a number, adjust the length of the specified slice by the requested amount. Use a negative value to shrink or positive to grow the slice.
+
 ## duplicate-slice
 
     pointer - pointer
+
+Make a copy of a slice, returning a pointer to the copy.
 
 ## length?
 
     pointer - number
 
+Return the length of a slice.
 
 ## variable
 
     string -
 
+Create a simple named variable.
+
 ## @
 
     pointer - value
+
+Fetch a value stored in a simple variable.
 
 ## !
 
     value pointer -
 
+Store a value into a simple variable.
+
 ## variable!
 
     value string -
+
+Create a named variable with an initial value.
 
 ## off
 
     pointer -
 
+Set a simple variable to 0.
+
 ## on
 
     pointer -
+
+Set a simple variable to -1
 
 ## increment
 
     pointer -
 
+Increment the stored value in a simple variable by 1.
+
 ## decrement
 
     pointer -
+
+Decrement the stored value in a simple variable by 1.
 
 ## zero-out
 
     pointer -
 
+Erase all values in a slice.
+
 ## preserve
 
-    pointer pointer -
+    pointer quote -
 
+Backup the contents of a slice and remove the pointer from the stack. Execute the quotation. Then restore the contents of the specified slice to their original state.
 
 ## max
 
     number number - number
 
+Return the larger of two numbers.
+
 ## min
 
     number number - number
+
+Return the smaller of two numbers.
 
 ## abs
 
     number - number
 
+Return the absolute value of a number.
+
 ## bi*
 
-    value value pointer pointer - ?
+    value:a value:b pointer:a pointer:b - ?
+
+Execute pointer:a against value:a and pointer:b against value:b.
 
 ## tri*
 
-    value value value pointer pointer pointer - ?
+    value:a value:b value:c pointer:a pointer:b pointer:c - ?
+
+Execute pointer:a against value:a, pointer:b against value:b, and pointer:c against value:c.
 
 ## bi@
 
     value value pointer - ?
 
+Execute pointer against each value.
+
 ## tri@
 
     value value value pointer - ?
+
+Execute pointer against each value.
 
 ## true
 
     - flag
 
+Return a true flag.
+
 ## false
 
     - flag
+
+Return a false flag.
 
 ## not
 
     flag - flag
 
+Invert the state of a flag.
+
 ## if-true
 
     flag quote -
+
+Execute the quotation if the flag is true.
 
 ## if-false
 
     flag quote -
 
+Execute the quotation if the flag is false.
+
 ## zero?
 
     number - flag
+
+If the value is zero, return **true** otherwise return **false**.
 
 ## true?
 
