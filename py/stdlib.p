@@ -47,8 +47,8 @@
 [ "-"      `405 ] 'collect-garbage' define
 [ "p-n"    `406 ] 'get-last-index' define
 [ "np-"    `407 ] 'set-last-index' define
-[ "pnt-"   `408 ] 'set-stored-type' define
-[ "p-n"    `409 ] 'get-stored-type' define
+[ "tpn-"   `408 ] 'set-stored-type' define
+[ "pn-n"   `409 ] 'get-stored-type' define
 [ "v-vv"   `500 ] 'dup' define
 [ "v-"     `501 ] 'drop' define
 [ "vV-Vv"  `502 ] 'swap' define
