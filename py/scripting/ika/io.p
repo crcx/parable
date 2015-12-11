@@ -27,3 +27,6 @@
 "Command Line Arguments"
 [ "- number"  `4000 ] 'arg-count' define
 [ "number - string"  `4001 ] 'get-arg' define
+
+"Library Support"
+[ "s-"  `9000 ] 'import' define

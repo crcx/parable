@@ -1,4 +1,6 @@
-import sys, os
+import os
+import sys
+
 
 def dump_stack():
     """display the stack"""
@@ -72,6 +74,7 @@ def display_errors():
 
 files = []
 
+
 def opcodes(slice, offset, opcode):
     global files, TYPE_NUMBER
     if opcode == 2000:
@@ -128,6 +131,10 @@ def opcodes(slice, offset, opcode):
     elif opcode == 4001:
         n = int(stack_pop())
         stack_push(string_to_slice(sys.argv[n + 2]), TYPE_STRING)
+    elif opcode == 9000:
+        home = os.path.expanduser("~")
+        file = home + "/.parable/library/" + slice_to_string(stack_pop())
+        load_file(file)
     return offset
 
 
