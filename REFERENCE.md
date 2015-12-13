@@ -1225,6 +1225,29 @@ Example:
       [ [ true ] [ 'hmm, this is a strange number!' ] ] \
     ] when
 
+
+## split
+
+    string value - pointer
+
+Given a string, split it into pieces wherever the value (a character or string) is found and construct an array from these pieces. Return the array.
+
+Example:
+
+    'hello brave new world'
+    ' ' split
+
+## join
+
+    pointer value - string
+
+Given an array and a value, convert the values in the array to strings and construct a new string, concatenating the pieces together with the specified value (a string or a character) between them.
+
+Example:
+
+    [ 'this' 'is' 'a' 'series' 'of' 'values' ]
+    '---' join
+
 ## apropos
 
     string - string
