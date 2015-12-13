@@ -1082,7 +1082,7 @@ def request_slice(attempts=1):
             p_map[i] = 1
             p_slices[i] = [0]
             p_types[i] = [TYPE_NUMBER]
-            p_sizes[i] = -1
+            p_sizes[i] = 0
             return i
         else:
             i += 1
