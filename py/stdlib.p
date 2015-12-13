@@ -276,6 +276,31 @@
 [ '*TESTS'  '*DONE'  '*OFFSET'  '<next>' ] hide-functions
 
 
+[ '*Source'  '*Value'  '*Target' ] values
+
+[ "n-"  [ *Source 0 ] dip subslice :s ] 'extract' define
+[ "n-"  *Source swap 1 + over length? subslice :s to *Source ] 'next-piece' define
+ 
+[ "ss-p" \
+  :s to *Value \
+  to *Source \
+  request to *Target  *Target pop drop \
+  [ *Source *Value find dup \
+    -1 <> [ [ extract *Target push ] sip next-piece true ] \
+          [ drop *Source *Target push false ] if \
+  ] while-true \
+  *Target \
+] 'split' define
+
+[ "pv-s" \
+  :s to *Value \
+  reverse '' [ :s + *Value + ] reduce \
+  "This leaves the join value appended to the string. Remove it." \
+  0 over length? *Value length? - subslice :s \
+] 'join' define
+
+[ '*Source'  '*Value'  '*Target'  'extract'  'next-piece' ] hide-functions
+
 "apropos"
 [ "s-s" \
   dup function-exists? \

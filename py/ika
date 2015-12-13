@@ -1688,6 +1688,12 @@ bootstrap.append(""" [ '*TESTS'  '*DONE'  '*OFFSET' ] values """)
 bootstrap.append(""" [ *OFFSET 1 + to *OFFSET ] '<next>' define """)
 bootstrap.append(""" [ "q-"  *OFFSET [ *DONE [ *TESTS [ to *TESTS false to *DONE 0 to *OFFSET [ *TESTS *OFFSET fetch @ invoke [ true to *DONE *TESTS *OFFSET fetch 1 fetch invoke ] if-true <next> *DONE ] while-false ] dip to *TESTS ] dip to *DONE ] dip to *OFFSET ] 'when' define """)
 bootstrap.append(""" [ '*TESTS'  '*DONE'  '*OFFSET'  '<next>' ] hide-functions """)
+bootstrap.append(""" [ '*Source'  '*Value'  '*Target' ] values """)
+bootstrap.append(""" [ "n-"  [ *Source 0 ] dip subslice :s ] 'extract' define """)
+bootstrap.append(""" [ "n-"  *Source swap 1 + over length? subslice :s to *Source ] 'next-piece' define """)
+bootstrap.append(""" [ "ss-p" :s to *Value to *Source request to *Target  *Target pop drop [ *Source *Value find dup -1 <> [ [ extract *Target push ] sip next-piece true ] [ drop *Source *Target push false ] if ] while-true *Target ] 'split' define """)
+bootstrap.append(""" [ "pv-s" :s to *Value reverse '' [ :s + *Value + ] reduce "This leaves the join value appended to the string. Remove it." 0 over length? *Value length? - subslice :s ] 'join' define """)
+bootstrap.append(""" [ '*Source'  '*Value'  '*Target'  'extract'  'next-piece' ] hide-functions """)
 bootstrap.append(""" "apropos" """)
 bootstrap.append(""" [ "s-s" dup function-exists? [ lookup-function @ ] [ drop 'function not found' report-error ] if ] 'apropos' define """)
 # i/o functions
@@ -1710,8 +1716,12 @@ bootstrap.append(""" [ "string:name - flag"  `3008 ] 'file-exists?' define """)
 bootstrap.append(""" "Command Line Arguments" """)
 bootstrap.append(""" [ "- number"  `4000 ] 'arg-count' define """)
 bootstrap.append(""" [ "number - string"  `4001 ] 'get-arg' define """)
+bootstrap.append(""" "Library Support" """)
+bootstrap.append(""" [ "s-"  `9000 ] 'import' define """)
 
-import sys, os
+import os
+import sys
+
 
 def dump_stack():
     """display the stack"""
@@ -1785,6 +1795,7 @@ def display_errors():
 
 files = []
 
+
 def opcodes(slice, offset, opcode):
     global files, TYPE_NUMBER
     if opcode == 2000:
@@ -1841,6 +1852,10 @@ def opcodes(slice, offset, opcode):
     elif opcode == 4001:
         n = int(stack_pop())
         stack_push(string_to_slice(sys.argv[n + 2]), TYPE_STRING)
+    elif opcode == 9000:
+        home = os.path.expanduser("~")
+        file = home + "/.parable/library/" + slice_to_string(stack_pop())
+        load_file(file)
     return offset
 
 
