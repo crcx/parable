@@ -4,11 +4,19 @@
 
 Primitive. Convert value on stack to a bytecode.
 
+Notes:
+
+* Currently the value is assumed to be a *number*.
+
 ## :n
 
     value - number
 
 Primitive. Convert value on stack to a number.
+
+Notes:
+
+* If the conversion fails, #nan will be returned.
 
 ## :s
 
@@ -16,11 +24,20 @@ Primitive. Convert value on stack to a number.
 
 Primitive. Convert value on stack to a string.
 
+Notes:
+
+* Currently strings should consist of ASCII characters. Unicode is not guaranteed to work.
+
 ## :c
 
     value - character
 
 Primitive. Convert value on stack to a character.
+
+Notes:
+
+* Currently the value should be a number corresponding to an ASCII character code.
+* If you pass a string, this will return the first character in the string.
 
 ## :p
 
@@ -45,6 +62,11 @@ Primitive. Convert value on stack to a function call.
     value number:type - value
 
 Primitive. Set the value to a specific type.
+
+Notes:
+
+* This allows setting a value on the stack to a specific type without going through the conversion process (see **:b :c :n :s :call :f :p**).
+* This is not limited to the built-in types.
 
 ## type?
 
@@ -266,6 +288,10 @@ Primitive. Store a value into a slice.
 
 Primitive. Request a new memory slice. Returns a pointer to it.
 
+Notes:
+
+* The slice will have an initial cell stored in offset 0 with a *number* type and a value of 0. If you need a fully empty slice you will need to use **request-empty**.
+
 ## release
 
     pointer -
@@ -296,6 +322,10 @@ Primitive. Set the last index in a slice to the specified offset.
 
 Primitive. Set the stored type for the value at offset within the specified slice to the specified type.
 
+Notes:
+
+* This is not limited to the built-in types.
+
 ## get-stored-type
 
     pointer offset - number
@@ -306,13 +336,13 @@ Primitive. Get the stored type for the value at offset within the specified slic
 
     value - value value
 
-Primitive. Duplicate the top value on the stack. If the value is a string, make a new copy of the string.
+Primitive. Duplicate the top value on the stack. If the value is a string, makes a new copy of the string.
 
 ## drop
 
     value -
 
-Primitive. Remove a value from the stack.
+Primitive. Remove the top value from the stack.
 
 ## swap
 
@@ -372,7 +402,7 @@ Primitive. Remove the named function from the dictionary. This removes the name,
 
     string:haystack string:needle - number
 
-Primitive. Search for the substring *needle* in the *haystack*. Returns the starting offset of -1 if no match is found.
+Primitive. Search for the substring *needle* in the *haystack*. Returns an offset of -1 if no match is found.
 
 ## subslice
 
@@ -389,6 +419,18 @@ Primitive. If string can be converted to a number using **:n** return **true**. 
 ## reverse
 
     pointer - pointer
+
+Primitive. Reverse the order of items stored in a slice.
+
+E.g., given a slice:
+
+    [ 1 2 3 ]
+
+This will modify the slice to be:
+
+    [ 3 2 1 ]
+
+This function modifies contents of the original slice.
 
 ## to-lowercase
 
@@ -1085,6 +1127,12 @@ Tip: If you are trying to append characters to a string, this is much faster tha
     pointer - value
 
 Remove and return the last value from a slice. This modifies the original slice.
+
+## request-empty
+
+    - pointer
+
+Return a new slice. Unlike **request** the returned slice will be fully empty.
 
 ## reduce
 
