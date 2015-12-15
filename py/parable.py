@@ -1357,7 +1357,10 @@ def compile_function_call(name, slice, offset):
 
 def parse_string(tokens, i, count, delimiter):
     s = ""
-    if (tokens[i].endswith(delimiter) and tokens[i] != delimiter):
+    a = tokens[i].endswith(delimiter)
+    b = tokens[i] != delimiter
+    c = tokens[i].endswith("\\" + delimiter)
+    if (a and b and not c):
         s = tokens[i]
     else:
         j = i + 1
@@ -1365,11 +1368,13 @@ def parse_string(tokens, i, count, delimiter):
         while j < count:
             s += " "
             s += tokens[j]
-            if (tokens[j].endswith(delimiter)):
+            a = tokens[j].endswith(delimiter)
+            b = tokens[j].endswith("\\" + delimiter)
+            if (a and not b):
                 i = j
                 j = count
             j += 1
-    return i, s
+    return i, s.replace("\\", "")
 
 
 def compile(str, slice):

@@ -264,12 +264,6 @@
 [ "s-n" chosen-hash *Hash-Prime rem ] 'hash' define
 
 
-"when: a conditional combinator"
-"[ [ [ condition ] [ code to execute if true ] ] \"
-"  [ [ condition ] [ code to execute if true ] ] \"
-"  [ [ true ]      [ default case ] ] \"
-"] when"
-
 [ '*CASES'  '*OFFSET'  'next'  'fetch-value'  '<when>' ] hide-functions
 [ '*TESTS'  '*DONE'  '*OFFSET' ] values
 [ *OFFSET 1 + to *OFFSET ] '<next>' define
