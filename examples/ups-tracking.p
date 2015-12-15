@@ -3,7 +3,7 @@
 
 "See http://osiris.978.org/~alex/ups.html for a list of service codes."
 
-[ [ #0 #2 subslice :s '1Z' = ] sip swap ] 'valid?' define
+[ [ #0 #2 subslice :s '1Z' eq? ] sip swap ] 'valid?' define
 [ [ #2 #8 subslice :s 'Account: ' swap + ] sip ] 'account' define
 [ [ #8 #10 subslice :s 'Service code: ' swap + ] sip ] 'service-code' define
 [ [ #10 #17 subslice :s 'Package ID: ' swap + ] sip ] 'package-id' define

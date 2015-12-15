@@ -3,7 +3,7 @@
   request :s to *scratch \
   to-lowercase \
   [ dup letter? [ dup $a - *scratch swap store ] [ drop ] if ] for-each \
-  'abcdefghijklmnopqrstuvwxyz' *scratch = \
+  'abcdefghijklmnopqrstuvwxyz' *scratch eq? \
 ] 'pangram?' define
 
 'is this a pangram?' pangram?

@@ -9,7 +9,7 @@
 [ #3 ] 'VICTIM' define
 
 [ ] '(josephus)' define
-[ "r i" swap VICTIM + over rem swap #1 + dup SOLDIERS > [ (josephus) ] if-false ] '(josephus)' define
+[ "r i" swap VICTIM + over rem swap #1 + dup SOLDIERS gt? [ (josephus) ] if-false ] '(josephus)' define
 [ #0 #1 (josephus) drop #1 + ] 'josephus' define
 
 [ 'The number of the last man standing out of ' SOLDIERS ', killing each ' VICTIM ' is ' josephus ] build-string
