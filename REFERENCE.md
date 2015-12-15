@@ -174,37 +174,37 @@ Primitive. Return a random number.
 
 Primitive. Return the square root of a number.
 
-## <
+## lt?
 
     number:a number:b - flag
 
 Primitive. Compare two numbers. Returns **true** if the first number (a) is less than the second (b) or **false** otherwise.
 
-## >
+## gt?
 
     number:a number:b - flag
 
 Primitive. Compare two numbers. Returns **true** if the first number (a) is greater than the second (b) or **false** otherwise.
 
-## <=
+## lteq?
 
     number:a number:b - flag
 
 Primitive. Compare two numbers. Returns **true** if the first number (a) is less than or equal to the second (b) or **false** otherwise.
 
-## >=
+## gteq?
 
     number:a number:b - flag
 
 Primitive. Compare two numbers. Returns **true** if the first number (a) is greater than or equal to the second (b) or **false** otherwise.
 
-## =
+## eq?
 
     value value - flag
 
 Primitive. Compare two values for equality, returns a Boolean flag.
 
-## <>
+## -eq?
 
     value value - flag
 
