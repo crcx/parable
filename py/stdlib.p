@@ -227,6 +227,7 @@
 "Arrays and Operations on Quotations"
 [ "q-v"  @ ] 'first' define
 [ "q-q"  1 over length? subslice ] 'rest' define
+[ "p-v"  slice-length? 1 - fetch ] 'last' define
 
 [ '*Found'  '*Value'  '*XT'  '*Source'  '*Target'  '*Offset' ] values
 [ "q-"   &*Found [ &*Value [ &*XT [ &*Source [ &*Target [ &*Offset [ invoke ] preserve ] preserve ] preserve ] preserve ] preserve ] preserve ] 'localize' define
