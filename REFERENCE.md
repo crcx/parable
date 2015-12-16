@@ -1114,6 +1114,12 @@ Example:
 
     'Eggs Are Tasty' rest :s
 
+## last
+
+    pointer - value
+
+Given a slice, return the last value in it.
+
 ## push
 
     value pointer -
