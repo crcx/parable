@@ -2,23 +2,15 @@
 "Simulates rolls of 4, 6, 8, 10, 12, and 20 sided dice"
 "Has capacity to roll multiple dice and sum the results (including modifiers) quickly"
 
+[ "n-n"  [ random #100 * ] dip rem floor #1 + ] 'roll-die' define
 
-[ [ random #100 * ] dip rem floor #1 + ] 'roll-n-sided-die' define
+[ [ [ 4 roll-die ] times ] sip #1 - [ + ] times ] 'd4' define
+[ [ [ 6 roll-die ] times ] sip #1 - [ + ] times ] 'd6' define
+[ [ [ 8 roll-die ] times ] sip #1 - [ + ] times ] 'd8' define
+[ [ [ 10 roll-die ] times ] sip #1 - [ + ] times ] 'd10' define
+[ [ [ 12 roll-die ] times ] sip #1 - [ + ] times ] 'd12' define
+[ [ [ 20 roll-die ] times ] sip #1 - [ + ] times ] 'd20' define
 
-[ #4 roll-n-sided-die ] 'roll<d4>' define
-[ #6 roll-n-sided-die ] 'roll<d6>' define
-[ #8 roll-n-sided-die ] 'roll<d8>' define
-[ #10 roll-n-sided-die ] 'roll<d10>' define
-[ #12 roll-n-sided-die ] 'roll<d12>' define
-[ #20 roll-n-sided-die ] 'roll<d20>' define
-
-[ [ [ roll<d4> ] times ] sip #1 - [ + ] times ] 'd4' define
-[ [ [ roll<d6> ] times ] sip #1 - [ + ] times ] 'd6' define
-[ [ [ roll<d8> ] times ] sip #1 - [ + ] times ] 'd8' define
-[ [ [ roll<d10> ] times ] sip #1 - [ + ] times ] 'd10' define
-[ [ [ roll<d12> ] times ] sip #1 - [ + ] times ] 'd12' define
-[ [ [ roll<d20> ] times ] sip #1 - [ + ] times ] 'd20' define
-
-[ capture-results #0 [ + ] reduce ] 'roll-dice' define
+[ "q-n"  capture-results #0 [ + ] reduce ] 'roll-dice' define
 
 [ #2 d6 #5 ] roll-dice
