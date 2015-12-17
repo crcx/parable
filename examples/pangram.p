@@ -1,9 +1,9 @@
-'*scratch' value
+'*Scratch' value
 [ "s-f" \
-  request :s to *scratch \
+  request-empty :s to *Scratch \
   to-lowercase \
-  [ dup letter? [ dup $a - *scratch swap store ] [ drop ] if ] for-each \
-  'abcdefghijklmnopqrstuvwxyz' *scratch eq? \
+  [ dup letter? [ dup $a - *Scratch swap store ] [ drop ] if ] for-each \
+  'abcdefghijklmnopqrstuvwxyz' *Scratch eq? \
 ] 'pangram?' define
 
 'is this a pangram?' pangram?
