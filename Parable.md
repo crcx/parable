@@ -1,6 +1,55 @@
 # Parable Language
 
-*It's time to gather all of the Parable documentation together, into a single document explaining the language, virtual machine, and features.*
+
+## Syntax
+
+Parable code consists of whitespace delimited tokens. Each token can have a prefix which tells the language how to treat it.
+
+    Prefix    Token is...
+    ------    -----------
+    #         Number
+    $         Character
+    &         Pointer
+    '         String
+    "         Comment
+
+Strings and comments start and end with the delimiter (either ' or "). Either can obtain spaces.
+
+Everything is done using reverse polish notation. There are no functions that parse or modify the input.
+
+## Parsing and Compiling
+
+Parable's parser and compiler are closely coupled. All code is compiled before being run, and code has no direct access to the parser.
+
+The basic process is:
+
+* Split source into array of tokens
+* Iterate over the tokens, compiling them based on the prefixes
+* Return a pointer to the slice containing the compiled code
+
+The second part of this where the work gets done. An example implementation of this in Parable would be:
+
+    [ "s-..." \
+      [ [ [ current-prefix $# eq? ]  [ compile-number ] ] \
+        [ [ current-prefix $$ eq? ]  [ compile-character ] ] \
+        [ [ current-prefix $& eq? ]  [ compile-pointer ] ] \
+        [ [ current-prefix $' eq? ]  [ compile-string ] ] \
+        [ [ current-prefix $" eq? ]  [ compile-comment ] ] \
+        [ [ current-token numeric? ] [ current-token :n *Slice push ] ] \
+        [ [ current-token '[' eq? ]  [ handle-[ ] ] \
+        [ [ current-token ']' eq? ]  [ handle-] ] ] \
+        [ [ true ]                   [ compile-funcall ] ] \
+      ] when ] 'compile-token' define
+
+Basically the parser will look at each prefix and invoke a handling function for the specific type.
+
+There are a couple of special cases: **[** and **]**.
+
+In Parable code is compiled into anonymous functions called *quotations*. These start with **[** and end with **]**. The compiler itself handles this; these do not exist as separate functions within the language.
+
+If the token is not handled by one of the prefixes, it will be treated as a function call.
+
+----
 
 # Overview
 
@@ -76,32 +125,13 @@ Two special cases exist: [ and ]. When the compiler encounters a [ it begins com
 
 Parable's memory model consists of an array of variable sized regions called *slices*.  Each slice contains one or more values. Both the value and data type are stored.
 
-New slices are allocated by the compiler and bytecode interpreter as needed, and can be allocated on demand using the **request** function. When done with a slice, it can be safely discarded using **release**, or Parable will attempt to reclaim it once no remaining references are found. (This can also be done manually, using **collect-garbage**).
+New slices are allocated by the compiler and bytecode interpreter as needed, and can be allocated on demand using the **request** function. When done with a slice, it can be safely discarded using **release**, or the user interface layer will attempt to reclaim it once no remaining references are found. (This can also be done manually, using **collect-garbage**).
 
 Accessing stored values can be done using **fetch**, and modifications can be made using **store**. Specific values within a slice are referenced using a slice pointer and offset number. Indexing is zero based.
 
 The number of items in a slice can be returned using **length?**.
 
 When a slice is used as a function it is called a *quotation*. Functions operating on *quotations* are called *combinators*.
-
-# Garbage Collection
-
-Parable's memory model leads to a lot of slices being allocated and used for short periods of time. While it's possible to manually track and release these, this is not something that is normally needed. The memory manager in Parable includes a *garbage collector* which is capable of finding slices that are no longer in use and reclaiming them when necessary.
-
-The garbage collector scans all named slices and pointers on the stack (including strings and comments) for references to other slices. Each reference is added to a list of slices to be kept. When all slices have been scanned, any allocated slices that are not referenced are released.
-
-This process occurs in the following circumstances:
-
-* When a **request** fails initially garbage will be collected and the request will be reattempted.
-* When **collect-garbage** is manually called.
-* Some interfaces will collect garbage periodically as well. E.g., many will perform a collection after initial processing of *stdlib.p* or at the end of a long execution cycle.
-
-The following are considered references:
-
-* Pointers
-* Strings
-* Comments
-* Function Calls
 
 # The Stack
 
@@ -163,9 +193,9 @@ Numbers are signed, floating point values. They can be specified using the **#**
 
 Examples:
 
-    #1
-    #-40
-    #3.14159
+    1
+    -40
+    3.14159
     #inf
     #-inf
     #nan
@@ -440,6 +470,7 @@ A new slice is allocated, and compilation switches to this slice. When the endin
 
 A special case exists if the quotation is empty (a **[ ]** pair). In this case a return instruction is compiled into the otherwise empty quote and then the pointer is compiled.
 
+
 # Appendix: Error Messages
 
 Parable provides several standard error messages for various cases. These are currently:
@@ -460,4 +491,21 @@ This can be thrown in the following conditions:
 * When using #, the token is not a valid base 10 number
 * When compiling a function call, the token does not correspond to a name in the dictionary
 
-# Appendix: A List of Words
+# Appendix: Garbage Collection
+
+Parable's memory model leads to a lot of slices being allocated and used for short periods of time. While it's possible to manually track and release these, this is not something that is normally needed. The memory manager in Parable includes a *garbage collector* which is capable of finding slices that are no longer in use and reclaiming them when necessary.
+
+The garbage collector scans all named slices and pointers on the stack (including strings and comments) for references to other slices. Each reference is added to a list of slices to be kept. When all slices have been scanned, any allocated slices that are not referenced are released.
+
+This process occurs in the following circumstances:
+
+* When a **request** fails initially garbage will be collected and the request will be reattempted.
+* When **collect-garbage** is manually called.
+* Some interfaces will collect garbage periodically as well. E.g., many will perform a collection after initial processing of *stdlib.p* or at the end of a long execution cycle.
+
+The following are considered references:
+
+* Pointers
+* Strings
+* Comments
+* Function Calls
