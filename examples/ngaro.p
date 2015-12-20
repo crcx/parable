@@ -1,10 +1,19 @@
-"Ngaro"
+"Ngaro: a MISC inspired virtual machine for a dual-stack architecture"
 
-[ '*Image'  '*I'  '*O'  '*Ports' ] values
+
+[ '*Image'  '*I'  '*O' ] values
 [ '*Data'   '*Address' ] values
-[ '*Input'  '*Output' ] values
+[ '*Ports'  '*Input'  '*Output' ] values
 
-[ 1 0 0 0 0 0 0 0 0 0 0 0 0 ] to *Ports
+[ "-" \
+  0 to *I \
+  0 to *O \
+  request-empty to *Image \
+  request-empty to *Data \
+  [ 1 0 0 0 0 0 0 0 0 0 0 0 0 ] to *Ports \
+  request-empty :s to *Output \
+  request-empty :s to *Input \
+] 'ngaro.initialize' define
 
 
 [ "-" *I 1 + to *I ] '*I+' define
@@ -16,29 +25,26 @@
 [ "-n" *Address pop ] 'A>' define
 [ "n-" *Address push ] '>A' define
 
+"I/O Simulation"
 [ "-" \
   *Input first :n >D *Input rest to *Input \
-  0 *Ports 1 store \
-] 'io-console-input' define
+  0 *Ports 1 store ] 'io-console-input' define
 
 [ "-" \
   *Output D> :c :s + to *Output \
-  0 *Ports 2 store \
-] 'io-console-output' define
+  0 *Ports 2 store ] 'io-console-output' define
 
 [ "-" \
   *Ports 0 fetch 1 -eq? \
   [ \
-    [ [ [ *Ports 1 fetch 1 eq? ] \
-        [ io-console-input ] ] \
-      [ [ *Ports 2 fetch 1 eq? ] \
-        [ io-console-output ] ] \
-      [ [ *Ports 5 fetch 0 -eq? ] \
-        [ "capabilities" ] ] \
+    [ [ [ *Ports 1 fetch 1 eq? ]   [ io-console-input ] ] \
+      [ [ *Ports 2 fetch 1 eq? ]   [ io-console-output ] ] \
+      [ [ *Ports 5 fetch 0 -eq? ]  [ "capabilities" ] ] \
     ] when \
   ] if-true \
 ] 'simulate-io' define
 
+"Implement the instructions"
 [ "-" ] 'I.nop' define
 [ "-"  *I+ @Image >D ] 'I.lit' define
 [ "-"  D> dup >D >D ] 'I.dup' define
@@ -46,7 +52,10 @@
 [ "-"  D> D> swap >D >D ] 'I.swap' define
 [ "-"  D> >A ] 'I.push' define
 [ "-"  A> >D ] 'I.pop' define
-[ "-"  D> 1 - >D *I+ D> dup >D zero? not [ "-"  @Image 1 - to *I ] [ I.drop ] if ] 'I.loop' define
+[ "-" \
+  *I+ \
+  D> 1 - dup >D zero? not \
+  [ "-"  @Image 1 - to *I ] [ I.drop ] if ] 'I.loop' define
 [ "-"  *I+ @Image 1 - to *I ] 'I.jump' define
 [ "-"  A> to *I ] 'I.return' define
 [ "-"  D> D> lt? [ I.jump ] [ *I+ ] if ] 'I.lt_jump' define
@@ -72,6 +81,8 @@
 [ "-"  D> 1 - >D ] 'I.1-' define
 [ "-"  *I >A @Image 1 - to *I ] 'I.call' define
 
+"Instruction dispatch"
+"We could also use a lookup table for this, which would probably be faster"
 [ "-" \
   *Image *I fetch to *O \
   [ [ [ *O  0 eq? ] [ I.nop        ] ] \
@@ -109,22 +120,22 @@
   ] when \
 ] 'process-bytecode' define
 
+"Top level implementation: loop over each instruction until at tge end of"
+"the slice."
+[ "p-" \
+  to *Image \
+  [ process-bytecode *I+ *I *Image length? lt? ] while-true ] 'ngaro' define
 
-[ "p-" to *Image [ process-bytecode *I+ *I *Image length? lt? ] while-true ] 'ngaro' define
+"------------------------------------------------------------------------------"
 
-0 to *I
-0 to *O
-request-empty to *Image
-request-empty to *Data
-
-
-"Ngaro Assembler"
+"An assembler for Ngaro"
+"Like the assembler part of the Retro metacompiler, this is kept very minimal,"
+"though a few helper functions exist."
 
 '*Target' value
-request-empty to *Target
+
 [ "n-"  :n *Target push ] 'v,' define
 [ "ns-" [ [ v, ] curry ] dip define ] 'vmi' define
-
 [ "s-"  *Target length? swap define ] 'label' define
 
 0 '.nop' vmi
@@ -159,24 +170,26 @@ request-empty to *Target
 29 '.out' vmi
 30 '.wait' vmi
 
-[ "-"  request-empty to *Target ] 'begin-assembly' define
+[ "-" \
+  request-empty to *Target .jump 32 [ 31 v, ] times ] 'begin-assembly' define
 [ "s-" [ *Target ] dip define ] 'save-assembly' define
+[ "-"  *Target length? *Target 1 store ] ':main' define
+
 
 "Some test images"
+
 begin-assembly
-
-  .lit 10 v,
-
 ':loop' label
-
   .dup
   .loop &:loop v,
-
+  .ret
+:main
+  .lit 10 v,
+  &:loop v,
 'Ngaro:countdown' save-assembly
 
 
 begin-assembly
-
   .lit 1 v,
   .lit 2 v,
   .+
@@ -186,11 +199,6 @@ begin-assembly
 
 
 begin-assembly
-
-  .jump 0 v,
-
-32 [ .nop ] times
-
 ':putc' label
   .lit 1 v,
   .lit 2 v,
@@ -200,24 +208,21 @@ begin-assembly
   .out
   .wait
   .ret
-
-[ "-"  *Target length? *Target 1 store ] ':main' define
-
 :main
-
-  .lit 98 v,
+  .lit $h v,
   &:putc v,
-  .lit 99 v,
+  .lit $e v,
   &:putc v,
-  .lit 100 v,
+  .lit $l v,
   &:putc v,
-
+  .lit $l v,
+  &:putc v,
+  .lit $o v,
+  &:putc v,
 'Ngaro:display' save-assembly
 
-request-empty :s to *Output
-'aeiou' to *Input
 
+ngaro.initialize
 &Ngaro:display Ngaro
 *Data invoke
 *Output
-
