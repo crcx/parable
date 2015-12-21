@@ -208,17 +208,32 @@ begin-assembly
   .out
   .wait
   .ret
+
+':(puts)' label
+  .dup
+  .fetch
+  .0;
+  &:putc v,
+  .1+
+  .jump &:(puts) v,
+
+':puts' label
+  &:(puts) v,
+  .drop
+  .ret
+
+':hello' label
+  $h v,
+  $e v,
+  $l v,
+  $l v,
+  $o v,
+  0 v,
+
 :main
-  .lit $h v,
-  &:putc v,
-  .lit $e v,
-  &:putc v,
-  .lit $l v,
-  &:putc v,
-  .lit $l v,
-  &:putc v,
-  .lit $o v,
-  &:putc v,
+  .lit &:hello v,
+  &:puts v,
+
 'Ngaro:display' save-assembly
 
 
