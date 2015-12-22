@@ -35,13 +35,13 @@ print "bootstrap = []"
 print "# core language functions"
 f = condense_lines(open('stdlib.p').readlines())
 for line in f:
-    if len(line) > 1:
+    if len(line) > 0:
         print 'bootstrap.append(""" ' + line.strip() + ' """)'
 
 print "# i/o functions"
 f = condense_lines(open('io.p').readlines())
 for line in f:
-    if len(line) > 1:
+    if len(line) > 0:
         print 'bootstrap.append(""" ' + line.strip() + ' """)'
 
 print ""

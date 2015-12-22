@@ -253,49 +253,67 @@
 [ "-"    0 &*TOB set-last-index ] 'clear-tob' define
 
 
+"Scope"
+'*Internals' value
+[ "q-" \
+  to *Internals \
+  *Internals duplicate-slice \
+  [ dup @ $* eq? [ value ] [ variable ] if ] for-each ] '{' define
+[ "-"  *Internals hide-functions ] '}' define
+
+
 "Hashing functions"
-389 '*Hash-Prime' value!
-
-[ "s-n" 0 swap [ :n xor ] for-each ] 'hash:xor' define
-[ "s-n" 5381 swap [ over -5 shift + + ] for-each ] 'hash:djb2' define
-[ :n over -6 shift + over -16 shift + swap - ] 'hash:sdbm<n>' define
-[ "s-n" 0 swap [ :c swap hash:sdbm<n> ] for-each ] 'hash:sdbm' define
-'hash-sdbm<n>' hide-function
-[ "s-b" hash:djb2 ] 'chosen-hash' define
-[ "s-n" chosen-hash *Hash-Prime rem ] 'hash' define
-
-
-[ '*CASES'  '*OFFSET'  'next'  'fetch-value'  '<when>' ] hide-functions
-[ '*TESTS'  '*DONE'  '*OFFSET' ] values
-[ *OFFSET 1 + to *OFFSET ] '<next>' define
-[ "q-"  *OFFSET [ *DONE [ *TESTS [ to *TESTS false to *DONE 0 to *OFFSET [ *TESTS *OFFSET fetch @ invoke [ true to *DONE *TESTS *OFFSET fetch 1 fetch invoke ] if-true <next> *DONE ] while-false ] dip to *TESTS ] dip to *DONE ] dip to *OFFSET ] 'when' define
-[ '*TESTS'  '*DONE'  '*OFFSET'  '<next>' ] hide-functions
+[ 'hash:sdbm<n>' ] {
+  389 '*Hash-Prime' value!
+  [ "s-n" 0 swap [ :n xor ] for-each ] 'hash:xor' define
+  [ "s-n" 5381 swap [ over -5 shift + + ] for-each ] 'hash:djb2' define
+  [ :n over -6 shift + over -16 shift + swap - ] 'hash:sdbm<n>' define
+  [ "s-n" 0 swap [ :c swap hash:sdbm<n> ] for-each ] 'hash:sdbm' define
+  [ "s-b" hash:djb2 ] 'chosen-hash' define
+  [ "s-n" chosen-hash *Hash-Prime rem ] 'hash' define
+}
 
 
-[ '*Source'  '*Value'  '*Target' ] values
+[ '*Offset'  '*Tests'  '*Done' ] {
+  [ "q-" \
+    *Offset \
+    [ *Done \
+      [ *Tests \
+        [ to *Tests false to *Done 0 to *Offset \
+          [ *Tests *Offset fetch @ invoke \
+            [ true to *Done *Tests *Offset fetch 1 fetch invoke ] if-true \
+            *Offset 1 + to *Offset *Done \
+          ] while-false \
+        ] dip to *Tests \
+      ] dip to *Done \
+    ] dip to *Offset \
+  ] 'when' define
+}
 
-[ "n-"  [ *Source 0 ] dip subslice :s ] 'extract' define
-[ "n-"  *Source swap 1 + over length? subslice :s to *Source ] 'next-piece' define
- 
-[ "ss-p" \
-  :s to *Value \
-  to *Source \
-  request-empty to *Target \
-  [ *Source *Value find dup \
-    -1 -eq? [ [ extract *Target push ] sip next-piece true ] \
-            [ drop *Source *Target push false ] if \
-  ] while-true \
-  *Target \
-] 'split' define
 
-[ "pv-s" \
-  :s to *Value \
-  reverse '' [ :s + *Value + ] reduce \
-  "This leaves the join value appended to the string. Remove it." \
-  0 over length? *Value length? - subslice rest :s \
-] 'join' define
+[ '*Source'  '*Value'  '*Target'  'extract'  'next-piece' ] {
+  [ "n-"  [ *Source 0 ] dip subslice :s ] 'extract' define
+  [ "n-"  *Source swap 1 + over length? subslice :s to *Source ] 'next-piece' define
 
-[ '*Source'  '*Value'  '*Target'  'extract'  'next-piece' ] hide-functions
+  [ "ss-p" \
+    :s to *Value \
+    to *Source \
+    request-empty to *Target \
+    [ *Source *Value find dup \
+      -1 -eq? [ [ extract *Target push ] sip next-piece true ] \
+              [ drop *Source *Target push false ] if \
+    ] while-true \
+    *Target \
+  ] 'split' define
+
+  [ "pv-s" \
+    :s to *Value \
+    reverse '' [ :s + *Value + ] reduce \
+    "This leaves the join value appended to the string. Remove it." \
+    0 over length? *Value length? - subslice rest :s \
+  ] 'join' define
+}
+
 
 "apropos"
 [ "s-s" \

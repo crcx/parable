@@ -1229,6 +1229,32 @@ Push the values in the *text output buffer* to the stack.
 
 Remove all entries from the *text output buffer*.
 
+## *Internals
+
+    - value
+
+Value. Holds a list of function names to create or remove. This is used by **{** and **}**.
+
+## {
+
+    pointer -
+
+Create functions or values for each item stored in the array specified. Begins a scope sequence that will end with **}**.
+
+## }
+
+    -
+
+End a sequence begun by **{**. Removes the names created by executing **{**.
+
+Example:
+
+    [ 'a' '*B' ] {
+        ... do something with a and *B ...
+    }
+
+    "a and *B are no longer in the dictionary at this point"
+
 ## *Hash-Prime
 
     - value

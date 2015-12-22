@@ -31,7 +31,7 @@ for line in f:
 print "bootstrap = []"
 f = condense_lines(open('stdlib.p').readlines())
 for line in f:
-    if len(line) > 1:
+    if len(line) > 0:
         print 'bootstrap.append(""" ' + line.strip() + ' """)'
 
 f = open('pre_interface.py').readlines()

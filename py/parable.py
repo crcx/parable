@@ -1429,7 +1429,7 @@ def parse_bootstrap(f):
     """compile the bootstrap package it into memory"""
     f = condense_lines(f)
     for line in f:
-        if len(line) > 1:
+        if len(line) > 0:
             interpret(compile(line, request_slice()))
 
 
