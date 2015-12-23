@@ -1019,7 +1019,7 @@ Store an arbitrary number of items into the current buffer.
 
     -
 
-Create a new buffer.
+Create a new buffer and set it as the current one.
 
 ## preserve-buffer
 
@@ -1030,6 +1030,8 @@ Executes the specified quote while saving the current buffer and location. Resto
 ## named-buffer
 
     string -
+
+Create a new buffer with the specified name. Also assigns the buffer as the current one.
 
 ## cons
 
@@ -1120,6 +1122,10 @@ Example:
 
 Given a slice, return the last value in it.
 
+Example:
+
+    'hello world!' last
+
 ## push
 
     value pointer -
@@ -1139,6 +1145,8 @@ Remove and return the last value from a slice. This modifies the original slice.
     - pointer
 
 Return a new slice. Unlike **request** the returned slice will be fully empty.
+
+Note: **request** allocates an initial cell in the first slot; this does not.
 
 ## reduce
 
@@ -1204,6 +1212,11 @@ Tip: the results will be appended in the order they are encountered on the stack
     pointer value - number
 
 Given a slice and a value, return the offset that the value is located at. If the value is not found, returns an offset of -1.
+
+Example:
+
+    [ 1 2 3 4 5 ]  9 index-of
+    [ 1 2 3 4 5 ]  3 index-of
 
 ## *TOB
 
