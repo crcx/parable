@@ -1696,6 +1696,11 @@ bootstrap.append(""" [ "n-"  *Source swap *Value length? + over length? subslice
 bootstrap.append(""" [ "ss-p" :s to *Value to *Source request-empty to *Target [ *Source *Value find dup -1 -eq? [ [ extract *Target push ] sip next-piece true ] [ drop *Source *Target push false ] if ] while-true *Target   ] 'split' define """)
 bootstrap.append(""" [ "pv-s" :s to *Value reverse '' [ :s + *Value + ] reduce "This leaves the join value appended to the string. Remove it." 0 over length? *Value length? - subslice rest :s   ] 'join' define """)
 bootstrap.append(""" } """)
+bootstrap.append(""" [ '*Data'  '*Source'  '*String'  '(accumulate)'  '(next)' ] { """)
+bootstrap.append(""" [ "-"  *String *Source first *Data first :s + + to *String ] '(accumulate)' define """)
+bootstrap.append(""" [ "-"  *Source rest to *Source  *Data rest to *Data ] '(next)' define """)
+bootstrap.append(""" [ "ps-s" '{v}' split to *Source to *Data request-empty :s to *String *Data length? [ (accumulate) (next) ] times "Merge any remaining items" *String *Source ' ' join + to *String "Filter out any control characters" *String [ :n #32 gteq? ] filter :s   ] 'interpolate' define """)
+bootstrap.append(""" } """)
 bootstrap.append(""" "apropos" """)
 bootstrap.append(""" [ "s-s" dup function-exists? [ lookup-function @ ] [ drop 'function not found' report-error ] if ] 'apropos' define """)
 import sys, os

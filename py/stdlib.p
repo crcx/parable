@@ -314,6 +314,22 @@
   ] 'join' define
 }
 
+[ '*Data'  '*Source'  '*String'  '(accumulate)'  '(next)' ] {
+  [ "-"  *String *Source first *Data first :s + + to *String ] '(accumulate)' define
+  [ "-"  *Source rest to *Source  *Data rest to *Data ] '(next)' define
+
+  [ "ps-s" \
+    '{v}' split to *Source \
+    to *Data \
+    request-empty :s to *String \
+    *Data length? [ (accumulate) (next) ] times \
+    "Merge any remaining items" \
+    *String *Source ' ' join + to *String \
+    "Filter out any control characters" \
+    *String [ :n #32 gteq? ] filter :s \
+  ] 'interpolate' define
+}
+
 
 "apropos"
 [ "s-s" \

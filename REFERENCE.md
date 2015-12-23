@@ -1328,6 +1328,16 @@ Example:
     [ 'this' 'is' 'a' 'series' 'of' 'values' ]
     '---' join
 
+## interpolate
+
+    pointer string - string
+
+Takes an array and a string. Replaces instances of {v} in the string with values from the array.
+
+Example:
+
+    [ 1 2 3 ] '{v} + {v} = {v}' interpolate
+
 ## apropos
 
     string - string
