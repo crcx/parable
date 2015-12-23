@@ -12,4 +12,5 @@
 [ "r i" swap VICTIM + over rem swap #1 + dup SOLDIERS gt? [ (josephus) ] if-false ] '(josephus)' define
 [ #0 #1 (josephus) drop #1 + ] 'josephus' define
 
-[ 'The number of the last man standing out of ' SOLDIERS ', killing each ' VICTIM ' is ' josephus ] build-string
+[ SOLDIERS VICTIM josephus ] capture-results reverse
+'The number of the last man standing out of {v}, killing each {v} is {v}' interpolate
