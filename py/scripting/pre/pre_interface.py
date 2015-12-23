@@ -82,7 +82,7 @@ def display(verbose):
 def load_file(file):
     f = condenseLines(open(file).readlines())
     for line in f:
-        if len(line) > 1:
+        if len(line) > 0:
             if not line.startswith("#!"):
                 s = compile(line, request_slice())
                 interpret(s)
