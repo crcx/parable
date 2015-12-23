@@ -292,8 +292,8 @@
 
 
 [ '*Source'  '*Value'  '*Target'  'extract'  'next-piece' ] {
-  [ "n-"  [ *Source 0 *Value length? 1 - + ] dip subslice :s ] 'extract' define
-  [ "n-"  *Source swap 1 + over length? subslice :s to *Source ] 'next-piece' define
+  [ "n-"  [ *Source 0 ] dip subslice :s ] 'extract' define
+  [ "n-"  *Source swap *Value length? + over length? subslice :s to *Source ] 'next-piece' define
 
   [ "ss-p" \
     :s to *Value \
