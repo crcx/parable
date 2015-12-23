@@ -821,6 +821,11 @@ Return **true** if the types of the two values match or **false** otherwise.
 
 Given two values, expand the range. 
 
+Example:
+
+    10 90 expand-range
+    10 1 expand-range
+
 ## sum-range
 
     ... number - number
@@ -838,11 +843,20 @@ Example:
 
 Given an array of strings, hide the function each names.
 
+Example:
+
+    [ 'a'  'e'  'i'  'o'  'u' ] hide-function
+
 ## rename-function
 
     string:old string:new -
 
 Remove the old name for a function and assign a new one.
+
+Example:
+
+    'foo' variable
+    'foo'  'bar' rename
 
 ## variables
 
@@ -912,6 +926,12 @@ Return **true** if the value is uppercase or **false** otherwise.
     quote - string
 
 Execute a quotation, constructing a string from the values it returns.
+
+Example:
+
+    [ 'Hello' 32 :c 'World!' ] build-string
+
+See also: **interpolate**
 
 ## trim-left
 
@@ -1318,7 +1338,6 @@ Example:
       [ [ true ] [ 'hmm, this is a strange number!' ] ] \
     ] when
 
-
 ## split
 
     string value - pointer
@@ -1350,6 +1369,8 @@ Takes an array and a string. Replaces instances of {v} in the string with values
 Example:
 
     [ 1 2 3 ] '{v} + {v} = {v}' interpolate
+
+See also: **build-string**
 
 ## apropos
 
