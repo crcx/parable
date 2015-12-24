@@ -314,6 +314,11 @@
   ] 'join' define
 }
 
+[ "s-s"  [ :n 32 128 between? ] filter :s ] 'clean-string' define
+
+[ "sss-s"  [ split ] dip join clean-string ] 'replace' define
+
+
 [ '*Data'  '*Source'  '*String'  '(accumulate)'  '(next)' ] {
   [ "-"  *String *Source first *Data first :s + + to *String ] '(accumulate)' define
   [ "-"  *Source rest to *Source  *Data rest to *Data ] '(next)' define
@@ -324,9 +329,7 @@
     request-empty :s to *String \
     *Data length? [ (accumulate) (next) ] times \
     "Merge any remaining items" \
-    *String *Source ' ' join + to *String \
-    "Filter out any control characters" \
-    *String [ :n #32 gteq? ] filter :s \
+    *String *Source ' ' join + clean-string \
   ] 'interpolate' define
 }
 
