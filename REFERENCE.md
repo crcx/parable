@@ -1360,6 +1360,23 @@ Example:
     [ 'this' 'is' 'a' 'series' 'of' 'values' ]
     '---' join
 
+## clean-string
+
+    string - string
+
+Remove all non basic ASCII characters from a string. This will filter out anything less than 32 and greater than 128 and should be used if you find yourself with strings that have control characters or other problematic values.
+
+## replace
+
+    string:source string:seek string:replace - string
+
+Replace all instances of *string:seek* in *string:source* with *string:replace*.
+
+Example:
+
+    'Apples are horrible'
+    'horrible'
+
 ## interpolate
 
     pointer string - string
