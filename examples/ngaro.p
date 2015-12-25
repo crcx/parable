@@ -35,11 +35,14 @@
   0 *Ports 2 store ] 'io-console-output' define
 
 [ "-" \
+  0 *Ports 5 store ] 'io-capabilities' define
+
+[ "-" \
   *Ports 0 fetch 1 -eq? \
   [ \
     [ [ [ *Ports 1 fetch 1 eq? ]   [ io-console-input ] ] \
       [ [ *Ports 2 fetch 1 eq? ]   [ io-console-output ] ] \
-      [ [ *Ports 5 fetch 0 -eq? ]  [ "capabilities" ] ] \
+      [ [ *Ports 5 fetch 0 -eq? ]  [ io-capabilities ] ] \
     ] when \
   ] if-true \
 ] 'simulate-io' define
