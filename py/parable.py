@@ -269,6 +269,13 @@ def interpret(slice, more=None):
                         a = slice_to_string(a)
                         b = slice_to_string(b)
                         stack_push(string_to_slice(b + a), TYPE_STRING)
+                    elif x == TYPE_POINTER and y == TYPE_POINTER:
+                        c = request_slice()
+                        d = get_last_index(b) + get_last_index(a) + 1
+                        set_slice_last_index(c, d)
+                        p_slices[c] = p_slices[b][:] + p_slices[a][:]
+                        p_types[c] = p_types[b][:] + p_types[a][:]
+                        stack_push(c, TYPE_POINTER)
                     else:
                         stack_push(a + b, TYPE_NUMBER)
                 else:
