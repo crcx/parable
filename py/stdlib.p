@@ -320,7 +320,7 @@
 
 
 [ '*Data'  '*Source'  '*String'  '(accumulate)'  '(next)' ] {
-  [ "-"  *String *Source first *Data first :s + + to *String ] '(accumulate)' define
+  [ "-"  *String *Source first *Data first type? POINTER eq? [ invoke ] if-true :s + + to *String ] '(accumulate)' define
   [ "-"  *Source rest to *Source  *Data rest to *Data ] '(next)' define
 
   [ "ps-s" \
