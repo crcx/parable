@@ -5,12 +5,13 @@
 "quite agree with the whole 'we should all kill ourselves' idea, figured out"
 "the perfect way to avoid death: be the last man standing."
 
-[ #40 ] 'SOLDIERS' define
-[ #3 ] 'VICTIM' define
+[ '(josephus)' ] {
+  #40  'SOLDIERS' value!
+  #3   'VICTIM' value!
 
-[ ] '(josephus)' define
-[ "r i" swap VICTIM + over rem swap #1 + dup SOLDIERS gt? [ (josephus) ] if-false ] '(josephus)' define
-[ #0 #1 (josephus) drop #1 + ] 'josephus' define
+  [ "r i"   swap VICTIM + over rem swap #1 + dup SOLDIERS gt? [ (josephus) ] if-false ] '(josephus)' define
+  [ "nn-n"  #0 #1 (josephus) drop #1 + ] 'josephus' define
+}	
 
 [ SOLDIERS VICTIM josephus ] capture-results reverse
 'The number of the last man standing out of {v}, killing each {v} is {v}' interpolate
