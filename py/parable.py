@@ -298,7 +298,11 @@ def interpret(slice, more=None):
                 if check_depth(slice, offset, 2):
                     a = stack_pop()
                     b = stack_pop()
-                    stack_push(b / a, TYPE_NUMBER)
+                    if a == 0 or b == 0:
+                        stack_push(float('nan'), TYPE_NUMBER)
+                        report('E04: Divide by Zero')
+                    else:
+                        stack_push(b / a, TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_REMAINDER:

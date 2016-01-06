@@ -491,6 +491,8 @@ This can be thrown in the following conditions:
 * When using #, the token is not a valid base 10 number
 * When compiling a function call, the token does not correspond to a name in the dictionary
 
+## E04: Divide by Zero
+
 # Appendix: Garbage Collection
 
 Parable's memory model leads to a lot of slices being allocated and used for short periods of time. While it's possible to manually track and release these, this is not something that is normally needed. The memory manager in Parable includes a *garbage collector* which is capable of finding slices that are no longer in use and reclaiming them when necessary.
