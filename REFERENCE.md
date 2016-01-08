@@ -216,13 +216,13 @@ Primitive. Compare two values for inequality, returns a Boolean flag.
 
 Primitive. Given a flag, execute the first quote if the flag is **true** or the second if the flag is **false**.
 
-## while-true
+## while
 
     quote -
 
 Takes a quote which returns a flag. If the flag is **true**, execute the quote again. Repeat until the quote returns **false**.
 
-## while-false
+## until
 
     quote -
 

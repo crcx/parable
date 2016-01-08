@@ -31,8 +31,8 @@
 [ "vv-f"   `224 ] 'eq?' define
 [ "vv-f"   `225 ] '-eq?' define
 [ "fpp-"   `300 ] 'if' define
-[ "p-"     `301 ] 'while-true' define
-[ "p-"     `302 ] 'while-false' define
+[ "p-"     `301 ] 'while' define
+[ "p-"     `302 ] 'until' define
 [ "np-"    `303 ] 'times' define
 [ "p-"     `305 ] 'invoke' define
 [ "vp-v"   `306 ] 'dip' define
@@ -160,7 +160,7 @@
 
 
 "numeric ranges"
-[ "nn-..."  dup-pair lt? [ [ [ dup 1 + ] dip dup-pair eq? ] while-false ] [ [ [ dup 1 - ] dip dup-pair eq? ] while-false ] if drop ] 'expand-range' define
+[ "nn-..."  dup-pair lt? [ [ [ dup 1 + ] dip dup-pair eq? ] until ] [ [ [ dup 1 - ] dip dup-pair eq? ] until ] if drop ] 'expand-range' define
 [ "...n-n"  1 - [ + ] times ] 'sum-range' define
 
 
@@ -184,7 +184,7 @@
 [ "p-s"  invoke<depth?> 1 - [ [ :s ] bi@ + ] times ] 'build-string' define
 
 "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
-[ "s-s"  :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while-true 1 - [ last-index? ] dip swap subslice :s ] 'trim-left' define
+[ "s-s"  :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while 1 - [ last-index? ] dip swap subslice :s ] 'trim-left' define
 [ ] 'trim-right' define
 [ "s-s"  :s last-index? dup-pair 1 - fetch :n nip 32 eq? [ last-index? 1 - 0 swap subslice :s trim-right ] if-true ] 'trim-right' define
 [ "s-s"  trim-left trim-right ] 'trim' define
@@ -283,7 +283,7 @@
           [ *Tests *Offset fetch @ invoke \
             [ true to *Done *Tests *Offset fetch 1 fetch invoke ] if-true \
             *Offset 1 + to *Offset *Done \
-          ] while-false \
+          ] until \
         ] dip to *Tests \
       ] dip to *Done \
     ] dip to *Offset \
@@ -302,7 +302,7 @@
     [ *Source *Value find dup \
       -1 -eq? [ [ extract *Target push ] sip next-piece true ] \
               [ drop *Source *Target push false ] if \
-    ] while-true \
+    ] while \
     *Target \
   ] 'split' define
 

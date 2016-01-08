@@ -18,7 +18,7 @@
   to *Delimiter \
   request-empty :s to *S \
   final-token-in-string? \
-  [ [ append-to-string next-token final-token-in-string? ] while-false ] if-false \
+  [ [ append-to-string next-token final-token-in-string? ] until ] if-false \
   append-to-string \
   "clean string delimiters" \
   *S 2 over length? 1 - subslice :s \
@@ -69,7 +69,7 @@
   ] when ] 'compile-token' define
 
 "And finally, the top level compiler loop"
-[ "s-p"  prepare tokenize [ compile-token next-token more? ] while-true *Slice ] 'compile' define
+[ "s-p"  prepare tokenize [ compile-token next-token more? ] while *Slice ] 'compile' define
 
 '1 [ 2 ] dip 3 +' compile
 

@@ -127,7 +127,7 @@
 "the slice."
 [ "p-" \
   to *Image \
-  [ process-bytecode *I+ *I *Image length? lt? ] while-true ] 'ngaro' define
+  [ process-bytecode *I+ *I *Image length? lt? ] while ] 'ngaro' define
 
 "------------------------------------------------------------------------------"
 

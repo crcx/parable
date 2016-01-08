@@ -21,7 +21,7 @@
     ] when ] 'process-token' define
 
   "And finally, the top level compiler loop"
-  [ "s-p"  tokenize [ process-token next-token more? ] while-true  ] 'translate' define
+  [ "s-p"  tokenize [ process-token next-token more? ] while ] 'translate' define
 
   [ *Numbers first *Numbers rest to *Numbers ] '@n' define
   [ *Operators first *Operators rest to *Operators ] '@o' define

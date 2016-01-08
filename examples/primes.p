@@ -15,7 +15,7 @@
 "Filter the rest"
 [ collect-garbage \
   [ dup ~I eq? swap ~I rem 0 -eq? xor :f ] filter \
-  (next) ~I 1000 lteq? ] while-true
+  (next) ~I 1000 lteq? ] while
 
 reverse to *Primes
 
