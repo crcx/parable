@@ -27,7 +27,7 @@ The basic process is:
 * Iterate over the tokens, compiling them based on the prefixes
 * Return a pointer to the slice containing the compiled code
 
-The second part of this where the work gets done. An example implementation of this in Parable would be:
+The second part of this is where the work gets done. An example implementation of this in Parable would be:
 
     [ "s-..." \
       [ [ [ current-prefix $# eq? ]  [ compile-number ] ] \
@@ -372,7 +372,7 @@ All of this is good, but the array combinators are what make arrays truely usefu
 Or, to return values greather than 20:
 
     [ 10 20 30 4 40 5 50 60 8 98 ]
-    [ 20 < ] filter
+    [ 20 lt? ] filter
 
 **Filter** executes the quotation passed once for each item in the array. It passes each item on the stack to the quotation, and then checks the value returned. If **true**, it appends the stored value into a new quote, otherwise it ignores it. The quotation you pass to **filter** should consume the value passed to it and return a valid flag.
 
