@@ -362,14 +362,14 @@ The length can be obtained with **length?**.
 
 You can use the standard **fetch** and **store** functions to access array elements.
 
-All of this is good, but the array combinators are what make arrays truely useful. There are currently six of interest: **filter**, **map**,  **reduce**, **for-each**, **contains?**, and **index-of**.
+All of this is good, but the array combinators are what make arrays truly useful. There are currently six of interest: **filter**, **map**,  **reduce**, **for-each**, **contains?**, and **index-of**.
 
 **Filter** takes an array and a quote which filters values, and returns a new array that contains values that match the filter. So to find all vowels in a string, we could do:
 
     'this is a string of sorts'
     [ vowel? ] filter :s
 
-Or, to return values greather than 20:
+Or, to return values greater than 20:
 
     [ 10 20 30 4 40 5 50 60 8 98 ]
     [ 20 lt? ] filter
