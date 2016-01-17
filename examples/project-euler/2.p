@@ -4,6 +4,6 @@
 
 "By considering the terms in the Fibonacci sequence whose values do not exceed four million, find the sum of the even-valued terms."
 
-[ #1 #2 [ dup-pair + dup #4000000 lt? ] while-true drop ] capture-results
+[ #1 #2 [ dup-pair + dup #4000000 lt? ] while drop ] capture-results
 [ even? ] filter
 #0 [ + ] reduce
