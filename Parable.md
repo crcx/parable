@@ -353,10 +353,10 @@ Arrays can be created directly as quotations or from the results of executing a 
 
 *All of the above are valid arrays*
 
-New values can be added with **array-push** and removed with **array-pop**.
+New values can be added with **push** and removed with **pop**.
 
-    #100 &name array-push
-    &name array-pop
+    #100 &name push
+    &name pop
 
 The length can be obtained with **length?**.
 
