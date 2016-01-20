@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (c) 2013-2015, Charles Childers
+# Copyright (c) 2013-2016, Charles Childers
 #
 # legend is a full screen console interface to the parable language.
 # interaction is done by typing in short commands (prefixed by a
@@ -9,8 +9,6 @@
 # legend recognizes the following commands:
 #
 #   :q         quit legend
-#   :w         write session to a file
-#   :e         edit session in $EDITOR (or vim if not set)
 #   :r         reset to a fresh state
 #   :i file    load and run the contents of *file*
 #

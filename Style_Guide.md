@@ -9,30 +9,29 @@
 * Use Unix-style line endings
 * All named functions should have a stack comment
 * If a function is more than one line, start the code on the line following the stack comment
-* Short, one line definitions are preferred, but you can split functions into multiple linesf  when necessary
-* Closing brackets should not be on a separate line
+* Short, one line definitions are preferred, but you can split functions into multiple lines when necessary
 
 
 ## Naming
 
 * Function names should not start with these characters: ' " ` & $ #
 * Constants should be named with UPPERCASE
-* Global variables should have an initial asterisk and use UPPERCASE names
-* Global values should have an initial asterisk and use Capital case names
+* Variables should have an initial asterisk and use UPPERCASE names
+* Values should have an initial asterisk and use Capital case names
 * Single line definitions are preferred, but long definitions can be split into multiple lines if this significantly improves readability
 * All named functions should start with a stack comment
 * Use of a **-** as a prefix should be read as "*not <function>*" or "*no <function>*"
 * Inquisitive functions should end with a **?** and be past or present tense
 * Imperative functions should generally be named with a command phrase
 * Declarative functions should normally use a past participle verb form (ending in **-ed**)
-* Internal functions
+* Internal functions left visible in the global dictionary should be enclosed in parenthesis
 
-Global variables should be named like:
+Variables should be named like:
 
     *FOO
     *BAR
 
-Global values should be named like:
+Values should be named like:
 
     *Token
 
@@ -48,6 +47,7 @@ Or:
         ... code ... \
         ... code ... \
     ] 'name' define
+
 
 ## Comments
 
