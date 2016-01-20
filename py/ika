@@ -100,6 +100,7 @@ BC_QUOTE_NAME = 600
 BC_FUNCTION_EXISTS = 601
 BC_FUNCTION_LOOKUP = 602
 BC_FUNCTION_HIDE = 603
+BC_FUNCTION_NAME = 604
 BC_STRING_SEEK = 700
 BC_SLICE_SUBSLICE = 701
 BC_STRING_NUMERIC = 702
@@ -726,6 +727,12 @@ def interpret(slice, more=None):
                     name = slice_to_string(stack_pop())
                     if lookup_pointer(name) != -1:
                         remove_name(name)
+                else:
+                    offset = size
+            elif opcode == BC_FUNCTION_NAME:
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    stack_push(string_to_slice(pointer_to_name(a)), TYPE_STRING)
                 else:
                     offset = size
             elif opcode == BC_STRING_SEEK:
@@ -1534,6 +1541,7 @@ bootstrap.append(""" [ "...-"   `507 ] 'reset' define """)
 bootstrap.append(""" [ "s-f"    `601 ] 'function-exists?' define """)
 bootstrap.append(""" [ "s-p"    `602 ] 'lookup-function' define """)
 bootstrap.append(""" [ "s-"     `603 ] 'hide-function' define """)
+bootstrap.append(""" [ "p-s"    `604 ] 'lookup-name' define """)
 bootstrap.append(""" [ "ss-n"   `700 ] 'find' define """)
 bootstrap.append(""" [ "pnn-p"  `701 ] 'subslice' define """)
 bootstrap.append(""" [ "s-f"    `702 ] 'numeric?' define """)

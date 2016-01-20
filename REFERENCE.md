@@ -398,6 +398,12 @@ Primitive. Return a pointer to the function if the function exists or a pointer 
 
 Primitive. Remove the named function from the dictionary. This removes the name, but not the definition: existing references to it will continue to work.
 
+## lookup-name
+
+    pointer - string
+
+Primitive. Return the name for a function stored at the specified slice.
+
 ## find
 
     string:haystack string:needle - number

@@ -60,6 +60,7 @@
 [ "s-f"    `601 ] 'function-exists?' define
 [ "s-p"    `602 ] 'lookup-function' define
 [ "s-"     `603 ] 'hide-function' define
+[ "p-s"    `604 ] 'lookup-name' define
 [ "ss-n"   `700 ] 'find' define
 [ "pnn-p"  `701 ] 'subslice' define
 [ "s-f"    `702 ] 'numeric?' define
