@@ -85,6 +85,7 @@
 [ "-n"  600 ] 'BYTECODE' define
 [ "-n"  700 ] 'COMMENT' define
 [ "-n"  800 ] 'FUNCTION-CALL' define
+[ "v-c" COMMENT set-type ] ':comment' define
 
 
 "Stack Flow"

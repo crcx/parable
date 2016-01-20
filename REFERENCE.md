@@ -532,6 +532,12 @@ Constant. Type for bytecides.
 
 Constant. Type for comments.
 
+## :comment
+
+    string - comment
+
+Convert a string to a comment.
+
 
 ## FUNCTION-CALL
 
