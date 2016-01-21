@@ -169,6 +169,7 @@
 "Misc"
 [ "p-"   invoke<depth?> [ hide-function ] times ] 'hide-functions' define
 [ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap define ] [ drop ] if ] 'rename-function' define
+[ "ps-"  dup hide-function define ] 'redefine' define
 [ "p-"   invoke<depth?> [ variable ] times ] 'variables' define
 
 

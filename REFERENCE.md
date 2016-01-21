@@ -404,6 +404,8 @@ Primitive. Remove the named function from the dictionary. This removes the name,
 
 Primitive. Return the name for a function stored at the specified slice.
 
+Note: this returns the first (canonical) name in the dictionary that corresponds to a slice. It will not return aliases.
+
 ## find
 
     string:haystack string:needle - number
@@ -869,6 +871,21 @@ Example:
 
     'foo' variable
     'foo'  'bar' rename
+
+## redefine
+
+    pointer string -
+
+Remove the old header referred to by the string and define a new
+function with the name pointing to the new pointer.
+
+Example:
+
+    [ "n-n" 10 * ] 'scale' define
+    [ "-n"  5 scale ] 'b' define
+    [ "n-n" 20 * ] 'scale' redefine
+    [ "-n"  5 scale ] 'c' define
+    b c
 
 ## variables
 
