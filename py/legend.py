@@ -199,12 +199,15 @@ def display(height, width):
 
 
 def load_file(file):
-    f = open(file).readlines()
-    f = parable.condense_lines(f)
-    for line in f:
-        if len(line) > 1:
-            s = parable.compile(line, parable.request_slice())
-            parable.interpret(s)
+    if not os.path.exists(file):
+        parable.report('L00: Unable to find ' + str(file))
+    else:
+        f = open(file).readlines()
+        f = parable.condense_lines(f)
+        for line in f:
+            if len(line) > 1:
+                s = parable.compile(line, parable.request_slice())
+                parable.interpret(s)
 
 
 def get_input():
