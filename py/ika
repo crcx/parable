@@ -1893,13 +1893,15 @@ def opcodes(slice, offset, opcode):
 
 
 def load_file(file):
-    f = open(file).readlines()
-    for line in condense_lines(f):
-        if len(line) > 1:
-            if not line.startswith("#!"):
-                s = compile(line, request_slice())
-                interpret(s, opcodes)
-                display_errors()
+    if not os.path.exists(file):
+        report('P00:Filenotfound:'+file)
+    else:
+        f = condenseLines(open(file).readlines())
+        for line in f:
+            if len(line) > 0:
+                if not line.startswith("#!"):
+                    s = compile(line, request_slice())
+                    interpret(s)
 
 
 if __name__ == '__main__':
