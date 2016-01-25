@@ -332,7 +332,7 @@
     request-empty :s to *String \
     *Data length? [ (accumulate) (next) ] times \
     "Merge any remaining items" \
-    *String *Source ' ' join + clean-string \
+    *String *Source '' join + clean-string \
   ] 'interpolate' define
 }
 

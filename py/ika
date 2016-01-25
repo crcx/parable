@@ -1725,7 +1725,7 @@ bootstrap.append(""" [ "sss-s"  [ split ] dip join clean-string ] 'replace' defi
 bootstrap.append(""" [ '*Data'  '*Source'  '*String'  '(accumulate)'  '(next)' ] { """)
 bootstrap.append(""" [ "-"  *String *Source first *Data first type? POINTER eq? [ invoke ] if-true :s + + to *String ] '(accumulate)' define """)
 bootstrap.append(""" [ "-"  *Source rest to *Source  *Data rest to *Data ] '(next)' define """)
-bootstrap.append(""" [ "ps-s" '{v}' split to *Source to *Data request-empty :s to *String *Data length? [ (accumulate) (next) ] times "Merge any remaining items" *String *Source ' ' join + clean-string   ] 'interpolate' define """)
+bootstrap.append(""" [ "ps-s" '{v}' split to *Source to *Data request-empty :s to *String *Data length? [ (accumulate) (next) ] times "Merge any remaining items" *String *Source '' join + clean-string   ] 'interpolate' define """)
 bootstrap.append(""" } """)
 bootstrap.append(""" "apropos" """)
 bootstrap.append(""" [ "s-s" dup function-exists? [ lookup-function @ ] [ drop 'function not found' report-error ] if ] 'apropos' define """)
