@@ -58,6 +58,13 @@ def opcodes(slice, offset, opcode):
         exit()
     elif opcode == 9002:
         dump_dict()
+    elif opcode == 9003:
+        name = parable.slice_to_string(parable.stack_pop())
+        if os.path.exists(name):
+            lines = parable.condense_lines(open(name).readlines())
+            for l in lines:
+                slice = parable.request_slice()
+                parable.interpret(parable.compile(l, slice), opcodes)
 
     return offset
 
@@ -93,6 +100,7 @@ if __name__ == '__main__':
     evaluate("[ \"-\"   `9000 ] '.s' define")
     evaluate("[ \"-\"   `9001 ] 'bye' define")
     evaluate("[ \"-\"   `9002 ] 'words' define")
+    evaluate("[ \"s-\"   `9003 ] 'include' define")
 
     while 1 == 1:
         sys.stdout.write("\ninput> ")
