@@ -1,49 +1,43 @@
 #!/usr/bin/env python
 
+# Listener: a basic UI for Parable
 # Copyright (c) 2013, 2015  Charles Childers
 #
-# This implements a pretty minimal user interface for parable. It
-# allows code (or a couple of commands) to be typed in, compiled,
-# and run.
-#
-# Commands recognized are:
-#
-# .              display the top value on the stack
-# show-stack     display the stack
-# show-named     display all named elements
-# bye            exit listener
-#
-# Anything else is treated as parable code.
-#
-# For a nicer interface, try legend.py
-#
 
+import os
 import sys
-from parable import *
+import parable
+
+
+def display_item(prefix, value):
+    sys.stdout.write('\t' + prefix + str(value))
 
 def dump_stack():
     """display the stack"""
-    global stack
     i = 0
-    while i < len(stack):
+    while i < len(parable.stack):
+        tos = parable.stack[i]
+        type = parable.types[i]
         sys.stdout.write("\t" + str(i))
-        if types[i] == TYPE_NUMBER:
-            sys.stdout.write("\t#" + str(stack[i]))
-        elif types[i] == TYPE_CHARACTER:
-            sys.stdout.write("\t$" + str(chr(stack[i])))
-        elif types[i] == TYPE_STRING:
-            sys.stdout.write("\t'" + slice_to_string(stack[i]) +"'")
-        elif types[i] == TYPE_POINTER:
-            sys.stdout.write("\t&" + str(stack[i]))
-        elif types[i] == TYPE_FLAG:
-            if stack[i] == -1:
-                sys.stdout.write("true")
-            elif stack[i] == 0:
-                sys.stdout.write("false")
+        if type == parable.TYPE_NUMBER:
+            display_item('#', tos)
+        elif type == parable.TYPE_CHARACTER:
+            display_item('$', chr(tos))
+        elif type == parable.TYPE_STRING:
+            display_item('\'', parable.slice_to_string(tos) + '\'')
+        elif type == parable.TYPE_POINTER:
+            display_item('&', tos)
+        elif type == parable.TYPE_COMMENT:
+            display_item('"', parable.slice_to_string(tos) + '"')
+        elif type == parable.TYPE_FLAG:
+            if tos == -1:
+                display_item("", "true")
+            elif tos == 0:
+                display_item("", "false")
             else:
-                sys.stdout.write("malformed flag")
+                display_item("", "malformed flag")
         else:
-            sys.stdout.write("unmatched type on stack!")
+            display_item("", "unmatched type on the stack")
         sys.stdout.write("\n")
         i += 1
 
@@ -51,73 +45,67 @@ def dump_stack():
 def dump_dict():
     """display named items"""
     l = ''
-    for w in dictionary_names:
+    for w in parable.dictionary_names:
         l = l + w + ' '
     sys.stdout.write(l)
     sys.stdout.write("\n")
 
 
-def display_value():
-    global stack, types
-    i = len(stack) - 1
-    if types[i] == TYPE_NUMBER:
-        sys.stdout.write(str(stack[i]))
-    elif types[i] == TYPE_CHARACTER:
-        sys.stdout.write(str(chr(stack[i])))
-    elif types[i] == TYPE_STRING:
-        sys.stdout.write(slice_to_string(stack[i]))
-    elif types[i] == TYPE_POINTER:
-        sys.stdout.write('&' + str(stack[i]))
-    elif types[i] == TYPE_FLAG:
-        if stack[i] == -1:
-            sys.stdout.write("true")
-        elif stack[i] == 0:
-            sys.stdout.write("false")
-        else:
-            sys.stdout.write("malformed flag")
-
-
 def opcodes(slice, offset, opcode):
     if opcode == 9000:
-        display_value()
-        stack_pop()
-    elif opcode == 9010:
         dump_stack()
-    elif opcode == 9020:
+    elif opcode == 9001:
         exit()
-    elif opcode == 9030:
+    elif opcode == 9002:
         dump_dict()
 
     return offset
 
 
+def evaluate(s):
+    parable.interpret(parable.compile(s, parable.request_slice()))
+
+
+def get_input():
+    done = 0
+    s = ''
+    while done == 0:
+        s = s + sys.stdin.readline()
+        if s.endswith(' \\\n'):
+            s = s[:-2].strip() + ' '
+        else:
+            done = 1
+    return s
+
 
 if __name__ == '__main__':
-    sys.stdout.write("parable (listener 2015-05-22)\n")
-    sys.stdout.write('?              display the top value on the stack\n')
-    sys.stdout.write('show-stack     display the stack\n')
-    sys.stdout.write('show-named     display all named elements\n')
-    sys.stdout.write('bye            exit listener\n')
-    prepare_slices()
-    prepare_dictionary()
-    parse_bootstrap(open('stdlib.p').readlines())
+    print 'Parable Listener, (c) 2013-2016 Charles Childers'
+    print '------------------------------------------------'
+    print '.s       Display Stack'
+    print 'bye      Exit Listener'
+    print 'words    Display a list of all named items'
+    print '------------------------------------------------\n'
 
-    interpret(compile("[ `9000 ] '?' define", request_slice()))
-    interpret(compile("[ `9010 ] 'show-stack' define", request_slice()))
-    interpret(compile("[ `9020 ] 'bye' define", request_slice()))
-    interpret(compile("[ `9030 ] 'show-named' define", request_slice()))
+    parable.prepare_slices()
+    parable.prepare_dictionary()
+    parable.parse_bootstrap(open('stdlib.p').readlines())
+
+    evaluate("[ \"-\"   `9000 ] '.s' define")
+    evaluate("[ \"-\"   `9001 ] 'bye' define")
+    evaluate("[ \"-\"   `9002 ] 'words' define")
 
     while 1 == 1:
-        sys.stdout.write("\nok ")
+        sys.stdout.write("\ninput> ")
         sys.stdout.flush()
 
-        src = sys.stdin.readline()
+        src = get_input()
 
-        if len(src) > 1:
-            interpret(compile(src, request_slice()), opcodes)
+        if len(src) > 0:
+            slice = parable.request_slice()
+            parable.interpret(parable.compile(src, slice), opcodes)
 
-        for e in errors:
+        for e in parable.errors:
             sys.stdout.write(e)
 
-        clear_errors()
+        parable.clear_errors()
         sys.stdout.flush()
