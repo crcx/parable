@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
         src = get_input()
 
-        if len(src) > 0:
+        if len(src) > 1:
             slice = parable.request_slice()
             parable.interpret(parable.compile(src, slice), opcodes)
 
