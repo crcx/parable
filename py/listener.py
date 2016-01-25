@@ -89,7 +89,7 @@ def get_input():
 names = []
 
 def completer(text, state):
-    options = [x for x in names if x.startswith(text)]
+    options = [x for x in parable.dictionary_names if x.startswith(text)]
     try:
         return options[state]
     except IndexError:
@@ -105,9 +105,6 @@ if __name__ == '__main__':
 
     readline.set_completer(completer)
     readline.parse_and_bind("tab: complete")
-
-    if os.path.exists('autocomplete.txt'):
-        names = open('autocomplete.txt').readlines()
 
     parable.prepare_slices()
     parable.prepare_dictionary()
