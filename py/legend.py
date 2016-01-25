@@ -32,7 +32,7 @@
 # ===================================================================
 
 # Dependencies
-import os, sys
+import os, readline, sys
 import parable
 
 
@@ -214,8 +214,8 @@ def get_input():
     done = 0
     s = ''
     while done == 0:
-        s = s + sys.stdin.readline()
-        if s.endswith(' \\\n'):
+        s = s + raw_input()
+        if s.endswith(' \\'):
             s = s[:-2].strip() + ' '
         else:
             done = 1
@@ -243,7 +243,7 @@ if __name__ == '__main__':
         elif cmd[0:2] == ':i':
             load_file(cmd[3:])
         else:
-            if len(src) > 1:
+            if len(src) >= 1:
                 parable.interpret(parable.compile(src, parable.request_slice()))
 
         sys.stdout.flush()

@@ -4,6 +4,7 @@
 # Copyright (c) 2013, 2015  Charles Childers
 #
 
+import readline
 import os
 import sys
 import parable
@@ -77,8 +78,8 @@ def get_input():
     done = 0
     s = ''
     while done == 0:
-        s = s + sys.stdin.readline()
-        if s.endswith(' \\\n'):
+        s = s + raw_input()
+        if s.endswith(' \\'):
             s = s[:-2].strip() + ' '
         else:
             done = 1
@@ -108,7 +109,7 @@ if __name__ == '__main__':
 
         src = get_input()
 
-        if len(src) > 1:
+        if len(src) >= 1:
             slice = parable.request_slice()
             parable.interpret(parable.compile(src, slice), opcodes)
 
