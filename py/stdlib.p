@@ -336,6 +336,18 @@
   ] 'interpolate' define
 }
 
+[ '*D'  '*S'  '*L' ] {
+  [ "qs-s" \
+    to *S \
+    to *D \
+    *S '{v}' split length? to *L \
+    [ *D length? *L lt? dup [ *D duplicate-slice *D + to *D ] if-true ] while \
+    [ *D length? *L lt? dup [ *D pop drop ] if-false ] until \
+    *D *S interpolate \
+  ] 'interpolate<cycling>' define
+}
+
+
 
 "apropos"
 [ "s-s" \

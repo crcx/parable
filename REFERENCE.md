@@ -1416,7 +1416,21 @@ Example:
 
     [ 1 2 3 ] '{v} + {v} = {v}' interpolate
 
+Note: if the array has fewer values than the number of replace points this will replace the remaining points with an empty string.
+
 See also: **build-string**
+
+## interpolate<cycling>
+
+    pointer string - string
+
+Takes an array and a string. Replaces instances of {v} in the string with values from the array.
+
+Example:
+
+    [ 1 2 3 ] '{v} + {v} = {v}' interpolate<cycling>
+
+Note: if the array has fewer values than the number of replace points this will cycle through the data until all replace points are exhausted.
 
 ## apropos
 

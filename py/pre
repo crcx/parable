@@ -1724,6 +1724,9 @@ bootstrap.append(""" [ "-"  *String *Source first *Data first type? POINTER eq? 
 bootstrap.append(""" [ "-"  *Source rest to *Source  *Data rest to *Data ] '(next)' define """)
 bootstrap.append(""" [ "ps-s" '{v}' split to *Source to *Data request-empty :s to *String *Data length? [ (accumulate) (next) ] times "Merge any remaining items" *String *Source '' join + clean-string   ] 'interpolate' define """)
 bootstrap.append(""" } """)
+bootstrap.append(""" [ '*D'  '*S'  '*L' ] { """)
+bootstrap.append(""" [ "qs-s" to *S to *D *S '{v}' split length? to *L [ *D length? *L lt? dup [ *D duplicate-slice *D + to *D ] if-true ] while [ *D length? *L lt? dup [ *D pop drop ] if-false ] until *D *S interpolate   ] 'interpolate<cycling>' define """)
+bootstrap.append(""" } """)
 bootstrap.append(""" "apropos" """)
 bootstrap.append(""" [ "s-s" dup function-exists? [ lookup-function @ ] [ drop 'function not found' report-error ] if ] 'apropos' define """)
 import sys, os
