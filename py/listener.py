@@ -86,6 +86,15 @@ def get_input():
     return s
 
 
+names = []
+
+def completer(text, state):
+    options = [x for x in names if x.startswith(text)]
+    try:
+        return options[state]
+    except IndexError:
+        return None
+
 if __name__ == '__main__':
     print 'Parable Listener, (c) 2013-2016 Charles Childers'
     print '------------------------------------------------'
@@ -94,6 +103,12 @@ if __name__ == '__main__':
     print 'words    Display a list of all named items'
     print '------------------------------------------------\n'
 
+    readline.set_completer(completer)
+    readline.parse_and_bind("tab: complete")
+
+    if os.path.exists('autocomplete.txt'):
+        names = open('autocomplete.txt').readlines()
+
     parable.prepare_slices()
     parable.prepare_dictionary()
     parable.parse_bootstrap(open('stdlib.p').readlines())
@@ -101,7 +116,7 @@ if __name__ == '__main__':
     evaluate("[ \"-\"   `9000 ] '.s' define")
     evaluate("[ \"-\"   `9001 ] 'bye' define")
     evaluate("[ \"-\"   `9002 ] 'words' define")
-    evaluate("[ \"s-\"   `9003 ] 'include' define")
+    evaluate("[ \"s-\"  `9003 ] 'include' define")
 
     while 1 == 1:
         sys.stdout.write("\ninput> ")
