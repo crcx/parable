@@ -8,7 +8,14 @@
 "VM State"
 [ "-p"  `9100 ] 'vm.dict<names>' define
 [ "-p"  `9101 ] 'vm.dict<slices>' define
-[ "-p"  `9102 ] 'vm.stack' define
+[ '*S' ] {
+  [ "-p" \
+    request-empty to *S \
+    depth [ *S push ] times \
+    *S reverse dup to *S invoke \
+    *S \
+  ] 'vm.stack' define
+}
 
 "File Operations"
 [ "string:name string:mode - number:file-id"  `3000 ] 'open-file' define
