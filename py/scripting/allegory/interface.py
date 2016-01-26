@@ -204,6 +204,13 @@ def opcodes(slice, offset, opcode):
             store(slice, s, i, TYPE_POINTER)
             i = i + 1
         stack_push(s, TYPE_POINTER)
+    elif opcode == 9102:
+        s = request_slice()
+        i = 0
+        while i < len(stack):
+            store(stack[i], s, i, types[i])
+            i = i + 1
+        stack_push(s, TYPE_POINTER)
     return offset
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-

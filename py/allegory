@@ -1739,6 +1739,7 @@ extensions.append(""" [ "-"   `9005 ] 'reload-session' define """)
 extensions.append(""" "VM State" """)
 extensions.append(""" [ "-p"  `9100 ] 'vm.dict<names>' define """)
 extensions.append(""" [ "-p"  `9101 ] 'vm.dict<slices>' define """)
+extensions.append(""" [ "-p"  `9102 ] 'vm.stack' define """)
 extensions.append(""" "File Operations" """)
 extensions.append(""" [ "string:name string:mode - number:file-id"  `3000 ] 'open-file' define """)
 extensions.append(""" [ "number:file-id -"  `3001 ] 'close-file' define """)
@@ -1964,6 +1965,13 @@ def opcodes(slice, offset, opcode):
         i = 0
         for slice in dictionary_slices:
             store(slice, s, i, TYPE_POINTER)
+            i = i + 1
+        stack_push(s, TYPE_POINTER)
+    elif opcode == 9102:
+        s = request_slice()
+        i = 0
+        while i < len(stack):
+            store(stack[i], s, i, types[i])
             i = i + 1
         stack_push(s, TYPE_POINTER)
     return offset
