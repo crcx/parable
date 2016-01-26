@@ -86,8 +86,6 @@ def get_input():
     return s
 
 
-names = []
-
 def completer(text, state):
     options = [x for x in parable.dictionary_names if x.startswith(text)]
     try:
