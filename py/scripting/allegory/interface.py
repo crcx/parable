@@ -2,9 +2,59 @@
 
 # allegory interface layer begins here
 
+import gzip
+import json
 import os
 import readline
 import sys
+
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+def save_session(filename):
+    global dictionary_names, \
+           dictionary_slices, \
+           errors, \
+           stack, \
+           types, \
+           p_slices, \
+           p_types, \
+           p_map, \
+           p_sizes
+
+    collect_garbage()
+    j = json.dumps({"symbols": dictionary_names, \
+                    "symbol_map": dictionary_slices, \
+                    "errors": errors, \
+                    "stack_values": stack, \
+                    "stack_types": types, \
+                    "memory_contents": p_slices, \
+                    "memory_types": p_types, \
+                    "memory_map": p_map, \
+                    "memory_sizes": p_sizes})
+    with gzip.open(filename, 'wb') as file:
+        file.write(j)
+
+def load_session(filename):
+    global dictionary_names, \
+           dictionary_slices, \
+           errors, \
+           stack, \
+           types, \
+           p_slices, \
+           p_types, \
+           p_map, \
+           p_sizes
+
+    j = json.loads(gzip.open(filename, 'rb').read())
+    dictionary_names = j['symbols']
+    dictionary_slices = j['symbol_map']
+    errors = j['errors']
+    stack = j['stack_values']
+    types = j['stack_types']
+    p_slices = j['memory_contents']
+    p_types = j['memory_types']
+    p_map = j['memory_map']
+    p_sizes = j['memory_sizes']
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
@@ -132,6 +182,13 @@ def opcodes(slice, offset, opcode):
     elif opcode == 9003:
         name = slice_to_string(stack_pop())
         load_file(name)
+    elif opcode == 9004:
+        save_session('session.pso')
+    elif opcode == 9005:
+        if os.path.exists('session.pso'):
+            load_session('session.pso')
+        else:
+            report('E99: session.pso not found')
     elif opcode == 9100:
         s = request_slice()
         i = 0

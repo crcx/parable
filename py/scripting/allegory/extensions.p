@@ -2,6 +2,8 @@
 [ "-"   `9001 ] 'bye' define
 [ "-"   `9002 ] 'words' define
 [ "s-"  `9003 ] 'include' define
+[ "-"   `9004 ] 'save-session' define
+[ "-"   `9005 ] 'reload-session' define
 
 "VM State"
 [ "-p"  `9100 ] 'vm.dict<names>' define
