@@ -1,0 +1,2002 @@
+#!/usr/bin/env python
+# Copyright (c)2012-2016, Charles Childers
+# parable
+# Copyright (c) 2012-2016, Charles Childers
+# ==========================================
+
+#
+# Dependencies
+#
+import math
+import random
+import sys
+
+#
+# Memory Configuration
+#
+
+MAX_SLICES = 80000
+
+#
+# Constants for data types
+#
+
+TYPE_NUMBER = 100
+TYPE_STRING = 200
+TYPE_CHARACTER = 300
+TYPE_POINTER = 400
+TYPE_FLAG = 500
+TYPE_BYTECODE = 600
+TYPE_COMMENT = 700
+TYPE_FUNCTION_CALL = 800
+
+#
+# Constants for byte codes
+# These are loosely grouped by type
+#
+
+BC_TYPE_B = 100
+BC_TYPE_N = 101
+BC_TYPE_S = 102
+BC_TYPE_C = 103
+BC_TYPE_F = 104
+BC_TYPE_FLAG = 105
+BC_TYPE_CALL = 106
+BC_SET_TYPE = 109
+BC_GET_TYPE = 110
+BC_ADD = 200
+BC_SUBTRACT = 201
+BC_MULTIPLY = 202
+BC_DIVIDE = 203
+BC_REMAINDER = 204
+BC_FLOOR = 205
+BC_POW = 206
+BC_LOG = 207
+BC_LOG10 = 208
+BC_LOGN = 209
+BC_BITWISE_SHIFT = 210
+BC_BITWISE_AND = 211
+BC_BITWISE_OR = 212
+BC_BITWISE_XOR = 213
+BC_RANDOM = 214
+BC_SQRT = 215
+BC_COMPARE_LT = 220
+BC_COMPARE_GT = 221
+BC_COMPARE_LTEQ = 222
+BC_COMPARE_GTEQ = 223
+BC_COMPARE_EQ = 224
+BC_COMPARE_NEQ = 225
+BC_FLOW_IF = 300
+BC_FLOW_WHILE = 301
+BC_FLOW_UNTIL = 302
+BC_FLOW_TIMES = 303
+BC_FLOW_CALL = 304
+BC_FLOW_CALL_F = 305
+BC_FLOW_DIP = 306
+BC_FLOW_SIP = 307
+BC_FLOW_BI = 308
+BC_FLOW_TRI = 309
+BC_FLOW_RETURN = 399
+BC_MEM_COPY = 400
+BC_MEM_FETCH = 401
+BC_MEM_STORE = 402
+BC_MEM_REQUEST = 403
+BC_MEM_RELEASE = 404
+BC_MEM_COLLECT = 405
+BC_MEM_GET_LAST = 406
+BC_MEM_SET_LAST = 407
+BC_MEM_SET_TYPE = 408
+BC_MEM_GET_TYPE = 409
+BC_STACK_DUP = 500
+BC_STACK_DROP = 501
+BC_STACK_SWAP = 502
+BC_STACK_OVER = 503
+BC_STACK_TUCK = 504
+BC_STACK_NIP = 505
+BC_STACK_DEPTH = 506
+BC_STACK_CLEAR = 507
+BC_QUOTE_NAME = 600
+BC_FUNCTION_EXISTS = 601
+BC_FUNCTION_LOOKUP = 602
+BC_FUNCTION_HIDE = 603
+BC_FUNCTION_NAME = 604
+BC_STRING_SEEK = 700
+BC_SLICE_SUBSLICE = 701
+BC_STRING_NUMERIC = 702
+BC_SLICE_REVERSE = 703
+BC_TO_LOWER = 800
+BC_TO_UPPER = 801
+BC_REPORT = 900
+BC_TRIG_SIN = 1000
+BC_TRIG_COS = 1001
+BC_TRIG_TAN = 1002
+BC_TRIG_ASIN = 1003
+BC_TRIG_ACOS = 1004
+BC_TRIG_ATAN = 1005
+BC_TRIG_ATAN2 = 1006
+
+
+#
+# Support code
+#
+
+def is_number(s):
+    """return True if s is a number, or False otherwise"""
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+
+def condense_lines(code):
+    """Take an array of code, join lines ending with a \, and return"""
+    """the new array"""
+    m = len(code)
+    s = ''
+    r = []
+    i = 0
+    c = 0
+    while i < m:
+        if code[i].endswith(' \\\n'):
+            s = s + ' ' + code[i][:-2].strip()
+            c = 1
+        else:
+            c = 0
+            s = s + ' ' + code[i]
+        if c == 0:
+            if s != '' and s != ' \n':
+                r.append(s.strip())
+            s = ''
+        i = i + 1
+    return r
+
+
+#
+# logging of errors
+#
+# errors are stored in an array, with helper functions to
+# record and clear them
+#
+
+errors = []
+
+
+def clear_errors():
+    """remove all errors from the error log"""
+    global errors
+    i = 0
+    while i < len(errors):
+        errors.pop()
+        i += 1
+
+
+def report(text):
+    """report an error"""
+    global errors
+    errors.append(text)
+
+
+def check_depth(slice, offset, cells):
+    """returns True if the stack has at least *cells* number of items, or"""
+    """False otherwise. If False, reports an underflow error."""
+    global stack
+    if len(stack) < cells:
+        details = 'Slice ' + str(slice) + ' Offset: ' + str(offset)
+        expected = str(cells) + ' values required'
+        report('E01: Stack underflow: ' + details + ': ' + expected)
+        return False
+    else:
+        return True
+
+
+#
+# Byte code interpreter
+#
+
+current_slice = 0
+
+
+def interpret(slice, more=None):
+    """Interpret the byte codes contained in a slice."""
+    global current_slice
+    offset = 0
+    size = get_last_index(int(slice))
+    if current_slice == 0:
+        current_slice = slice
+    while offset <= size:
+        opcode = fetch(slice, offset)
+        optype = fetch_type(slice, offset)
+
+        if optype != TYPE_BYTECODE:
+            stack_push(opcode, optype)
+            if optype == TYPE_COMMENT:
+                stack_pop()
+            if optype == TYPE_FUNCTION_CALL:
+                interpret(stack_pop(), more)
+        else:
+            if opcode == BC_TYPE_B:
+                if check_depth(slice, offset, 1):
+                    stack_change_type(TYPE_BYTECODE)
+                else:
+                    offset = size
+            elif opcode == BC_TYPE_N:
+                if check_depth(slice, offset, 1):
+                    stack_change_type(TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_TYPE_S:
+                if check_depth(slice, offset, 1):
+                    stack_change_type(TYPE_STRING)
+                else:
+                    offset = size
+            elif opcode == BC_TYPE_C:
+                if check_depth(slice, offset, 1):
+                    stack_change_type(TYPE_CHARACTER)
+                else:
+                    offset = size
+            elif opcode == BC_TYPE_F:
+                if check_depth(slice, offset, 1):
+                    stack_change_type(TYPE_POINTER)
+                else:
+                    offset = size
+            elif opcode == BC_TYPE_FLAG:
+                if check_depth(slice, offset, 1):
+                    stack_change_type(TYPE_FLAG)
+                else:
+                    offset = size
+            elif opcode == BC_TYPE_CALL:
+                if check_depth(slice, offset, 1):
+                    stack_change_type(TYPE_FUNCTION_CALL)
+                else:
+                    offset = size
+            elif opcode == BC_SET_TYPE:
+                if check_depth(slice, offset, 2):
+                    a = stack_pop()  # type
+                    b = stack_pop()  # value
+                    stack_push(b, a)
+                else:
+                    offset = size
+            elif opcode == BC_GET_TYPE:
+                if check_depth(slice, offset, 1):
+                    stack_push(stack_type(), TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_ADD:
+                if check_depth(slice, offset, 2):
+                    x = stack_type()
+                    a = stack_pop()
+                    y = stack_type()
+                    b = stack_pop()
+                    if x == TYPE_STRING and y == TYPE_STRING:
+                        a = slice_to_string(a)
+                        b = slice_to_string(b)
+                        stack_push(string_to_slice(b + a), TYPE_STRING)
+                    elif x == TYPE_POINTER and y == TYPE_POINTER:
+                        c = request_slice()
+                        d = get_last_index(b) + get_last_index(a) + 1
+                        set_slice_last_index(c, d)
+                        p_slices[c] = p_slices[b][:] + p_slices[a][:]
+                        p_types[c] = p_types[b][:] + p_types[a][:]
+                        stack_push(c, TYPE_POINTER)
+                    else:
+                        stack_push(a + b, TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_SUBTRACT:
+                if check_depth(slice, offset, 2):
+                    a = stack_pop()
+                    b = stack_pop()
+                    stack_push(b - a, TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_MULTIPLY:
+                if check_depth(slice, offset, 2):
+                    a = stack_pop()
+                    b = stack_pop()
+                    stack_push(a * b, TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_DIVIDE:
+                if check_depth(slice, offset, 2):
+                    a = stack_pop()
+                    b = stack_pop()
+                    if a == 0 or b == 0:
+                        stack_push(float('nan'), TYPE_NUMBER)
+                        report('E04: Divide by Zero')
+                    else:
+                        stack_push(b / a, TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_REMAINDER:
+                if check_depth(slice, offset, 2):
+                    a = stack_pop()
+                    b = stack_pop()
+                    stack_push(b % a, TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_FLOOR:
+                if check_depth(slice, offset, 1):
+                    stack_push(math.floor(float(stack_pop())), TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_POW:
+                if check_depth(slice, offset, 2):
+                    a = stack_pop()
+                    b = stack_pop()
+                    stack_push(math.pow(b, a), TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_LOG:
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    stack_push(math.log(a), TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_LOG10:
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    stack_push(math.log10(a), TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_LOGN:
+                if check_depth(slice, offset, 2):
+                    a = stack_pop()
+                    b = stack_pop()
+                    stack_push(math.log(b, a), TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_BITWISE_SHIFT:
+                if check_depth(slice, offset, 2):
+                    a = int(stack_pop())
+                    b = int(stack_pop())
+                    if a < 0:
+                        stack_push(b << abs(a), TYPE_NUMBER)
+                    else:
+                        stack_push(b >> a, TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_BITWISE_AND:
+                if check_depth(slice, offset, 2):
+                    a = int(stack_pop())
+                    b = int(stack_pop())
+                    stack_push(b & a, TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_BITWISE_OR:
+                if check_depth(slice, offset, 2):
+                    a = int(stack_pop())
+                    b = int(stack_pop())
+                    stack_push(b | a, TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_BITWISE_XOR:
+                if check_depth(slice, offset, 2):
+                    a = int(stack_pop())
+                    b = int(stack_pop())
+                    stack_push(b ^ a, TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_RANDOM:
+                stack_push(random.SystemRandom().random(), TYPE_NUMBER)
+            elif opcode == BC_SQRT:
+                if check_depth(slice, offset, 1):
+                    stack_push(math.sqrt(stack_pop()), TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_COMPARE_LT:
+                if check_depth(slice, offset, 2):
+                    x = stack_type()
+                    a = stack_pop()
+                    y = stack_type()
+                    b = stack_pop()
+                    if x == TYPE_NUMBER and y == TYPE_NUMBER:
+                        if b < a:
+                            stack_push(-1, TYPE_FLAG)
+                        else:
+                            stack_push(0, TYPE_FLAG)
+                    else:
+                        offset = size
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
+                else:
+                    offset = size
+            elif opcode == BC_COMPARE_GT:
+                if check_depth(slice, offset, 2):
+                    x = stack_type()
+                    a = stack_pop()
+                    y = stack_type()
+                    b = stack_pop()
+                    if x == TYPE_NUMBER and y == TYPE_NUMBER:
+                        if b > a:
+                            stack_push(-1, TYPE_FLAG)
+                        else:
+                            stack_push(0, TYPE_FLAG)
+                    else:
+                        offset = size
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
+                else:
+                    offset = size
+            elif opcode == BC_COMPARE_LTEQ:
+                if check_depth(slice, offset, 2):
+                    x = stack_type()
+                    a = stack_pop()
+                    y = stack_type()
+                    b = stack_pop()
+                    if x == TYPE_NUMBER and y == TYPE_NUMBER:
+                        if b <= a:
+                            stack_push(-1, TYPE_FLAG)
+                        else:
+                            stack_push(0, TYPE_FLAG)
+                    else:
+                        offset = size
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
+                else:
+                    offset = size
+            elif opcode == BC_COMPARE_GTEQ:
+                if check_depth(slice, offset, 2):
+                    x = stack_type()
+                    a = stack_pop()
+                    y = stack_type()
+                    b = stack_pop()
+                    if x == TYPE_NUMBER and y == TYPE_NUMBER:
+                        if b >= a:
+                            stack_push(-1, TYPE_FLAG)
+                        else:
+                            stack_push(0, TYPE_FLAG)
+                    else:
+                        offset = size
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
+                else:
+                    offset = size
+            elif opcode == BC_COMPARE_EQ:
+                if check_depth(slice, offset, 2):
+                    x = stack_type()
+                    a = stack_pop()
+                    y = stack_type()
+                    b = stack_pop()
+                    if x == y and x != TYPE_STRING:
+                        if b == a:
+                            stack_push(-1, TYPE_FLAG)
+                        else:
+                            stack_push(0, TYPE_FLAG)
+                    elif x == y and x == TYPE_STRING:
+                        if slice_to_string(b) == slice_to_string(a):
+                            stack_push(-1, TYPE_FLAG)
+                        else:
+                            stack_push(0, TYPE_FLAG)
+                    else:
+                        offset = size
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
+                else:
+                    offset = size
+            elif opcode == BC_COMPARE_NEQ:
+                if check_depth(slice, offset, 2):
+                    x = stack_type()
+                    a = stack_pop()
+                    y = stack_type()
+                    b = stack_pop()
+                    if x == y and x != TYPE_STRING:
+                        if b != a:
+                            stack_push(-1, TYPE_FLAG)
+                        else:
+                            stack_push(0, TYPE_FLAG)
+                    elif x == y and x == TYPE_STRING:
+                        if slice_to_string(b) != slice_to_string(a):
+                            stack_push(-1, TYPE_FLAG)
+                        else:
+                            stack_push(0, TYPE_FLAG)
+                    else:
+                        offset = size
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
+                else:
+                    offset = size
+            elif opcode == BC_FLOW_IF:
+                if check_depth(slice, offset, 3):
+                    a = stack_pop()
+                    b = stack_pop()
+                    c = stack_pop()
+                    if c == -1:
+                        interpret(b, more)
+                    else:
+                        interpret(a, more)
+                else:
+                    offset = size
+            elif opcode == BC_FLOW_WHILE:
+                if check_depth(slice, offset, 1):
+                    quote = stack_pop()
+                    a = -1
+                    while a == -1:
+                        interpret(quote, more)
+                        a = stack_pop()
+                else:
+                    offset = size
+            elif opcode == BC_FLOW_UNTIL:
+                if check_depth(slice, offset, 1):
+                    quote = stack_pop()
+                    a = 0
+                    while a == 0:
+                        interpret(quote, more)
+                        a = stack_pop()
+                else:
+                    offset = size
+            elif opcode == BC_FLOW_TIMES:
+                if check_depth(slice, offset, 2):
+                    quote = stack_pop()
+                    count = stack_pop()
+                    while count > 0:
+                        interpret(quote, more)
+                        count -= 1
+                else:
+                    offset = size
+            elif opcode == BC_FLOW_CALL:
+                offset += 1
+                interpret(int(fetch(slice, offset)), more)
+            elif opcode == BC_FLOW_CALL_F:
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    interpret(a, more)
+                else:
+                    offset = size
+            elif opcode == BC_FLOW_DIP:
+                if check_depth(slice, offset, 2):
+                    quote = stack_pop()
+                    vtype = stack_type()
+                    value = stack_pop()
+                    interpret(quote, more)
+                    stack_push(value, vtype)
+                else:
+                    offset = size
+            elif opcode == BC_FLOW_SIP:
+                if check_depth(slice, offset, 2):
+                    quote = stack_pop()
+                    stack_dup()
+                    vtype = stack_type()
+                    value = stack_pop()
+                    interpret(quote, more)
+                    stack_push(value, vtype)
+                else:
+                    offset = size
+            elif opcode == BC_FLOW_BI:
+                if check_depth(slice, offset, 3):
+                    a = stack_pop()
+                    b = stack_pop()
+                    stack_dup()
+                    x = stack_type()
+                    y = stack_pop()
+                    interpret(b, more)
+                    stack_push(y, x)
+                    interpret(a, more)
+                else:
+                    offset = size
+            elif opcode == BC_FLOW_TRI:
+                if check_depth(slice, offset, 4):
+                    a = stack_pop()
+                    b = stack_pop()
+                    c = stack_pop()
+                    stack_dup()
+                    x = stack_type()
+                    y = stack_pop()
+                    stack_dup()
+                    m = stack_type()
+                    q = stack_pop()
+                    interpret(c, more)
+                    stack_push(q, m)
+                    interpret(b, more)
+                    stack_push(y, x)
+                    interpret(a, more)
+                else:
+                    offset = size
+            elif opcode == BC_FLOW_RETURN:
+                offset = size
+            elif opcode == BC_MEM_COPY:
+                if check_depth(slice, offset, 2):
+                    a = stack_pop()
+                    b = stack_pop()
+                    copy_slice(b, a)
+                else:
+                    offset = size
+            elif opcode == BC_MEM_FETCH:
+                if check_depth(slice, offset, 2):
+                    a = stack_pop()
+                    b = stack_pop()
+                    stack_push(fetch(b, a), fetch_type(b, a))
+                else:
+                    offset = size
+            elif opcode == BC_MEM_STORE:
+                if check_depth(slice, offset, 3):
+                    a = stack_pop()   # offset
+                    b = stack_pop()   # slice
+                    t = stack_type()  # type
+                    c = stack_pop()   # value
+                    store(c, b, a, t)
+                else:
+                    offset = size
+            elif opcode == BC_MEM_REQUEST:
+                stack_push(request_slice(), TYPE_POINTER)
+            elif opcode == BC_MEM_RELEASE:
+                if check_depth(slice, offset, 1):
+                    release_slice(stack_pop())
+                else:
+                    offset = size
+            elif opcode == BC_MEM_COLLECT:
+                collect_garbage()
+            elif opcode == BC_MEM_GET_LAST:
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    stack_push(get_last_index(a), TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_MEM_SET_LAST:
+                if check_depth(slice, offset, 2):
+                    a = stack_pop()
+                    b = stack_pop()
+                    set_slice_last_index(a, b)
+                else:
+                    offset = size
+            elif opcode == BC_MEM_SET_TYPE:
+                if check_depth(slice, offset, 3):
+                    a = stack_pop()  # offset
+                    b = stack_pop()  # slice
+                    c = stack_pop()  # type
+                    store_type(b, a, c)
+                else:
+                    offset = size
+            elif opcode == BC_MEM_GET_TYPE:
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    b = stack_pop()
+                    c = fetch_type(b, a)
+                    stack_push(int(c), TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_STACK_DUP:
+                if check_depth(slice, offset, 1):
+                    stack_dup()
+                else:
+                    offset = size
+            elif opcode == BC_STACK_DROP:
+                if check_depth(slice, offset, 1):
+                    stack_drop()
+                else:
+                    offset = size
+            elif opcode == BC_STACK_SWAP:
+                if check_depth(slice, offset, 2):
+                    stack_swap()
+                else:
+                    offset = size
+            elif opcode == BC_STACK_OVER:
+                if check_depth(slice, offset, 2):
+                    stack_over()
+                else:
+                    offset = size
+            elif opcode == BC_STACK_TUCK:
+                if check_depth(slice, offset, 2):
+                    stack_tuck()
+                else:
+                    offset = size
+            elif opcode == BC_STACK_NIP:
+                if check_depth(slice, offset, 2):
+                    stack_swap()
+                    stack_drop()
+                else:
+                    offset = size
+            elif opcode == BC_STACK_DEPTH:
+                stack_push(len(stack), TYPE_NUMBER)
+            elif opcode == BC_STACK_CLEAR:
+                stack_clear()
+            elif opcode == BC_QUOTE_NAME:
+                if check_depth(slice, offset, 2):
+                    name = slice_to_string(stack_pop())
+                    ptr = stack_pop()
+                    add_definition(name, ptr)
+                else:
+                    offset = size
+            elif opcode == BC_FUNCTION_EXISTS:
+                if check_depth(slice, offset, 1):
+                    name = slice_to_string(stack_pop())
+                    if lookup_pointer(name) != -1:
+                        stack_push(-1, TYPE_FLAG)
+                    else:
+                        stack_push(0, TYPE_FLAG)
+                else:
+                    offset = size
+            elif opcode == BC_FUNCTION_LOOKUP:
+                if check_depth(slice, offset, 1):
+                    name = slice_to_string(stack_pop())
+                    if lookup_pointer(name) != -1:
+                        stack_push(lookup_pointer(name), TYPE_POINTER)
+                    else:
+                        stack_push(-1, TYPE_POINTER)
+                else:
+                    offset = size
+            elif opcode == BC_FUNCTION_HIDE:
+                if check_depth(slice, offset, 1):
+                    name = slice_to_string(stack_pop())
+                    if lookup_pointer(name) != -1:
+                        remove_name(name)
+                else:
+                    offset = size
+            elif opcode == BC_FUNCTION_NAME:
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    stack_push(string_to_slice(pointer_to_name(a)), TYPE_STRING)
+                else:
+                    offset = size
+            elif opcode == BC_STRING_SEEK:
+                if check_depth(slice, offset, 2):
+                    a = slice_to_string(stack_pop())
+                    b = slice_to_string(stack_pop())
+                    stack_push(b.find(a), TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_SLICE_SUBSLICE:
+                if check_depth(slice, offset, 3):
+                    a = int(stack_pop())
+                    b = int(stack_pop())
+                    s = int(stack_pop())
+                    c = p_slices[s]
+                    d = c[b:a]
+                    dt = p_types[s]
+                    dt = dt[b:a]
+                    e = request_slice()
+                    i = 0
+                    while i < len(d):
+                        store(d[i], e, i, dt[i])
+                        i = i + 1
+                    stack_push(e, TYPE_POINTER)
+                else:
+                    offset = size
+            elif opcode == BC_STRING_NUMERIC:
+                if check_depth(slice, offset, 1):
+                    a = slice_to_string(stack_pop())
+                    if is_number(a):
+                        stack_push(-1, TYPE_FLAG)
+                    else:
+                        stack_push(0, TYPE_FLAG)
+                else:
+                    offset = size
+            elif opcode == BC_SLICE_REVERSE:
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    p_slices[int(a)] = p_slices[int(a)][::-1]
+                    stack_push(a, TYPE_POINTER)
+                else:
+                    offset = size
+            elif opcode == BC_TO_UPPER:
+                if check_depth(slice, offset, 1):
+                    t = stack_type()
+                    if t == TYPE_STRING:
+                        ptr = stack_pop()
+                        a = slice_to_string(ptr).upper()
+                        stack_push(string_to_slice(a), TYPE_STRING)
+                    elif t == TYPE_CHARACTER:
+                        a = stack_pop()
+                        b = ''.join(unichr(a))
+                        a = b.upper()
+                        stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
+                    else:
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
+                else:
+                    offset = size
+            elif opcode == BC_TO_LOWER:
+                if check_depth(slice, offset, 1):
+                    t = stack_type()
+                    if t == TYPE_STRING:
+                        ptr = stack_pop()
+                        a = slice_to_string(ptr).lower()
+                        stack_push(string_to_slice(a), TYPE_STRING)
+                    elif t == TYPE_CHARACTER:
+                        a = stack_pop()
+                        b = ''.join(unichr(a))
+                        a = b.lower()
+                        stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
+                    else:
+                        details = 'Slice ' + str(slice)
+                        details = details + ' Offset: ' + str(offset)
+                        report('E02: Type mismatch: ' + details)
+                else:
+                    offset = size
+            elif opcode == BC_REPORT:
+                if check_depth(slice, offset, 1):
+                    if stack_type() == TYPE_STRING:
+                        a = slice_to_string(stack_pop())
+                        report(a)
+                offset = size
+            elif opcode == BC_TRIG_SIN:
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    stack_push(math.sin(a), TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_TRIG_COS:
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    stack_push(math.cos(a), TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_TRIG_TAN:
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    stack_push(math.tan(a), TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_TRIG_ASIN:
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    stack_push(math.asin(a), TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_TRIG_ACOS:
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    stack_push(math.acos(a), TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_TRIG_ATAN:
+                if check_depth(slice, offset, 1):
+                    a = stack_pop()
+                    stack_push(math.atan(a), TYPE_NUMBER)
+                else:
+                    offset = size
+            elif opcode == BC_TRIG_ATAN2:
+                if check_depth(slice, offset, 2):
+                    a = stack_pop()
+                    b = stack_pop()
+                    stack_push(math.atan2(b, a), TYPE_NUMBER)
+                else:
+                    offset = size
+            if more is not None:
+                offset = more(slice, offset, opcode)
+
+        offset += 1
+    current_slice = 0
+
+
+#
+# Data stack implementation
+#
+
+stack = []
+types = []
+
+
+def stack_clear():
+    """remove all values from the stack"""
+    global stack, types
+    i = 0
+    while i < len(stack):
+        stack.pop()
+        types.pop()
+
+
+def stack_push(value, type):
+    """push a value to the stack"""
+    global stack, types
+    stack.append(value)
+    types.append(type)
+
+
+def stack_drop():
+    """remove a value from the stack"""
+    global stack, types
+    stack.pop()
+    types.pop()
+
+
+def stack_pop():
+    """remove and return a value from the stack"""
+    global stack, types
+    types.pop()
+    return stack.pop()
+
+
+def tos():
+    """return a pointer to the top element in the stack"""
+    global stack, types
+    return len(stack) - 1
+
+
+def stack_tos():
+    """return the top element on the stack"""
+    global stack, types
+    return stack[tos()]
+
+
+def stack_type():
+    """return the type identifier for the top item on the stack"""
+    global stack, types
+    return types[tos()]
+
+
+def stack_swap():
+    """switch the positions of the top items on the stack"""
+    at = stack_type()
+    av = stack_pop()
+    bt = stack_type()
+    bv = stack_pop()
+    stack_push(av, at)
+    stack_push(bv, bt)
+
+
+def stack_dup():
+    """duplicate the top item on the stack"""
+    """if the value is a string, makes a copy of it"""
+    at = stack_type()
+    av = stack_pop()
+    stack_push(av, at)
+    if at == TYPE_STRING:
+        s = request_slice()
+        copy_slice(av, s)
+        stack_push(s, at)
+    else:
+        stack_push(av, at)
+
+
+def stack_over():
+    """put a copy of the second item on the stack over the top item"""
+    """if the value is a string, makes a copy of it"""
+    at = stack_type()
+    av = stack_pop()
+    bt = stack_type()
+    bv = stack_pop()
+    stack_push(bv, bt)
+    stack_push(av, at)
+    if bt == TYPE_STRING:
+        s = request_slice()
+        copy_slice(bv, s)
+        stack_push(s, bt)
+    else:
+        stack_push(bv, bt)
+
+
+def stack_tuck():
+    """put a copy of the top item under the second item"""
+    """if the value is a string, makes a copy of it"""
+    stack_swap()
+    stack_over()
+
+
+def stack_change_type(type):
+    """convert the type of an item on the stack to a different type"""
+    global types, stack
+    if type == TYPE_BYTECODE:
+        if stack_type() == TYPE_NUMBER:
+            a = stack_pop()
+            stack_push(a, TYPE_BYTECODE)
+    elif type == TYPE_NUMBER:
+        if stack_type() == TYPE_STRING:
+            if is_number(slice_to_string(stack_tos())):
+                stack_push(float(slice_to_string(stack_pop())), TYPE_NUMBER)
+            else:
+                stack_pop()
+                stack_push(float('nan'), TYPE_NUMBER)
+        else:
+            types.pop()
+            types.append(TYPE_NUMBER)
+    elif type == TYPE_STRING:
+        if stack_type() == TYPE_NUMBER:
+            stack_push(string_to_slice(unicode(stack_pop())), TYPE_STRING)
+        elif stack_type() == TYPE_CHARACTER:
+            a = stack_pop()
+            stack_push(string_to_slice(''.join(unichr(a))), TYPE_STRING)
+        elif stack_type() == TYPE_FLAG:
+            s = stack_pop()
+            if s == -1:
+                stack_push(string_to_slice('true'), TYPE_STRING)
+            elif s == 0:
+                stack_push(string_to_slice('false'), TYPE_STRING)
+            else:
+                stack_push(string_to_slice('malformed flag'), TYPE_STRING)
+        elif stack_type() == TYPE_POINTER:
+            types.pop()
+            types.append(TYPE_STRING)
+        else:
+            return 0
+    elif type == TYPE_CHARACTER:
+        if stack_type() == TYPE_STRING:
+            s = slice_to_string(stack_pop())
+            stack_push(ord(s[0].encode('utf-8')), TYPE_CHARACTER)
+        else:
+            s = stack_pop()
+            stack_push(int(s), TYPE_CHARACTER)
+    elif type == TYPE_POINTER:
+        types.pop()
+        types.append(TYPE_POINTER)
+    elif type == TYPE_FLAG:
+        if stack_type() == TYPE_STRING:
+            s = slice_to_string(stack_pop())
+            if s == 'true':
+                stack_push(-1, TYPE_FLAG)
+            elif s == 'false':
+                stack_push(0, TYPE_FLAG)
+            else:
+                stack_push(1, TYPE_FLAG)
+        else:
+            s = stack_pop()
+            stack_push(s, TYPE_FLAG)
+    elif type == TYPE_FUNCTION_CALL:
+        if stack_type() == TYPE_NUMBER or stack_type() == TYPE_POINTER:
+            a = stack_pop()
+            stack_push(a, TYPE_FUNCTION_CALL)
+    else:
+        return
+
+
+#
+# Parable's dictionary consists of two related arrays.
+# The first contains the names. The second contains pointers
+# to the slices for each named item.
+#
+
+dictionary_names = []
+dictionary_slices = []
+
+
+def in_dictionary(s):
+    global dictionary_names, dictionary_slices
+    return s in dictionary_names
+
+
+def lookup_pointer(name):
+    global dictionary_names, dictionary_slices
+    name = name.lower()
+    if in_dictionary(name) is False:
+        return -1
+    else:
+        return dictionary_slices[dictionary_names.index(name)]
+
+
+def add_definition(name, slice):
+    global dictionary_names, dictionary_slices
+    name = name.lower()
+    if in_dictionary(name) is False:
+        dictionary_names.append(name)
+        dictionary_slices.append(slice)
+    else:
+        target = dictionary_slices[dictionary_names.index(name)]
+        copy_slice(slice, target)
+    return dictionary_names.index(name)
+
+
+def remove_name(name):
+    global dictionary_names, dictionary_slices
+    name = name.lower()
+    if in_dictionary(name) is not False:
+        i = dictionary_names.index(name)
+        del dictionary_names[i]
+        del dictionary_slices[i]
+
+
+#
+# in parable, memory is divided into regions called slices
+# compiled code, strings, and other data are stored in these.
+# each slice can contain up to SLICE_LEN values
+#
+
+p_slices = []
+p_types = []
+p_map = []
+p_sizes = []
+
+
+def request_slice(attempts=1):
+    """request a new memory slice"""
+    global p_slices, p_types, p_map, p_sizes, MAX_SLICES
+    i = 0
+    while i < MAX_SLICES:
+        if p_map[i] == 0:
+            p_map[i] = 1
+            p_slices[i] = [0]
+            p_types[i] = [TYPE_NUMBER]
+            p_sizes[i] = 0
+            return i
+        else:
+            i += 1
+    if attempts == 1:
+        collect_garbage()
+        return request_slice(2)
+    else:
+        return -1
+
+
+def release_slice(slice):
+    """release a slice. the slice should not be used after this is done"""
+    global p_map
+    p_map[int(slice)] = 0
+
+
+def copy_slice(source, dest):
+    """copy the contents of one slice to another"""
+    global p_slices, p_map, p_sizes
+    i = 0
+    l = p_sizes[int(source)]
+    while i <= l:
+        v = fetch(int(source), i)
+        t = fetch_type(int(source), i)
+        store(v, int(dest), i, t)
+        i += 1
+    p_sizes[int(dest)] = p_sizes[int(source)]
+
+
+def prepare_slices():
+    """prepare the initial set of slices for use"""
+    global p_slices, p_types, p_map, p_sizes, MAX_SLICES
+    p_map = [0 for x in range(MAX_SLICES)]
+    p_slices = [0 for x in range(MAX_SLICES)]
+    p_types = [0 for x in range(MAX_SLICES)]
+    p_sizes = [0 for x in range(MAX_SLICES)]
+
+
+def fetch(slice, offset):
+    """obtain a value stored in a slice"""
+    global p_slices, p_map
+    if get_last_index(slice) < offset:
+        set_slice_last_index(slice, offset)
+    return p_slices[int(slice)][int(offset)]
+
+
+def fetch_type(slice, offset):
+    """obtain a value stored in a slice"""
+    global p_types, p_map
+    if get_last_index(slice) < offset:
+        set_slice_last_index(slice, offset)
+    return p_types[int(slice)][int(offset)]
+
+
+def store_type(slice, offset, type):
+    global p_slices, p_types, p_map
+    if get_last_index(slice) < offset:
+        set_slice_last_index(slice, offset)
+    p_types[int(slice)][int(offset)] = type
+
+
+def store(value, slice, offset, type=100):
+    """store a value into a slice"""
+    global p_slices, p_types, p_map
+    if get_last_index(slice) < offset:
+        set_slice_last_index(slice, offset)
+    p_slices[int(slice)][int(offset)] = value
+    p_types[int(slice)][int(offset)] = type
+
+
+def get_last_index(slice):
+    """get the length of a slice"""
+    global p_sizes
+    return p_sizes[int(slice)]
+
+
+def set_slice_last_index(slice, size):
+    """set the length of a slice"""
+    global p_slices, p_types, p_sizes
+    old_size = p_sizes[int(slice)]
+    grow_by = size - old_size
+    if grow_by > 0:
+        p_slices[int(slice)].extend(range(int(grow_by)))
+        p_types[int(slice)].extend(range(int(grow_by)))
+    if grow_by < 0:
+        while grow_by < 0:
+            grow_by = grow_by + 1
+            del p_slices[int(slice)][-1]
+            del p_types[int(slice)][-1]
+    p_sizes[int(slice)] = size
+
+
+def string_to_slice(string):
+    """convert a string into a slice"""
+    s = request_slice()
+    i = 0
+    for char in list(string):
+        store(ord(char.encode('utf-8')), s, i, TYPE_CHARACTER)
+        i += 1
+    return s
+
+
+def slice_to_string(slice):
+    """convert a slice into a string"""
+    s = []
+    i = 0
+    size = get_last_index(int(slice))
+    while i <= size:
+        s.append(unichr(int(fetch(slice, i))))
+        i += 1
+    return ''.join(s)
+
+
+#
+# unused slices can be reclaimed either manually using release_slice(),
+# or parable can attempt to identify them and reclaim them automatically.
+# the code here implements the garbage collector.
+#
+
+def find_references(s):
+    """given a slice, return a list of all references in it"""
+    ptrs = []
+    i = 0
+    if s < 0:
+        return []
+    if get_last_index(s) == 0:
+        type = fetch_type(s, 0)
+        if type == TYPE_POINTER or type == TYPE_STRING or type == TYPE_COMMENT or type == TYPE_FUNCTION_CALL:
+            ptrs.append(int(fetch(s, 0)))
+        if type == TYPE_POINTER or type == TYPE_FUNCTION_CALL:
+            for xt in find_references(int(fetch(s, 0))):
+                ptrs.append(int(xt))
+    else:
+        while i < get_last_index(s):
+            type = fetch_type(s, i)
+            if type == TYPE_POINTER or type == TYPE_STRING or type == TYPE_COMMENT or type == TYPE_FUNCTION_CALL:
+                ptrs.append(int(fetch(s, i)))
+            if type == TYPE_POINTER or type == TYPE_FUNCTION_CALL:
+                for xt in find_references(int(fetch(s, i))):
+                    ptrs.append(int(xt))
+            i += 1
+    return list(set(ptrs))
+
+
+def seek_all_references():
+    """return a list of all references in all named slices and stack items"""
+    global dictionary_slices, stack, types, current_slice
+    refs = []
+    for s in dictionary_slices:
+        refs.append(s)
+        for x in find_references(s):
+            refs.append(x)
+    for x in find_references(current_slice):
+        refs.append(x)
+    i = tos()
+    while i > 0:
+        if types[i] == TYPE_STRING or types[i] == TYPE_COMMENT or types[i] == TYPE_POINTER or types[i] == TYPE_FUNCTION_CALL:
+            refs.append(stack[i])
+            for x in find_references(stack[i]):
+                refs.append(x)
+        i -= 1
+    return list(set(refs))
+
+
+def collect_garbage():
+    """scan memory, and collect unused slices"""
+    global MAX_SLICES, p_map
+    i = 0
+    refs = seek_all_references()
+    while i < MAX_SLICES:
+        if p_map[i] == 1:
+            try:
+                x = refs.index(i)
+            except:
+                if i > 0:
+                    release_slice(i)
+        i += 1
+
+
+#
+# the compiler is pretty trivial.
+# we take a string, break it into tokens, then lay down bytecode based on
+# single character prefixes.
+#
+# #  Numbers
+# $  Characters
+# &  Pointers
+# `  Bytecodes
+# '  Strings
+# "  Comments
+#
+# the bytecode forms are kept simple:
+#
+# type           stored         type
+# ==========     ============================
+# Functions      pointer        function call
+# Strings        pointer        string
+# Numbers        VALUE          number
+# Characters     ASCII_VALUE    character
+# Pointers       pointer        pointer
+# Bytecodes      bytecode       bytecode
+# Comments       pointer        comment
+#
+# for two functions ([ and ]), new quotes are started or closed. These are
+# the only case where the corresponding action is run automatically rather
+# than being compiled.
+#
+# bytecodes get wrapped into named functions. At this point they are not
+# inlined. This hurts performance, but makes the implementation much simpler.
+#
+
+# The compile_ functions take a parameter, a slice, and the current offset
+# in that slice. They lay down the appropriate byte codes for the type of
+# item they are compiling. When done, they return the new offset.
+
+
+def compile_string(string, slice, offset):
+    store(string_to_slice(string), slice, offset, TYPE_STRING)
+    offset += 1
+    return offset
+
+
+def compile_comment(string, slice, offset):
+    store(string_to_slice(string), slice, offset, TYPE_COMMENT)
+    offset += 1
+    return offset
+
+
+def compile_character(character, slice, offset):
+    store(character, slice, offset, TYPE_CHARACTER)
+    offset += 1
+    return offset
+
+
+def compile_pointer(name, slice, offset):
+    if is_number(name):
+        store(float(name), slice, offset, TYPE_POINTER)
+    else:
+        if lookup_pointer(name) != -1:
+            store(lookup_pointer(name), slice, offset, TYPE_POINTER)
+        else:
+            store(0, slice, offset, TYPE_POINTER)
+            report('E03: Compile Error: Unable to map ' + name + ' to a pointer')
+    offset += 1
+    return offset
+
+
+def compile_number(number, slice, offset):
+    if is_number(number):
+        store(float(number), slice, offset, TYPE_NUMBER)
+    else:
+        store(float('nan'), slice, offset, TYPE_NUMBER)
+        report("E03: Compile Error: Unable to convert " + number + " to a number")
+    offset += 1
+    return offset
+
+
+def compile_bytecode(bytecode, slice, offset):
+    store(float(bytecode), slice, offset, TYPE_BYTECODE)
+    offset += 1
+    return offset
+
+
+def compile_function_call(name, slice, offset):
+    if lookup_pointer(name) != -1:
+        store(lookup_pointer(name), slice, offset, TYPE_FUNCTION_CALL)
+        offset += 1
+    else:
+        report('E03: Compile Error: Unable to map ' + name + ' to a pointer')
+    return offset
+
+
+def parse_string(tokens, i, count, delimiter):
+    s = ""
+    a = tokens[i].endswith(delimiter)
+    b = tokens[i] != delimiter
+    c = tokens[i].endswith("\\" + delimiter)
+    if (a and b and not c):
+        s = tokens[i]
+    else:
+        j = i + 1
+        s = tokens[i]
+        while j < count:
+            s += " "
+            s += tokens[j]
+            a = tokens[j].endswith(delimiter)
+            b = tokens[j].endswith("\\" + delimiter)
+            if (a and not b):
+                i = j
+                j = count
+            j += 1
+    return i, s.replace("\\", "")
+
+
+def compile(str, slice):
+    nest = []
+    cleaned = ' '.join(str.split())
+    tokens = cleaned.split(' ')
+    count = len(tokens)
+    i = 0
+    offset = 0
+    while i < count:
+        s = ""
+        if (tokens[i].startswith('"') or tokens[i] == '"'):
+            i, s = parse_string(tokens, i, count, '"')
+            offset = compile_comment(s[1:-1], slice, offset)
+        elif (tokens[i].startswith('\'') or tokens[i] == '\''):
+            i, s = parse_string(tokens, i, count, '\'')
+            offset = compile_string(s[1:-1], slice, offset)
+        elif tokens[i].startswith("$"):
+            v = ord(tokens[i][1:].encode('utf-8'))
+            offset = compile_character(v, slice, offset)
+        elif tokens[i].startswith("&"):
+            offset = compile_pointer(tokens[i][1:], slice, offset)
+        elif tokens[i].startswith("#"):
+            offset = compile_number(tokens[i][1:], slice, offset)
+        elif tokens[i].startswith("`"):
+            offset = compile_bytecode(tokens[i][1:], slice, offset)
+        elif tokens[i] == "[":
+            nest.append(slice)
+            nest.append(offset)
+            slice = request_slice()
+            offset = 0
+        elif tokens[i] == "]":
+            old = slice
+            if offset == 0:
+                store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
+            offset = nest.pop()
+            slice = nest.pop()
+            store(old, slice, offset, TYPE_POINTER)
+            offset += 1
+        else:
+            if is_number(tokens[i]):
+                offset = compile_number(tokens[i], slice, offset)
+            else:
+                offset = compile_function_call(tokens[i], slice, offset)
+        i += 1
+        if offset == 0:
+            store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
+    return slice
+
+
+def parse_bootstrap(f):
+    """compile the bootstrap package it into memory"""
+    f = condense_lines(f)
+    for line in f:
+        if len(line) > 0:
+            interpret(compile(line, request_slice()))
+
+
+#
+# some parts of the language (prefixes, brackets) are understood as part of
+# the parser. but one important bit, the ability to give a name to an item,
+# is not. this routine sets up an initial dictionary containing the *define*
+# function. with this loaded, all else can be built.
+#
+
+def prepare_dictionary():
+    """setup the initial dictionary"""
+    s = request_slice()
+    store(BC_QUOTE_NAME, s, 0, TYPE_BYTECODE)
+    add_definition('define', s)
+
+
+def pointer_to_name(ptr):
+    """given a parable pointer, return the corresponding name, or"""
+    """an empty string"""
+    global dictionary_names, dictionary_slices
+    s = ""
+    if ptr in dictionary_slices:
+        s = dictionary_names[dictionary_slices.index(ptr)]
+    return s
+stdlib = []
+stdlib.append(""" "Name the byte codes" """)
+stdlib.append(""" [ "v-b"    `100 ] ':b' define """)
+stdlib.append(""" [ "v-n"    `101 ] ':n' define """)
+stdlib.append(""" [ "v-s"    `102 ] ':s' define """)
+stdlib.append(""" [ "v-c"    `103 ] ':c' define """)
+stdlib.append(""" [ "v-p"    `104 ] ':p' define """)
+stdlib.append(""" [ "v-f"    `105 ] ':f' define """)
+stdlib.append(""" [ "v-f"    `106 ] ':call' define """)
+stdlib.append(""" [ "vt-v"   `109 ] 'set-type' define """)
+stdlib.append(""" [ "v-vn"   `110 ] 'type?' define """)
+stdlib.append(""" [ "nn-n"   `200 ] '+' define """)
+stdlib.append(""" [ "nn-n"   `201 ] '-' define """)
+stdlib.append(""" [ "nn-n"   `202 ] '*' define """)
+stdlib.append(""" [ "nn-n"   `203 ] '/' define """)
+stdlib.append(""" [ "nn-n"   `204 ] 'rem' define """)
+stdlib.append(""" [ "n-n"    `205 ] 'floor' define """)
+stdlib.append(""" [ "nn-n"   `206 ] '^' define """)
+stdlib.append(""" [ "n-n"    `207 ] 'log' define """)
+stdlib.append(""" [ "n-n"    `208 ] 'log10' define """)
+stdlib.append(""" [ "nn-n"   `209 ] 'log<n>' define """)
+stdlib.append(""" [ "nn-n"   `210 ] 'shift' define """)
+stdlib.append(""" [ "nn-n"   `211 ] 'and' define """)
+stdlib.append(""" [ "nn-n"   `212 ] 'or' define """)
+stdlib.append(""" [ "nn-n"   `213 ] 'xor' define """)
+stdlib.append(""" [ "-n"     `214 ] 'random' define """)
+stdlib.append(""" [ "n-n"    `215 ] 'sqrt' define """)
+stdlib.append(""" [ "nn-f"   `220 ] 'lt?' define """)
+stdlib.append(""" [ "nn-f"   `221 ] 'gt?' define """)
+stdlib.append(""" [ "nn-f"   `222 ] 'lteq?' define """)
+stdlib.append(""" [ "nn-f"   `223 ] 'gteq?' define """)
+stdlib.append(""" [ "vv-f"   `224 ] 'eq?' define """)
+stdlib.append(""" [ "vv-f"   `225 ] '-eq?' define """)
+stdlib.append(""" [ "fpp-"   `300 ] 'if' define """)
+stdlib.append(""" [ "p-"     `301 ] 'while' define """)
+stdlib.append(""" [ "p-"     `302 ] 'until' define """)
+stdlib.append(""" [ "np-"    `303 ] 'times' define """)
+stdlib.append(""" [ "p-"     `305 ] 'invoke' define """)
+stdlib.append(""" [ "vp-v"   `306 ] 'dip' define """)
+stdlib.append(""" [ "vp-v"   `307 ] 'sip' define """)
+stdlib.append(""" [ "vpp-?"  `308 ] 'bi' define """)
+stdlib.append(""" [ "vppp-?" `309 ] 'tri' define """)
+stdlib.append(""" [ "pp-"    `400 ] 'copy' define """)
+stdlib.append(""" [ "pn-v"   `401 ] 'fetch' define """)
+stdlib.append(""" [ "vpn-"   `402 ] 'store' define """)
+stdlib.append(""" [ "-p"     `403 ] 'request' define """)
+stdlib.append(""" [ "p-"     `404 ] 'release' define """)
+stdlib.append(""" [ "-"      `405 ] 'collect-garbage' define """)
+stdlib.append(""" [ "p-n"    `406 ] 'get-last-index' define """)
+stdlib.append(""" [ "np-"    `407 ] 'set-last-index' define """)
+stdlib.append(""" [ "tpn-"   `408 ] 'set-stored-type' define """)
+stdlib.append(""" [ "pn-n"   `409 ] 'get-stored-type' define """)
+stdlib.append(""" [ "v-vv"   `500 ] 'dup' define """)
+stdlib.append(""" [ "v-"     `501 ] 'drop' define """)
+stdlib.append(""" [ "vV-Vv"  `502 ] 'swap' define """)
+stdlib.append(""" [ "vV-vVv" `503 ] 'over' define """)
+stdlib.append(""" [ "vV-VvV" `504 ] 'tuck' define """)
+stdlib.append(""" [ "vV-V"   `505 ] 'nip' define """)
+stdlib.append(""" [ "-n"     `506 ] 'depth' define """)
+stdlib.append(""" [ "...-"   `507 ] 'reset' define """)
+stdlib.append(""" [ "s-f"    `601 ] 'function-exists?' define """)
+stdlib.append(""" [ "s-p"    `602 ] 'lookup-function' define """)
+stdlib.append(""" [ "s-"     `603 ] 'hide-function' define """)
+stdlib.append(""" [ "p-s"    `604 ] 'lookup-name' define """)
+stdlib.append(""" [ "ss-n"   `700 ] 'find' define """)
+stdlib.append(""" [ "pnn-p"  `701 ] 'subslice' define """)
+stdlib.append(""" [ "s-f"    `702 ] 'numeric?' define """)
+stdlib.append(""" [ "p-p"    `703 ] 'reverse' define """)
+stdlib.append(""" [ "v-v"    `800 ] 'to-lowercase' define """)
+stdlib.append(""" [ "v-v"    `801 ] 'to-uppercase' define """)
+stdlib.append(""" [ "s-"     `900 ] 'report-error' define """)
+stdlib.append(""" [ "n-n"    `1000 ] 'sin' define """)
+stdlib.append(""" [ "n-n"    `1001 ] 'cos' define """)
+stdlib.append(""" [ "n-n"    `1002 ] 'tan' define """)
+stdlib.append(""" [ "n-n"    `1003 ] 'asin' define """)
+stdlib.append(""" [ "n-n"    `1004 ] 'acos' define """)
+stdlib.append(""" [ "n-n"    `1005 ] 'atan' define """)
+stdlib.append(""" [ "n-n"    `1006 ] 'atan2' define """)
+stdlib.append(""" "Symbolic names for data types" """)
+stdlib.append(""" [ "-n"  100 ] 'NUMBER' define """)
+stdlib.append(""" [ "-n"  200 ] 'STRING' define """)
+stdlib.append(""" [ "-n"  300 ] 'CHARACTER' define """)
+stdlib.append(""" [ "-n"  400 ] 'POINTER' define """)
+stdlib.append(""" [ "-n"  500 ] 'FLAG' define """)
+stdlib.append(""" [ "-n"  600 ] 'BYTECODE' define """)
+stdlib.append(""" [ "-n"  700 ] 'COMMENT' define """)
+stdlib.append(""" [ "-n"  800 ] 'FUNCTION-CALL' define """)
+stdlib.append(""" [ "v-c" COMMENT set-type ] ':comment' define """)
+stdlib.append(""" "Stack Flow" """)
+stdlib.append(""" [ "vV-vVvV"  over over ] 'dup-pair' define """)
+stdlib.append(""" [ "vv-"      drop drop ] 'drop-pair' define """)
+stdlib.append(""" [ "?n-"      [ drop ] times ] 'drop-multiple' define """)
+stdlib.append(""" [ "q-...n"   depth [ invoke ] dip depth swap - ] 'invoke<depth?>' define """)
+stdlib.append(""" "Slice Functions" """)
+stdlib.append(""" [ "p-pn"  dup get-last-index ] 'last-index?' define """)
+stdlib.append(""" [ "p-pn"  last-index? 1 + ] 'slice-length?' define """)
+stdlib.append(""" [ "np-"   [ get-last-index + ] sip set-last-index ] 'adjust-slice-length' define """)
+stdlib.append(""" [ "p-p"   request [ copy ] sip ] 'duplicate-slice' define """)
+stdlib.append(""" [ "p-n"   get-last-index 1 + ] 'length?' define """)
+stdlib.append(""" "Simple variables are just named slices, with functions to access the first element. They're useful for holding single values." """)
+stdlib.append(""" [ "s-"   request swap define ] 'variable' define """)
+stdlib.append(""" [ "p-v"  0 fetch ] '@' define """)
+stdlib.append(""" [ "vp-"  0 store ] '!' define """)
+stdlib.append(""" [ "vs-"  request [ swap define ] sip 0 store ] 'variable!' define """)
+stdlib.append(""" [ "p-"   0 swap ! ] 'off' define """)
+stdlib.append(""" [ "p-"   -1 swap ! ] 'on' define """)
+stdlib.append(""" [ "p-"   [ @ 1 + ] sip ! ] 'increment' define """)
+stdlib.append(""" [ "p-"   [ @ 1 - ] sip ! ] 'decrement' define """)
+stdlib.append(""" [ "p-"   request swap copy ] 'zero-out' define """)
+stdlib.append(""" [ "pp-"  swap request dup-pair copy swap [ [ invoke ] dip ] dip copy ] 'preserve' define """)
+stdlib.append(""" "Number functions" """)
+stdlib.append(""" [ "nn-n"  over over lt? [ nip ] [ drop ] if ] 'max' define """)
+stdlib.append(""" [ "nn-n"  over over gt? [ nip ] [ drop ] if ] 'min' define """)
+stdlib.append(""" [ "n-n"  dup -1 * max ] 'abs' define """)
+stdlib.append(""" "The basic bi/tri combinators provided as part of the primitives allow application of multiple quotes to a single data element. Here we add new forms that are very useful." """)
+stdlib.append(""" "We consider the bi/tri variants to consist of one of three types." """)
+stdlib.append(""" "Cleave combinators (bi, tri) apply multiple quotations to a single value (or set of values)." """)
+stdlib.append(""" "Spread combinators (bi*, tri*) apply multiple quotations to multiple values." """)
+stdlib.append(""" [ "vvpp-?"   [ dip ] dip invoke ] 'bi*' define """)
+stdlib.append(""" [ "vvvppp-?" [ [ swap [ dip ] dip ] dip dip ] dip invoke ] 'tri*' define """)
+stdlib.append(""" "Apply combinators (bi@, tri@) apply a single quotation to multiple values." """)
+stdlib.append(""" [ "vvp-?"    dup bi* ] 'bi@' define """)
+stdlib.append(""" [ "vvvp-?"   dup dup tri* ] 'tri@' define """)
+stdlib.append(""" "Expand the basic conditionals into a more useful set." """)
+stdlib.append(""" [ "-f"   -1 :f ] 'true' define """)
+stdlib.append(""" [ "-f"   0  :f ] 'false' define """)
+stdlib.append(""" [ "f-f"  :f :n -1 xor :f ] 'not' define """)
+stdlib.append(""" [ "fp-"  [ ] if ] 'if-true' define """)
+stdlib.append(""" [ "fp-"  [ ] swap if ] 'if-false' define """)
+stdlib.append(""" [ "v-f"  :s 'nan' eq? ] 'nan?' define """)
+stdlib.append(""" [ "v-f"  0 eq? ] 'zero?' define """)
+stdlib.append(""" [ "v-f"  :f :n zero? not ] 'true?' define """)
+stdlib.append(""" [ "v-f"  :f :n zero? ] 'false?' define """)
+stdlib.append(""" [ "n-f"  2 rem zero? ] 'even?' define """)
+stdlib.append(""" [ "n-f"  2 rem zero? not ] 'odd?' define """)
+stdlib.append(""" [ "n-f"  0 lt? ] 'negative?' define """)
+stdlib.append(""" [ "n-f"  0 gteq? ] 'positive?' define """)
+stdlib.append(""" [ "cp-"  [ type? CHARACTER eq? ] dip if-true ] 'if-character' define """)
+stdlib.append(""" [ "sp-"  [ type? STRING eq? ] dip if-true ] 'if-string' define """)
+stdlib.append(""" [ "np-"  [ type? NUMBER eq? ] dip if-true ] 'if-number' define """)
+stdlib.append(""" [ "pp-"  [ type? POINTER eq? ] dip if-true ] 'if-pointer' define """)
+stdlib.append(""" [ "fp-"  [ type? FLAG eq? ] dip if-true ] 'if-flag' define """)
+stdlib.append(""" [ "nnn-f"  [ [ :n ] bi@ ] dip :n dup-pair gt? [ swap ] if-true [ over ] dip lteq? [ gteq? ] dip and :f ] 'between?' define """)
+stdlib.append(""" [ "vv-vvf"  [ type? ] dip type? swap [ eq? ] dip swap ] 'types-match?' define """)
+stdlib.append(""" "numeric ranges" """)
+stdlib.append(""" [ "nn-..."  dup-pair lt? [ [ [ dup 1 + ] dip dup-pair eq? ] until ] [ [ [ dup 1 - ] dip dup-pair eq? ] until ] if drop ] 'expand-range' define """)
+stdlib.append(""" [ "...n-n"  1 - [ + ] times ] 'sum-range' define """)
+stdlib.append(""" "Misc" """)
+stdlib.append(""" [ "p-"   invoke<depth?> [ hide-function ] times ] 'hide-functions' define """)
+stdlib.append(""" [ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap define ] [ drop ] if ] 'rename-function' define """)
+stdlib.append(""" [ "ps-"  dup hide-function define ] 'redefine' define """)
+stdlib.append(""" [ "p-"   invoke<depth?> [ variable ] times ] 'variables' define """)
+stdlib.append(""" "String and Character" """)
+stdlib.append(""" "Note that this is only supporting the basic ASCII character set presently." """)
+stdlib.append(""" [ "vs-f" swap :s find not true? ] 'string-contains?' define """)
+stdlib.append(""" [ "v-f"  :c $0 $9 between? ] 'digit?' define """)
+stdlib.append(""" [ "v-f"  '`~!@#$%^&*()'"<>,.:;[]{}\|-_=+'                    string-contains? ] 'symbol?' define """)
+stdlib.append(""" [ "v-f"  to-lowercase 'abcdefghijklmnopqrstuvwxyz'           string-contains? ] 'letter?' define """)
+stdlib.append(""" [ "v-f"  to-lowercase 'abcdefghijklmnopqrstuvwxyz1234567890' string-contains? ] 'alphanumeric?' define """)
+stdlib.append(""" [ "v-f"  to-lowercase 'bcdfghjklmnpqrstvwxyz'                string-contains? ] 'consonant?' define """)
+stdlib.append(""" [ "v-f"  to-lowercase 'aeiou'                                string-contains? ] 'vowel?' define """)
+stdlib.append(""" [ "v-f"  dup to-lowercase eq? ] 'lowercase?' define """)
+stdlib.append(""" [ "v-f"  dup to-uppercase eq? ] 'uppercase?' define """)
+stdlib.append(""" [ "p-s"  invoke<depth?> 1 - [ [ :s ] bi@ + ] times ] 'build-string' define """)
+stdlib.append(""" "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive." """)
+stdlib.append(""" [ "s-s"  :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while 1 - [ last-index? ] dip swap subslice :s ] 'trim-left' define """)
+stdlib.append(""" [ ] 'trim-right' define """)
+stdlib.append(""" [ "s-s"  :s last-index? dup-pair 1 - fetch :n nip 32 eq? [ last-index? 1 - 0 swap subslice :s trim-right ] if-true ] 'trim-right' define """)
+stdlib.append(""" [ "s-s"  trim-left trim-right ] 'trim' define """)
+stdlib.append(""" "Slice as a linear buffer" """)
+stdlib.append(""" [ '*CURRENT-BUFFER'  '*BUFFER-OFFSET' ] variables """)
+stdlib.append(""" [ "-p"     &*CURRENT-BUFFER @ ] 'current-buffer' define """)
+stdlib.append(""" [ "-pn"    current-buffer &*BUFFER-OFFSET @ ] 'buffer-position' define """)
+stdlib.append(""" [ "-"      &*BUFFER-OFFSET increment ] 'buffer-advance' define """)
+stdlib.append(""" [ "-"      &*BUFFER-OFFSET decrement ] 'buffer-retreat' define """)
+stdlib.append(""" [ "n-"     buffer-position store ] 'buffer-store-current' define """)
+stdlib.append(""" [ "-n"     buffer-position fetch ] 'buffer-fetch-current' define """)
+stdlib.append(""" [ "v-"     buffer-position store buffer-advance ] 'buffer-store' define """)
+stdlib.append(""" [ "-n"     buffer-position fetch buffer-advance ] 'buffer-fetch' define """)
+stdlib.append(""" [ "v-"     buffer-retreat buffer-position store ] 'buffer-store-retreat' define """)
+stdlib.append(""" [ "-n"     buffer-retreat buffer-position fetch ] 'buffer-fetch-retreat' define """)
+stdlib.append(""" [ "p-"     &*CURRENT-BUFFER ! &*BUFFER-OFFSET zero-out ] 'set-buffer' define """)
+stdlib.append(""" [ "...n-"  [ buffer-store ] times ] 'buffer-store-items' define """)
+stdlib.append(""" [ "-"      request set-buffer ] 'new-buffer' define """)
+stdlib.append(""" [ "p-"     &*CURRENT-BUFFER @ [ &*BUFFER-OFFSET @ [ invoke ] dip &*BUFFER-OFFSET ! ] dip &*CURRENT-BUFFER ! ] 'preserve-buffer' define """)
+stdlib.append(""" [ "s-"     request [ swap define ] sip set-buffer ] 'named-buffer' define """)
+stdlib.append(""" "Programatic Creation of Quotes" """)
+stdlib.append(""" [ "vv-p"  swap request [ 0 store ] sip [ 1 store ] sip ] 'cons' define """)
+stdlib.append(""" [ "vp-p"  :call cons ] 'curry' define """)
+stdlib.append(""" "Values" """)
+stdlib.append(""" '_STATE' variable """)
+stdlib.append(""" [ "-"    &_STATE on ] 'to' define """)
+stdlib.append(""" [ "?p-"  &_STATE @ :f [ ! &_STATE off ] [ @ ] if ] '(value-handler)' define """)
+stdlib.append(""" [ "s-"   request [ (value-handler) ] curry swap define ] 'value' define """)
+stdlib.append(""" [ "ns-"  [ value ] sip to lookup-function invoke ] 'value!' define """)
+stdlib.append(""" [ "p-"   invoke<depth?> [ value ] times ] 'values' define """)
+stdlib.append(""" '_STATE' hide-function """)
+stdlib.append(""" "Arrays and Operations on Quotations" """)
+stdlib.append(""" [ "q-v"  @ ] 'first' define """)
+stdlib.append(""" [ "q-q"  1 over length? subslice ] 'rest' define """)
+stdlib.append(""" [ "p-v"  slice-length? 1 - fetch ] 'last' define """)
+stdlib.append(""" [ '*Found'  '*Value'  '*XT'  '*Source'  '*Target'  '*Offset' ] values """)
+stdlib.append(""" [ "q-"   &*Found [ &*Value [ &*XT [ &*Source [ &*Target [ &*Offset [ invoke ] preserve ] preserve ] preserve ] preserve ] preserve ] preserve ] 'localize' define """)
+stdlib.append(""" [ "vp-"    :p dup length? store ] 'push' define """)
+stdlib.append(""" [ "p-v"    :p [ dup get-last-index fetch ] sip dup length? 2 - swap set-last-index ] 'pop' define """)
+stdlib.append(""" [ "-p"     request [ pop drop ] sip ] 'request-empty' define """)
+stdlib.append(""" [ "pnp-n"  [ to *XT over length? [ over pop *XT invoke ] times nip ] localize ] 'reduce' define """)
+stdlib.append(""" [ "pp-?"   [ to *XT to *Source 0 to *Offset *Source length? [ *Source *Offset fetch *XT invoke *Offset 1 + to *Offset ] times ] localize ] 'for-each' define """)
+stdlib.append(""" [ "pv-f"   false to *Found to *Value dup length? 0 swap [ dup-pair fetch *Value types-match? [ eq? *Found or :f to *Found ] [ drop-pair ] if 1 + ] times drop-pair *Found ] 'contains?' define """)
+stdlib.append(""" [ "pq-p"   [ to *XT to *Source request-empty to *Target 0 to *Offset *Source length? [ *Source *Offset fetch *XT invoke [ *Source *Offset fetch *Target push ] if-true *Offset 1 + to *Offset ] times *Target ] localize ] 'filter' define """)
+stdlib.append(""" [ "pq-"    [ to *XT duplicate-slice to *Source 0 to *Offset *Source length? [ *Source *Offset fetch *XT invoke *Source *Offset store *Offset 1 + to *Offset ] times *Source ] localize ] 'map' define """)
+stdlib.append(""" [ "p-p"    [ request to *Target invoke<depth?> 0 max [ *Target push ] times *Target 1 over length? subslice :p ] localize ] 'capture-results' define """)
+stdlib.append(""" [ "pv-n"   [ to *Target to *Source 0 to *Offset -1 to *Found *Source length? [ *Source *Offset fetch *Target eq? [ *Offset to *Found ] if-true *Offset 1 + to *Offset ] times *Found ] localize ] 'index-of' define """)
+stdlib.append(""" [ '*Found'  '*Value'  '*XT'  '*Source'  '*Target'  '*Offset'  'localize' ] hide-functions """)
+stdlib.append(""" "Text Output Buffer" """)
+stdlib.append(""" '*TOB' variable """)
+stdlib.append(""" [ "v-"   &*TOB push ] '.' define """)
+stdlib.append(""" [ "-..." &*TOB get-last-index [ &*TOB pop ] times ] 'show-tob' define """)
+stdlib.append(""" [ "-"    0 &*TOB set-last-index ] 'clear-tob' define """)
+stdlib.append(""" "Scope" """)
+stdlib.append(""" '*Internals' value """)
+stdlib.append(""" [ "q-" to *Internals *Internals duplicate-slice   [ dup @ $* eq? [ value ] [ variable ] if ] for-each ] '{' define """)
+stdlib.append(""" [ "-"  *Internals hide-functions ] '}' define """)
+stdlib.append(""" "Hashing functions" """)
+stdlib.append(""" [ 'hash:sdbm<n>' ] { """)
+stdlib.append(""" 389 '*Hash-Prime' value! """)
+stdlib.append(""" [ "s-n" 0 swap [ :n xor ] for-each ] 'hash:xor' define """)
+stdlib.append(""" [ "s-n" 5381 swap [ over -5 shift + + ] for-each ] 'hash:djb2' define """)
+stdlib.append(""" [ :n over -6 shift + over -16 shift + swap - ] 'hash:sdbm<n>' define """)
+stdlib.append(""" [ "s-n" 0 swap [ :c swap hash:sdbm<n> ] for-each ] 'hash:sdbm' define """)
+stdlib.append(""" [ "s-b" hash:djb2 ] 'chosen-hash' define """)
+stdlib.append(""" [ "s-n" chosen-hash *Hash-Prime rem ] 'hash' define """)
+stdlib.append(""" } """)
+stdlib.append(""" [ '*Offset'  '*Tests'  '*Done' ] { """)
+stdlib.append(""" [ "q-" *Offset [ *Done [ *Tests [ to *Tests false to *Done 0 to *Offset [ *Tests *Offset fetch @ invoke [ true to *Done *Tests *Offset fetch 1 fetch invoke ] if-true *Offset 1 + to *Offset *Done ] until ] dip to *Tests ] dip to *Done ] dip to *Offset   ] 'when' define """)
+stdlib.append(""" } """)
+stdlib.append(""" [ '*Source'  '*Value'  '*Target'  'extract'  'next-piece' ] { """)
+stdlib.append(""" [ "n-"  [ *Source 0 ] dip subslice :s ] 'extract' define """)
+stdlib.append(""" [ "n-"  *Source swap *Value length? + over length? subslice :s to *Source ] 'next-piece' define """)
+stdlib.append(""" [ "ss-p" :s to *Value to *Source request-empty to *Target [ *Source *Value find dup -1 -eq? [ [ extract *Target push ] sip next-piece true ] [ drop *Source *Target push false ] if ] while *Target   ] 'split' define """)
+stdlib.append(""" [ "pv-s" :s to *Value reverse '' [ :s + *Value + ] reduce "This leaves the join value appended to the string. Remove it." 0 over length? *Value length? - subslice rest :s   ] 'join' define """)
+stdlib.append(""" } """)
+stdlib.append(""" [ "s-s"  [ :n 32 128 between? ] filter :s ] 'clean-string' define """)
+stdlib.append(""" [ "sss-s"  [ split ] dip join clean-string ] 'replace' define """)
+stdlib.append(""" [ '*Data'  '*Source'  '*String'  '(accumulate)'  '(next)' ] { """)
+stdlib.append(""" [ "-"  *String *Source first *Data first type? POINTER eq? [ invoke ] if-true :s + + to *String ] '(accumulate)' define """)
+stdlib.append(""" [ "-"  *Source rest to *Source  *Data rest to *Data ] '(next)' define """)
+stdlib.append(""" [ "ps-s" '{v}' split to *Source to *Data request-empty :s to *String *Data length? [ (accumulate) (next) ] times "Merge any remaining items" *String *Source '' join + clean-string   ] 'interpolate' define """)
+stdlib.append(""" } """)
+stdlib.append(""" [ '*D'  '*S'  '*L' ] { """)
+stdlib.append(""" [ "qs-s" to *S to *D *S '{v}' split length? to *L [ *D length? *L lt? dup [ *D duplicate-slice *D + to *D ] if-true ] while [ *D length? *L lt? dup [ *D pop drop ] if-false ] until *D *S interpolate   ] 'interpolate<cycling>' define """)
+stdlib.append(""" } """)
+stdlib.append(""" "apropos" """)
+stdlib.append(""" [ "s-s" dup function-exists? [ lookup-function @ ] [ drop 'function not found' report-error ] if ] 'apropos' define """)
+extensions = []
+extensions.append(""" [ "-"   `9000 ] '.s' define """)
+extensions.append(""" [ "-"   `9001 ] 'bye' define """)
+extensions.append(""" [ "-"   `9002 ] 'words' define """)
+extensions.append(""" [ "s-"  `9003 ] 'include' define """)
+extensions.append(""" "VM State" """)
+extensions.append(""" [ "-p"  `9100 ] 'vm.dict<names>' define """)
+extensions.append(""" [ "-p"  `9101 ] 'vm.dict<slices>' define """)
+extensions.append(""" "File Operations" """)
+extensions.append(""" [ "string:name string:mode - number:file-id"  `3000 ] 'open-file' define """)
+extensions.append(""" [ "number:file-id -"  `3001 ] 'close-file' define """)
+extensions.append(""" [ "number:file-id - character"  `3002 :c ] 'read-file' define """)
+extensions.append(""" [ "character number:file-id -"  `3003 ] 'write-file' define """)
+extensions.append(""" [ "number:file-id - number:position"  `3004 ] 'file-position' define """)
+extensions.append(""" [ "number:offset number:file-id -"  `3005 ] 'file-seek' define """)
+extensions.append(""" [ "number:file-id - number:length"  `3006 ] 'file-size' define """)
+extensions.append(""" [ "string:name -"  `3007 ] 'delete-file' define """)
+extensions.append(""" [ '*FID'  '*S' ] { """)
+extensions.append(""" [ "string:name - string:contents" 'r' open-file to *FID request to *S *S pop drop *FID file-size [ *FID read-file *S push ] times *FID close-file *S :s   ] 'slurp-file' define """)
+extensions.append(""" } """)
+extensions.append(""" [ "string:name - flag"  `3008 ] 'file-exists?' define """)
+extensions.append(""" "Command Line Arguments" """)
+extensions.append(""" [ "- number"  `4000 ] 'arg-count' define """)
+extensions.append(""" [ "number - string"  `4001 ] 'get-arg' define """)
+extensions.append(""" "Command Line Arguments and System Integration" """)
+extensions.append(""" [ "- number"  `4000 ] 'arg-count' define """)
+extensions.append(""" [ "number - string"  `4001 ] 'get-arg' define """)
+extensions.append(""" [ "s-s"  `5000 ] 'value-for-key' define """)
+extensions.append(""" [ "s-s"  `5001 ] 'get-environment-value' define """)
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+# allegory interface layer begins here
+
+import os
+import readline
+import sys
+
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+def completer(text, state):
+    options = [x for x in dictionary_names if x.startswith(text)]
+    try:
+        return options[state]
+    except IndexError:
+        return None
+
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+def display_item(prefix, value):
+    sys.stdout.write('\t' + prefix + str(value))
+
+
+def dump_stack():
+    """display the stack"""
+    i = 0
+    while i < len(stack):
+        tos = stack[i]
+        type = types[i]
+        sys.stdout.write("\t" + str(i))
+        if type == TYPE_NUMBER:
+            display_item('#', tos)
+        elif type == TYPE_CHARACTER:
+            display_item('$', chr(tos))
+        elif type == TYPE_STRING:
+            display_item('\'', slice_to_string(tos) + '\'')
+        elif type == TYPE_POINTER:
+            display_item('&', tos)
+        elif type == TYPE_COMMENT:
+            display_item('"', slice_to_string(tos) + '"')
+        elif type == TYPE_FLAG:
+            if tos == -1:
+                display_item("", "true")
+            elif tos == 0:
+                display_item("", "false")
+            else:
+                display_item("", "malformed flag")
+        else:
+            display_item("", "unmatched type on the stack")
+        sys.stdout.write("\n")
+        i += 1
+
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+def dump_dict():
+    """display named items"""
+    l = ''
+    for w in dictionary_names:
+        l = l + w + ' '
+    sys.stdout.write(l)
+    sys.stdout.write("\n")
+
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+files = []
+
+def opcodes(slice, offset, opcode):
+    if opcode == 3000:
+        slot = 0
+        i = 1
+        while i < 8:
+            if files[i] == 0:
+                slot = i
+            i = i + 1
+        mode = slice_to_string(stack_pop())
+        name = slice_to_string(stack_pop())
+        if slot != 0:
+            files[int(slot)] = open(name, mode)
+        stack_push(slot, TYPE_NUMBER)
+    elif opcode == 3001:
+        slot = int(stack_pop())
+        files[slot].close()
+        files[slot] = 0
+    elif opcode == 3002:
+        slot = int(stack_pop())
+        stack_push(ord(files[slot].read(1)), TYPE_NUMBER)
+    elif opcode == 3003:
+        slot = int(stack_pop())
+        files[slot].write(unichr(int(stack_pop())))
+    elif opcode == 3004:
+        slot = int(stack_pop())
+        stack_push(files[slot].tell(), TYPE_NUMBER)
+    elif opcode == 3005:
+        slot = int(stack_pop())
+        pos = int(stack_pop())
+        stack_push(files[slot].seek(pos, 0), TYPE_NUMBER)
+    elif opcode == 3006:
+        slot = int(stack_pop())
+        at = files[slot].tell()
+        files[slot].seek(0, 2) # SEEK_END
+        stack_push(files[slot].tell(), TYPE_NUMBER)
+        files[slot].seek(at, 0) # SEEK_SET
+    elif opcode == 3007:
+        name = slice_to_string(stack_pop())
+        if os.path.exists(name):
+            os.remove(name)
+    elif opcode == 3008:
+        name = slice_to_string(stack_pop())
+        if os.path.exists(name):
+            stack_push(-1, TYPE_FLAG)
+        else:
+            stack_push(0, TYPE_FLAG)
+    elif opcode == 4000:
+        stack_push(len(sys.argv) - 2, TYPE_NUMBER)
+    elif opcode == 4001:
+        n = int(stack_pop())
+        stack_push(string_to_slice(sys.argv[n + 2]), TYPE_STRING)
+    elif opcode == 5000:
+        key = slice_to_string(stack_pop())
+        value = form.getvalue(key, "(no)")
+        stack_push(string_to_slice(value), TYPE_STRING)
+    elif opcode == 5001:
+        key = slice_to_string(stack_pop())
+        value = os.getenv(key, "(no)")
+        stack_push(string_to_slice(value), TYPE_STRING)
+    elif opcode == 9000:
+        dump_stack()
+    elif opcode == 9001:
+        exit()
+    elif opcode == 9002:
+        dump_dict()
+    elif opcode == 9003:
+        name = slice_to_string(stack_pop())
+        load_file(name)
+    elif opcode == 9100:
+        s = request_slice()
+        i = 0
+        for word in dictionary_names:
+            value = string_to_slice(word)
+            store(value, s, i, TYPE_STRING)
+            i = i + 1
+        stack_push(s, TYPE_POINTER)
+    elif opcode == 9101:
+        s = request_slice()
+        i = 0
+        for slice in dictionary_slices:
+            store(slice, s, i, TYPE_POINTER)
+            i = i + 1
+        stack_push(s, TYPE_POINTER)
+    return offset
+
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+def load_file(name):
+    if os.path.exists(name):
+        lines = condense_lines(open(name).readlines())
+        for l in lines:
+            slice = request_slice()
+            interpret(compile(l, slice), opcodes)
+
+
+def evaluate(s):
+    interpret(compile(s, request_slice()))
+
+
+def get_input():
+    done = 0
+    s = ''
+    while done == 0:
+        s = s + raw_input()
+        if s.endswith(' \\'):
+            s = s[:-2].strip() + ' '
+        else:
+            done = 1
+    return s
+
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+def scripting():
+    for source in sys.argv:
+        if not os.path.exists(source) and source != "-v":
+            sys.exit('ERROR: source file "%s" was not found!' % source)
+        if source != sys.argv[0]:
+            if source == "-v":
+                verbose = True
+            else:
+                load_file(source)
+    dump_stack()
+    for e in errors:
+        sys.stdout.write(e + '\n')
+
+
+def interactive():
+    readline.set_completer(completer)
+    readline.parse_and_bind("tab: complete")
+    print 'allegory, (c)2013-2016 Charles Childers'
+    print '------------------------------------------------'
+    print '.s       Display Stack'
+    print 'bye      Exit Listener'
+    print 'words    Display a list of all named items'
+    print '------------------------------------------------\n'
+    while 1 == 1:
+        sys.stdout.write("\ninput> ")
+        sys.stdout.flush()
+        src = get_input()
+
+        if len(src) >= 1:
+            slice = request_slice()
+            interpret(compile(src, slice), opcodes)
+
+        for e in errors:
+            sys.stdout.write(e)
+
+        clear_errors()
+        sys.stdout.flush()
+
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+if __name__ == '__main__':
+
+    home = os.environ['HOME']
+
+    files.append(0)
+    files.append(0)
+    files.append(0)
+    files.append(0)
+    files.append(0)
+    files.append(0)
+    files.append(0)
+    files.append(0)
+
+    prepare_slices()
+    prepare_dictionary()
+    parse_bootstrap(stdlib)
+    parse_bootstrap(extensions)
+
+    if len(sys.argv) < 2:
+        interactive()
+    else:
+        scripting()
+
+    sys.stdout.flush()

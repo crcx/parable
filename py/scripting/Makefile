@@ -1,4 +1,4 @@
-default: buildpre buildika
+default: buildpre buildika buildallegory
 
 buildpre:
 	cd pre && cp ../../parable.py .
@@ -15,3 +15,7 @@ buildika:
 	cd ika && chmod +x ika
 	cd ika && mv ika ../..
 	cd ika && rm -f parable.py stdlib.p *.pyc
+
+buildallegory:
+	cd allegory && make
+	mv allegory/allegory ../
