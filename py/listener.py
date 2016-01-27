@@ -117,7 +117,11 @@ if __name__ == '__main__':
         sys.stdout.write("\ninput> ")
         sys.stdout.flush()
 
-        src = get_input()
+        try:
+            src = get_input()
+        except:
+            sys.stdout.write("\n")
+            exit()
 
         if len(src) >= 1:
             slice = parable.request_slice()

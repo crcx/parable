@@ -260,7 +260,12 @@ def interactive():
     while 1 == 1:
         sys.stdout.write("\ninput> ")
         sys.stdout.flush()
-        src = get_input()
+
+        try:
+            src = get_input()
+        except:
+            sys.stdout.write("\n")
+            exit()
 
         if len(src) >= 1:
             slice = request_slice()
