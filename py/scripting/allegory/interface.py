@@ -10,7 +10,7 @@ import sys
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
-def save_session(filename):
+def save_snapshot(filename):
     global dictionary_names, \
            dictionary_slices, \
            errors, \
@@ -34,7 +34,7 @@ def save_session(filename):
     with gzip.open(filename, 'wb') as file:
         file.write(j)
 
-def load_session(filename):
+def load_snapshot(filename):
     global dictionary_names, \
            dictionary_slices, \
            errors, \
@@ -183,12 +183,13 @@ def opcodes(slice, offset, opcode):
         name = slice_to_string(stack_pop())
         load_file(name)
     elif opcode == 9004:
-        save_session('session.pso')
+        save_snapshot(slice_to_string(stack_pop()))
     elif opcode == 9005:
-        if os.path.exists('session.pso'):
-            load_session('session.pso')
+        name = slice_to_string(stack_pop())
+        if os.path.exists(name):
+            load_session(name)
         else:
-            report('E99: session.pso not found')
+            report('E99: ' + name + ' not found')
     elif opcode == 9100:
         s = request_slice()
         i = 0
