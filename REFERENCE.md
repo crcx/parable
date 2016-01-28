@@ -1437,3 +1437,9 @@ Note: if the array has fewer values than the number of replace points this will 
     string - string
 
 Given a function name, return the stack comment for it as a string.
+
+## stack-values
+
+    - pointer
+
+Returns a pointer to an array with copies of all values on the stack.

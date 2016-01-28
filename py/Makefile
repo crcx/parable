@@ -23,7 +23,7 @@ python3:
 
 
 update:
-	cp punga.py ~/www/api.forthworks.com/apologue
+	cp server/punga.py ~/www/api.forthworks.com/apologue
 	cp parable.py ~/www/api.forthworks.com/apologue/1.8
 	cp server/apologue-1.8 ~/www/api.forthworks.com/apologue/1.8/0
 	cp stdlib.p ~/www/api.forthworks.com/apologue/1.8

@@ -348,10 +348,21 @@
 }
 
 
-
 "apropos"
 [ "s-s" \
   dup function-exists? \
   [ lookup-function @ ] \
   [ drop 'function not found' report-error ] if \
 ] 'apropos' define
+
+
+"unsorted"
+[ '*S' ] {
+  [ "-p" \
+    request-empty to *S \
+    depth [ *S push ] times \
+    *S reverse dup to *S invoke \
+    *S \
+  ] 'stack-values' define
+}
+

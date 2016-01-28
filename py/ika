@@ -1732,6 +1732,10 @@ bootstrap.append(""" [ "qs-s" to *S to *D *S '{v}' split length? to *L [ *D leng
 bootstrap.append(""" } """)
 bootstrap.append(""" "apropos" """)
 bootstrap.append(""" [ "s-s" dup function-exists? [ lookup-function @ ] [ drop 'function not found' report-error ] if ] 'apropos' define """)
+bootstrap.append(""" "unsorted" """)
+bootstrap.append(""" [ '*S' ] { """)
+bootstrap.append(""" [ "-p" request-empty to *S depth [ *S push ] times *S reverse dup to *S invoke *S   ] 'stack-values' define """)
+bootstrap.append(""" } """)
 # i/o functions
 bootstrap.append(""" [ "value -"  `2000 ] 'print' define """)
 bootstrap.append(""" [ #10 :c print ] 'show:cr' define """)

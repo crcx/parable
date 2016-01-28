@@ -1729,6 +1729,10 @@ stdlib.append(""" [ "qs-s" to *S to *D *S '{v}' split length? to *L [ *D length?
 stdlib.append(""" } """)
 stdlib.append(""" "apropos" """)
 stdlib.append(""" [ "s-s" dup function-exists? [ lookup-function @ ] [ drop 'function not found' report-error ] if ] 'apropos' define """)
+stdlib.append(""" "unsorted" """)
+stdlib.append(""" [ '*S' ] { """)
+stdlib.append(""" [ "-p" request-empty to *S depth [ *S push ] times *S reverse dup to *S invoke *S   ] 'stack-values' define """)
+stdlib.append(""" } """)
 extensions = []
 extensions.append(""" [ "-"   `9000 ] '.s' define """)
 extensions.append(""" [ "-"   `9001 ] 'bye' define """)
