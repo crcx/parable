@@ -14,11 +14,13 @@ One other major difference is the memory model. Parable divides memory into dist
 
 The core Parable language does not provide a user interface. Various interface layers are available. The following are included with the standard Parable distribution:
 
-*Legend* is a full screen interface for terminals.
+*Listener* provides a simple interactive terminal.
+
+*Legend* is a full screen terminal based interface.
 
 *Pre* is the basic command line scripting environment.
 
-*Ika* is a better command line scripting environment which adds file I/O and additional I/O functions.
+*Allegory* combines the features of *Listener* and *Pre*, while extending the core language with I/O functions, further system integration, and and the ability to save and restore snapshots.
 
 *Punga* is a CGI based interface.
 
