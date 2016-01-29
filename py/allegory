@@ -2053,7 +2053,11 @@ def interactive():
 
         if len(src) >= 1:
             slice = request_slice()
-            interpret(compile(src, slice), opcodes)
+            try:
+                interpret(compile(src, slice), opcodes)
+            except:
+                sys.stdout.write("\n")
+                pass
 
         for e in errors:
             sys.stdout.write(e)
