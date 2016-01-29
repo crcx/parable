@@ -124,8 +124,12 @@ if __name__ == '__main__':
             exit()
 
         if len(src) >= 1:
-            slice = parable.request_slice()
-            parable.interpret(parable.compile(src, slice), opcodes)
+            try:
+                slice = parable.request_slice()
+                parable.interpret(parable.compile(src, slice), opcodes)
+            except:
+                sys.stdout.write("\n")
+                pass
 
         for e in parable.errors:
             sys.stdout.write(e)

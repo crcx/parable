@@ -264,6 +264,12 @@ Primitive. Apply each quotation to a copy of the value.
 
 Primitive. Apply each quotation to a copy of the value.
 
+## abort
+
+    -
+
+Primitive. Abort current execution cycle.
+
 ## copy
 
     pointer:source pointer:dest -

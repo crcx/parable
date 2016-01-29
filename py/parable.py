@@ -74,6 +74,7 @@ BC_FLOW_DIP = 306
 BC_FLOW_SIP = 307
 BC_FLOW_BI = 308
 BC_FLOW_TRI = 309
+BC_FLOW_ABORT = 398
 BC_FLOW_RETURN = 399
 BC_MEM_COPY = 400
 BC_MEM_FETCH = 401
@@ -193,16 +194,17 @@ def check_depth(slice, offset, cells):
 #
 
 current_slice = 0
-
+should_abort = False
 
 def interpret(slice, more=None):
     """Interpret the byte codes contained in a slice."""
     global current_slice
+    global should_abort
     offset = 0
     size = get_last_index(int(slice))
     if current_slice == 0:
         current_slice = slice
-    while offset <= size:
+    while offset <= size and should_abort is not True:
         opcode = fetch(slice, offset)
         optype = fetch_type(slice, offset)
 
@@ -596,6 +598,8 @@ def interpret(slice, more=None):
                     interpret(a, more)
                 else:
                     offset = size
+            elif opcode == BC_FLOW_ABORT:
+                should_abort = True
             elif opcode == BC_FLOW_RETURN:
                 offset = size
             elif opcode == BC_MEM_COPY:
@@ -1396,6 +1400,8 @@ def parse_string(tokens, i, count, delimiter):
 
 
 def compile(str, slice):
+    global should_abort
+    should_abort = False
     nest = []
     cleaned = ' '.join(str.split())
     tokens = cleaned.split(' ')

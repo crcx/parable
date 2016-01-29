@@ -39,6 +39,7 @@
 [ "vp-v"   `307 ] 'sip' define
 [ "vpp-?"  `308 ] 'bi' define
 [ "vppp-?" `309 ] 'tri' define
+[ "-"      `398 ] 'abort' define
 [ "pp-"    `400 ] 'copy' define
 [ "pn-v"   `401 ] 'fetch' define
 [ "vpn-"   `402 ] 'store' define

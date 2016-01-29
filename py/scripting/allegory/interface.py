@@ -214,11 +214,19 @@ def load_file(name):
         lines = condense_lines(open(name).readlines())
         for l in lines:
             slice = request_slice()
-            interpret(compile(l, slice), opcodes)
+            try:
+                interpret(compile(l, slice), opcodes)
+            except:
+                sys.stdout.write("\n")
+                pass
 
 
 def evaluate(s):
-    interpret(compile(s, request_slice()))
+    try:
+        interpret(compile(s, request_slice()))
+    except:
+        sys.stdout.write("\n")
+        pass
 
 
 def get_input():

@@ -243,7 +243,13 @@ if __name__ == '__main__':
 
     while 1 == 1:
         display(height, width)
-        src = get_input()
+
+        try:
+            src = get_input()
+        except:
+            sys.stdout.write("\n")
+            exit()
+
         cmd = ' '.join(src.split())
 
         if cmd == ':q':
@@ -256,6 +262,10 @@ if __name__ == '__main__':
             load_file(cmd[3:])
         else:
             if len(src) >= 1:
-                parable.interpret(parable.compile(src, parable.request_slice()))
+                try:
+                    parable.interpret(parable.compile(src, parable.request_slice()))
+                except:
+                    sys.stdout.write("\n")
+                    pass
 
         sys.stdout.flush()

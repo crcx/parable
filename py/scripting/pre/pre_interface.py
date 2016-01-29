@@ -67,12 +67,14 @@ def load_file(file):
             if len(line) > 0:
                 if not line.startswith("#!"):
                     s = compile(line, request_slice())
-                    interpret(s)
+                    try:
+                        interpret(s)
+                    except:
+                        sys.stdout.write("\n")
+                        pass
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        MAX_SLICES = 8000
     prepare_slices()
     prepare_dictionary()
     parse_bootstrap(bootstrap)
