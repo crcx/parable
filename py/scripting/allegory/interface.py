@@ -68,7 +68,7 @@ def completer(text, state):
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 def display_item(prefix, value):
-    sys.stdout.write('\t' + prefix + str(value))
+    sys.stdout.write(prefix + str(value))
 
 
 def dump_stack():
@@ -79,24 +79,24 @@ def dump_stack():
         type = types[i]
         sys.stdout.write("\t" + str(i))
         if type == TYPE_NUMBER:
-            display_item('#', tos)
+            display_item('\t' + '#', tos)
         elif type == TYPE_CHARACTER:
-            display_item('$', chr(tos))
+            display_item('\t' + '$', chr(tos))
         elif type == TYPE_STRING:
-            display_item('\'', slice_to_string(tos) + '\'')
+            display_item('\t' + '\'', slice_to_string(tos) + '\'')
         elif type == TYPE_POINTER:
-            display_item('&', tos)
+            display_item('\t' + '&', tos)
         elif type == TYPE_COMMENT:
-            display_item('"', slice_to_string(tos) + '"')
+            display_item('\t' + '"', slice_to_string(tos) + '"')
         elif type == TYPE_FLAG:
             if tos == -1:
-                display_item("", "true")
+                display_item('\t' + "", "true")
             elif tos == 0:
-                display_item("", "false")
+                display_item('\t' + "", "false")
             else:
-                display_item("", "malformed flag")
+                display_item('\t' + "", "malformed flag")
         else:
-            display_item("", "unmatched type on the stack")
+            display_item('\t' + "", "unmatched type on the stack")
         sys.stdout.write("\n")
         i += 1
 
@@ -109,6 +109,35 @@ def dump_dict():
         l = l + w + ' '
     sys.stdout.write(l)
     sys.stdout.write("\n")
+
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+def display_value():
+    global stack, types
+    i = len(stack) - 1
+    if types[i] == TYPE_NUMBER:
+        sys.stdout.write(unicode(stack[i]))
+    elif types[i] == TYPE_CHARACTER:
+        sys.stdout.write(unicode(unichr(stack[i])))
+    elif types[i] == TYPE_STRING:
+        sys.stdout.write(slice_to_string(stack[i]).encode('utf-8'))
+    elif types[i] == TYPE_POINTER:
+        sys.stdout.write('&' + unicode(stack[i]))
+    elif types[i] == TYPE_FLAG:
+        if stack[i] == -1:
+            sys.stdout.write("true")
+        elif stack[i] == 0:
+            sys.stdout.write("false")
+        else:
+            sys.stdout.write("malformed flag")
+    elif types[i] == TYPE_COMMENT:
+        sys.stdout.write(slice_to_string(stack[i]).encode('utf-8'))
+    elif types[i] == TYPE_BYTECODE:
+        sys.stdout.write('`' + unicode(stack[i]))
+    elif types[i] == TYPE_FUNCTION_CALL:
+        sys.stdout.write('CALL: ' + unicode(stack[i]))
+    else:
+       sys.stdout.write("unknown type")
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
@@ -173,6 +202,10 @@ def opcodes(slice, offset, opcode):
         key = slice_to_string(stack_pop())
         value = os.getenv(key, "(no)")
         stack_push(string_to_slice(value), TYPE_STRING)
+    elif opcode == 6000:
+        display_value()
+        stack_pop()
+        sys.stdout.flush()
     elif opcode == 9000:
         dump_stack()
     elif opcode == 9001:
@@ -213,9 +246,10 @@ def load_file(name):
     if os.path.exists(name):
         lines = condense_lines(open(name).readlines())
         for l in lines:
-            slice = request_slice()
             try:
-                interpret(compile(l, slice), opcodes)
+                if l != "#!/usr/bin/env allegory":
+                    slice = request_slice()
+                    interpret(compile(l, slice), opcodes)
             except:
                 sys.stdout.write("\n")
                 pass
@@ -243,14 +277,10 @@ def get_input():
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 def scripting():
-    for source in sys.argv:
-        if not os.path.exists(source) and source != "-v":
-            sys.exit('ERROR: source file "%s" was not found!' % source)
-        if source != sys.argv[0]:
-            if source == "-v":
-                verbose = True
-            else:
-                load_file(source)
+    source = sys.argv[1]
+    if not os.path.exists(source):
+        sys.exit('ERROR: source file "%s" was not found!' % source)
+    load_file(source)
     dump_stack()
     for e in errors:
         sys.stdout.write(e + '\n')
@@ -265,7 +295,7 @@ def interactive():
     print 'bye      Exit Listener'
     print 'words    Display a list of all named items'
     print '------------------------------------------------\n'
-    while 1 == 1:
+    while True:
         sys.stdout.write("\ninput> ")
         sys.stdout.flush()
 

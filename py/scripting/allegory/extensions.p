@@ -8,14 +8,6 @@
 "VM State"
 [ "-p"  `9100 ] 'vm.dict<names>' define
 [ "-p"  `9101 ] 'vm.dict<slices>' define
-[ '*S' ] {
-  [ "-p" \
-    request-empty to *S \
-    depth [ *S push ] times \
-    *S reverse dup to *S invoke \
-    *S \
-  ] 'vm.stack' define
-}
 
 "File Operations"
 [ "string:name string:mode - number:file-id"  `3000 ] 'open-file' define
@@ -26,7 +18,6 @@
 [ "number:offset number:file-id -"  `3005 ] 'file-seek' define
 [ "number:file-id - number:length"  `3006 ] 'file-size' define
 [ "string:name -"  `3007 ] 'delete-file' define
-
 
 [ '*FID'  '*S' ] {
   [ "string:name - string:contents" \
@@ -40,12 +31,14 @@
 
 [ "string:name - flag"  `3008 ] 'file-exists?' define
 
-"Command Line Arguments"
-[ "- number"  `4000 ] 'arg-count' define
-[ "number - string"  `4001 ] 'get-arg' define
 
 "Command Line Arguments and System Integration"
 [ "- number"  `4000 ] 'arg-count' define
 [ "number - string"  `4001 ] 'get-arg' define
 [ "s-s"  `5000 ] 'value-for-key' define
 [ "s-s"  `5001 ] 'get-environment-value' define
+
+"Terminal I/O"
+[ "v-"  `6000 ] 'display' define
+[ #10 :c display ] 'tty.cr' define
+
