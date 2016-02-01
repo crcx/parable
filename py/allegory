@@ -1993,7 +1993,7 @@ def opcodes(slice, offset, opcode):
     elif opcode == 9005:
         name = slice_to_string(stack_pop())
         if os.path.exists(name):
-            load_session(name)
+            load_snapshot(name)
         else:
             report('E99: ' + name + ' not found')
     elif opcode == 9100:
