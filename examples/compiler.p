@@ -10,7 +10,7 @@
 [ "-c"  current-token @ ] 'current-prefix' define
 [ "-"  *Offset 1 + to *Offset ] 'next-token' define
 
-"Strings (and comments) can contain spaces. This constructs a string from the tokens, ending when the token has the delimiter as the last character."
+"Strings (and remarks) can contain spaces. This constructs a string from the tokens, ending when the token has the delimiter as the last character."
 [ '*S'  '*Delimiter' ] values
 [ "-f"  current-token last *Delimiter eq? ] 'final-token-in-string?' define
 [ "-"  *S ' ' + current-token + to *S ] 'append-to-string' define
@@ -31,13 +31,13 @@
 [ "-"  cleaned-token :c c, ] 'compile-character' define
 [ "-"  cleaned-token :n :b c, ] 'compile-bytecode' define
 [ "-"  $' gather-string c, ] 'compile-string' define
-[ "-"  $" gather-string c, ] 'compile-comment' define
+[ "-"  $" gather-string c, ] 'compile-remark' define
 [ "s-p"  dup function-exists? [ lookup-function ] [ :n :p ] if ] 'resolve-pointer' define
 [ "-" \
   current-token rest :s resolve-pointer c, ] 'compile-pointer' define
 [ "-" \
   current-token dup function-exists? \
-  [ lookup-function :call c, ] \
+  [ lookup-function :x c, ] \
   [ dup numeric? \
     [ :n c, ] \
     [ 'ERROR: WORD NOT FOUND' report-error ] \
@@ -61,7 +61,7 @@
     [ [ current-prefix $$ eq? ] [ compile-character ] ] \
     [ [ current-prefix $& eq? ] [ compile-pointer   ] ] \
     [ [ current-prefix $' eq? ] [ compile-string    ] ] \
-    [ [ current-prefix $" eq? ] [ compile-comment   ] ] \
+    [ [ current-prefix $" eq? ] [ compile-remark    ] ] \
     [ [ current-prefix $` eq? ] [ compile-bytecode  ] ] \
     [ [ current-token '[' eq? ] [ begin-quote       ] ] \
     [ [ current-token ']' eq? ] [ end-quote         ] ] \

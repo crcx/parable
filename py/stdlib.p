@@ -5,7 +5,7 @@
 [ "v-c"    `103 ] ':c' define
 [ "v-p"    `104 ] ':p' define
 [ "v-f"    `105 ] ':f' define
-[ "v-f"    `106 ] ':call' define
+[ "v-f"    `106 ] ':x' define
 [ "vt-v"   `109 ] 'set-type' define
 [ "v-vn"   `110 ] 'type?' define
 [ "nn-n"   `200 ] '+' define
@@ -85,9 +85,9 @@
 [ "-n"  400 ] 'POINTER' define
 [ "-n"  500 ] 'FLAG' define
 [ "-n"  600 ] 'BYTECODE' define
-[ "-n"  700 ] 'COMMENT' define
+[ "-n"  700 ] 'REMARK' define
 [ "-n"  800 ] 'FUNCTION-CALL' define
-[ "v-c" COMMENT set-type ] ':comment' define
+[ "v-c" REMARK set-type ] ':r' define
 
 
 "Stack Flow"
@@ -215,7 +215,7 @@
 
 "Programatic Creation of Quotes"
 [ "vv-p"  swap request [ 0 store ] sip [ 1 store ] sip ] 'cons' define
-[ "vp-p"  :call cons ] 'curry' define
+[ "vp-p"  :x cons ] 'curry' define
 
 
 "Values"
@@ -366,4 +366,3 @@
     *S \
   ] 'stack-values' define
 }
-

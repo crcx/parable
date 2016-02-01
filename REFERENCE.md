@@ -51,7 +51,7 @@ Primitive. Convert value on stack to a pointer.
 
 Primitive. Convert value on stack to a flag.
 
-## :call
+## :x
 
     value - function-call
 
@@ -540,17 +540,17 @@ Constant. Type for Boolean flag.
 
 Constant. Type for bytecides.
 
-## COMMENT
+## REMARK
 
     - number
 
-Constant. Type for comments.
+Constant. Type for comments / embedded remarks.
 
-## :comment
+## :r
 
     string - comment
 
-Convert a string to a comment.
+Convert a string to a comment / remark.
 
 
 ## FUNCTION-CALL
