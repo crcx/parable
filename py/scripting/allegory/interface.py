@@ -151,6 +151,12 @@ def revert():
     prepare_slices()
     prepare_dictionary()
     stack_clear()
+    i = 1
+    while i < 8:
+        if files[i] != 0:
+            files[i].close()
+            files[i] = 0
+        i = i + 1
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
