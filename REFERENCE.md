@@ -538,7 +538,7 @@ Constant. Type for Boolean flag.
 
     - number
 
-Constant. Type for bytecides.
+Constant. Type for bytecodes.
 
 ## REMARK
 
