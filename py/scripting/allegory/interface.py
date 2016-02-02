@@ -141,6 +141,19 @@ def display_value():
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
+def revert():
+    global p_slices, p_map, p_types, dictionary_slices, dictionary_names
+    p_slices = []
+    p_map = []
+    p_types = []
+    dictionary_slices = []
+    dictionary_names = []
+    prepare_slices()
+    prepare_dictionary()
+    stack_clear()
+
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
 files = []
 
 def opcodes(slice, offset, opcode):
@@ -223,6 +236,10 @@ def opcodes(slice, offset, opcode):
             load_snapshot(name)
         else:
             report('E99: ' + name + ' not found')
+    elif opcode == 9006:
+        revert()
+        parse_bootstrap(stdlib)
+        parse_bootstrap(extensions)
     elif opcode == 9100:
         s = request_slice()
         i = 0

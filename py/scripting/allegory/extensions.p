@@ -4,6 +4,7 @@
 [ "s-"  `9003 ] 'include' define
 [ "s-"  `9004 ] 'save-snapshot' define
 [ "s-"  `9005 ] 'reload-snapshot' define
+[ "...-" `9006 ] 'restart' define
 
 "VM State"
 [ "-p"  `9100 ] 'vm.dict<names>' define
