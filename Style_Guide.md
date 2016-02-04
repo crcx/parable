@@ -35,6 +35,12 @@ Values should be named like:
 
     *Token
 
+Or like:
+
+    *i
+
+When its name consists of a * and a single character.
+
 Acceptable forms for multi-line definitions:
 
     [ "stack comment" \
