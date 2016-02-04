@@ -506,9 +506,9 @@ def interpret(slice, more=None):
                     offset = size
             elif opcode == BC_FLOW_IF:
                 if check_depth(slice, offset, 3):
-                    a = stack_pop()
-                    b = stack_pop()
-                    c = stack_pop()
+                    a = stack_pop()  # false
+                    b = stack_pop()  # true
+                    c = stack_pop()  # flag
                     if c == -1:
                         interpret(b, more)
                     else:
@@ -914,12 +914,6 @@ def tos():
     return len(stack) - 1
 
 
-def stack_tos():
-    """return the top element on the stack"""
-    global stack, types
-    return stack[tos()]
-
-
 def stack_type():
     """return the type identifier for the top item on the stack"""
     global stack, types
@@ -984,7 +978,7 @@ def stack_change_type(desired):
             types.append(TYPE_BYTECODE)
     elif desired == TYPE_NUMBER:
         if original == TYPE_STRING:
-            if is_number(slice_to_string(stack_tos())):
+            if is_number(slice_to_string(stack[tos()])):
                 stack_push(float(slice_to_string(stack_pop())), TYPE_NUMBER)
             else:
                 stack_pop()
@@ -1397,7 +1391,7 @@ def parse_string(tokens, i, count, delimiter):
     a = tokens[i].endswith(delimiter)
     b = tokens[i] != delimiter
     c = tokens[i].endswith("\\" + delimiter)
-    if (a and b and not c):
+    if a and b and not c:
         s = tokens[i]
     else:
         j = i + 1
@@ -1407,7 +1401,7 @@ def parse_string(tokens, i, count, delimiter):
             s += tokens[j]
             a = tokens[j].endswith(delimiter)
             b = tokens[j].endswith("\\" + delimiter)
-            if (a and not b):
+            if a and not b:
                 i = j
                 j = count
             j += 1
