@@ -196,8 +196,8 @@
 
 "Slice as a linear buffer"
 [ '*CURRENT-BUFFER'  '*BUFFER-OFFSET' ] variables
-[ "-p"     *CURRENT-BUFFER ] 'current-buffer' define
-[ "-pn"    current-buffer *BUFFER-OFFSET ] 'buffer-position' define
+[ "-p"     &*CURRENT-BUFFER @ ] 'current-buffer' define
+[ "-pn"    current-buffer &*BUFFER-OFFSET @ ] 'buffer-position' define
 [ "-"      &*BUFFER-OFFSET increment ] 'buffer-advance' define
 [ "-"      &*BUFFER-OFFSET decrement ] 'buffer-retreat' define
 [ "n-"     buffer-position store ] 'buffer-store-current' define
@@ -209,7 +209,7 @@
 [ "p-"     &*CURRENT-BUFFER ! &*BUFFER-OFFSET zero-out ] 'set-buffer' define
 [ "...n-"  [ buffer-store ] times ] 'buffer-store-items' define
 [ "-"      request set-buffer ] 'new-buffer' define
-[ "p-"     *CURRENT-BUFFER [ *BUFFER-OFFSET [ invoke ] dip &*BUFFER-OFFSET ! ] dip &*CURRENT-BUFFER ! ] 'preserve-buffer' define
+[ "p-"     &*CURRENT-BUFFER @ [ &*BUFFER-OFFSET @ [ invoke ] dip &*BUFFER-OFFSET ! ] dip &*CURRENT-BUFFER ! ] 'preserve-buffer' define
 [ "s-"     request [ swap define ] sip set-buffer ] 'named-buffer' define
 
 
@@ -221,7 +221,7 @@
 "Values"
 '_STATE' variable
 [ "-"    &_STATE on ] 'to' define
-[ "?p-"  _STATE :f [ ! &_STATE off ] [ @ ] if ] '(value-handler)' define
+[ "?p-"  &_STATE @ :f [ ! &_STATE off ] [ @ ] if ] '(value-handler)' define
 [ "s-"   request [ (value-handler) ] curry swap define ] 'value' define
 [ "ns-"  [ value ] sip to lookup-function invoke ] 'value!' define
 [ "p-"   invoke<depth?> [ value ] times ] 'values' define
