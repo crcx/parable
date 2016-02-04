@@ -63,11 +63,11 @@ def get_results(message):
     p_map = []
     i = 0
     while i < parable.MAX_SLICES:
-        if parable.p_map[i] != 0:
+        if parable.memory_map[i] != 0:
             p_map.append(i)
         i = i + 1
 
-    return json.dumps({"symbols": parable.dictionary_names, "symbol_map": parable.dictionary_slices, "errors": parable.errors, "parsed_stack": sequence, "types": parable.types, "code": message, "slices": parable.p_slices, "typetags": parable.p_types, "memory_map": p_map})
+    return json.dumps({"symbols": parable.dictionary_names, "symbol_map": parable.dictionary_slices, "errors": parable.errors, "parsed_stack": sequence, "types": parable.types, "code": message, "slices": parable.memory_values, "typetags": parable.memory_types, "memory_map": p_map})
 
 
 def process_input(source):

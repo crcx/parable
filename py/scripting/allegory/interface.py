@@ -16,10 +16,10 @@ def save_snapshot(filename):
            errors, \
            stack, \
            types, \
-           p_slices, \
-           p_types, \
-           p_map, \
-           p_sizes
+           memory_values, \
+           memory_types, \
+           memory_map, \
+           memory_size
 
     collect_garbage()
     j = json.dumps({"symbols": dictionary_names, \
@@ -27,10 +27,10 @@ def save_snapshot(filename):
                     "errors": errors, \
                     "stack_values": stack, \
                     "stack_types": types, \
-                    "memory_contents": p_slices, \
-                    "memory_types": p_types, \
-                    "memory_map": p_map, \
-                    "memory_sizes": p_sizes})
+                    "memory_contents": memory_values, \
+                    "memory_types": memory_types, \
+                    "memory_map": memory_map, \
+                    "memory_sizes": memory_size})
     with gzip.open(filename, 'wb') as file:
         file.write(j)
 
@@ -40,10 +40,10 @@ def load_snapshot(filename):
            errors, \
            stack, \
            types, \
-           p_slices, \
-           p_types, \
-           p_map, \
-           p_sizes
+           memory_values, \
+           memory_types, \
+           memory_map, \
+           memory_size
 
     j = json.loads(gzip.open(filename, 'rb').read())
     dictionary_names = j['symbols']
@@ -51,10 +51,10 @@ def load_snapshot(filename):
     errors = j['errors']
     stack = j['stack_values']
     types = j['stack_types']
-    p_slices = j['memory_contents']
-    p_types = j['memory_types']
-    p_map = j['memory_map']
-    p_sizes = j['memory_sizes']
+    memory_values = j['memory_contents']
+    memory_types = j['memory_types']
+    memory_map = j['memory_map']
+    memory_size = j['memory_sizes']
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
@@ -142,10 +142,10 @@ def display_value():
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 def revert():
-    global p_slices, p_map, p_types, dictionary_slices, dictionary_names
-    p_slices = []
-    p_map = []
-    p_types = []
+    global memory_values, memory_map, memory_types, dictionary_slices, dictionary_names
+    memory_values = []
+    memory_map = []
+    memory_types = []
     dictionary_slices = []
     dictionary_names = []
     prepare_slices()

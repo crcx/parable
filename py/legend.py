@@ -99,10 +99,10 @@ def getTerminalSize():
 
 def revert():
     """revert the session to a clean state (does not load bootstrap)"""
-    for i in parable.p_slices:
-        parable.p_slices.pop()
-    for i in parable.p_map:
-        parable.p_map.pop()
+    for i in parable.memory_values:
+        parable.memory_values.pop()
+    for i in parable.memory_map:
+        parable.memory_map.pop()
     for i in parable.dictionary_slices:
         parable.dictionary_slices.pop()
     for i in parable.dictionary_names:
