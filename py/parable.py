@@ -1225,6 +1225,18 @@ def slice_to_string(slice):
 # the code here implements the garbage collector.
 #
 
+def is_pointer(type):
+    flag = False
+    if type == TYPE_POINTER or \
+       type == TYPE_STRING or \
+       type == TYPE_COMMENT or \
+       type == TYPE_FUNCTION_CALL:
+        flag = True
+    else:
+        flag = False
+    return flag
+
+
 def find_references(s):
     """given a slice, return a list of all references in it"""
     ptrs = []
@@ -1233,7 +1245,7 @@ def find_references(s):
         return []
     if get_last_index(s) == 0:
         type = fetch_type(s, 0)
-        if type == TYPE_POINTER or type == TYPE_STRING or type == TYPE_COMMENT or type == TYPE_FUNCTION_CALL:
+        if is_pointer(type):
             ptrs.append(int(fetch(s, 0)))
         if type == TYPE_POINTER or type == TYPE_FUNCTION_CALL:
             for xt in find_references(int(fetch(s, 0))):
@@ -1241,7 +1253,7 @@ def find_references(s):
     else:
         while i < get_last_index(s):
             type = fetch_type(s, i)
-            if type == TYPE_POINTER or type == TYPE_STRING or type == TYPE_COMMENT or type == TYPE_FUNCTION_CALL:
+            if is_pointer(type):
                 ptrs.append(int(fetch(s, i)))
             if type == TYPE_POINTER or type == TYPE_FUNCTION_CALL:
                 for xt in find_references(int(fetch(s, i))):
@@ -1262,7 +1274,7 @@ def seek_all_references():
         refs.append(x)
     i = tos()
     while i > 0:
-        if types[i] == TYPE_STRING or types[i] == TYPE_COMMENT or types[i] == TYPE_POINTER or types[i] == TYPE_FUNCTION_CALL:
+        if is_pointer(types[i]):
             refs.append(stack[i])
             for x in find_references(stack[i]):
                 refs.append(x)
@@ -1455,8 +1467,7 @@ def compile(str, slice):
 
 def parse_bootstrap(f):
     """compile the bootstrap package it into memory"""
-    f = condense_lines(f)
-    for line in f:
+    for line in condense_lines(f):
         if len(line) > 0:
             interpret(compile(line, request_slice()))
 
