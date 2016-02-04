@@ -1421,7 +1421,7 @@ def compile(str, slice):
             i, s = parse_string(tokens, i, count, '\'')
             offset = compile_string(s[1:-1], slice, offset)
         elif prefix == "$":
-            v = ord(current[1:].encode('utf-8'))
+            v = ord(current[1:][0].encode('utf-8'))
             offset = compile_character(v, slice, offset)
         elif prefix == "&":
             offset = compile_pointer(current[1:], slice, offset)
