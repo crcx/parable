@@ -24,10 +24,10 @@ def save_snapshot():
                     "stack_values": parable.stack,
                     "stack_types": parable.types,
                     "errors": parable.errors,
-                    "memory_contents": parable.p_slices,
-                    "memory_types": parable.p_types,
-                    "memory_map": parable.p_map,
-                    "memory_sizes": parable.p_sizes})
+                    "memory_contents": parable.memory_values,
+                    "memory_types": parable.memory_types,
+                    "memory_map": parable.memory_map,
+                    "memory_sizes": parable.memory_size})
     o = StringIO.StringIO()
     with gzip.GzipFile(fileobj=o, mode="w") as file:
         file.write(j)
@@ -42,10 +42,10 @@ def load_snapshot(data):
     parable.dictionary_slices = j['symbol_map']
     parable.stack = j['stack_values']
     parable.types = j['stack_types']
-    parable.p_slices = j['memory_contents']
-    parable.p_types = j['memory_types']
-    parable.p_map = j['memory_map']
-    parable.p_sizes = j['memory_sizes']
+    parable.memory_values = j['memory_contents']
+    parable.memory_types = j['memory_types']
+    parable.memory_map = j['memory_map']
+    parable.memory_size = j['memory_sizes']
     parable.errors = j['errors']
 
 

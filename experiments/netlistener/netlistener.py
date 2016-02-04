@@ -102,7 +102,6 @@ if __name__ == '__main__':
 
         if len(src) >= 1:
             if src == ".s":
-                print pso.stack_values(parable)
                 for i in stack(parable):
                     sys.stdout.write(i + '  ')
                 sys.stdout.write("\n")
