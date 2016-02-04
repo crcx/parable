@@ -1,7 +1,6 @@
 # parable
 # Copyright (c) 2012-2016, Charles Childers
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-# ==========================================
 # coding: utf-8
 
 #
@@ -198,6 +197,7 @@ def check_depth(slice, offset, cells):
 current_slice = 0
 should_abort = False
 
+
 def interpret(slice, more=None):
     """Interpret the byte codes contained in a slice."""
     global current_slice
@@ -278,8 +278,8 @@ def interpret(slice, more=None):
                         c = request_slice()
                         d = get_last_index(b) + get_last_index(a) + 1
                         set_slice_last_index(c, d)
-                        memory_values[c] = memory_values[b][:] + memory_values[a][:]
-                        memory_types[c] = memory_types[b][:] + memory_types[a][:]
+                        memory_values[c] = memory_values[b] + memory_values[a]
+                        memory_types[c] = memory_types[b] + memory_types[a]
                         stack_push(c, TYPE_POINTER)
                     else:
                         stack_push(a + b, TYPE_NUMBER)
@@ -734,8 +734,8 @@ def interpret(slice, more=None):
                     offset = size
             elif opcode == BC_FUNCTION_NAME:
                 if check_depth(slice, offset, 1):
-                    a = stack_pop()
-                    stack_push(string_to_slice(pointer_to_name(a)), TYPE_STRING)
+                    a = pointer_to_name(stack_pop())
+                    stack_push(string_to_slice(a), TYPE_STRING)
                 else:
                     offset = size
             elif opcode == BC_STRING_SEEK:
@@ -1360,7 +1360,8 @@ def compile_pointer(name, slice, offset):
             store(lookup_pointer(name), slice, offset, TYPE_POINTER)
         else:
             store(0, slice, offset, TYPE_POINTER)
-            report('E03: Compile Error: Unable to map ' + name + ' to a pointer')
+            report('E03: Compile Error: Unable to map ' +
+                   name + ' to a pointer')
     offset += 1
     return offset
 
@@ -1370,7 +1371,8 @@ def compile_number(number, slice, offset):
         store(float(number), slice, offset, TYPE_NUMBER)
     else:
         store(float('nan'), slice, offset, TYPE_NUMBER)
-        report("E03: Compile Error: Unable to convert " + number + " to a number")
+        report("E03: Compile Error: Unable to convert " +
+               number + " to a number")
     offset += 1
     return offset
 
