@@ -1,3 +1,4 @@
+# coding: utf-8
 # parable
 # Copyright (c) 2012-2016, Charles Childers
 # ==========================================
@@ -1403,34 +1404,37 @@ def compile(str, slice):
     global should_abort
     should_abort = False
     nest = []
-    cleaned = ' '.join(str.split())
-    tokens = cleaned.split(' ')
+    tokens = ' '.join(str.split()).split(' ')
     count = len(tokens)
     i = 0
     offset = 0
+    current = ""
+    prefix = ""
     while i < count:
+        current = tokens[i]
+        prefix = tokens[i][:1]
         s = ""
-        if (tokens[i].startswith('"') or tokens[i] == '"'):
+        if prefix == '"':
             i, s = parse_string(tokens, i, count, '"')
             offset = compile_comment(s[1:-1], slice, offset)
-        elif (tokens[i].startswith('\'') or tokens[i] == '\''):
+        elif prefix == "'":
             i, s = parse_string(tokens, i, count, '\'')
             offset = compile_string(s[1:-1], slice, offset)
-        elif tokens[i].startswith("$"):
-            v = ord(tokens[i][1:].encode('utf-8'))
+        elif prefix == "$":
+            v = ord(current[1:].encode('utf-8'))
             offset = compile_character(v, slice, offset)
-        elif tokens[i].startswith("&"):
-            offset = compile_pointer(tokens[i][1:], slice, offset)
-        elif tokens[i].startswith("#"):
-            offset = compile_number(tokens[i][1:], slice, offset)
-        elif tokens[i].startswith("`"):
-            offset = compile_bytecode(tokens[i][1:], slice, offset)
-        elif tokens[i] == "[":
+        elif prefix == "&":
+            offset = compile_pointer(current[1:], slice, offset)
+        elif prefix == "#":
+            offset = compile_number(current[1:], slice, offset)
+        elif prefix == "`":
+            offset = compile_bytecode(current[1:], slice, offset)
+        elif current == "[":
             nest.append(slice)
             nest.append(offset)
             slice = request_slice()
             offset = 0
-        elif tokens[i] == "]":
+        elif current == "]":
             old = slice
             if offset == 0:
                 store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
@@ -1439,10 +1443,10 @@ def compile(str, slice):
             store(old, slice, offset, TYPE_POINTER)
             offset += 1
         else:
-            if is_number(tokens[i]):
-                offset = compile_number(tokens[i], slice, offset)
+            if is_number(current):
+                offset = compile_number(current, slice, offset)
             else:
-                offset = compile_function_call(tokens[i], slice, offset)
+                offset = compile_function_call(current, slice, offset)
         i += 1
         if offset == 0:
             store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
