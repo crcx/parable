@@ -5,20 +5,20 @@ def display_stack(verbose):
     i = 0
     while i < len(stack):
         if i == len(stack) - 1:
-            sys.stdout.write("TOS\t" + unicode(i))
+            sys.stdout.write("TOS\t" + str(i))
         else:
-            sys.stdout.write("\t" + unicode(i))
+            sys.stdout.write("\t" + str(i))
 
         if types[i] == TYPE_NUMBER:
-            sys.stdout.write("\t#" + unicode(stack[i]))
+            sys.stdout.write("\t#" + str(stack[i]))
         elif types[i] == TYPE_CHARACTER:
-            sys.stdout.write("\t$" + unicode(unichr(stack[i])))
+            sys.stdout.write("\t$" + str(chr(stack[i])))
         elif types[i] == TYPE_STRING:
-            sys.stdout.write(("\t'" + slice_to_string(stack[i]) + "'").encode('utf-8'))
+            sys.stdout.write(("\t'" + slice_to_string(stack[i]) + "'"))
             if verbose == True:
-                sys.stdout.write("\n\t\tstored at: " + unicode(stack[i]))
+                sys.stdout.write("\n\t\tstored at: " + str(stack[i]))
         elif types[i] == TYPE_POINTER:
-            sys.stdout.write("\t&" + unicode(stack[i]))
+            sys.stdout.write("\t&" + str(stack[i]))
             if verbose == True:
                 if pointer_to_name(stack[i]) != "":
                     sys.stdout.write("\n\t\tpointer to: " + pointer_to_name(stack[i]))
@@ -30,18 +30,18 @@ def display_stack(verbose):
             else:
                 sys.stdout.write("\tmalformed flag")
         elif types[i] == TYPE_BYTECODE:
-            sys.stdout.write("\t`" + unicode(stack[i]))
+            sys.stdout.write("\t`" + str(stack[i]))
         elif types[i] == TYPE_COMMENT:
-            sys.stdout.write(("\t\"" + slice_to_string(stack[i]) + "\"").encode('utf-8'))
+            sys.stdout.write(("\t\"" + slice_to_string(stack[i]) + "\""))
             if verbose == True:
-                sys.stdout.write("\n\t\tstored at: " + unicode(stack[i]))
+                sys.stdout.write("\n\t\tstored at: " + str(stack[i]))
         elif types[i] == TYPE_FUNCTION_CALL:
-            sys.stdout.write("\tCALL: " + unicode(stack[i]))
+            sys.stdout.write("\tCALL: " + str(stack[i]))
         else:
             sys.stdout.write("\tunmatched type on stack!")
             if verbose == True:
-                sys.stdout.write("\n\tRaw value: " + unicode(stack[i]))
-                sys.stdout.write("\n\tType code: " + unicode(types[i]))
+                sys.stdout.write("\n\tRaw value: " + str(stack[i]))
+                sys.stdout.write("\n\tType code: " + str(types[i]))
         sys.stdout.write("\n")
         i += 1
 

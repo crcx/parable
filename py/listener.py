@@ -10,6 +10,13 @@ import sys
 import parable
 
 
+try:
+    import __builtin__
+    input = getattr(__builtin__, 'raw_input')
+except (ImportError, AttributeError):
+    pass
+
+
 def display_item(prefix, value):
     sys.stdout.write('\t' + prefix + str(value))
 
@@ -75,20 +82,20 @@ def evaluate(s):
 
 
 def get_input():
-    done = 0
+    done = False
     s = ''
     sys.stdout.write("\ninput> ")
     sys.stdout.flush()
     indent = False
-    while done == 0:
+    while not done:
         if indent:
             sys.stdout.write("       ")
-        s = s + raw_input()
+        s = s + input()
         if s.endswith(' \\'):
             s = s[:-2].strip() + ' '
             indent = True
         else:
-            done = 1
+            done = True
     return s
 
 
@@ -100,12 +107,12 @@ def completer(text, state):
         return None
 
 if __name__ == '__main__':
-    print 'Parable Listener, (c) 2013-2016 Charles Childers'
-    print '------------------------------------------------'
-    print '.s       Display Stack'
-    print 'bye      Exit Listener'
-    print 'words    Display a list of all named items'
-    print '------------------------------------------------\n'
+    print('Parable Listener, (c) 2013-2016 Charles Childers')
+    print('------------------------------------------------')
+    print('.s       Display Stack')
+    print('bye      Exit Listener')
+    print('words    Display a list of all named items')
+    print('------------------------------------------------\n')
 
     readline.set_completer(completer)
     readline.parse_and_bind("tab: complete")

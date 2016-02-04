@@ -3,7 +3,6 @@
 # parable
 # Copyright (c) 2012-2016, Charles Childers
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-# ==========================================
 # coding: utf-8
 
 #
@@ -200,6 +199,7 @@ def check_depth(slice, offset, cells):
 current_slice = 0
 should_abort = False
 
+
 def interpret(slice, more=None):
     """Interpret the byte codes contained in a slice."""
     global current_slice
@@ -280,8 +280,8 @@ def interpret(slice, more=None):
                         c = request_slice()
                         d = get_last_index(b) + get_last_index(a) + 1
                         set_slice_last_index(c, d)
-                        memory_values[c] = memory_values[b][:] + memory_values[a][:]
-                        memory_types[c] = memory_types[b][:] + memory_types[a][:]
+                        memory_values[c] = memory_values[b] + memory_values[a]
+                        memory_types[c] = memory_types[b] + memory_types[a]
                         stack_push(c, TYPE_POINTER)
                     else:
                         stack_push(a + b, TYPE_NUMBER)
@@ -508,9 +508,9 @@ def interpret(slice, more=None):
                     offset = size
             elif opcode == BC_FLOW_IF:
                 if check_depth(slice, offset, 3):
-                    a = stack_pop()
-                    b = stack_pop()
-                    c = stack_pop()
+                    a = stack_pop()  # false
+                    b = stack_pop()  # true
+                    c = stack_pop()  # flag
                     if c == -1:
                         interpret(b, more)
                     else:
@@ -736,8 +736,8 @@ def interpret(slice, more=None):
                     offset = size
             elif opcode == BC_FUNCTION_NAME:
                 if check_depth(slice, offset, 1):
-                    a = stack_pop()
-                    stack_push(string_to_slice(pointer_to_name(a)), TYPE_STRING)
+                    a = pointer_to_name(stack_pop())
+                    stack_push(string_to_slice(a), TYPE_STRING)
                 else:
                     offset = size
             elif opcode == BC_STRING_SEEK:
@@ -789,7 +789,7 @@ def interpret(slice, more=None):
                         stack_push(string_to_slice(a), TYPE_STRING)
                     elif t == TYPE_CHARACTER:
                         a = stack_pop()
-                        b = ''.join(unichr(a))
+                        b = ''.join(chr(a))
                         a = b.upper()
                         stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                     else:
@@ -807,7 +807,7 @@ def interpret(slice, more=None):
                         stack_push(string_to_slice(a), TYPE_STRING)
                     elif t == TYPE_CHARACTER:
                         a = stack_pop()
-                        b = ''.join(unichr(a))
+                        b = ''.join(chr(a))
                         a = b.lower()
                         stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                     else:
@@ -916,12 +916,6 @@ def tos():
     return len(stack) - 1
 
 
-def stack_tos():
-    """return the top element on the stack"""
-    global stack, types
-    return stack[tos()]
-
-
 def stack_type():
     """return the type identifier for the top item on the stack"""
     global stack, types
@@ -986,7 +980,7 @@ def stack_change_type(desired):
             types.append(TYPE_BYTECODE)
     elif desired == TYPE_NUMBER:
         if original == TYPE_STRING:
-            if is_number(slice_to_string(stack_tos())):
+            if is_number(slice_to_string(stack[tos()])):
                 stack_push(float(slice_to_string(stack_pop())), TYPE_NUMBER)
             else:
                 stack_pop()
@@ -996,9 +990,9 @@ def stack_change_type(desired):
             types.append(TYPE_NUMBER)
     elif desired == TYPE_STRING:
         if original == TYPE_NUMBER:
-            stack_push(string_to_slice(unicode(stack_pop())), TYPE_STRING)
+            stack_push(string_to_slice(str(stack_pop())), TYPE_STRING)
         elif original == TYPE_CHARACTER:
-            stack_push(string_to_slice(str(unichr(stack_pop()))), TYPE_STRING)
+            stack_push(string_to_slice(str(chr(stack_pop()))), TYPE_STRING)
         elif original == TYPE_FLAG:
             s = stack_pop()
             if s == -1:
@@ -1190,8 +1184,8 @@ def set_slice_last_index(slice, size):
     old_size = memory_size[int(slice)]
     grow_by = size - old_size
     if grow_by > 0:
-        memory_values[int(slice)].extend(range(int(grow_by)))
-        memory_types[int(slice)].extend(range(int(grow_by)))
+        memory_values[int(slice)].extend(list(range(int(grow_by))))
+        memory_types[int(slice)].extend(list(range(int(grow_by))))
     if grow_by < 0:
         while grow_by < 0:
             grow_by = grow_by + 1
@@ -1216,7 +1210,7 @@ def slice_to_string(slice):
     i = 0
     size = get_last_index(int(slice))
     while i <= size:
-        s.append(unichr(int(fetch(slice, i))))
+        s.append(chr(int(fetch(slice, i))))
         i += 1
     return ''.join(s)
 
@@ -1227,6 +1221,18 @@ def slice_to_string(slice):
 # the code here implements the garbage collector.
 #
 
+def is_pointer(type):
+    flag = False
+    if type == TYPE_POINTER or \
+       type == TYPE_STRING or \
+       type == TYPE_COMMENT or \
+       type == TYPE_FUNCTION_CALL:
+        flag = True
+    else:
+        flag = False
+    return flag
+
+
 def find_references(s):
     """given a slice, return a list of all references in it"""
     ptrs = []
@@ -1235,7 +1241,7 @@ def find_references(s):
         return []
     if get_last_index(s) == 0:
         type = fetch_type(s, 0)
-        if type == TYPE_POINTER or type == TYPE_STRING or type == TYPE_COMMENT or type == TYPE_FUNCTION_CALL:
+        if is_pointer(type):
             ptrs.append(int(fetch(s, 0)))
         if type == TYPE_POINTER or type == TYPE_FUNCTION_CALL:
             for xt in find_references(int(fetch(s, 0))):
@@ -1243,7 +1249,7 @@ def find_references(s):
     else:
         while i < get_last_index(s):
             type = fetch_type(s, i)
-            if type == TYPE_POINTER or type == TYPE_STRING or type == TYPE_COMMENT or type == TYPE_FUNCTION_CALL:
+            if is_pointer(type):
                 ptrs.append(int(fetch(s, i)))
             if type == TYPE_POINTER or type == TYPE_FUNCTION_CALL:
                 for xt in find_references(int(fetch(s, i))):
@@ -1264,7 +1270,7 @@ def seek_all_references():
         refs.append(x)
     i = tos()
     while i > 0:
-        if types[i] == TYPE_STRING or types[i] == TYPE_COMMENT or types[i] == TYPE_POINTER or types[i] == TYPE_FUNCTION_CALL:
+        if is_pointer(types[i]):
             refs.append(stack[i])
             for x in find_references(stack[i]):
                 refs.append(x)
@@ -1350,7 +1356,8 @@ def compile_pointer(name, slice, offset):
             store(lookup_pointer(name), slice, offset, TYPE_POINTER)
         else:
             store(0, slice, offset, TYPE_POINTER)
-            report('E03: Compile Error: Unable to map ' + name + ' to a pointer')
+            report('E03: Compile Error: Unable to map ' +
+                   name + ' to a pointer')
     offset += 1
     return offset
 
@@ -1360,7 +1367,8 @@ def compile_number(number, slice, offset):
         store(float(number), slice, offset, TYPE_NUMBER)
     else:
         store(float('nan'), slice, offset, TYPE_NUMBER)
-        report("E03: Compile Error: Unable to convert " + number + " to a number")
+        report("E03: Compile Error: Unable to convert " +
+               number + " to a number")
     offset += 1
     return offset
 
@@ -1385,7 +1393,7 @@ def parse_string(tokens, i, count, delimiter):
     a = tokens[i].endswith(delimiter)
     b = tokens[i] != delimiter
     c = tokens[i].endswith("\\" + delimiter)
-    if (a and b and not c):
+    if a and b and not c:
         s = tokens[i]
     else:
         j = i + 1
@@ -1395,7 +1403,7 @@ def parse_string(tokens, i, count, delimiter):
             s += tokens[j]
             a = tokens[j].endswith(delimiter)
             b = tokens[j].endswith("\\" + delimiter)
-            if (a and not b):
+            if a and not b:
                 i = j
                 j = count
             j += 1
@@ -1457,8 +1465,7 @@ def compile(str, slice):
 
 def parse_bootstrap(f):
     """compile the bootstrap package it into memory"""
-    f = condense_lines(f)
-    for line in f:
+    for line in condense_lines(f):
         if len(line) > 0:
             interpret(compile(line, request_slice()))
 
@@ -1751,20 +1758,20 @@ def display_stack(verbose):
     i = 0
     while i < len(stack):
         if i == len(stack) - 1:
-            sys.stdout.write("TOS\t" + unicode(i))
+            sys.stdout.write("TOS\t" + str(i))
         else:
-            sys.stdout.write("\t" + unicode(i))
+            sys.stdout.write("\t" + str(i))
 
         if types[i] == TYPE_NUMBER:
-            sys.stdout.write("\t#" + unicode(stack[i]))
+            sys.stdout.write("\t#" + str(stack[i]))
         elif types[i] == TYPE_CHARACTER:
-            sys.stdout.write("\t$" + unicode(unichr(stack[i])))
+            sys.stdout.write("\t$" + str(chr(stack[i])))
         elif types[i] == TYPE_STRING:
-            sys.stdout.write(("\t'" + slice_to_string(stack[i]) + "'").encode('utf-8'))
+            sys.stdout.write(("\t'" + slice_to_string(stack[i]) + "'"))
             if verbose == True:
-                sys.stdout.write("\n\t\tstored at: " + unicode(stack[i]))
+                sys.stdout.write("\n\t\tstored at: " + str(stack[i]))
         elif types[i] == TYPE_POINTER:
-            sys.stdout.write("\t&" + unicode(stack[i]))
+            sys.stdout.write("\t&" + str(stack[i]))
             if verbose == True:
                 if pointer_to_name(stack[i]) != "":
                     sys.stdout.write("\n\t\tpointer to: " + pointer_to_name(stack[i]))
@@ -1776,18 +1783,18 @@ def display_stack(verbose):
             else:
                 sys.stdout.write("\tmalformed flag")
         elif types[i] == TYPE_BYTECODE:
-            sys.stdout.write("\t`" + unicode(stack[i]))
+            sys.stdout.write("\t`" + str(stack[i]))
         elif types[i] == TYPE_COMMENT:
-            sys.stdout.write(("\t\"" + slice_to_string(stack[i]) + "\"").encode('utf-8'))
+            sys.stdout.write(("\t\"" + slice_to_string(stack[i]) + "\""))
             if verbose == True:
-                sys.stdout.write("\n\t\tstored at: " + unicode(stack[i]))
+                sys.stdout.write("\n\t\tstored at: " + str(stack[i]))
         elif types[i] == TYPE_FUNCTION_CALL:
-            sys.stdout.write("\tCALL: " + unicode(stack[i]))
+            sys.stdout.write("\tCALL: " + str(stack[i]))
         else:
             sys.stdout.write("\tunmatched type on stack!")
             if verbose == True:
-                sys.stdout.write("\n\tRaw value: " + unicode(stack[i]))
-                sys.stdout.write("\n\tType code: " + unicode(types[i]))
+                sys.stdout.write("\n\tRaw value: " + str(stack[i]))
+                sys.stdout.write("\n\tType code: " + str(types[i]))
         sys.stdout.write("\n")
         i += 1
 

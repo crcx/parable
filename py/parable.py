@@ -787,7 +787,7 @@ def interpret(slice, more=None):
                         stack_push(string_to_slice(a), TYPE_STRING)
                     elif t == TYPE_CHARACTER:
                         a = stack_pop()
-                        b = ''.join(unichr(a))
+                        b = ''.join(chr(a))
                         a = b.upper()
                         stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                     else:
@@ -805,7 +805,7 @@ def interpret(slice, more=None):
                         stack_push(string_to_slice(a), TYPE_STRING)
                     elif t == TYPE_CHARACTER:
                         a = stack_pop()
-                        b = ''.join(unichr(a))
+                        b = ''.join(chr(a))
                         a = b.lower()
                         stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                     else:
@@ -988,9 +988,9 @@ def stack_change_type(desired):
             types.append(TYPE_NUMBER)
     elif desired == TYPE_STRING:
         if original == TYPE_NUMBER:
-            stack_push(string_to_slice(unicode(stack_pop())), TYPE_STRING)
+            stack_push(string_to_slice(str(stack_pop())), TYPE_STRING)
         elif original == TYPE_CHARACTER:
-            stack_push(string_to_slice(str(unichr(stack_pop()))), TYPE_STRING)
+            stack_push(string_to_slice(str(chr(stack_pop()))), TYPE_STRING)
         elif original == TYPE_FLAG:
             s = stack_pop()
             if s == -1:
@@ -1182,8 +1182,8 @@ def set_slice_last_index(slice, size):
     old_size = memory_size[int(slice)]
     grow_by = size - old_size
     if grow_by > 0:
-        memory_values[int(slice)].extend(range(int(grow_by)))
-        memory_types[int(slice)].extend(range(int(grow_by)))
+        memory_values[int(slice)].extend(list(range(int(grow_by))))
+        memory_types[int(slice)].extend(list(range(int(grow_by))))
     if grow_by < 0:
         while grow_by < 0:
             grow_by = grow_by + 1
@@ -1208,7 +1208,7 @@ def slice_to_string(slice):
     i = 0
     size = get_last_index(int(slice))
     while i <= size:
-        s.append(unichr(int(fetch(slice, i))))
+        s.append(chr(int(fetch(slice, i))))
         i += 1
     return ''.join(s)
 

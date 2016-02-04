@@ -10,6 +10,14 @@ import sys
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
+try:
+    import __builtin__
+    input = getattr(__builtin__, 'raw_input')
+except (ImportError, AttributeError):
+    pass
+
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
 def save_snapshot(filename):
     global dictionary_names, \
            dictionary_slices, \
@@ -116,13 +124,13 @@ def display_value():
     global stack, types
     i = len(stack) - 1
     if types[i] == TYPE_NUMBER:
-        sys.stdout.write(unicode(stack[i]))
+        sys.stdout.write(str(stack[i]))
     elif types[i] == TYPE_CHARACTER:
-        sys.stdout.write(unicode(unichr(stack[i])))
+        sys.stdout.write(str(chr(stack[i])))
     elif types[i] == TYPE_STRING:
-        sys.stdout.write(slice_to_string(stack[i]).encode('utf-8'))
+        sys.stdout.write(slice_to_string(stack[i]))
     elif types[i] == TYPE_POINTER:
-        sys.stdout.write('&' + unicode(stack[i]))
+        sys.stdout.write('&' + str(stack[i]))
     elif types[i] == TYPE_FLAG:
         if stack[i] == -1:
             sys.stdout.write("true")
@@ -131,11 +139,11 @@ def display_value():
         else:
             sys.stdout.write("malformed flag")
     elif types[i] == TYPE_COMMENT:
-        sys.stdout.write(slice_to_string(stack[i]).encode('utf-8'))
+        sys.stdout.write(slice_to_string(stack[i]))
     elif types[i] == TYPE_BYTECODE:
-        sys.stdout.write('`' + unicode(stack[i]))
+        sys.stdout.write('`' + str(stack[i]))
     elif types[i] == TYPE_FUNCTION_CALL:
-        sys.stdout.write('CALL: ' + unicode(stack[i]))
+        sys.stdout.write('CALL: ' + str(stack[i]))
     else:
        sys.stdout.write("unknown type")
 
@@ -184,7 +192,7 @@ def opcodes(slice, offset, opcode):
         stack_push(ord(files[slot].read(1)), TYPE_NUMBER)
     elif opcode == 3003:
         slot = int(stack_pop())
-        files[slot].write(unichr(int(stack_pop())))
+        files[slot].write(chr(int(stack_pop())))
     elif opcode == 3004:
         slot = int(stack_pop())
         stack_push(files[slot].tell(), TYPE_NUMBER)
@@ -290,7 +298,7 @@ def get_input():
     done = 0
     s = ''
     while done == 0:
-        s = s + raw_input()
+        s = s + input()
         if s.endswith(' \\'):
             s = s[:-2].strip() + ' '
         else:
@@ -312,12 +320,12 @@ def scripting():
 def interactive():
     readline.set_completer(completer)
     readline.parse_and_bind("tab: complete")
-    print 'allegory, (c)2013-2016 Charles Childers'
-    print '------------------------------------------------'
-    print '.s       Display Stack'
-    print 'bye      Exit Listener'
-    print 'words    Display a list of all named items'
-    print '------------------------------------------------\n'
+    print('allegory, (c)2013-2016 Charles Childers')
+    print('------------------------------------------------')
+    print('.s       Display Stack')
+    print('bye      Exit Listener')
+    print('words    Display a list of all named items')
+    print('------------------------------------------------\n')
     while True:
         sys.stdout.write("\ninput> ")
         sys.stdout.flush()
