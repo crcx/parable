@@ -974,15 +974,16 @@ def stack_tuck():
     stack_over()
 
 
-def stack_change_type(type):
+def stack_change_type(desired):
     """convert the type of an item on the stack to a different type"""
     global types, stack
-    if type == TYPE_BYTECODE:
-        if stack_type() == TYPE_NUMBER:
-            a = stack_pop()
-            stack_push(a, TYPE_BYTECODE)
-    elif type == TYPE_NUMBER:
-        if stack_type() == TYPE_STRING:
+    original = stack_type()
+    if desired == TYPE_BYTECODE:
+        if original == TYPE_NUMBER:
+            types.pop()
+            types.append(TYPE_BYTECODE)
+    elif desired == TYPE_NUMBER:
+        if original == TYPE_STRING:
             if is_number(slice_to_string(stack_tos())):
                 stack_push(float(slice_to_string(stack_pop())), TYPE_NUMBER)
             else:
@@ -991,13 +992,12 @@ def stack_change_type(type):
         else:
             types.pop()
             types.append(TYPE_NUMBER)
-    elif type == TYPE_STRING:
-        if stack_type() == TYPE_NUMBER:
+    elif desired == TYPE_STRING:
+        if original == TYPE_NUMBER:
             stack_push(string_to_slice(unicode(stack_pop())), TYPE_STRING)
-        elif stack_type() == TYPE_CHARACTER:
-            a = stack_pop()
-            stack_push(string_to_slice(''.join(unichr(a))), TYPE_STRING)
-        elif stack_type() == TYPE_FLAG:
+        elif original == TYPE_CHARACTER:
+            stack_push(string_to_slice(str(unichr(stack_pop()))), TYPE_STRING)
+        elif original == TYPE_FLAG:
             s = stack_pop()
             if s == -1:
                 stack_push(string_to_slice('true'), TYPE_STRING)
@@ -1005,23 +1005,23 @@ def stack_change_type(type):
                 stack_push(string_to_slice('false'), TYPE_STRING)
             else:
                 stack_push(string_to_slice('malformed flag'), TYPE_STRING)
-        elif stack_type() == TYPE_POINTER:
+        elif original == TYPE_POINTER:
             types.pop()
             types.append(TYPE_STRING)
         else:
             return 0
-    elif type == TYPE_CHARACTER:
-        if stack_type() == TYPE_STRING:
+    elif desired == TYPE_CHARACTER:
+        if original == TYPE_STRING:
             s = slice_to_string(stack_pop())
             stack_push(ord(s[0].encode('utf-8')), TYPE_CHARACTER)
         else:
             s = stack_pop()
             stack_push(int(s), TYPE_CHARACTER)
-    elif type == TYPE_POINTER:
+    elif desired == TYPE_POINTER:
         types.pop()
         types.append(TYPE_POINTER)
-    elif type == TYPE_FLAG:
-        if stack_type() == TYPE_STRING:
+    elif desired == TYPE_FLAG:
+        if original == TYPE_STRING:
             s = slice_to_string(stack_pop())
             if s == 'true':
                 stack_push(-1, TYPE_FLAG)
@@ -1032,8 +1032,8 @@ def stack_change_type(type):
         else:
             s = stack_pop()
             stack_push(s, TYPE_FLAG)
-    elif type == TYPE_FUNCTION_CALL:
-        if stack_type() == TYPE_NUMBER or stack_type() == TYPE_POINTER:
+    elif desired == TYPE_FUNCTION_CALL:
+        if original == TYPE_NUMBER or original == TYPE_POINTER:
             a = stack_pop()
             stack_push(a, TYPE_FUNCTION_CALL)
     else:
