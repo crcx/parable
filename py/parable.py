@@ -1,7 +1,8 @@
-# coding: utf-8
 # parable
 # Copyright (c) 2012-2016, Charles Childers
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 # ==========================================
+# coding: utf-8
 
 #
 # Dependencies
@@ -277,8 +278,8 @@ def interpret(slice, more=None):
                         c = request_slice()
                         d = get_last_index(b) + get_last_index(a) + 1
                         set_slice_last_index(c, d)
-                        p_slices[c] = p_slices[b][:] + p_slices[a][:]
-                        p_types[c] = p_types[b][:] + p_types[a][:]
+                        memory_values[c] = memory_values[b][:] + memory_values[a][:]
+                        memory_types[c] = memory_types[b][:] + memory_types[a][:]
                         stack_push(c, TYPE_POINTER)
                     else:
                         stack_push(a + b, TYPE_NUMBER)
@@ -749,9 +750,9 @@ def interpret(slice, more=None):
                     a = int(stack_pop())
                     b = int(stack_pop())
                     s = int(stack_pop())
-                    c = p_slices[s]
+                    c = memory_values[s]
                     d = c[b:a]
-                    dt = p_types[s]
+                    dt = memory_types[s]
                     dt = dt[b:a]
                     e = request_slice()
                     i = 0
@@ -773,7 +774,7 @@ def interpret(slice, more=None):
             elif opcode == BC_SLICE_REVERSE:
                 if check_depth(slice, offset, 1):
                     a = stack_pop()
-                    p_slices[int(a)] = p_slices[int(a)][::-1]
+                    memory_values[int(a)] = memory_values[int(a)][::-1]
                     stack_push(a, TYPE_POINTER)
                 else:
                     offset = size
@@ -1087,25 +1088,24 @@ def remove_name(name):
 #
 # in parable, memory is divided into regions called slices
 # compiled code, strings, and other data are stored in these.
-# each slice can contain up to SLICE_LEN values
 #
 
-p_slices = []
-p_types = []
-p_map = []
-p_sizes = []
+memory_values = []
+memory_types = []
+memory_map = []
+memory_size = []
 
 
 def request_slice(attempts=1):
     """request a new memory slice"""
-    global p_slices, p_types, p_map, p_sizes, MAX_SLICES
+    global memory_values, memory_types, memory_map, memory_size, MAX_SLICES
     i = 0
     while i < MAX_SLICES:
-        if p_map[i] == 0:
-            p_map[i] = 1
-            p_slices[i] = [0]
-            p_types[i] = [TYPE_NUMBER]
-            p_sizes[i] = 0
+        if memory_map[i] == 0:
+            memory_map[i] = 1
+            memory_values[i] = [0]
+            memory_types[i] = [TYPE_NUMBER]
+            memory_size[i] = 0
             return i
         else:
             i += 1
@@ -1118,84 +1118,84 @@ def request_slice(attempts=1):
 
 def release_slice(slice):
     """release a slice. the slice should not be used after this is done"""
-    global p_map
-    p_map[int(slice)] = 0
+    global memory_map
+    memory_map[int(slice)] = 0
 
 
 def copy_slice(source, dest):
     """copy the contents of one slice to another"""
-    global p_slices, p_map, p_sizes
+    global memory_values, memory_map, memory_size
     i = 0
-    l = p_sizes[int(source)]
+    l = memory_size[int(source)]
     while i <= l:
         v = fetch(int(source), i)
         t = fetch_type(int(source), i)
         store(v, int(dest), i, t)
         i += 1
-    p_sizes[int(dest)] = p_sizes[int(source)]
+    memory_size[int(dest)] = memory_size[int(source)]
 
 
 def prepare_slices():
     """prepare the initial set of slices for use"""
-    global p_slices, p_types, p_map, p_sizes, MAX_SLICES
-    p_map = [0 for x in range(MAX_SLICES)]
-    p_slices = [0 for x in range(MAX_SLICES)]
-    p_types = [0 for x in range(MAX_SLICES)]
-    p_sizes = [0 for x in range(MAX_SLICES)]
+    global memory_values, memory_types, memory_map, memory_size, MAX_SLICES
+    memory_map = [0 for x in range(MAX_SLICES)]
+    memory_values = [0 for x in range(MAX_SLICES)]
+    memory_types = [0 for x in range(MAX_SLICES)]
+    memory_size = [0 for x in range(MAX_SLICES)]
 
 
 def fetch(slice, offset):
     """obtain a value stored in a slice"""
-    global p_slices, p_map
+    global memory_values, memory_map
     if get_last_index(slice) < offset:
         set_slice_last_index(slice, offset)
-    return p_slices[int(slice)][int(offset)]
+    return memory_values[int(slice)][int(offset)]
 
 
 def fetch_type(slice, offset):
     """obtain a value stored in a slice"""
-    global p_types, p_map
+    global memory_types, memory_map
     if get_last_index(slice) < offset:
         set_slice_last_index(slice, offset)
-    return p_types[int(slice)][int(offset)]
+    return memory_types[int(slice)][int(offset)]
 
 
 def store_type(slice, offset, type):
-    global p_slices, p_types, p_map
+    global memory_values, memory_types, memory_map
     if get_last_index(slice) < offset:
         set_slice_last_index(slice, offset)
-    p_types[int(slice)][int(offset)] = type
+    memory_types[int(slice)][int(offset)] = type
 
 
 def store(value, slice, offset, type=100):
     """store a value into a slice"""
-    global p_slices, p_types, p_map
+    global memory_values, memory_types, memory_map
     if get_last_index(slice) < offset:
         set_slice_last_index(slice, offset)
-    p_slices[int(slice)][int(offset)] = value
-    p_types[int(slice)][int(offset)] = type
+    memory_values[int(slice)][int(offset)] = value
+    memory_types[int(slice)][int(offset)] = type
 
 
 def get_last_index(slice):
     """get the length of a slice"""
-    global p_sizes
-    return p_sizes[int(slice)]
+    global memory_size
+    return memory_size[int(slice)]
 
 
 def set_slice_last_index(slice, size):
     """set the length of a slice"""
-    global p_slices, p_types, p_sizes
-    old_size = p_sizes[int(slice)]
+    global memory_values, memory_types, memory_size
+    old_size = memory_size[int(slice)]
     grow_by = size - old_size
     if grow_by > 0:
-        p_slices[int(slice)].extend(range(int(grow_by)))
-        p_types[int(slice)].extend(range(int(grow_by)))
+        memory_values[int(slice)].extend(range(int(grow_by)))
+        memory_types[int(slice)].extend(range(int(grow_by)))
     if grow_by < 0:
         while grow_by < 0:
             grow_by = grow_by + 1
-            del p_slices[int(slice)][-1]
-            del p_types[int(slice)][-1]
-    p_sizes[int(slice)] = size
+            del memory_values[int(slice)][-1]
+            del memory_types[int(slice)][-1]
+    memory_size[int(slice)] = size
 
 
 def string_to_slice(string):
@@ -1272,11 +1272,11 @@ def seek_all_references():
 
 def collect_garbage():
     """scan memory, and collect unused slices"""
-    global MAX_SLICES, p_map
+    global MAX_SLICES, memory_map
     i = 0
     refs = seek_all_references()
     while i < MAX_SLICES:
-        if p_map[i] == 1:
+        if memory_map[i] == 1:
             try:
                 x = refs.index(i)
             except:
