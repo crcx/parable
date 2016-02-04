@@ -77,10 +77,16 @@ def evaluate(s):
 def get_input():
     done = 0
     s = ''
+    sys.stdout.write("\ninput> ")
+    sys.stdout.flush()
+    indent = False
     while done == 0:
+        if indent:
+            sys.stdout.write("       ")
         s = s + raw_input()
         if s.endswith(' \\'):
             s = s[:-2].strip() + ' '
+            indent = True
         else:
             done = 1
     return s
@@ -114,9 +120,6 @@ if __name__ == '__main__':
     evaluate("[ \"s-\"  `9003 ] 'include' define")
 
     while 1 == 1:
-        sys.stdout.write("\ninput> ")
-        sys.stdout.flush()
-
         try:
             src = get_input()
         except:
@@ -132,7 +135,7 @@ if __name__ == '__main__':
                 pass
 
         for e in parable.errors:
-            sys.stdout.write(e)
+            sys.stdout.write(e + "\n")
 
         parable.clear_errors()
         sys.stdout.flush()
