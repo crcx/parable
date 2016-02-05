@@ -1,11 +1,11 @@
-#!/usr/bin/env pypy
+#!/usr/bin/env python3
 # (c) 2015, 2016 Charles Childers
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 
-import base64, cgi, cgitb, gzip, json, signal, sys
-import StringIO
+import base64, cgi, cgitb, bz2, json, signal, sys
+import io
 import parable
 
 
@@ -14,7 +14,7 @@ import parable
 
 def extract(pso, key):
     raw = base64.b64decode(pso)
-    j = json.loads(gzip.GzipFile(fileobj=StringIO.StringIO(raw)).read())
+    j = json.loads(bz2.decompress(raw).decode())
     return j[key]
 
 
@@ -28,16 +28,13 @@ def save_snapshot():
                     "memory_types": parable.memory_types,
                     "memory_map": parable.memory_map,
                     "memory_sizes": parable.memory_size})
-    o = StringIO.StringIO()
-    with gzip.GzipFile(fileobj=o, mode="w") as file:
-        file.write(j)
-
-    return base64.b64encode(o.getvalue())
+    o = bz2.compress(bytes(j, 'utf-8'))
+    return base64.b64encode(o)
 
 
 def load_snapshot(data):
     raw = base64.b64decode(data)
-    j = json.loads(gzip.GzipFile(fileobj=StringIO.StringIO(raw)).read())
+    j = json.loads(bz2.decompress(raw).decode())
     parable.dictionary_names = j['symbols']
     parable.dictionary_slices = j['symbol_map']
     parable.stack = j['stack_values']
@@ -57,7 +54,7 @@ def getpso(form):
     parable.prepare_dictionary()
     parable.parse_bootstrap(open('stdlib.p').readlines())
     parable.collect_garbage()
-    pso = save_snapshot()
+    pso = save_snapshot().decode()
     return pso
 
 
@@ -67,7 +64,7 @@ def evaluate(form):
     parable.errors = []
     source = form.getvalue("source")
     process_input(source)
-    pso = save_snapshot()
+    pso = save_snapshot().decode()
     return pso
 
 
@@ -112,17 +109,16 @@ def errors(form):
 def clear_errors(form):
     pso = form.getvalue("pso")
     load_snapshot(pso)
-    parable.errors = []
-    pso = save_snapshot()
-    return pso
+    parable.clear_errors()
+    return save_snapshot().decode()
 
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 
 def handler(signum, frame):
-    print "Content-Type: application/json"
-    print
+    print("Content-Type: application/json")
+    print("")
     report('FATAL ERROR: Execution exceed max runtime permitted')
     sys.exit('fatal error: execution runtime exceeded')
 
@@ -143,8 +139,6 @@ def process_input(source):
 
 
 if __name__ == '__main__':
-    cgitb.enable()  # for troubleshooting
-
     # Cap max run time at 60 seconds
     # (This seems satisfactory so far, and keeps server load managable)
     signal.signal(signal.SIGALRM, handler)
@@ -183,8 +177,8 @@ if __name__ == '__main__':
     if req == "get_slice":
         res = get_slice(form)
 
-    print "Content-Type: text/plain"
-    print
-    print str(res)
+    print("Content-Type: text/plain")
+    print("")
+    print(res)
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
