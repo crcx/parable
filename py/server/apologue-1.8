@@ -35,13 +35,13 @@ def get_results(message):
     i = 0
     while i < len(parable.stack):
         if parable.types[i] == parable.TYPE_NUMBER:
-            sequence.append("#" + unicode(parable.stack[i]))
+            sequence.append("#" + str(parable.stack[i]))
         elif parable.types[i] == parable.TYPE_CHARACTER:
-            sequence.append("$" + unicode(unichr(parable.stack[i])))
+            sequence.append("$" + str(chr(parable.stack[i])))
         elif parable.types[i] == parable.TYPE_STRING:
-            sequence.append("'" + unicode(parable.slice_to_string(parable.stack[i])) + "'")
+            sequence.append("'" + str(parable.slice_to_string(parable.stack[i])) + "'")
         elif parable.types[i] == parable.TYPE_POINTER:
-            sequence.append("&" + unicode(parable.stack[i]))
+            sequence.append("&" + str(parable.stack[i]))
         elif parable.types[i] == parable.TYPE_FLAG:
             if parable.stack[i] == -1:
                 sequence.append("true")
@@ -50,11 +50,11 @@ def get_results(message):
             else:
                 sequence.append("malformed flag")
         elif parable.types[i] == parable.TYPE_BYTECODE:
-            sequence.append("`" + unicode(parable.stack[i]))
+            sequence.append("`" + str(parable.stack[i]))
         elif parable.types[i] == parable.TYPE_COMMENT:
-            sequence.append("\"" + unicode(parable.slice_to_string(parable.stack[i])) + "\"")
+            sequence.append("\"" + str(parable.slice_to_string(parable.stack[i])) + "\"")
         elif parable.types[i] == parable.TYPE_FUNCTION_CALL:
-            sequence.append("Call to: " + unicode(parable.stack[i]))
+            sequence.append("Call to: " + str(parable.stack[i]))
         else:
             sequence.append("unmatched type on stack!")
         i = i + 1
