@@ -46,7 +46,7 @@ def dump_stack():
         if type == parable.TYPE_NUMBER:
             sys.stdout.write(stack_item(i, "#" + str(tos)))
         elif type == parable.TYPE_CHARACTER:
-            sys.stdout.write(stack_item(i, "$" + unicode(unichr(tos)).encode('utf-8')))
+            sys.stdout.write(stack_item(i, "$" + str(chr(tos))))
         elif type == parable.TYPE_STRING:
             s = "'" + parable.slice_to_string(tos) + "'"
             s = s + "<br>Store at: " + str(tos)
@@ -112,7 +112,7 @@ if __name__ == '__main__':
     message = form.getvalue("code", "")
     sys.stdout.write("Content-type: text/html\n\n")
 
-    print """
+    print("""
         <!DOCTYPE html>
         <head>
             <title>parable language</title>
@@ -128,17 +128,17 @@ if __name__ == '__main__':
             <div class="row">
                 <div class="span6">
                     <form name='editor' id='editor' action='punga.py' method='post'>
-    """
+    """)
     sys.stdout.write("<textarea rows='12' class='span6' name='code' ")
     sys.stdout.write("placeholder='enter your code here'>")
     sys.stdout.write(message)
     sys.stdout.write("</textarea>")
-    print """
+    print("""
                         <a onClick='document.forms["editor"].submit()' class='btn'>Evaluate</a>
                     </form>
                 </div>
                 <div class="span6">
-    """
+    """)
 
     message = message.replace("\\\r\n", " ")
     message = message.replace("\\\n", " ")
@@ -156,7 +156,7 @@ if __name__ == '__main__':
     dump_errors()
     dump_stack()
 
-    print """
+    print("""
                     &nbsp;
                 </div>
             </div>
@@ -169,4 +169,4 @@ if __name__ == '__main__':
     </div>
     </body>
     </html>
-    """
+    """)
