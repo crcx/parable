@@ -36,6 +36,13 @@ import os, readline, sys
 import parable
 
 
+try:
+    import __builtin__
+    input = getattr(__builtin__, 'raw_input')
+except (ImportError, AttributeError):
+    pass
+
+
 #
 # Configuration
 #
@@ -69,7 +76,7 @@ colorCodes = {
 
 def write(text, color):
     """Write to stdout in color."""
-    sys.stdout.write(("\033[" + colorCodes[color] + "m" + text + "\033[0m").encode('utf-8'))
+    sys.stdout.write("\033[" + colorCodes[color] + "m" + text + "\033[0m")
 
 
 def getTerminalSize():
@@ -121,21 +128,21 @@ def display_stack():
 
         # display the stack item number
         if i == len(parable.stack) - 1:
-            write("TOS\t" + unicode(i), COLOR_STACK_LINE)
+            write("TOS\t" + str(i), COLOR_STACK_LINE)
         else:
-            write("\t" + unicode(i), COLOR_STACK_LINE)
+            write("\t" + str(i), COLOR_STACK_LINE)
 
         # display the stack item
         if type == parable.TYPE_NUMBER:
-            write("\t#" + unicode(tos), COLOR_STACK_N)
+            write("\t#" + str(tos), COLOR_STACK_N)
         elif type == parable.TYPE_CHARACTER:
-            write("\t$" + unicode(unichr(tos)), COLOR_STACK_C)
+            write("\t$" + str(chr(tos)), COLOR_STACK_C)
         elif type == parable.TYPE_STRING:
             write("\t'" + parable.slice_to_string(tos) + "'", COLOR_STACK_S)
-            write("\n\t\tstored at: " + unicode(tos), 'normal')
+            write("\n\t\tstored at: " + str(tos), 'normal')
             l += 1
         elif type == parable.TYPE_POINTER:
-            write("\t&" + unicode(tos), COLOR_STACK_F)
+            write("\t&" + str(tos), COLOR_STACK_F)
             if parable.pointer_to_name(tos) != "":
                 write("\n\t\tpointer to: ", 'normal')
                 write(parable.pointer_to_name(tos), 'normal')
@@ -148,13 +155,13 @@ def display_stack():
             else:
                 write("\tmalformed flag", COLOR_STACK_FLAG)
         elif type == parable.TYPE_BYTECODE:
-            write("\t`" + unicode(tos), COLOR_STACK_BYTECODE)
+            write("\t`" + str(tos), COLOR_STACK_BYTECODE)
         elif type == parable.TYPE_COMMENT:
             write("\t\"" + parable.slice_to_string(tos) + "\"", COLOR_STACK_COMMENT)
-            write("\n\t\tstored at: " + unicode(tos), 'normal')
+            write("\n\t\tstored at: " + str(tos), 'normal')
             l += 1
         elif type == parable.TYPE_FUNCTION_CALL:
-            write("\tCALL: " + unicode(tos), COLOR_STACK_FUN_CALL)
+            write("\tCALL: " + str(tos), COLOR_STACK_FUN_CALL)
         else:
             write("\tUNKNOWN\t" + str(tos) + "\t" + str(type), COLOR_ERROR)
         sys.stdout.write("\n")
@@ -214,7 +221,7 @@ def get_input():
     done = 0
     s = ''
     while done == 0:
-        s = s + raw_input()
+        s = s + input()
         if s.endswith(' \\'):
             s = s[:-2].strip() + ' '
         else:
