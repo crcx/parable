@@ -20,8 +20,9 @@ except (ImportError, AttributeError):
 
 
 def stack(pso):
-    v = PaaS.stack_values(pso)
-    t = PaaS.stack_types(pso)
+    s = PaaS.stack(pso)
+    v = s['values']
+    t = s['types']
     a = []
     x = 0
     while x < len(v):
@@ -114,7 +115,8 @@ if __name__ == '__main__':
                     sys.stdout.write(i + '  ')
                 sys.stdout.write("\n")
             elif src == "words":
-                for w in PaaS.dictionary_names(parable):
+                dictionary = PaaS.dictionary(parable)
+                for w in dictionary['names']:
                     sys.stdout.write(w + ' ')
                 sys.stdout.write("\n")
             elif src == "bye":

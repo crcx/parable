@@ -68,6 +68,24 @@ def evaluate(form):
     return pso
 
 
+def dictionary(form):
+    pso = form.getvalue("pso")
+    load_snapshot(pso)
+    j = json.dumps({"names": parable.dictionary_names,
+                    "pointers": parable.dictionary_slices,
+                  })
+    return j
+
+
+def stack(form):
+    pso = form.getvalue("pso")
+    load_snapshot(pso)
+    j = json.dumps({"values": parable.stack,
+                    "types": parable.types,
+                  })
+    return j
+
+
 def dictionary_names(form):
     pso = form.getvalue("pso")
     load_snapshot(pso)
@@ -155,6 +173,12 @@ if __name__ == '__main__':
 
     if req == "evaluate":
         res = evaluate(form)
+
+    if req == "dictionary":
+        res = dictionary(form)
+
+    if req == "stack":
+        res = stack(form)
 
     if req == "dictionary_names":
         res = dictionary_names(form)
