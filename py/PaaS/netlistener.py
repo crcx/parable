@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # netlistener - listener using PaaS backend
 # (c) 2016, charles childers
 
