@@ -10,6 +10,14 @@ import sys
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
+try:
+    import __builtin__
+    input = getattr(__builtin__, 'raw_input')
+except (ImportError, AttributeError):
+    pass
+
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
 
 def stack(pso):
     v = PaaS.stack_values(pso)
@@ -44,7 +52,7 @@ def get_input():
     done = 0
     s = ''
     while done == 0:
-        s = s + raw_input()
+        s = s + input()
         if s.endswith(' \\'):
             s = s[:-2].strip() + ' '
         else:
@@ -77,12 +85,12 @@ def prompt():
 
 
 if __name__ == '__main__':
-    print
-    print 'netlistener, (c) 2016 Charles Childers'
+    print("")
+    print('netlistener, (c) 2016 Charles Childers')
     sep()
-    print '.s\tdisplay stack'
-    print 'words\tdisplay all named items'
-    print 'bye\texit netlistener'
+    print('.s\tdisplay stack')
+    print('words\tdisplay all named items')
+    print('bye\texit netlistener')
     sep()
 
     readline.set_completer(completer)
@@ -120,7 +128,8 @@ if __name__ == '__main__':
                     pass
 
         for e in PaaS.errors(parable):
-            print e
+            print(e)
+
         parable = PaaS.clear_errors(parable)
 
         sys.stdout.flush()

@@ -3,9 +3,7 @@
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
-
-import urllib
-import urllib2
+import requests
 
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
@@ -16,81 +14,53 @@ def endpoint():
 
 
 def getpso():
-    url = endpoint()
-    params = urllib.urlencode({
-      'req': 'getpso',
-    })
-    return urllib2.urlopen(url, params).read()
+    payload = { 'req': 'getpso' }
+    return requests.post(endpoint(), data=payload).text
 
 
 def evaluate(pso, source):
-    url = endpoint()
-    params = urllib.urlencode({
-      'req': 'evaluate',
-      'source': source,
-      'pso': pso,
-    })
-    return urllib2.urlopen(url, params).read()
+    payload = { 'req': 'evaluate', 'source': source, 'pso': pso }
+    return requests.post(endpoint(), data=payload).text
 
 
 def errors(pso):
-    url = endpoint()
-    params = urllib.urlencode({
-      'req': 'errors',
-      'pso': pso,
-    })
-    return eval(urllib2.urlopen(url, params).read())
+    payload = { 'req': 'errors', 'pso': pso }
+    r = requests.post(endpoint(), data=payload)
+    return eval(r.text)
 
 
 def clear_errors(pso):
-    url = endpoint()
-    params = urllib.urlencode({
-      'req': 'clear_errors',
-      'pso': pso,
-    })
-    return urllib2.urlopen(url, params).read()
+    payload = { 'req': 'clear_errors', 'pso': pso }
+    return requests.post(endpoint(), data=payload).text
 
 
 def dictionary_names(pso):
-    url = endpoint()
-    params = urllib.urlencode({
-      'req': 'dictionary_names',
-      'pso': pso,
-    })
-    return eval(urllib2.urlopen(url, params).read())
+    payload = { 'req': 'dictionary_names', 'pso': pso }
+    r = requests.post(endpoint(), data=payload)
+    return eval(r.text)
 
 
 def slice_contents(pso, slice):
-    url = endpoint()
-    params = urllib.urlencode({
-      'req': 'get_slice',
-      's': slice,
-      'pso': pso,
-    })
-    return eval(urllib2.urlopen(url, params).read())
+    payload = { 'req': 'get_slice', 's': slice, 'pso': pso }
+    r = requests.post(endpoint(), data=payload)
+    return eval(r.text)
 
 
 def slice_to_string(pso, slice):
     s = []
     res = slice_contents(pso, slice)
     for c in res:
-        s.append(unichr(c))
+        s.append(chr(c))
     return ''.join(s)
 
 
 def stack_values(pso):
-    url = endpoint()
-    params = urllib.urlencode({
-      'req': 'stack_values',
-      'pso': pso,
-    })
-    return eval(urllib2.urlopen(url, params).read())
+    payload = { 'req': 'stack_values', 'pso': pso }
+    r = requests.post(endpoint(), data=payload)
+    return eval(r.text)
 
 
 def stack_types(pso):
-    url = endpoint()
-    params = urllib.urlencode({
-      'req': 'stack_types',
-      'pso': pso,
-    })
-    return eval(urllib2.urlopen(url, params).read())
+    payload = { 'req': 'stack_types', 'pso': pso }
+    r = requests.post(endpoint(), data=payload)
+    return eval(r.text)
