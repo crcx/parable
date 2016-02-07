@@ -2,7 +2,6 @@
 
 # allegory interface layer begins here
 
-import gzip
 import json
 import os
 import readline
@@ -39,7 +38,7 @@ def save_snapshot(filename):
                     "memory_types": memory_types, \
                     "memory_map": memory_map, \
                     "memory_sizes": memory_size})
-    with gzip.open(filename, 'wb') as file:
+    with open(filename, 'wb') as file:
         file.write(j)
 
 def load_snapshot(filename):
@@ -53,7 +52,7 @@ def load_snapshot(filename):
            memory_map, \
            memory_size
 
-    j = json.loads(gzip.open(filename, 'rb').read())
+    j = json.loads(open(filename, 'rb').read())
     dictionary_names = j['symbols']
     dictionary_slices = j['symbol_map']
     errors = j['errors']
