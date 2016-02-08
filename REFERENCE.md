@@ -1415,8 +1415,8 @@ Replace all instances of *string:seek* in *string:source* with *string:replace*.
 
 Example:
 
-    'Apples are horrible'
-    'horrible'
+    'Apples are horrible.'
+    'horrible'  'tasty' replace
 
 ## interpolate
 
