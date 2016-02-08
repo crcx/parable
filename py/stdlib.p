@@ -24,6 +24,7 @@
 [ "nn-n"   `213 ] 'xor' define
 [ "-n"     `214 ] 'random' define
 [ "n-n"    `215 ] 'sqrt' define
+[ "n-n"    `216 ] 'round' define
 [ "nn-f"   `220 ] 'lt?' define
 [ "nn-f"   `221 ] 'gt?' define
 [ "nn-f"   `222 ] 'lteq?' define

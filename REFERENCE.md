@@ -174,6 +174,12 @@ Primitive. Return a random number.
 
 Primitive. Return the square root of a number.
 
+## round
+
+    number - number
+
+Primitive. Round a number.
+
 ## lt?
 
     number:a number:b - flag
