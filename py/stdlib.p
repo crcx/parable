@@ -268,6 +268,20 @@
 [ "-"  *Internals hide-functions ] '}' define
 
 
+[ '*Prior' '*List' ] {
+  [ "qq-" \
+    *Prior [ \
+      *List [ \
+        swap duplicate-slice to *List \
+        [ *List [ invoke ] for-each ] capture-results reverse to *Prior \
+        invoke \
+        *Prior length? [ *Prior pop *List pop to invoke ] times \
+      ] dip to *List \
+    ] dip to *Prior \
+  ] 'invoke<preserving>' define
+}
+
+
 "Hashing functions"
 [ 'hash:sdbm<n>' ] {
   389 '*Hash-Prime' value!
@@ -282,17 +296,13 @@
 
 [ '*Offset'  '*Tests'  '*Done' ] {
   [ "q-" \
-    *Offset \
-    [ *Done \
-      [ *Tests \
-        [ to *Tests false to *Done 0 to *Offset \
-          [ *Tests *Offset fetch @ invoke \
-            [ true to *Done *Tests *Offset fetch 1 fetch invoke ] if-true \
-            *Offset 1 + to *Offset *Done \
-          ] until \
-        ] dip to *Tests \
-      ] dip to *Done \
-    ] dip to *Offset \
+    [ *Offset *Tests *Done ] \
+    [ to *Tests false to *Done 0 to *Offset \
+      [ *Tests *Offset fetch @ invoke \
+        [ true to *Done *Tests *Offset fetch 1 fetch invoke ] if-true \
+        *Offset 1 + to *Offset *Done \
+      ] until \
+    ] invoke<preserving> \
   ] 'when' define
 }
 
@@ -330,23 +340,26 @@
   [ "-"  *Source rest to *Source  *Data rest to *Data ] '(next)' define
 
   [ "ps-s" \
-    '{v}' split to *Source \
-    to *Data \
-    request-empty :s to *String \
-    *Data length? [ (accumulate) (next) ] times \
-    "Merge any remaining items" \
-    *String *Source '' join + clean-string \
+    [ *Data *Source *String ] \
+    [ '{v}' split to *Source \
+      to *Data \
+      request-empty :s to *String \
+      *Data length? [ (accumulate) (next) ] times \
+      "Merge any remaining items" \
+      *String *Source '' join + clean-string \
+    ] invoke<preserving> \
   ] 'interpolate' define
 }
 
 [ '*D'  '*S'  '*L' ] {
   [ "qs-s" \
-    to *S \
-    to *D \
-    *S '{v}' split length? to *L \
-    [ *D length? *L lt? dup [ *D duplicate-slice *D + to *D ] if-true ] while \
-    [ *D length? *L lt? dup [ *D pop drop ] if-false ] until \
-    *D *S interpolate \
+    [ *S *D *L ] \
+    [ to *S  to *D \
+      *S '{v}' split length? to *L \
+      [ *D length? *L lt? dup [ *D duplicate-slice *D + to *D ] if-true ] while \
+      [ *D length? *L lt? dup [ *D pop drop ] if-false ] until \
+      *D *S interpolate \
+    ] invoke<preserving> \
   ] 'interpolate<cycling>' define
 }
 

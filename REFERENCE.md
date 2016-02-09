@@ -1329,6 +1329,18 @@ Example:
 
     "a and *B are no longer in the dictionary at this point"
 
+## invoke<preserving>
+
+    pointer:values pointer:code -
+
+Executes the *code* quotation, preserving and restoring the contents of the values specified.
+
+Example:
+
+    100 '*A' value!
+    [ *A ]  [ 200 to *A  *A dup * ] invoke<preserving>
+    *A
+
 ## *Hash-Prime
 
     - value
