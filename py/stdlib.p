@@ -235,7 +235,8 @@
 [ "p-v"  slice-length? 1 - fetch ] 'last' define
 
 [ '*Found'  '*Value'  '*XT'  '*Source'  '*Target'  '*Offset' ] values
-[ "q-"   &*Found [ &*Value [ &*XT [ &*Source [ &*Target [ &*Offset [ invoke ] preserve ] preserve ] preserve ] preserve ] preserve ] preserve ] 'localize' define
+[ "q-" \
+  *Found [ *Value [ *XT [ *Source [ *Target [ *Offset [ invoke ] dip to *Offset ] dip to *Target ] dip to *Source ] dip to *XT ] dip to *Value ] dip to *Found ] 'localize' define
 
 [ "vp-"    :p dup length? store ] 'push' define
 [ "p-v"    :p [ dup get-last-index fetch ] sip dup length? 2 - swap set-last-index ] 'pop' define
