@@ -24,7 +24,7 @@ import parable
 
 def handler(signum, frame):
     print("Content-Type: application/json")
-    print()
+    print("")
     report('FATAL ERROR: Execution exceed max runtime permitted')
     sys.exit('fatal error: execution runtime exceeded')
 
@@ -106,5 +106,5 @@ if __name__ == '__main__':
 
     # return results as a JSON object
     print("Content-Type: application/json")
-    print()
+    print("")
     print(get_results(source))
