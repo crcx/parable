@@ -2134,7 +2134,7 @@ def interactive():
             slice = request_slice()
             try:
                 interpret(compile(src, slice), opcodes)
-            except:
+            except KeyboardInterrupt:
                 sys.stdout.write("\n")
                 pass
 

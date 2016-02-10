@@ -137,7 +137,7 @@ if __name__ == '__main__':
             try:
                 slice = parable.request_slice()
                 parable.interpret(parable.compile(src, slice), opcodes)
-            except:
+            except KeyboardInterrupt:
                 sys.stdout.write("\n")
                 pass
 
