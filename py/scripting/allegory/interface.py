@@ -293,15 +293,21 @@ def evaluate(s):
         pass
 
 
-def get_input():
-    done = 0
+def get_input():                                                                                                                                 
+    done = False
     s = ''
-    while done == 0:
+    sys.stdout.write("\ninput> ")
+    sys.stdout.flush()
+    indent = False
+    while not done:
+        if indent:
+            sys.stdout.write("       ")
         s = s + input()
         if s.endswith(' \\'):
             s = s[:-2].strip() + ' '
+            indent = True
         else:
-            done = 1
+            done = True
     return s
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
@@ -326,9 +332,6 @@ def interactive():
     print('words    Display a list of all named items')
     print('------------------------------------------------\n')
     while True:
-        sys.stdout.write("\ninput> ")
-        sys.stdout.flush()
-
         try:
             src = get_input()
         except:
