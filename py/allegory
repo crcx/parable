@@ -1203,10 +1203,13 @@ def set_slice_last_index(slice, size):
 def string_to_slice(string):
     """convert a string into a slice"""
     s = request_slice()
-    i = 0
-    for char in list(string):
-        store(ord(char.encode('utf-8')), s, i, TYPE_CHARACTER)
-        i += 1
+    if string != '':
+        i = 0
+        for char in list(string):
+            store(ord(char.encode('utf-8')), s, i, TYPE_CHARACTER)
+            i += 1
+    else:
+        set_slice_last_index(s, -1)
     return s
 
 
