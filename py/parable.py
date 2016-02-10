@@ -166,10 +166,7 @@ errors = []
 def clear_errors():
     """remove all errors from the error log"""
     global errors
-    i = 0
-    while i < len(errors):
-        errors.pop()
-        i += 1
+    errors = []
 
 
 def report(text):

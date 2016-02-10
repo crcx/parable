@@ -347,7 +347,7 @@ def interactive():
                 pass
 
         for e in errors:
-            sys.stdout.write(e)
+            print(e)
 
         clear_errors()
         sys.stdout.flush()
