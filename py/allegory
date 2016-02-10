@@ -1007,7 +1007,7 @@ def stack_change_type(desired):
                 stack_push(string_to_slice('false'), TYPE_STRING)
             else:
                 stack_push(string_to_slice('malformed flag'), TYPE_STRING)
-        elif original == TYPE_POINTER:
+        elif original == TYPE_POINTER or original == TYPE_COMMENT:
             types.pop()
             types.append(TYPE_STRING)
         else:
