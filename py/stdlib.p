@@ -279,6 +279,17 @@
       ] dip to *List \
     ] dip to *Prior \
   ] 'invoke<preserving>' define
+
+  [ "qq-" \
+    *Prior [ \
+      *List [ \
+        swap duplicate-slice to *List \
+        [ *List [ @ ] for-each ] capture-results reverse to *Prior \
+        invoke \
+        *Prior length? [ *Prior pop *List pop ! ] times \
+      ] dip to *List \
+    ] dip to *Prior \
+  ] 'invoke<preserving-variables>' define
 }
 
 

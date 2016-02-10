@@ -1341,6 +1341,18 @@ Example:
     [ *A ]  [ 200 to *A  *A dup * ] invoke<preserving>
     *A
 
+## invoke<preserving-variables>
+
+    pointer:variables pointer:code -
+
+Executes the *code* quotation, preserving and restoring the contents of the variables specified.
+
+Example:
+
+    100 'A' variable!
+    [ &A ]  [ 200 &A !  &A @ dup * ] invoke<preserving-variables>
+    &A @
+
 ## *Hash-Prime
 
     - value
