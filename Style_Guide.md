@@ -10,7 +10,10 @@
 * All named functions should have a stack comment
 * If a function is more than one line, start the code on the line following the stack comment
 * Short, one line definitions are preferred, but you can split functions into multiple lines when necessary
+* If a quotation would consist of a single named item, it is acceptable to use a pointer in place of a quotation. If working on a project, follow the existing conventions. E.g., either of these are acceptable:
 
+    [ name ]
+    &name
 
 ## Naming
 
