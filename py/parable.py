@@ -1272,7 +1272,7 @@ def seek_all_references():
             refs.append(x)
     for x in find_references(current_slice):
         refs.append(x)
-    i = tos()
+    i = tos() + 1
     while i > 0:
         if is_pointer(types[i]):
             refs.append(stack[i])
