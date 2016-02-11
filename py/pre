@@ -16,7 +16,7 @@ import sys
 # Memory Configuration
 #
 
-MAX_SLICES = 80000
+MAX_SLICES = 3000
 
 #
 # Constants for data types
@@ -1245,21 +1245,25 @@ def find_references(s):
     i = 0
     if s < 0:
         return []
-    if get_last_index(s) == 0:
+    if get_last_index(s) <= 0:
         type = fetch_type(s, 0)
         if is_pointer(type):
-            ptrs.append(int(fetch(s, 0)))
+            if not fetch(s, 0) in ptrs:
+                ptrs.append(int(fetch(s, 0)))
         if type == TYPE_POINTER or type == TYPE_FUNCTION_CALL:
             for xt in find_references(int(fetch(s, 0))):
-                ptrs.append(int(xt))
+                if not fetch(s, 0) in ptrs:
+                    ptrs.append(int(xt))
     else:
         while i < get_last_index(s):
             type = fetch_type(s, i)
             if is_pointer(type):
-                ptrs.append(int(fetch(s, i)))
+                if not fetch(s, i) in ptrs:
+                    ptrs.append(int(fetch(s, i)))
             if type == TYPE_POINTER or type == TYPE_FUNCTION_CALL:
                 for xt in find_references(int(fetch(s, i))):
-                    ptrs.append(int(xt))
+                    if not xt in ptrs:
+                        ptrs.append(int(xt))
             i += 1
     return list(set(ptrs))
 
@@ -1267,21 +1271,31 @@ def find_references(s):
 def seek_all_references():
     """return a list of all references in all named slices and stack items"""
     global dictionary_slices, stack, types, current_slice
-    refs = []
+    sources = []
+
+    # Named items
     for s in dictionary_slices:
-        refs.append(s)
-        for x in find_references(s):
-            refs.append(x)
-    for x in find_references(current_slice):
-        refs.append(x)
+        if not s in sources:
+            sources.append(s)
+
+    # The current slice
+    if not current_slice in sources:
+        sources.append(current_slice)
+
+    # Strings, comments, pointers, function calls on the stack
     i = tos() + 1
     while i > 0:
         if is_pointer(types[i]):
-            refs.append(stack[i])
-            for x in find_references(stack[i]):
+            sources.append(stack[i])
+        i = i - 1
+
+    refs = sources
+    for s in sources:
+        for x in find_references(s):
+            if not x in refs:
                 refs.append(x)
-        i -= 1
-    return list(set(refs))
+
+    return refs
 
 
 def collect_garbage():
@@ -1290,14 +1304,10 @@ def collect_garbage():
     i = 0
     refs = seek_all_references()
     while i < MAX_SLICES:
-        if memory_map[i] == 1:
-            try:
-                x = refs.index(i)
-            except:
-                if i > 0:
-                    release_slice(i)
-        i += 1
-
+        if not i in refs:
+            release_slice(i)
+        i = i + 1
+    print(refs)
 
 #
 # the compiler is pretty trivial.
