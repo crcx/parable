@@ -17,10 +17,9 @@
 
 ## Naming
 
-* Function names should not start with these characters: ' " ` & $ #
+* Function names may not start with these characters: ' " ` & $ # @ !
 * Constants should be named with UPPERCASE
-* Variables should have an initial asterisk and use UPPERCASE names
-* Values should have an initial asterisk and use Capital case names
+* Variables should use CamelCase names
 * Single line definitions are preferred, but long definitions can be split into multiple lines if this significantly improves readability
 * All named functions should start with a stack comment
 * Use of a **-** as a prefix should be read as "*not <function>*" or "*no <function>*"
@@ -31,18 +30,14 @@
 
 Variables should be named like:
 
-    *FOO
-    *BAR
-
-Values should be named like:
-
-    *Token
+    Foo
+    NumericBase
 
 Or like:
 
-    *i
+    I
 
-When its name consists of a * and a single character.
+When its name consists of a single character.
 
 Acceptable forms for multi-line definitions:
 
@@ -91,4 +86,3 @@ The codes are:
 * All documentation is to be written using Markdown
 * Use two blank lines before each section/subsection/etc. title
 * Documentation should be released under CC0
-
