@@ -1,72 +1,73 @@
 "Ngaro: a MISC inspired virtual machine for a dual-stack architecture"
 
+collect-garbage
 
-[ '*Image'  '*I'  '*O' ] values
-[ '*Data'   '*Address' ] values
-[ '*Ports'  '*Input'  '*Output' ] values
+[ 'Image'  'I'  'O' ] variables
+[ 'Data'   'Address' ] variables
+[ 'Ports'  'Input'  'Output' ] variables
 
 [ "-" \
-  0 to *I \
-  0 to *O \
-  request-empty to *Image \
-  request-empty to *Data \
-  [ 1 0 0 0 0 0 0 0 0 0 0 0 0 ] to *Ports \
-  request-empty :s to *Output \
-  request-empty :s to *Input \
+  0 !I \
+  0 !O \
+  request-empty !Image \
+  request-empty !Data \
+  [ 1 0 0 0 0 0 0 0 0 0 0 0 0 ] !Ports \
+  request-empty :s !Output \
+  request-empty :s !Input \
 ] 'ngaro.initialize' define
 
 
-[ "-" *I 1 + to *I ] '*I+' define
-[ "-n" *Image *I fetch ] '@Image' define
-[ "n-" *Image *I store ] '!Image' define
+[ "-" @I 1 + !I ] 'I+' define
+[ "-n" @Image @I fetch ] 'Image@' define
+[ "n-" @Image @I store ] 'Image!' define
 
-[ "-n" *Data pop ] 'D>' define
-[ "n-" *Data push ] '>D' define
-[ "-n" *Address pop ] 'A>' define
-[ "n-" *Address push ] '>A' define
+[ "-n" @Data pop ] 'D>' define
+[ "n-" @Data push ] '>D' define
+[ "-n" @Address pop ] 'A>' define
+[ "n-" @Address push ] '>A' define
 
 "I/O Simulation"
 [ "-" \
-  *Input first :n >D *Input rest to *Input \
-  0 *Ports 1 store ] 'io-console-input' define
+  @Input first :n >D @Input rest !Input \
+  0 @Ports 1 store ] 'io-console-input' define
 
 [ "-" \
-  *Output D> :c :s + to *Output \
-  0 *Ports 2 store ] 'io-console-output' define
+  @Output D> :c :s + !Output \
+  0 @Ports 2 store ] 'io-console-output' define
 
 [ "-" \
-  0 *Ports 5 store ] 'io-capabilities' define
+  0 @Ports 5 store ] 'io-capabilities' define
 
 [ "-" \
-  *Ports 0 fetch 1 -eq? \
+  @Ports 0 fetch 1 -eq? \
   [ \
-    [ [ [ *Ports 1 fetch 1 eq? ]   [ io-console-input ] ] \
-      [ [ *Ports 2 fetch 1 eq? ]   [ io-console-output ] ] \
-      [ [ *Ports 5 fetch 0 -eq? ]  [ io-capabilities ] ] \
+    [ [ [ @Ports 1 fetch 1 eq? ]   [ io-console-input ] ] \
+      [ [ @Ports 2 fetch 1 eq? ]   [ io-console-output ] ] \
+      [ [ @Ports 5 fetch 0 -eq? ]  [ io-capabilities ] ] \
     ] when \
   ] if-true \
 ] 'simulate-io' define
 
 "Implement the instructions"
 [ "-" ] 'I.nop' define
-[ "-"  *I+ @Image >D ] 'I.lit' define
+[ "-"  I+ Image@ >D ] 'I.lit' define
 [ "-"  D> dup >D >D ] 'I.dup' define
 [ "-"  D> drop ] 'I.drop' define
 [ "-"  D> D> swap >D >D ] 'I.swap' define
 [ "-"  D> >A ] 'I.push' define
 [ "-"  A> >D ] 'I.pop' define
 [ "-" \
-  *I+ \
+  I+ \
   D> 1 - dup >D zero? not \
-  [ "-"  @Image 1 - to *I ] [ I.drop ] if ] 'I.loop' define
-[ "-"  *I+ @Image 1 - to *I ] 'I.jump' define
-[ "-"  A> to *I ] 'I.return' define
-[ "-"  D> D> lt? [ I.jump ] [ *I+ ] if ] 'I.lt_jump' define
-[ "-"  D> D> gt? [ I.jump ] [ *I+ ] if ] 'I.gt_jump' define
-[ "-"  D> D> -eq? [ I.jump ] [ *I+ ] if ] 'I.ne_jump' define
-[ "-"  D> D> eq? [ I.jump ] [ *I+ ] if ] 'I.eq_jump' define
-[ "-"  *Image D> fetch >D ] 'I.fetch' define
-[ "-"  D> D> swap *Image swap store ] 'I.store' define
+  [ "-"  Image@ 1 - !I ] [ I.drop ] if ] 'I.loop' define
+[ "-"  I+ Image@ 1 - !I ] 'I.jump' define
+[ "-"  A> !I ] 'I.return' define
+[ "-"  D> D> lt? [ I.jump ] [ I+ ] if ] 'I.lt_jump' define
+[ "-"  D> D> gt? [ I.jump ] [ I+ ] if ] 'I.gt_jump' define
+[ "-"  D> D> -eq? [ I.jump ] [ I+ ] if ] 'I.ne_jump' define
+[ "-"  D> D> eq? [ I.jump ] [ I+ ] if ] 'I.eq_jump' define
+[ "-"  @Image D> fetch >D ] 'I.fetch' define
+[ "-"  D> D> swap @Image swap store ] 'I.store' define
 [ "-"  D> D> + >D ] 'I.+' define
 [ "-"  D> D> - >D ] 'I.-' define
 [ "-"  D> D> * >D ] 'I.*' define
@@ -77,57 +78,57 @@
 [ "-"  D> D> -1 * shift >D ] 'I.shl' define
 [ "-"  D> D> shift >D ] 'I.shr' define
 [ "-"  I.dup D> zero? [ I.drop I.return ] if-true ] 'I.0;' define
-[ "-"  0 *Ports D> dup-pair fetch >D store ] 'I.in' define
-[ "-"  D> D> swap *Ports swap store ] 'I.out' define
+[ "-"  0 @Ports D> dup-pair fetch >D store ] 'I.in' define
+[ "-"  D> D> swap @Ports swap store ] 'I.out' define
 [ "-"  simulate-io ] 'I.wait' define
 [ "-"  D> 1 + >D ] 'I.1+' define
 [ "-"  D> 1 - >D ] 'I.1-' define
-[ "-"  *I >A @Image 1 - to *I ] 'I.call' define
+[ "-"  @I >A Image@ 1 - !I ] 'I.call' define
 
 "Instruction dispatch"
 "We could also use a lookup table for this, which would probably be faster"
 [ "-" \
-  *Image *I fetch to *O \
-  [ [ [ *O  0 eq? ] [ I.nop        ] ] \
-    [ [ *O  1 eq? ] [ I.lit        ] ] \
-    [ [ *O  2 eq? ] [ I.dup        ] ] \
-    [ [ *O  3 eq? ] [ I.drop       ] ] \
-    [ [ *O  4 eq? ] [ I.swap       ] ] \
-    [ [ *O  5 eq? ] [ I.push       ] ] \
-    [ [ *O  6 eq? ] [ I.pop        ] ] \
-    [ [ *O  7 eq? ] [ I.loop       ] ] \
-    [ [ *O  8 eq? ] [ I.jump       ] ] \
-    [ [ *O  9 eq? ] [ I.return     ] ] \
-    [ [ *O 10 eq? ] [ I.lt_jump    ] ] \
-    [ [ *O 11 eq? ] [ I.gt_jump    ] ] \
-    [ [ *O 12 eq? ] [ I.ne_jump    ] ] \
-    [ [ *O 13 eq? ] [ I.eq_jump    ] ] \
-    [ [ *O 14 eq? ] [ I.fetch      ] ] \
-    [ [ *O 15 eq? ] [ I.store      ] ] \
-    [ [ *O 16 eq? ] [ I.+          ] ] \
-    [ [ *O 17 eq? ] [ I.-          ] ] \
-    [ [ *O 18 eq? ] [ I.*          ] ] \
-    [ [ *O 19 eq? ] [ I./rem       ] ] \
-    [ [ *O 20 eq? ] [ I.and        ] ] \
-    [ [ *O 21 eq? ] [ I.or         ] ] \
-    [ [ *O 22 eq? ] [ I.xor        ] ] \
-    [ [ *O 23 eq? ] [ I.shl        ] ] \
-    [ [ *O 24 eq? ] [ I.shr        ] ] \
-    [ [ *O 25 eq? ] [ I.0;         ] ] \
-    [ [ *O 26 eq? ] [ I.1+         ] ] \
-    [ [ *O 27 eq? ] [ I.1-         ] ] \
-    [ [ *O 28 eq? ] [ I.in         ] ] \
-    [ [ *O 29 eq? ] [ I.out        ] ] \
-    [ [ *O 30 eq? ] [ I.wait       ] ] \
+  @Image @I fetch !O \
+  [ [ [ @O  0 eq? ] [ I.nop        ] ] \
+    [ [ @O  1 eq? ] [ I.lit        ] ] \
+    [ [ @O  2 eq? ] [ I.dup        ] ] \
+    [ [ @O  3 eq? ] [ I.drop       ] ] \
+    [ [ @O  4 eq? ] [ I.swap       ] ] \
+    [ [ @O  5 eq? ] [ I.push       ] ] \
+    [ [ @O  6 eq? ] [ I.pop        ] ] \
+    [ [ @O  7 eq? ] [ I.loop       ] ] \
+    [ [ @O  8 eq? ] [ I.jump       ] ] \
+    [ [ @O  9 eq? ] [ I.return     ] ] \
+    [ [ @O 10 eq? ] [ I.lt_jump    ] ] \
+    [ [ @O 11 eq? ] [ I.gt_jump    ] ] \
+    [ [ @O 12 eq? ] [ I.ne_jump    ] ] \
+    [ [ @O 13 eq? ] [ I.eq_jump    ] ] \
+    [ [ @O 14 eq? ] [ I.fetch      ] ] \
+    [ [ @O 15 eq? ] [ I.store      ] ] \
+    [ [ @O 16 eq? ] [ I.+          ] ] \
+    [ [ @O 17 eq? ] [ I.-          ] ] \
+    [ [ @O 18 eq? ] [ I.*          ] ] \
+    [ [ @O 19 eq? ] [ I./rem       ] ] \
+    [ [ @O 20 eq? ] [ I.and        ] ] \
+    [ [ @O 21 eq? ] [ I.or         ] ] \
+    [ [ @O 22 eq? ] [ I.xor        ] ] \
+    [ [ @O 23 eq? ] [ I.shl        ] ] \
+    [ [ @O 24 eq? ] [ I.shr        ] ] \
+    [ [ @O 25 eq? ] [ I.0;         ] ] \
+    [ [ @O 26 eq? ] [ I.1+         ] ] \
+    [ [ @O 27 eq? ] [ I.1-         ] ] \
+    [ [ @O 28 eq? ] [ I.in         ] ] \
+    [ [ @O 29 eq? ] [ I.out        ] ] \
+    [ [ @O 30 eq? ] [ I.wait       ] ] \
     [ [ true      ] [ I.call       ] ] \
   ] when \
 ] 'process-bytecode' define
 
-"Top level implementation: loop over each instruction until at tge end of"
+"Top level implementation: loop over each instruction until at the end of"
 "the slice."
 [ "p-" \
-  to *Image \
-  [ process-bytecode *I+ *I *Image length? lt? ] while ] 'ngaro' define
+  !Image \
+  [ process-bytecode I+ @I @Image length? lt? ] while ] 'ngaro' define
 
 "------------------------------------------------------------------------------"
 
@@ -135,11 +136,11 @@
 "Like the assembler part of the Retro metacompiler, this is kept very minimal,"
 "though a few helper functions exist."
 
-'*Target' value
+'Target' variable
 
-[ "n-"  :n *Target push ] 'v,' define
+[ "n-"  :n @Target push ] 'v,' define
 [ "ns-" [ [ v, ] curry ] dip define ] 'vmi' define
-[ "s-"  *Target length? swap define ] 'label' define
+[ "s-"  @Target length? swap define ] 'label' define
 
 0 '.nop' vmi
 1 '.lit' vmi
@@ -174,9 +175,9 @@
 30 '.wait' vmi
 
 [ "-" \
-  request-empty to *Target .jump 32 [ 31 v, ] times ] 'begin-assembly' define
-[ "s-" [ *Target ] dip define ] 'save-assembly' define
-[ "-"  *Target length? *Target 1 store ] ':main' define
+  request-empty !Target .jump 32 [ 31 v, ] times ] 'begin-assembly' define
+[ "s-" [ @Target ] dip define ] 'save-assembly' define
+[ "-"  @Target length? @Target 1 store ] ':main' define
 
 
 "Some test images"
@@ -242,5 +243,5 @@ begin-assembly
 
 ngaro.initialize
 &Ngaro:display Ngaro
-*Data invoke
-*Output
+@Data invoke
+@Output
