@@ -108,13 +108,11 @@
 
 "Simple variables are just named slices, with functions to access the first element. They're useful for holding single values."
 [ "s-"   request swap define ] 'variable' define
-[ "p-v"  0 fetch ] '@' define
-[ "vp-"  0 store ] '!' define
 [ "vs-"  request [ swap define ] sip 0 store ] 'variable!' define
-[ "p-"   0 swap ! ] 'off' define
-[ "p-"   -1 swap ! ] 'on' define
-[ "p-"   [ @ 1 + ] sip ! ] 'increment' define
-[ "p-"   [ @ 1 - ] sip ! ] 'decrement' define
+[ "p-"   0 swap 0 store ] 'off' define
+[ "p-"   -1 swap 0 store ] 'on' define
+[ "p-"   [ 0 fetch 1 + ] sip 0 store ] 'increment' define
+[ "p-"   [ 0 fetch 1 - ] sip 0 store ] 'decrement' define
 [ "p-"   request swap copy ] 'zero-out' define
 [ "pp-"  swap request dup-pair copy swap [ [ invoke ] dip ] dip copy ] 'preserve' define
 
@@ -196,21 +194,20 @@
 
 
 "Slice as a linear buffer"
-[ '*CURRENT-BUFFER'  '*BUFFER-OFFSET' ] variables
-[ "-p"     &*CURRENT-BUFFER @ ] 'current-buffer' define
-[ "-pn"    current-buffer &*BUFFER-OFFSET @ ] 'buffer-position' define
-[ "-"      &*BUFFER-OFFSET increment ] 'buffer-advance' define
-[ "-"      &*BUFFER-OFFSET decrement ] 'buffer-retreat' define
+[ 'CurrentBuffer'  'BufferOffset' ] variables
+[ "-pn"    @CurrentBuffer @BufferOffset ] 'buffer-position' define
+[ "-"      &BufferOffset increment ] 'buffer-advance' define
+[ "-"      &BufferOffset decrement ] 'buffer-retreat' define
 [ "n-"     buffer-position store ] 'buffer-store-current' define
 [ "-n"     buffer-position fetch ] 'buffer-fetch-current' define
 [ "v-"     buffer-position store buffer-advance ] 'buffer-store' define
 [ "-n"     buffer-position fetch buffer-advance ] 'buffer-fetch' define
 [ "v-"     buffer-retreat buffer-position store ] 'buffer-store-retreat' define
 [ "-n"     buffer-retreat buffer-position fetch ] 'buffer-fetch-retreat' define
-[ "p-"     &*CURRENT-BUFFER ! &*BUFFER-OFFSET zero-out ] 'set-buffer' define
+[ "p-"     !CurrentBuffer 0 !BufferOffset ] 'set-buffer' define
 [ "...n-"  [ buffer-store ] times ] 'buffer-store-items' define
 [ "-"      request set-buffer ] 'new-buffer' define
-[ "p-"     &*CURRENT-BUFFER @ [ &*BUFFER-OFFSET @ [ invoke ] dip &*BUFFER-OFFSET ! ] dip &*CURRENT-BUFFER ! ] 'preserve-buffer' define
+[ "p-"     @CurrentBuffer [ @BufferOffset [ invoke ] dip !BufferOffset ] dip !CurrentBuffer ] 'preserve-buffer' define
 [ "s-"     request [ swap define ] sip set-buffer ] 'named-buffer' define
 
 
@@ -219,125 +216,103 @@
 [ "vp-p"  :x cons ] 'curry' define
 
 
-"Values"
-'_STATE' variable
-[ "-"    &_STATE on ] 'to' define
-[ "?p-"  &_STATE @ :f [ ! &_STATE off ] [ @ ] if ] '(value-handler)' define
-[ "s-"   request [ (value-handler) ] curry swap define ] 'value' define
-[ "ns-"  [ value ] sip to lookup-function invoke ] 'value!' define
-[ "p-"   invoke<depth?> [ value ] times ] 'values' define
-'_STATE' hide-function
-
-
 "Arrays and Operations on Quotations"
-[ "q-v"  @ ] 'first' define
+[ "q-v"  0 fetch ] 'first' define
 [ "q-q"  1 over length? subslice ] 'rest' define
 [ "p-v"  slice-length? 1 - fetch ] 'last' define
 
-[ '*Found'  '*Value'  '*XT'  '*Source'  '*Target'  '*Offset' ] values
+[ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset' ] variables
 [ "q-" \
-  *Found [ *Value [ *XT [ *Source [ *Target [ *Offset [ invoke ] dip to *Offset ] dip to *Target ] dip to *Source ] dip to *XT ] dip to *Value ] dip to *Found ] 'localize' define
+  @Found [ @Value [ @XT [ @Source [ @Target [ @Offset [ invoke ] dip !Offset ] dip !Target ] dip !Source ] dip !XT ] dip !Value ] dip !Found ] 'localize' define
 
 [ "vp-"    :p dup length? store ] 'push' define
 [ "p-v"    :p [ dup get-last-index fetch ] sip dup length? 2 - swap set-last-index ] 'pop' define
 [ "-p"     request [ pop drop ] sip ] 'request-empty' define
-[ "pnp-n"  [ to *XT over length? [ over pop *XT invoke ] times nip ] localize ] 'reduce' define
-[ "pp-?"   [ to *XT to *Source 0 to *Offset *Source length? [ *Source *Offset fetch *XT invoke *Offset 1 + to *Offset ] times ] localize ] 'for-each' define
-[ "pv-f"   false to *Found to *Value dup length? 0 swap [ dup-pair fetch *Value types-match? [ eq? *Found or :f to *Found ] [ drop-pair ] if 1 + ] times drop-pair *Found ] 'contains?' define
-[ "pq-p"   [ to *XT to *Source request-empty to *Target 0 to *Offset *Source length? [ *Source *Offset fetch *XT invoke [ *Source *Offset fetch *Target push ] if-true *Offset 1 + to *Offset ] times *Target ] localize ] 'filter' define
-[ "pq-"    [ to *XT duplicate-slice to *Source 0 to *Offset *Source length? [ *Source *Offset fetch *XT invoke *Source *Offset store *Offset 1 + to *Offset ] times *Source ] localize ] 'map' define
-[ "p-p"    [ request to *Target invoke<depth?> 0 max [ *Target push ] times *Target 1 over length? subslice :p ] localize ] 'capture-results' define
-[ "pv-n"   [ to *Target to *Source 0 to *Offset -1 to *Found *Source length? [ *Source *Offset fetch *Target eq? [ *Offset to *Found ] if-true *Offset 1 + to *Offset ] times *Found ] localize ] 'index-of' define
+[ "pnp-n"  [ !XT over length? [ over pop @XT invoke ] times nip ] localize ] 'reduce' define
+[ "pp-?"   [ !XT !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke @Offset 1 + !Offset ] times ] localize ] 'for-each' define
+[ "pv-f"   false !Found !Value dup length? 0 swap [ dup-pair fetch @Value types-match? [ eq? @Found or :f !Found ] [ drop-pair ] if 1 + ] times drop-pair @Found ] 'contains?' define
+[ "pq-p"   [ !XT !Source request-empty !Target 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke [ @Source @Offset fetch @Target push ] if-true @Offset 1 + !Offset ] times @Target ] localize ] 'filter' define
+[ "pq-"    [ !XT duplicate-slice !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke @Source @Offset store @Offset 1 + !Offset ] times @Source ] localize ] 'map' define
+[ "p-p"    [ request !Target invoke<depth?> 0 max [ @Target push ] times @Target 1 over length? subslice :p ] localize ] 'capture-results' define
+[ "pv-n"   [ !Target !Source 0 !Offset -1 !Found @Source length? [ @Source @Offset fetch @Target eq? [ @Offset !Found ] if-true @Offset 1 + !Offset ] times @Found ] localize ] 'index-of' define
 
-[ '*Found'  '*Value'  '*XT'  '*Source'  '*Target'  '*Offset'  'localize' ] hide-functions
+[ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset'  'localize' ] hide-functions
 
 
 "Text Output Buffer"
-'*TOB' variable
-[ "v-"   &*TOB push ] '.' define
-[ "-..." &*TOB get-last-index [ &*TOB pop ] times ] 'show-tob' define
-[ "-"    0 &*TOB set-last-index ] 'clear-tob' define
+'TOB' variable
+[ "v-"   &TOB push ] '.' define
+[ "-..." &TOB get-last-index [ &TOB pop ] times ] 'show-tob' define
+[ "-"    0 &TOB set-last-index ] 'clear-tob' define
 
 
 "Scope"
-'*Internals' value
+'Internals' variable
 [ "q-" \
-  to *Internals \
-  *Internals duplicate-slice \
-  [ dup @ $* eq? [ value ] [ variable ] if ] for-each ] '{' define
-[ "-"  *Internals hide-functions ] '}' define
+  !Internals \
+  @Internals duplicate-slice [ variable ] for-each ] '{' define
+[ "-"  @Internals hide-functions ] '}' define
 
 
-[ '*Prior' '*List' ] {
+[ 'Prior' 'List' ] {
   [ "qq-" \
-    *Prior [ \
-      *List [ \
-        swap duplicate-slice to *List \
-        [ *List [ invoke ] for-each ] capture-results reverse to *Prior \
+    @Prior [ \
+      @List [ \
+        swap duplicate-slice !List \
+        [ @List [ first ] for-each ] capture-results reverse !Prior \
         invoke \
-        *Prior length? [ *Prior pop *List pop to invoke ] times \
-      ] dip to *List \
-    ] dip to *Prior \
+        @Prior length? [ @Prior pop @List pop 0 store ] times \
+      ] dip !List \
+    ] dip !Prior \
   ] 'invoke<preserving>' define
-
-  [ "qq-" \
-    *Prior [ \
-      *List [ \
-        swap duplicate-slice to *List \
-        [ *List [ @ ] for-each ] capture-results reverse to *Prior \
-        invoke \
-        *Prior length? [ *Prior pop *List pop ! ] times \
-      ] dip to *List \
-    ] dip to *Prior \
-  ] 'invoke<preserving-variables>' define
 }
 
 
 "Hashing functions"
 [ 'hash:sdbm<n>' ] {
-  389 '*Hash-Prime' value!
+  389 'Hash-Prime' variable!
   [ "s-n" 0 swap [ :n xor ] for-each ] 'hash:xor' define
   [ "s-n" 5381 swap [ over -5 shift + + ] for-each ] 'hash:djb2' define
   [ :n over -6 shift + over -16 shift + swap - ] 'hash:sdbm<n>' define
   [ "s-n" 0 swap [ :c swap hash:sdbm<n> ] for-each ] 'hash:sdbm' define
   [ "s-b" hash:djb2 ] 'chosen-hash' define
-  [ "s-n" chosen-hash *Hash-Prime rem ] 'hash' define
+  [ "s-n" chosen-hash @Hash-Prime rem ] 'hash' define
 }
 
 
-[ '*Offset'  '*Tests'  '*Done' ] {
+[ 'Offset'  'Tests'  'Done' ] {
   [ "q-" \
-    [ *Offset *Tests *Done ] \
-    [ to *Tests false to *Done 0 to *Offset \
-      [ *Tests *Offset fetch @ invoke \
-        [ true to *Done *Tests *Offset fetch 1 fetch invoke ] if-true \
-        *Offset 1 + to *Offset *Done \
+    [ Offset Tests Done ] \
+    [ !Tests false !Done 0 !Offset \
+      [ @Tests @Offset fetch first invoke \
+        [ true !Done @Tests @Offset fetch 1 fetch invoke ] if-true \
+        @Offset 1 + !Offset @Done \
       ] until \
     ] invoke<preserving> \
   ] 'when' define
 }
 
 
-[ '*Source'  '*Value'  '*Target'  'extract'  'next-piece' ] {
-  [ "n-"  [ *Source 0 ] dip subslice :s ] 'extract' define
-  [ "n-"  *Source swap *Value length? + over length? subslice :s to *Source ] 'next-piece' define
+[ 'Source'  'Value'  'Target'  'extract'  'next-piece' ] {
+  [ "n-"  [ @Source 0 ] dip subslice :s ] 'extract' define
+  [ "n-"  @Source swap @Value length? + over length? subslice :s !Source ] 'next-piece' define
 
   [ "ss-p" \
-    :s to *Value \
-    to *Source \
-    request-empty to *Target \
-    [ *Source *Value find dup \
-      -1 -eq? [ [ extract *Target push ] sip next-piece true ] \
-              [ drop *Source *Target push false ] if \
+    :s !Value \
+    !Source \
+    request-empty !Target \
+    [ @Source @Value find dup \
+      -1 -eq? [ [ extract @Target push ] sip next-piece true ] \
+              [ drop @Source @Target push false ] if \
     ] while \
-    *Target \
+    @Target \
   ] 'split' define
 
   [ "pv-s" \
-    :s to *Value \
-    reverse '' [ :s + *Value + ] reduce \
+    :s !Value \
+    reverse '' [ :s + @Value + ] reduce \
     "This leaves the join value appended to the string. Remove it." \
-    0 over length? *Value length? - subslice :s \
+    0 over length? @Value length? - subslice :s \
   ] 'join' define
 }
 
@@ -346,30 +321,30 @@
 [ "sss-s"  [ split ] dip join clean-string ] 'replace' define
 
 
-[ '*Data'  '*Source'  '*String'  '(accumulate)'  '(next)' ] {
-  [ "-"  *String *Source first *Data first type? POINTER eq? [ invoke ] if-true :s + + to *String ] '(accumulate)' define
-  [ "-"  *Source rest to *Source  *Data rest to *Data ] '(next)' define
+[ 'Data'  'Source'  'String'  '(accumulate)'  '(next)' ] {
+  [ "-"  @String @Source first @Data first type? POINTER eq? [ invoke ] if-true :s + + !String ] '(accumulate)' define
+  [ "-"  @Source rest !Source  @Data rest !Data ] '(next)' define
 
   [ "ps-s" \
-    [ *Data *Source *String ] \
-    [ '{v}' split to *Source \
-      to *Data \
-      request-empty :s to *String \
-      *Data length? [ (accumulate) (next) ] times \
+    [ Data Source String ] \
+    [ '{v}' split !Source \
+      !Data \
+      request-empty :s !String \
+      @Data length? [ (accumulate) (next) ] times \
       "Merge any remaining items" \
-      *String *Source '' join + clean-string \
+      @String @Source '' join + clean-string \
     ] invoke<preserving> \
   ] 'interpolate' define
 }
 
-[ '*D'  '*S'  '*L' ] {
+[ 'D'  'S'  'L' ] {
   [ "qs-s" \
-    [ *S *D *L ] \
-    [ to *S  to *D \
-      *S '{v}' split length? to *L \
-      [ *D length? *L lt? dup [ *D duplicate-slice *D + to *D ] if-true ] while \
-      [ *D length? *L lt? dup [ *D pop drop ] if-false ] until \
-      *D *S interpolate \
+    [ S D L ] \
+    [ !S  !D \
+      @S '{v}' split length? !L \
+      [ @D length? @L lt? dup [ @D duplicate-slice @D + !D ] if-true ] while \
+      [ @D length? @L lt? dup [ @D pop drop ] if-false ] until \
+      @D @S interpolate \
     ] invoke<preserving> \
   ] 'interpolate<cycling>' define
 }
@@ -378,17 +353,17 @@
 "apropos"
 [ "s-s" \
   dup function-exists? \
-  [ lookup-function @ ] \
+  [ lookup-function first ] \
   [ drop 'function not found' report-error ] if \
 ] 'apropos' define
 
 
 "unsorted"
-[ '*S' ] {
+[ 'S' ] {
   [ "-p" \
-    request-empty to *S \
-    depth [ *S push ] times \
-    *S reverse dup to *S invoke \
-    *S \
+    request-empty !S \
+    depth [ @S push ] times \
+    @S reverse dup !S invoke \
+    @S \
   ] 'stack-values' define
 }

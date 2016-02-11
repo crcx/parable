@@ -250,7 +250,7 @@ Primitive. Execute the specified quotation.
 
     value quote - value
 
-Primitive. Remove value from the stack and execute the quotation. When execution completes restore the value.
+Primitive. Remove value from the stack and execute the quotation. When execution completes restore the Variable.
 
 ## sip
 
@@ -262,13 +262,13 @@ Primitive. Execute the quotation. When execution completes, restore a copy of th
 
     value pointer pointer - ?
 
-Primitive. Apply each quotation to a copy of the value.
+Primitive. Apply each quotation to a copy of the Variable.
 
 ## tri
 
     value pointer pointer pointer - ?
 
-Primitive. Apply each quotation to a copy of the value.
+Primitive. Apply each quotation to a copy of the Variable.
 
 ## abort
 
@@ -623,49 +623,37 @@ Return the length of a slice.
 
     string -
 
-Create a simple named variable.
-
-## @
-
-    pointer - value
-
-Fetch a value stored in a simple variable.
-
-## !
-
-    value pointer -
-
-Store a value into a simple variable.
+Create a named variable.
 
 ## variable!
 
     value string -
 
-Create a named variable with an initial value.
+Create a named variable with an initial Variable.
 
 ## off
 
     pointer -
 
-Set a simple variable to 0.
+Set a variable to 0.
 
 ## on
 
     pointer -
 
-Set a simple variable to -1
+Set a variable to -1
 
 ## increment
 
     pointer -
 
-Increment the stored value in a simple variable by 1.
+Increment the stored value in a variable by 1.
 
 ## decrement
 
     pointer -
 
-Decrement the stored value in a simple variable by 1.
+Decrement the stored value in a variable by 1.
 
 ## zero-out
 
@@ -713,13 +701,13 @@ Execute pointer:a against value:a, pointer:b against value:b, and pointer:c agai
 
     value value pointer - ?
 
-Execute pointer against each value.
+Execute pointer against each Variable.
 
 ## tri@
 
     value value value pointer - ?
 
-Execute pointer against each value.
+Execute pointer against each Variable.
 
 ## true
 
@@ -1108,7 +1096,7 @@ Example:
 
     value quote - quote
 
-Bind a value and a quote, returning a new quote which will execute the original quote on the stored value.
+Bind a value and a quote, returning a new quote which will execute the original quote on the stored Variable.
 
 Example:
 
@@ -1117,45 +1105,6 @@ Example:
 
     counter 'c' define
     5 [ c ] times
- 
-## to
-
-    -
-
-Sets an internal flag telling the next value encountered to update the stored value instead of returning it.
-
-## (value-handler)
-
-    ? pointer -
-
-Internal helper function used by values. This will either return the stored value or update it, depending on the value state set by **to**. If the state requires an update, toggle it back to returning the value instead.
-
-## value
-
-    string -
-
-Create a new value with the specified name.
-
-## value!
-
-    value string -
-
-Create a new value with the specified name and set its initial contents to the specified value.
-
-Example:
-
-    100 'test' value!
-
-## values
-
-    quote -
-
-Given an array of strings, create a new value for each one.
-
-Example:
-
-    "Creates new values named a, b, and c:"
-    [ 'a'  'b'  'c' ] values
 
 ## first
 
@@ -1213,7 +1162,7 @@ Note: **request** allocates an initial cell in the first slot; this does not.
 
     pointer value pointer - value
 
-**reduce** takes a slice, a starting value, and a quote. It executes the quote once for each item in the slice, passing the item and the value to the quote. The quote should consume both and return a new value.
+**reduce** takes a slice, a starting value, and a quote. It executes the quote once for each item in the slice, passing the item and the value to the quote. The quote should consume both and return a new Variable.
 
 Example:
 
@@ -1307,7 +1256,7 @@ Remove all entries from the *text output buffer*.
 
     - value
 
-Value. Holds a list of function names to create or remove. This is used by **{** and **}**.
+Variable. Holds a list of function names to create or remove. This is used by **{** and **}**.
 
 ## {
 
@@ -1333,31 +1282,19 @@ Example:
 
     pointer:values pointer:code -
 
-Executes the *code* quotation, preserving and restoring the contents of the values specified.
-
-Example:
-
-    100 '*A' value!
-    [ *A ]  [ 200 to *A  *A dup * ] invoke<preserving>
-    *A
-
-## invoke<preserving-variables>
-
-    pointer:variables pointer:code -
-
 Executes the *code* quotation, preserving and restoring the contents of the variables specified.
 
 Example:
 
     100 'A' variable!
-    [ &A ]  [ 200 &A !  &A @ dup * ] invoke<preserving-variables>
-    &A @
+    [ A ]  [ 200 !A  @A dup * ] invoke<preserving>
+    @A
 
 ## *Hash-Prime
 
     - value
 
-Value. Holds the prime number used to salt the raw hash. This is used by **hash**.
+Variable. Holds the prime number used to salt the raw hash. This is used by **hash**.
 
 ## hash:xor
 

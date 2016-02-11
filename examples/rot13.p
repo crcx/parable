@@ -1,6 +1,6 @@
-[ '*ROT13:Map'  'encode' ] {
-  'nopqrstuvwxyzabcdefghijklm' to *ROT13:Map
-  [ "c-c"  :n $a :n - *ROT13:Map swap fetch :c ] 'encode' define
+[ 'ROT13:Map'  'encode' ] {
+  'nopqrstuvwxyzabcdefghijklm' !ROT13:Map
+  [ "c-c"  :n $a :n - @ROT13:Map swap fetch :c ] 'encode' define
 
   [ "s-s" \
     to-lowercase '' swap \

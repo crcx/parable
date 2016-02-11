@@ -1443,6 +1443,14 @@ def compile(str, slice):
             offset = compile_number(current[1:], slice, offset)
         elif prefix == "`":
             offset = compile_bytecode(current[1:], slice, offset)
+        elif prefix == "@":
+            offset = compile_pointer(current[1:], slice, offset)
+            offset = compile_number(0, slice, offset)
+            offset = compile_bytecode(BC_MEM_FETCH, slice, offset)
+        elif prefix == "!":
+            offset = compile_pointer(current[1:], slice, offset)
+            offset = compile_number(0, slice, offset)
+            offset = compile_bytecode(BC_MEM_STORE, slice, offset)
         elif current == "[":
             nest.append(slice)
             nest.append(offset)
