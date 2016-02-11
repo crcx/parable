@@ -2,7 +2,7 @@
 # a standalone script named 'pre'
 
 print "#!/usr/bin/env python"
-print "# Copyright (c)2012-2015, Charles Childers"
+print "# Copyright (c)2012-2016, Charles Childers"
 
 def condense_lines(code):
     m = len(code)
@@ -34,6 +34,6 @@ for line in f:
     if len(line) > 0:
         print 'bootstrap.append(""" ' + line.strip() + ' """)'
 
-f = open('pre_interface.py').readlines()
+f = open('interface.py').readlines()
 for line in f:
     print line.rstrip()
