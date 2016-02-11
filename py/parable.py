@@ -1045,7 +1045,7 @@ def stack_change_type(desired):
 
 dictionary_names = []
 dictionary_slices = []
-
+dictionary_hidden_slices = []
 
 def in_dictionary(s):
     global dictionary_names, dictionary_slices
@@ -1074,11 +1074,12 @@ def add_definition(name, slice):
 
 
 def remove_name(name):
-    global dictionary_names, dictionary_slices
+    global dictionary_names, dictionary_slices, dictionary_hidden_slices
     name = name.lower()
     if in_dictionary(name) is not False:
         i = dictionary_names.index(name)
         del dictionary_names[i]
+        dictionary_hidden_slices.append(dictionary_slices[i])
         del dictionary_slices[i]
 
 
@@ -1273,6 +1274,11 @@ def seek_all_references():
 
     # Named items
     for s in dictionary_slices:
+        if not s in sources:
+            sources.append(s)
+
+    # Previously named but now hidden items
+    for s in dictionary_hidden_slices:
         if not s in sources:
             sources.append(s)
 
