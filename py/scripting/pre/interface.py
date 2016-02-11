@@ -77,7 +77,6 @@ if __name__ == '__main__':
     prepare_slices()
     prepare_dictionary()
     parse_bootstrap(bootstrap)
-    collect_garbage()
 
     verbose = False
 

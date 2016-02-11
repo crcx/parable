@@ -1304,10 +1304,9 @@ def collect_garbage():
     i = 0
     refs = seek_all_references()
     while i < MAX_SLICES:
-        if not i in refs:
+        if not i in refs and memory_map[i] == 1:
             release_slice(i)
         i = i + 1
-    print(refs)
 
 #
 # the compiler is pretty trivial.
