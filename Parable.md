@@ -315,9 +315,9 @@ Conversions:
 * Only numbers and pointers can be converted to function calls.
 * Calling **:call** with any other type will be silently ignored.
 
-# Variables and Values
+# Variables
 
-Parable provides two simple data structures: variables and values.
+Parable provides a simple data structures for quickly storing or retrieving a single value: the variable.
 
 Variables are a quick and dirty way to store single values in a slice. Typically access to values is done by using **fetch** and **store**. This can get messy. For instance:
 
@@ -328,18 +328,10 @@ Variables are a quick and dirty way to store single values in a slice. Typically
 The need to reference the offsets obscures the intent. Variables simplify this to:
 
     'a' variable
-    100 &a !
-    &a @ 1 + &a !
+    100 !a
+    @a 1 + !a
 
-The **@** replaces the **0 fetch** and **!** replaces **0 store**. It's a small, but useful improvement. 
-
-Values take this a step further. A value provides a named function that either returns or updates a single value. The above example can become:
-
-    'a' value
-    100 to a
-    a 1 + to a
-
-In this, referencing the function itself returns the stored value. Using **to** sets an internal flag that tells the function to replace its stored value with the top value on the stack.
+The **@** prefix replaces the **0 fetch** and the **!** prefix replaces **0 store**. It's a small, but useful improvement. 
 
 # Arrays
 
