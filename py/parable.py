@@ -14,7 +14,7 @@ import sys
 # Memory Configuration
 #
 
-MAX_SLICES = 3000
+MAX_SLICES = 100000
 
 #
 # Constants for data types
