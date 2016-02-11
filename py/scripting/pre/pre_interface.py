@@ -70,7 +70,6 @@ def load_file(file):
                     try:
                         interpret(s)
                     except:
-                        sys.stdout.write("\n")
                         pass
 
 

@@ -103,7 +103,6 @@ def setup_environment():
     parable.prepare_slices()
     parable.prepare_dictionary()
     parable.parse_bootstrap(open('stdlib.p').readlines())
-    parable.collect_garbage()
 
 
 if __name__ == '__main__':
@@ -143,16 +142,10 @@ if __name__ == '__main__':
     message = message.replace("\\\r\n", " ")
     message = message.replace("\\\n", " ")
     f = parable.condense_lines(message.split("\n"))
-    counter = 0
     for line in f:
         if len(line) > 1:
             s = parable.compile(line, parable.request_slice())
             parable.interpret(s)
-            counter += 1
-            if counter > 100:
-                if len(parable.stack) == 0:
-                    parable.collect_garbage()
-                    counter = 0
     dump_errors()
     dump_stack()
 

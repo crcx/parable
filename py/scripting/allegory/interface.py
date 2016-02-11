@@ -281,7 +281,6 @@ def load_file(name):
                     slice = request_slice()
                     interpret(compile(l, slice), opcodes)
             except:
-                sys.stdout.write("\n")
                 pass
 
 
