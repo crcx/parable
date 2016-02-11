@@ -337,7 +337,7 @@
     :s to *Value \
     reverse '' [ :s + *Value + ] reduce \
     "This leaves the join value appended to the string. Remove it." \
-    0 over length? *Value length? - subslice rest :s \
+    0 over length? *Value length? - subslice :s \
   ] 'join' define
 }
 

@@ -1744,7 +1744,7 @@ stdlib.append(""" [ '*Source'  '*Value'  '*Target'  'extract'  'next-piece' ] { 
 stdlib.append(""" [ "n-"  [ *Source 0 ] dip subslice :s ] 'extract' define """)
 stdlib.append(""" [ "n-"  *Source swap *Value length? + over length? subslice :s to *Source ] 'next-piece' define """)
 stdlib.append(""" [ "ss-p" :s to *Value to *Source request-empty to *Target [ *Source *Value find dup -1 -eq? [ [ extract *Target push ] sip next-piece true ] [ drop *Source *Target push false ] if ] while *Target   ] 'split' define """)
-stdlib.append(""" [ "pv-s" :s to *Value reverse '' [ :s + *Value + ] reduce "This leaves the join value appended to the string. Remove it." 0 over length? *Value length? - subslice rest :s   ] 'join' define """)
+stdlib.append(""" [ "pv-s" :s to *Value reverse '' [ :s + *Value + ] reduce "This leaves the join value appended to the string. Remove it." 0 over length? *Value length? - subslice :s   ] 'join' define """)
 stdlib.append(""" } """)
 stdlib.append(""" [ "s-s"  [ :n 32 128 between? ] filter :s ] 'clean-string' define """)
 stdlib.append(""" [ "sss-s"  [ split ] dip join clean-string ] 'replace' define """)
