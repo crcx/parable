@@ -242,6 +242,6 @@ begin-assembly
 
 
 ngaro.initialize
-&Ngaro:display Ngaro
+&Ngaro:display ngaro
 @Data invoke
 @Output

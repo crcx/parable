@@ -1054,7 +1054,6 @@ def in_dictionary(s):
 
 def lookup_pointer(name):
     global dictionary_names, dictionary_slices
-    name = name.lower()
     if in_dictionary(name) is False:
         return -1
     else:
@@ -1063,7 +1062,6 @@ def lookup_pointer(name):
 
 def add_definition(name, slice):
     global dictionary_names, dictionary_slices
-    name = name.lower()
     if in_dictionary(name) is False:
         dictionary_names.append(name)
         dictionary_slices.append(slice)
@@ -1075,7 +1073,6 @@ def add_definition(name, slice):
 
 def remove_name(name):
     global dictionary_names, dictionary_slices, dictionary_hidden_slices
-    name = name.lower()
     if in_dictionary(name) is not False:
         i = dictionary_names.index(name)
         del dictionary_names[i]
