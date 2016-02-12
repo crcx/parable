@@ -282,6 +282,9 @@ def load_file(name):
                     interpret(compile(l, slice), opcodes)
             except:
                 pass
+    for e in errors:
+        sys.stdout.write('IN: ' + name + ', ' + e + '\n')
+    clear_errors()
 
 
 def evaluate(s):
@@ -317,8 +320,6 @@ def scripting():
         sys.exit('ERROR: source file "%s" was not found!' % source)
     load_file(source)
     dump_stack()
-    for e in errors:
-        sys.stdout.write(e + '\n')
 
 
 def interactive():
