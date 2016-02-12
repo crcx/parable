@@ -273,11 +273,12 @@ def opcodes(slice, offset, opcode):
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 def load_file(name):
+    global should_abort
     if os.path.exists(name):
         lines = condense_lines(open(name).readlines())
         for l in lines:
             try:
-                if l != "#!/usr/bin/env allegory":
+                if l != "#!/usr/bin/env allegory" and should_abort == False:
                     slice = request_slice()
                     interpret(compile(l, slice), opcodes)
             except:
@@ -285,6 +286,7 @@ def load_file(name):
     for e in errors:
         sys.stdout.write('IN: ' + name + ', ' + e + '\n')
     clear_errors()
+    should_abort = False
 
 
 def evaluate(s):
