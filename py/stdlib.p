@@ -80,15 +80,15 @@
 
 
 "Symbolic names for data types"
-[ "-n"  100 ] 'NUMBER' define
-[ "-n"  200 ] 'STRING' define
-[ "-n"  300 ] 'CHARACTER' define
-[ "-n"  400 ] 'POINTER' define
-[ "-n"  500 ] 'FLAG' define
-[ "-n"  600 ] 'BYTECODE' define
-[ "-n"  700 ] 'REMARK' define
-[ "-n"  800 ] 'FUNCTION-CALL' define
-[ "v-c" REMARK set-type ] ':r' define
+[ "-n"  100 ] 'type.NUMBER' define
+[ "-n"  200 ] 'type.STRING' define
+[ "-n"  300 ] 'type.CHARACTER' define
+[ "-n"  400 ] 'type.POINTER' define
+[ "-n"  500 ] 'type.FLAG' define
+[ "-n"  600 ] 'type.BYTECODE' define
+[ "-n"  700 ] 'type.REMARK' define
+[ "-n"  800 ] 'type.FUNCTION-CALL' define
+[ "v-c" type.REMARK set-type ] ':r' define
 
 
 "Stack Flow"
@@ -152,11 +152,11 @@
 [ "n-f"  2 rem zero? not ] 'odd?' define
 [ "n-f"  0 lt? ] 'negative?' define
 [ "n-f"  0 gteq? ] 'positive?' define
-[ "cp-"  [ type? CHARACTER eq? ] dip if-true ] 'if-character' define
-[ "sp-"  [ type? STRING eq? ] dip if-true ] 'if-string' define
-[ "np-"  [ type? NUMBER eq? ] dip if-true ] 'if-number' define
-[ "pp-"  [ type? POINTER eq? ] dip if-true ] 'if-pointer' define
-[ "fp-"  [ type? FLAG eq? ] dip if-true ] 'if-flag' define
+[ "cp-"  [ type? type.CHARACTER eq? ] dip if-true ] 'if-character' define
+[ "sp-"  [ type? type.STRING eq? ] dip if-true ] 'if-string' define
+[ "np-"  [ type? type.NUMBER eq? ] dip if-true ] 'if-number' define
+[ "pp-"  [ type? type.POINTER eq? ] dip if-true ] 'if-pointer' define
+[ "fp-"  [ type? type.FLAG eq? ] dip if-true ] 'if-flag' define
 [ "nnn-f"  [ [ :n ] bi@ ] dip :n dup-pair gt? [ swap ] if-true [ over ] dip lteq? [ gteq? ] dip and :f ] 'between?' define
 [ "vv-vvf"  [ type? ] dip type? swap [ eq? ] dip swap ] 'types-match?' define
 
@@ -322,7 +322,7 @@
 
 
 [ 'Data'  'Source'  'String'  '(accumulate)'  '(next)' ] {
-  [ "-"  @String @Source first @Data first type? POINTER eq? [ invoke ] if-true :s + + !String ] '(accumulate)' define
+  [ "-"  @String @Source first @Data first type? type.POINTER eq? [ invoke ] if-true :s + + !String ] '(accumulate)' define
   [ "-"  @Source rest !Source  @Data rest !Data ] '(next)' define
 
   [ "ps-s" \
