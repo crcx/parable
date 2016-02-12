@@ -1284,8 +1284,8 @@ def seek_all_references():
         sources.append(current_slice)
 
     # Strings, comments, pointers, function calls on the stack
-    i = tos() + 1
-    while i > 0:
+    i = tos()
+    while i >= 0:
         if is_pointer(types[i]):
             sources.append(stack[i])
         i = i - 1
