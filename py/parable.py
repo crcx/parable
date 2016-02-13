@@ -26,7 +26,7 @@ TYPE_CHARACTER = 300
 TYPE_POINTER = 400
 TYPE_FLAG = 500
 TYPE_BYTECODE = 600
-TYPE_COMMENT = 700
+TYPE_REMARK = 700
 TYPE_FUNCTION_CALL = 800
 
 #
@@ -210,7 +210,7 @@ def interpret(slice, more=None):
 
         if optype != TYPE_BYTECODE:
             stack_push(opcode, optype)
-            if optype == TYPE_COMMENT:
+            if optype == TYPE_REMARK:
                 stack_pop()
             if optype == TYPE_FUNCTION_CALL:
                 interpret(stack_pop(), more)
@@ -272,6 +272,10 @@ def interpret(slice, more=None):
                         a = slice_to_string(a)
                         b = slice_to_string(b)
                         stack_push(string_to_slice(b + a), TYPE_STRING)
+                    elif x == TYPE_REMARK and y == TYPE_REMARK:
+                        a = slice_to_string(a)
+                        b = slice_to_string(b)
+                        stack_push(string_to_slice(b + a), TYPE_REMARK)
                     elif x == TYPE_POINTER and y == TYPE_POINTER:
                         c = request_slice()
                         d = get_last_index(b) + get_last_index(a) + 1
@@ -1002,7 +1006,7 @@ def stack_change_type(desired):
                 stack_push(string_to_slice('false'), TYPE_STRING)
             else:
                 stack_push(string_to_slice('malformed flag'), TYPE_STRING)
-        elif original == TYPE_POINTER or original == TYPE_COMMENT:
+        elif original == TYPE_POINTER or original == TYPE_REMARK:
             types.pop()
             types.append(TYPE_STRING)
         else:
@@ -1227,7 +1231,7 @@ def is_pointer(type):
     flag = False
     if type == TYPE_POINTER or \
        type == TYPE_STRING or \
-       type == TYPE_COMMENT or \
+       type == TYPE_REMARK or \
        type == TYPE_FUNCTION_CALL:
         flag = True
     else:
@@ -1353,7 +1357,7 @@ def compile_string(string, slice, offset):
 
 
 def compile_comment(string, slice, offset):
-    store(string_to_slice(string), slice, offset, TYPE_COMMENT)
+    store(string_to_slice(string), slice, offset, TYPE_REMARK)
     offset += 1
     return offset
 

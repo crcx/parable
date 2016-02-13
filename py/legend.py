@@ -156,7 +156,7 @@ def display_stack():
                 write("\tmalformed flag", COLOR_STACK_FLAG)
         elif type == parable.TYPE_BYTECODE:
             write("\t`" + str(tos), COLOR_STACK_BYTECODE)
-        elif type == parable.TYPE_COMMENT:
+        elif type == parable.TYPE_REMARK:
             write("\t\"" + parable.slice_to_string(tos) + "\"", COLOR_STACK_COMMENT)
             write("\n\t\tstored at: " + str(tos), 'normal')
             l += 1

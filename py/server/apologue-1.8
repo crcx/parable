@@ -51,7 +51,7 @@ def get_results(message):
                 sequence.append("malformed flag")
         elif parable.types[i] == parable.TYPE_BYTECODE:
             sequence.append("`" + str(parable.stack[i]))
-        elif parable.types[i] == parable.TYPE_COMMENT:
+        elif parable.types[i] == parable.TYPE_REMARK:
             sequence.append("\"" + str(parable.slice_to_string(parable.stack[i])) + "\"")
         elif parable.types[i] == parable.TYPE_FUNCTION_CALL:
             sequence.append("Call to: " + str(parable.stack[i]))

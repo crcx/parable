@@ -28,7 +28,7 @@ TYPE_CHARACTER = 300
 TYPE_POINTER = 400
 TYPE_FLAG = 500
 TYPE_BYTECODE = 600
-TYPE_COMMENT = 700
+TYPE_REMARK = 700
 TYPE_FUNCTION_CALL = 800
 
 #
@@ -212,7 +212,7 @@ def interpret(slice, more=None):
 
         if optype != TYPE_BYTECODE:
             stack_push(opcode, optype)
-            if optype == TYPE_COMMENT:
+            if optype == TYPE_REMARK:
                 stack_pop()
             if optype == TYPE_FUNCTION_CALL:
                 interpret(stack_pop(), more)
@@ -274,6 +274,10 @@ def interpret(slice, more=None):
                         a = slice_to_string(a)
                         b = slice_to_string(b)
                         stack_push(string_to_slice(b + a), TYPE_STRING)
+                    elif x == TYPE_REMARK and y == TYPE_REMARK:
+                        a = slice_to_string(a)
+                        b = slice_to_string(b)
+                        stack_push(string_to_slice(b + a), TYPE_REMARK)
                     elif x == TYPE_POINTER and y == TYPE_POINTER:
                         c = request_slice()
                         d = get_last_index(b) + get_last_index(a) + 1
@@ -1004,7 +1008,7 @@ def stack_change_type(desired):
                 stack_push(string_to_slice('false'), TYPE_STRING)
             else:
                 stack_push(string_to_slice('malformed flag'), TYPE_STRING)
-        elif original == TYPE_POINTER or original == TYPE_COMMENT:
+        elif original == TYPE_POINTER or original == TYPE_REMARK:
             types.pop()
             types.append(TYPE_STRING)
         else:
@@ -1229,7 +1233,7 @@ def is_pointer(type):
     flag = False
     if type == TYPE_POINTER or \
        type == TYPE_STRING or \
-       type == TYPE_COMMENT or \
+       type == TYPE_REMARK or \
        type == TYPE_FUNCTION_CALL:
         flag = True
     else:
@@ -1355,7 +1359,7 @@ def compile_string(string, slice, offset):
 
 
 def compile_comment(string, slice, offset):
-    store(string_to_slice(string), slice, offset, TYPE_COMMENT)
+    store(string_to_slice(string), slice, offset, TYPE_REMARK)
     offset += 1
     return offset
 
@@ -1769,7 +1773,11 @@ bootstrap.append(""" [ 'D'  'S'  'L' ] { """)
 bootstrap.append(""" [ "qs-s" [ S D L ] [ !S  !D @S '{v}' split length? !L [ @D length? @L lt? dup [ @D duplicate-slice @D + !D ] if-true ] while [ @D length? @L lt? dup [ @D pop drop ] if-false ] until @D @S interpolate ] invoke<preserving>   ] 'interpolate<cycling>' define """)
 bootstrap.append(""" } """)
 bootstrap.append(""" "apropos" """)
-bootstrap.append(""" [ "s-s" dup function-exists? [ lookup-function first ] [ drop 'function not found' report-error ] if ] 'apropos' define """)
+bootstrap.append(""" [ 'enquote'  'merge' ] { """)
+bootstrap.append(""" [ "s-s"   '"' swap + '"' + ] 'enquote' define """)
+bootstrap.append(""" [ "ss-s"  [ enquote 9 :c :s + ] dip + ] 'merge' define """)
+bootstrap.append(""" [ "s-s" depth [ dup function-exists? [ lookup-function [ first ] [ last ] bi [ remark? [ drop ] if-false ] bi@ ] [ 'Function "' swap + '" not found' + report-error '' ] if ] dip depth swap - 2 eq? [ [ :s ] bi@ merge ] [ :s enquote ] if "Returns a string describing a function. This will include the stack comment and notes (found at the end of the function) if provided."   ] 'apropos' define """)
+bootstrap.append(""" } """)
 bootstrap.append(""" "unsorted" """)
 bootstrap.append(""" [ 'S' ] { """)
 bootstrap.append(""" [ "-p" request-empty !S depth [ @S push ] times @S reverse dup !S invoke @S   ] 'stack-values' define """)
@@ -1807,7 +1815,7 @@ def display_stack(verbose):
                 sys.stdout.write("\tmalformed flag")
         elif types[i] == TYPE_BYTECODE:
             sys.stdout.write("\t`" + str(stack[i]))
-        elif types[i] == TYPE_COMMENT:
+        elif types[i] == TYPE_REMARK:
             sys.stdout.write(("\t\"" + slice_to_string(stack[i]) + "\""))
             if verbose == True:
                 sys.stdout.write("\n\t\tstored at: " + str(stack[i]))

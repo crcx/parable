@@ -31,7 +31,7 @@ def display_stack(verbose):
                 sys.stdout.write("\tmalformed flag")
         elif types[i] == TYPE_BYTECODE:
             sys.stdout.write("\t`" + str(stack[i]))
-        elif types[i] == TYPE_COMMENT:
+        elif types[i] == TYPE_REMARK:
             sys.stdout.write(("\t\"" + slice_to_string(stack[i]) + "\""))
             if verbose == True:
                 sys.stdout.write("\n\t\tstored at: " + str(stack[i]))

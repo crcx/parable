@@ -93,7 +93,7 @@ def dump_stack():
             display_item('\t' + '\'', slice_to_string(tos) + '\'')
         elif type == TYPE_POINTER:
             display_item('\t' + '&', tos)
-        elif type == TYPE_COMMENT:
+        elif type == TYPE_REMARK:
             display_item('\t' + '"', slice_to_string(tos) + '"')
         elif type == TYPE_FLAG:
             if tos == -1:

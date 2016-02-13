@@ -35,7 +35,7 @@ def dump_stack():
             display_item('\'', parable.slice_to_string(tos) + '\'')
         elif type == parable.TYPE_POINTER:
             display_item('&', tos)
-        elif type == parable.TYPE_COMMENT:
+        elif type == parable.TYPE_REMARK:
             display_item('"', parable.slice_to_string(tos) + '"')
         elif type == parable.TYPE_FLAG:
             if tos == -1:
