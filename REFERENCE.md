@@ -566,49 +566,49 @@ Convert a string to a comment / remark.
 
 ## number?
 
-    value - flag
+    value - value flag
 
 Return **true** if the value is a **NUMBER** or ***false** otherwise.
 
 ## string?
 
-    value - flag
+    value - value flag
 
 Return **true** if the value is a **STRING** or ***false** otherwise.
 
 ## character?
 
-    value - flag
+    value - value flag
 
 Return **true** if the value is a **CHARACTER** or ***false** otherwise.
 
 ## pointer?
 
-    value - flag
+    value - value flag
 
 Return **true** if the value is a **POINTER** or ***false** otherwise.
 
 ## flag?
 
-    value - flag
+    value - value flag
 
 Return **true** if the value is a **FLAG** or ***false** otherwise.
 
 ## bytecode?
 
-    value - flag
+    value - value flag
 
 Return **true** if the value is a **BYTECODE** or ***false** otherwise.
 
 ## remark?
 
-    value - flag
+    value - value flag
 
 Return **true** if the value is a **REMARK** or ***false** otherwise.
 
 ## funcall?
 
-    value - flag
+    value - value flag
 
 Return **true** if the value is a **FUNCALL** or ***false** otherwise.
 
