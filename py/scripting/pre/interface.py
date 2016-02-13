@@ -1,4 +1,5 @@
 import sys, os
+from os.path import expanduser
 
 def display_stack(verbose):
     global stack, types
@@ -77,6 +78,13 @@ if __name__ == '__main__':
     prepare_slices()
     prepare_dictionary()
     parse_bootstrap(bootstrap)
+
+    try:
+        home = expanduser("~")
+        src = home + "/.parable"
+        parse_bootstrap(open(src).readlines())
+    except:
+        pass
 
     verbose = False
 

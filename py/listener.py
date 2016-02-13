@@ -8,7 +8,7 @@ import readline
 import os
 import sys
 import parable
-
+from os.path import expanduser
 
 try:
     import __builtin__
@@ -125,6 +125,13 @@ if __name__ == '__main__':
     evaluate("[ \"-\"   `9001 ] 'bye' define")
     evaluate("[ \"-\"   `9002 ] 'words' define")
     evaluate("[ \"s-\"  `9003 ] 'include' define")
+
+    try:
+        home = expanduser("~")
+        src = home + "/.parable"
+        parable.parse_bootstrap(open(src).readlines())
+    except:
+        pass
 
     while 1 == 1:
         try:

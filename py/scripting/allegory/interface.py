@@ -6,6 +6,7 @@ import json
 import os
 import readline
 import sys
+from os.path import expanduser
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
@@ -357,9 +358,6 @@ def interactive():
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 if __name__ == '__main__':
-
-    home = os.environ['HOME']
-
     files.append(0)
     files.append(0)
     files.append(0)
@@ -373,6 +371,13 @@ if __name__ == '__main__':
     prepare_dictionary()
     parse_bootstrap(stdlib)
     parse_bootstrap(extensions)
+
+    try:
+        home = expanduser("~")
+        src = home + "/.parable"
+        parse_bootstrap(open(src).readlines())
+    except:
+        pass
 
     if len(sys.argv) < 2:
         interactive()

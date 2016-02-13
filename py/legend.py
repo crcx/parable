@@ -34,7 +34,7 @@
 # Dependencies
 import os, readline, sys
 import parable
-
+from os.path import expanduser
 
 try:
     import __builtin__
@@ -246,7 +246,13 @@ if __name__ == '__main__':
     parable.prepare_slices()
     parable.prepare_dictionary()
     parable.parse_bootstrap(open('stdlib.p').readlines())
-    parable.collect_garbage()
+
+    try:
+        home = expanduser("~")
+        src = home + "/.parable"
+        parable.parse_bootstrap(open(src).readlines())
+    except:
+        pass
 
     while 1 == 1:
         display(height, width)
