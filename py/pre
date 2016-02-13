@@ -1650,6 +1650,7 @@ bootstrap.append(""" "Apply combinators (bi@, tri@) apply a single quotation to 
 bootstrap.append(""" [ "vvp-?"    dup bi* ] 'bi@' define """)
 bootstrap.append(""" [ "vvvp-?"   dup dup tri* ] 'tri@' define """)
 bootstrap.append(""" "Expand the basic conditionals into a more useful set." """)
+bootstrap.append(""" [ "s-"   report-error abort ] 'abort<with-error>' define """)
 bootstrap.append(""" [ "-f"   -1 :f ] 'true' define """)
 bootstrap.append(""" [ "-f"   0  :f ] 'false' define """)
 bootstrap.append(""" [ "f-f"  :f :n -1 xor :f ] 'not' define """)

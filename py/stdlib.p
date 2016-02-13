@@ -100,6 +100,7 @@
 [ "v-f" type? REMARK    eq? ] 'remark?' define
 [ "v-f" type? FUNCALL   eq? ] 'funcall?' define
 
+
 "Stack Flow"
 [ "vV-vVvV"  over over ] 'dup-pair' define
 [ "vv-"      drop drop ] 'drop-pair' define
@@ -148,6 +149,7 @@
 
 
 "Expand the basic conditionals into a more useful set."
+[ "s-"   report-error abort ] 'abort<with-error>' define
 [ "-f"   -1 :f ] 'true' define
 [ "-f"   0  :f ] 'false' define
 [ "f-f"  :f :n -1 xor :f ] 'not' define

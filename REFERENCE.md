@@ -756,6 +756,12 @@ Execute pointer against each Variable.
 
 Execute pointer against each Variable.
 
+## abort<with-error>
+
+    string -
+
+Report an error and invoke **abort**.
+
 ## true
 
     - flag

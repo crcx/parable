@@ -1650,6 +1650,7 @@ stdlib.append(""" "Apply combinators (bi@, tri@) apply a single quotation to mul
 stdlib.append(""" [ "vvp-?"    dup bi* ] 'bi@' define """)
 stdlib.append(""" [ "vvvp-?"   dup dup tri* ] 'tri@' define """)
 stdlib.append(""" "Expand the basic conditionals into a more useful set." """)
+stdlib.append(""" [ "s-"   report-error abort ] 'abort<with-error>' define """)
 stdlib.append(""" [ "-f"   -1 :f ] 'true' define """)
 stdlib.append(""" [ "-f"   0  :f ] 'false' define """)
 stdlib.append(""" [ "f-f"  :f :n -1 xor :f ] 'not' define """)
