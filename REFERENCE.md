@@ -1101,7 +1101,7 @@ Bind a value and a quote, returning a new quote which will execute the original 
 Example:
 
     "Use this to create a counting function"
-    [ "s-q" request [ [ @ ] [ increment ] bi ] curry ] 'counter' define
+    [ "s-q" request [ [ first ] [ increment ] bi ] curry ] 'counter' define
 
     counter 'c' define
     5 [ c ] times
