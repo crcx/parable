@@ -19,18 +19,21 @@
 [ "number:offset number:file-id -"  `3005 ] 'file-seek' define
 [ "number:file-id - number:length"  `3006 ] 'file-size' define
 [ "string:name -"  `3007 ] 'delete-file' define
+[ "string:name - flag"  `3008 ] 'file-exists?' define
 
 [ 'FID'  'S' ] {
   [ "string:name - string:contents" \
-    'r' open-file !FID \
-    request !S @S pop drop \
-    @FID file-size [ @FID read-file @S push ] times \
-    @FID close-file \
-    @S :s \
+    dup file-exists? \
+    [ 'r' open-file !FID \
+      request !S @S pop drop \
+      @FID file-size [ @FID read-file @S push ] times \
+      @FID close-file \
+      @S :s \
+    ] \
+    [ drop '' duplicate-slice :s ] \
+    if \
   ] 'slurp-file' define
 }
-
-[ "string:name - flag"  `3008 ] 'file-exists?' define
 
 
 "Command Line Arguments and System Integration"
