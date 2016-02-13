@@ -4,7 +4,6 @@
 
 import json
 import os
-import readline
 import sys
 from os.path import expanduser
 
@@ -326,8 +325,13 @@ def scripting():
 
 
 def interactive():
-    readline.set_completer(completer)
-    readline.parse_and_bind("tab: complete")
+    try:
+        import readline
+        readline.set_completer(completer)
+        readline.parse_and_bind("tab: complete")
+    except (ImportError, AttributeError):
+        pass
+
     print('allegory, (c)2013-2016 Charles Childers')
     print('------------------------------------------------')
     print('.s       Display Stack')
