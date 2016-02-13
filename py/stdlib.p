@@ -274,6 +274,16 @@
   ] 'invoke<preserving>' define
 }
 
+[ 'A'  'B'  'X'  'C' ] {
+  [ "ppp-p" \
+    [ A B X C ] \
+    [ !X !B !A request-empty !C \
+      @A length? [ @A first @B first @X invoke @C push @A rest !A @B rest !B ] times \
+      @C duplicate-slice \
+    ] invoke<preserving> \
+  ] 'zip' define
+}
+
 
 "Hashing functions"
 [ 'hash:sdbm<n>' ] {

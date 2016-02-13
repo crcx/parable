@@ -1313,6 +1313,22 @@ Example:
     [ A ]  [ 200 !A  @A dup * ] invoke<preserving>
     @A
 
+## zip
+
+    pointer:source1 pointer:source2 pointer:code - pointer:results
+
+For each item in source1, push the item and the corresponding item from source2 to the stack. Execute the specified code. Push results into a new array, repeating until all items are exhausted. Returns the new array.
+
+This expects the code to return a single value as a result. It also assumes that both sources are the same size (or at least that the second does not contain less than the first).
+
+Example:
+
+    [ 1 2 3 ]  [ 4 5 6 ]  [ + ] zip
+
+This would return a new array identical to:
+
+    [ 5 7 9 ]
+
 ## *Hash-Prime
 
     - value
