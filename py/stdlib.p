@@ -357,12 +357,24 @@
 
 
 "apropos"
-[ "s-s" \
-  dup function-exists? \
-  [ lookup-function first ] \
-  [ drop 'function not found' report-error ] if \
-] 'apropos' define
+[ 'enquote'  'merge' ] {
+  [ "s-s"   '"' swap + '"' + ] 'enquote' define
+  [ "ss-s"  [ enquote 9 :c :s + ] dip + ] 'merge' define
 
+  [ "s-s" \
+    depth [ \
+      dup function-exists? \
+      [ lookup-function \
+        [ first ] [ last ] bi \
+        [ remark? [ drop ] if-false ] bi@ \
+      ] \
+      [ 'Function "' swap + '" not found' + report-error '' ] \
+      if \
+    ] dip depth swap - 2 eq? [ [ :s ] bi@ merge ] [ :s enquote ] if \
+    "Returns a string describing a function. This will include the stack \
+     comment and notes (found at the end of the function) if provided." \
+  ] 'apropos' define
+}
 
 "unsorted"
 [ 'S' ] {
