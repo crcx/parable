@@ -362,35 +362,11 @@ Primitive. Remove the top value from the stack.
 
 Primitive. Switch the positions of the top two items on the stack.
 
-## over
-
-    value:a value:b - value:a value:b value:a
-
-Primitive. Put a copy of value a over value b.
-
-## tuck
-
-    value:a value:b - value:b value:a value:b
-
-Primitive. Put a copy of value b under value a.
-
-## nip
-
-    value:a value:b - value:b
-
-Primitive. Remove the second value on the stack.
-
 ## depth
 
     - number
 
 Primitive. Return the number of items on the stack.
-
-## reset
-
-    ... -
-
-Primitive. Remove all values from the stack.
 
 ## function-exists?
 
@@ -451,6 +427,30 @@ This will modify the slice to be:
     [ 3 2 1 ]
 
 This function modifies contents of the original slice.
+
+## over
+
+    value:a value:b - value:a value:b value:a
+
+Put a copy of value a over value b.
+
+## tuck
+
+    value:a value:b - value:b value:a value:b
+
+Put a copy of value b under value a.
+
+## nip
+
+    value:a value:b - value:b
+
+Remove the second value on the stack.
+
+## reset
+
+    ... -
+
+Remove all values from the stack.
 
 ## to-lowercase
 

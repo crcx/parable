@@ -91,11 +91,7 @@ BC_MEM_GET_TYPE = 409
 BC_STACK_DUP = 500
 BC_STACK_DROP = 501
 BC_STACK_SWAP = 502
-BC_STACK_OVER = 503
-BC_STACK_TUCK = 504
-BC_STACK_NIP = 505
-BC_STACK_DEPTH = 506
-BC_STACK_CLEAR = 507
+BC_STACK_DEPTH = 503
 BC_QUOTE_NAME = 600
 BC_FUNCTION_EXISTS = 601
 BC_FUNCTION_LOOKUP = 602
@@ -687,26 +683,8 @@ def interpret(slice, more=None):
                     stack_swap()
                 else:
                     offset = size
-            elif opcode == BC_STACK_OVER:
-                if check_depth(slice, offset, 2):
-                    stack_over()
-                else:
-                    offset = size
-            elif opcode == BC_STACK_TUCK:
-                if check_depth(slice, offset, 2):
-                    stack_tuck()
-                else:
-                    offset = size
-            elif opcode == BC_STACK_NIP:
-                if check_depth(slice, offset, 2):
-                    stack_swap()
-                    stack_drop()
-                else:
-                    offset = size
             elif opcode == BC_STACK_DEPTH:
                 stack_push(len(stack), TYPE_NUMBER)
-            elif opcode == BC_STACK_CLEAR:
-                stack_clear()
             elif opcode == BC_QUOTE_NAME:
                 if check_depth(slice, offset, 2):
                     name = slice_to_string(stack_pop())
@@ -949,30 +927,6 @@ def stack_dup():
         stack_push(s, at)
     else:
         stack_push(av, at)
-
-
-def stack_over():
-    """put a copy of the second item on the stack over the top item"""
-    """if the value is a string, makes a copy of it"""
-    at = stack_type()
-    av = stack_pop()
-    bt = stack_type()
-    bv = stack_pop()
-    stack_push(bv, bt)
-    stack_push(av, at)
-    if bt == TYPE_STRING:
-        s = request_slice()
-        copy_slice(bv, s)
-        stack_push(s, bt)
-    else:
-        stack_push(bv, bt)
-
-
-def stack_tuck():
-    """put a copy of the top item under the second item"""
-    """if the value is a string, makes a copy of it"""
-    stack_swap()
-    stack_over()
 
 
 def stack_change_type(desired):

@@ -54,11 +54,7 @@
 [ "v-vv"   `500 ] 'dup' define
 [ "v-"     `501 ] 'drop' define
 [ "vV-Vv"  `502 ] 'swap' define
-[ "vV-vVv" `503 ] 'over' define
-[ "vV-VvV" `504 ] 'tuck' define
-[ "vV-V"   `505 ] 'nip' define
-[ "-n"     `506 ] 'depth' define
-[ "...-"   `507 ] 'reset' define
+[ "-n"     `503 ] 'depth' define
 [ "s-f"    `601 ] 'function-exists?' define
 [ "s-p"    `602 ] 'lookup-function' define
 [ "s-"     `603 ] 'hide-function' define
@@ -77,6 +73,11 @@
 [ "n-n"    `1004 ] 'acos' define
 [ "n-n"    `1005 ] 'atan' define
 [ "n-n"    `1006 ] 'atan2' define
+
+[ "vV-vVv" [ dup ] dip swap ] 'over' define
+[ "vV-VvV" [ swap ] sip ] 'tuck' define
+[ "vV-V"   swap drop ] 'nip' define
+[ "...-"   depth [ drop ] times ] 'reset' define
 
 
 "Symbolic names for data types"
