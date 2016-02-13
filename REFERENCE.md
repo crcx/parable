@@ -552,18 +552,65 @@ Constant. Type for bytecodes.
 
 Constant. Type for comments / embedded remarks.
 
+## FUNCALL
+
+    - number
+
+Constant. Type for function calls.
+
 ## :r
 
     string - comment
 
 Convert a string to a comment / remark.
 
+## number?
 
-## FUNCTION-CALL
+    value - flag
 
-    - number
+Return **true** if the value is a **NUMBER** or ***false** otherwise.
 
-Constant. Type for function calls.
+## string?
+
+    value - flag
+
+Return **true** if the value is a **STRING** or ***false** otherwise.
+
+## character?
+
+    value - flag
+
+Return **true** if the value is a **CHARACTER** or ***false** otherwise.
+
+## pointer?
+
+    value - flag
+
+Return **true** if the value is a **POINTER** or ***false** otherwise.
+
+## flag?
+
+    value - flag
+
+Return **true** if the value is a **FLAG** or ***false** otherwise.
+
+## bytecode?
+
+    value - flag
+
+Return **true** if the value is a **BYTECODE** or ***false** otherwise.
+
+## remark?
+
+    value - flag
+
+Return **true** if the value is a **REMARK** or ***false** otherwise.
+
+## funcall?
+
+    value - flag
+
+Return **true** if the value is a **FUNCALL** or ***false** otherwise.
 
 ## dup-pair
 
@@ -786,36 +833,6 @@ Return **true** if the number is negative or **false** otherwise.
     number - flag
 
 Return **true** if the number is positive or **false** otherwise.
-
-## if-character
-
-    value quote -
-
-Execute the specified quote if the value is a Character.
-
-## if-string
-
-    value quote -
-
-Execute the specified quote if the value is a String.
-
-## if-number
-
-    value quote -
-
-Execute the specified quote if the value is a Number.
-
-## if-pointer
-
-    value quote -
-
-Execute the specified quote if the value is a pointer.
-
-## if-flag
-
-    value quote -
-
-Execute the specified quote if the value is a Boolean flag.
 
 ## between?
 

@@ -87,9 +87,18 @@
 [ "-n"  500 ] 'FLAG' define
 [ "-n"  600 ] 'BYTECODE' define
 [ "-n"  700 ] 'REMARK' define
-[ "-n"  800 ] 'FUNCTION-CALL' define
+[ "-n"  800 ] 'FUNCALL' define
 [ "v-c" REMARK set-type ] ':r' define
 
+
+[ "v-f" type? NUMBER    eq? ] 'number?' define
+[ "v-f" type? STRING    eq? ] 'string?' define
+[ "v-f" type? CHARACTER eq? ] 'character?' define
+[ "v-f" type? POINTER   eq? ] 'pointer?' define
+[ "v-f" type? FLAG      eq? ] 'flag?' define
+[ "v-f" type? BYTECODE  eq? ] 'bytecode?' define
+[ "v-f" type? REMARK    eq? ] 'remark?' define
+[ "v-f" type? FUNCALL   eq? ] 'funcall?' define
 
 "Stack Flow"
 [ "vV-vVvV"  over over ] 'dup-pair' define
@@ -152,11 +161,6 @@
 [ "n-f"  2 rem zero? not ] 'odd?' define
 [ "n-f"  0 lt? ] 'negative?' define
 [ "n-f"  0 gteq? ] 'positive?' define
-[ "cp-"  [ type? CHARACTER eq? ] dip if-true ] 'if-character' define
-[ "sp-"  [ type? STRING eq? ] dip if-true ] 'if-string' define
-[ "np-"  [ type? NUMBER eq? ] dip if-true ] 'if-number' define
-[ "pp-"  [ type? POINTER eq? ] dip if-true ] 'if-pointer' define
-[ "fp-"  [ type? FLAG eq? ] dip if-true ] 'if-flag' define
 [ "nnn-f"  [ [ :n ] bi@ ] dip :n dup-pair gt? [ swap ] if-true [ over ] dip lteq? [ gteq? ] dip and :f ] 'between?' define
 [ "vv-vvf"  [ type? ] dip type? swap [ eq? ] dip swap ] 'types-match?' define
 
