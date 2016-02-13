@@ -1430,9 +1430,9 @@ Note: if the array has fewer values than the number of replace points this will 
 
 ## apropos
 
-    string - string
+    string - string | string - string string
 
-Given a function name, return the stack comment for it as a string.
+Given a function name, return the stack comment for it as a string. If a closing comment exists (as the last item in the function), return this as well.
 
 ## stack-values
 
