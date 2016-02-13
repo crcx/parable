@@ -1,13 +1,6 @@
 "Name the byte codes"
-[ "v-b"    `100 ] ':b' define
-[ "v-n"    `101 ] ':n' define
-[ "v-s"    `102 ] ':s' define
-[ "v-c"    `103 ] ':c' define
-[ "v-p"    `104 ] ':p' define
-[ "v-f"    `105 ] ':f' define
-[ "v-f"    `106 ] ':x' define
-[ "vt-v"   `109 ] 'set-type' define
-[ "v-vn"   `110 ] 'type?' define
+[ "vt-v"   `100 ] 'set-type' define
+[ "v-vn"   `101 ] 'type?' define
 [ "nn-n"   `200 ] '+' define
 [ "nn-n"   `201 ] '-' define
 [ "nn-n"   `202 ] '*' define
@@ -89,8 +82,15 @@
 [ "-n"  600 ] 'BYTECODE' define
 [ "-n"  700 ] 'REMARK' define
 [ "-n"  800 ] 'FUNCALL' define
-[ "v-c" REMARK set-type ] ':r' define
 
+[ "v-b" BYTECODE  set-type ] ':b' define
+[ "v-n" NUMBER    set-type ] ':n' define
+[ "v-s" STRING    set-type ] ':s' define
+[ "v-c" CHARACTER set-type ] ':c' define
+[ "v-p" POINTER   set-type ] ':p' define
+[ "v-f" FLAG      set-type ] ':f' define
+[ "v-f" FUNCALL   set-type ] ':x' define
+[ "v-c" REMARK    set-type ] ':r' define
 
 [ "v-f" type? NUMBER    eq? ] 'number?' define
 [ "v-f" type? STRING    eq? ] 'string?' define

@@ -34,15 +34,8 @@ TYPE_FUNCTION_CALL = 800
 # These are loosely grouped by type
 #
 
-BC_TYPE_B = 100
-BC_TYPE_N = 101
-BC_TYPE_S = 102
-BC_TYPE_C = 103
-BC_TYPE_F = 104
-BC_TYPE_FLAG = 105
-BC_TYPE_CALL = 106
-BC_SET_TYPE = 109
-BC_GET_TYPE = 110
+BC_SET_TYPE = 100
+BC_GET_TYPE = 101
 BC_ADD = 200
 BC_SUBTRACT = 201
 BC_MULTIPLY = 202
@@ -211,46 +204,10 @@ def interpret(slice, more=None):
             if optype == TYPE_FUNCTION_CALL:
                 interpret(stack_pop(), more)
         else:
-            if opcode == BC_TYPE_B:
-                if check_depth(slice, offset, 1):
-                    stack_change_type(TYPE_BYTECODE)
-                else:
-                    offset = size
-            elif opcode == BC_TYPE_N:
-                if check_depth(slice, offset, 1):
-                    stack_change_type(TYPE_NUMBER)
-                else:
-                    offset = size
-            elif opcode == BC_TYPE_S:
-                if check_depth(slice, offset, 1):
-                    stack_change_type(TYPE_STRING)
-                else:
-                    offset = size
-            elif opcode == BC_TYPE_C:
-                if check_depth(slice, offset, 1):
-                    stack_change_type(TYPE_CHARACTER)
-                else:
-                    offset = size
-            elif opcode == BC_TYPE_F:
-                if check_depth(slice, offset, 1):
-                    stack_change_type(TYPE_POINTER)
-                else:
-                    offset = size
-            elif opcode == BC_TYPE_FLAG:
-                if check_depth(slice, offset, 1):
-                    stack_change_type(TYPE_FLAG)
-                else:
-                    offset = size
-            elif opcode == BC_TYPE_CALL:
-                if check_depth(slice, offset, 1):
-                    stack_change_type(TYPE_FUNCTION_CALL)
-                else:
-                    offset = size
-            elif opcode == BC_SET_TYPE:
+            if opcode == BC_SET_TYPE:
                 if check_depth(slice, offset, 2):
-                    a = stack_pop()  # type
-                    b = stack_pop()  # value
-                    stack_push(b, a)
+                    a = stack_pop()
+                    stack_change_type(a)
                 else:
                     offset = size
             elif opcode == BC_GET_TYPE:
@@ -992,7 +949,8 @@ def stack_change_type(desired):
             a = stack_pop()
             stack_push(a, TYPE_FUNCTION_CALL)
     else:
-        return
+        a = stack_pop()
+        stack_push(a, desired)          
 
 
 #

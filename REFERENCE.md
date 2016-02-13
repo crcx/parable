@@ -2,7 +2,7 @@
 
     value - bytecode
 
-Primitive. Convert value on stack to a bytecode.
+Convert value on stack to a bytecode.
 
 Notes:
 
@@ -12,7 +12,7 @@ Notes:
 
     value - number
 
-Primitive. Convert value on stack to a number.
+Convert value on stack to a number.
 
 Notes:
 
@@ -22,7 +22,7 @@ Notes:
 
     value - string
 
-Primitive. Convert value on stack to a string.
+Convert value on stack to a string.
 
 Notes:
 
@@ -32,7 +32,7 @@ Notes:
 
     value - character
 
-Primitive. Convert value on stack to a character.
+Convert value on stack to a character.
 
 Notes:
 
@@ -43,30 +43,25 @@ Notes:
 
     value - pointer
 
-Primitive. Convert value on stack to a pointer.
+Convert value on stack to a pointer.
 
 ## :f
 
     value - flag
 
-Primitive. Convert value on stack to a flag.
+Convert value on stack to a flag.
 
 ## :x
 
     value - function-call
 
-Primitive. Convert value on stack to a function call.
+Convert value on stack to a function call.
 
 ## set-type
 
     value number:type - value
 
-Primitive. Set the value to a specific type.
-
-Notes:
-
-* This allows setting a value on the stack to a specific type without going through the conversion process (see **:b :c :n :s :call :f :p**).
-* This is not limited to the built-in types.
+Primitive. Set the value to a specific type. This will invoke the appropriate conversions for known types or set the internal type identifier otherwise.
 
 ## type?
 

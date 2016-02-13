@@ -36,15 +36,8 @@ TYPE_FUNCTION_CALL = 800
 # These are loosely grouped by type
 #
 
-BC_TYPE_B = 100
-BC_TYPE_N = 101
-BC_TYPE_S = 102
-BC_TYPE_C = 103
-BC_TYPE_F = 104
-BC_TYPE_FLAG = 105
-BC_TYPE_CALL = 106
-BC_SET_TYPE = 109
-BC_GET_TYPE = 110
+BC_SET_TYPE = 100
+BC_GET_TYPE = 101
 BC_ADD = 200
 BC_SUBTRACT = 201
 BC_MULTIPLY = 202
@@ -213,46 +206,10 @@ def interpret(slice, more=None):
             if optype == TYPE_FUNCTION_CALL:
                 interpret(stack_pop(), more)
         else:
-            if opcode == BC_TYPE_B:
-                if check_depth(slice, offset, 1):
-                    stack_change_type(TYPE_BYTECODE)
-                else:
-                    offset = size
-            elif opcode == BC_TYPE_N:
-                if check_depth(slice, offset, 1):
-                    stack_change_type(TYPE_NUMBER)
-                else:
-                    offset = size
-            elif opcode == BC_TYPE_S:
-                if check_depth(slice, offset, 1):
-                    stack_change_type(TYPE_STRING)
-                else:
-                    offset = size
-            elif opcode == BC_TYPE_C:
-                if check_depth(slice, offset, 1):
-                    stack_change_type(TYPE_CHARACTER)
-                else:
-                    offset = size
-            elif opcode == BC_TYPE_F:
-                if check_depth(slice, offset, 1):
-                    stack_change_type(TYPE_POINTER)
-                else:
-                    offset = size
-            elif opcode == BC_TYPE_FLAG:
-                if check_depth(slice, offset, 1):
-                    stack_change_type(TYPE_FLAG)
-                else:
-                    offset = size
-            elif opcode == BC_TYPE_CALL:
-                if check_depth(slice, offset, 1):
-                    stack_change_type(TYPE_FUNCTION_CALL)
-                else:
-                    offset = size
-            elif opcode == BC_SET_TYPE:
+            if opcode == BC_SET_TYPE:
                 if check_depth(slice, offset, 2):
-                    a = stack_pop()  # type
-                    b = stack_pop()  # value
-                    stack_push(b, a)
+                    a = stack_pop()
+                    stack_change_type(a)
                 else:
                     offset = size
             elif opcode == BC_GET_TYPE:
@@ -994,7 +951,8 @@ def stack_change_type(desired):
             a = stack_pop()
             stack_push(a, TYPE_FUNCTION_CALL)
     else:
-        return
+        a = stack_pop()
+        stack_push(a, desired)
 
 
 #
@@ -1478,15 +1436,8 @@ def pointer_to_name(ptr):
     return s
 stdlib = []
 stdlib.append(""" "Name the byte codes" """)
-stdlib.append(""" [ "v-b"    `100 ] ':b' define """)
-stdlib.append(""" [ "v-n"    `101 ] ':n' define """)
-stdlib.append(""" [ "v-s"    `102 ] ':s' define """)
-stdlib.append(""" [ "v-c"    `103 ] ':c' define """)
-stdlib.append(""" [ "v-p"    `104 ] ':p' define """)
-stdlib.append(""" [ "v-f"    `105 ] ':f' define """)
-stdlib.append(""" [ "v-f"    `106 ] ':x' define """)
-stdlib.append(""" [ "vt-v"   `109 ] 'set-type' define """)
-stdlib.append(""" [ "v-vn"   `110 ] 'type?' define """)
+stdlib.append(""" [ "vt-v"   `100 ] 'set-type' define """)
+stdlib.append(""" [ "v-vn"   `101 ] 'type?' define """)
 stdlib.append(""" [ "nn-n"   `200 ] '+' define """)
 stdlib.append(""" [ "nn-n"   `201 ] '-' define """)
 stdlib.append(""" [ "nn-n"   `202 ] '*' define """)
@@ -1565,7 +1516,14 @@ stdlib.append(""" [ "-n"  500 ] 'FLAG' define """)
 stdlib.append(""" [ "-n"  600 ] 'BYTECODE' define """)
 stdlib.append(""" [ "-n"  700 ] 'REMARK' define """)
 stdlib.append(""" [ "-n"  800 ] 'FUNCALL' define """)
-stdlib.append(""" [ "v-c" REMARK set-type ] ':r' define """)
+stdlib.append(""" [ "v-b" BYTECODE  set-type ] ':b' define """)
+stdlib.append(""" [ "v-n" NUMBER    set-type ] ':n' define """)
+stdlib.append(""" [ "v-s" STRING    set-type ] ':s' define """)
+stdlib.append(""" [ "v-c" CHARACTER set-type ] ':c' define """)
+stdlib.append(""" [ "v-p" POINTER   set-type ] ':p' define """)
+stdlib.append(""" [ "v-f" FLAG      set-type ] ':f' define """)
+stdlib.append(""" [ "v-f" FUNCALL   set-type ] ':x' define """)
+stdlib.append(""" [ "v-c" REMARK    set-type ] ':r' define """)
 stdlib.append(""" [ "v-f" type? NUMBER    eq? ] 'number?' define """)
 stdlib.append(""" [ "v-f" type? STRING    eq? ] 'string?' define """)
 stdlib.append(""" [ "v-f" type? CHARACTER eq? ] 'character?' define """)
