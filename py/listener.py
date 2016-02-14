@@ -128,7 +128,7 @@ if __name__ == '__main__':
 
     try:
         home = expanduser("~")
-        src = home + "/.parable"
+        src = home + "/.parable/on_startup.p"
         parable.parse_bootstrap(open(src).readlines())
     except:
         pass
