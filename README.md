@@ -18,9 +18,7 @@ The core Parable language does not provide a user interface. Various interface l
 
 *Legend* is a full screen terminal based interface.
 
-*Pre* is the basic command line scripting environment.
-
-*Allegory* combines the features of *Listener* and *Pre*, while extending the core language with I/O functions, further system integration, and and the ability to save and restore snapshots.
+*Allegory* provides an interactive interpreter and support for command line scripts. It also  extends the core language with I/O functions, further system integration, and and the ability to save and restore snapshots.
 
 *Punga* is a CGI based interface.
 
