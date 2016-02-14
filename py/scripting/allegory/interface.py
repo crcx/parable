@@ -297,22 +297,18 @@ def evaluate(s):
         pass
 
 
-def get_input():                                                                                                                                 
+def get_input():
     done = False
     s = ''
-    sys.stdout.write("\ninput> ")
-    sys.stdout.flush()
-    indent = False
+    s = input("\ninput> ")
     while not done:
-        if indent:
-            sys.stdout.write("       ")
-        s = s + input()
         if s.endswith(' \\'):
             s = s[:-2].strip() + ' '
-            indent = True
+            s = s + input("       ")
         else:
             done = True
     return s
+
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
