@@ -315,14 +315,17 @@
   [ "n-"  @Source swap @Value length? + over length? subslice :s !Source ] 'next-piece' define
 
   [ "ss-p" \
-    :s !Value \
-    !Source \
-    request-empty !Target \
-    [ @Source @Value find dup \
-      -1 -eq? [ [ extract @Target push ] sip next-piece true ] \
-              [ drop @Source @Target push false ] if \
-    ] while \
-    @Target \
+    slice-length? 0 eq? \
+    [ drop [ :s ] map ] \
+    [ :s !Value \
+      !Source \
+      request-empty !Target \
+      [ @Source @Value find dup \
+        -1 -eq? [ [ extract @Target push ] sip next-piece true ] \
+                [ drop @Source @Target push false ] if \
+      ] while \
+      @Target \
+    ] if \
   ] 'split' define
 
   [ "pv-s" \
