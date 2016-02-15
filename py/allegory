@@ -2072,7 +2072,14 @@ def interactive():
     print('.s       Display Stack')
     print('bye      Exit Listener')
     print('words    Display a list of all named items')
-    print('------------------------------------------------\n')
+    print('------------------------------------------------')
+
+    snapshot = expanduser("~") + "/.parable/default.j"
+    if os.path.exists(snapshot):
+        print('Initialized using ' + snapshot)
+        print('------------------------------------------------')
+        load_snapshot(snapshot)
+
     while True:
         try:
             src = get_input()
@@ -2111,8 +2118,9 @@ if __name__ == '__main__':
     parse_bootstrap(stdlib)
     parse_bootstrap(extensions)
 
+    home = expanduser("~")
+
     try:
-        home = expanduser("~")
         src = home + "/.parable/on_startup.p"
         parse_bootstrap(open(src).readlines())
     except:
