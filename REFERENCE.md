@@ -998,23 +998,17 @@ Remove trailing whitespace from a string.
 
 Remove both leading and trailing whitespace from a string.
 
-## *CURRENT-BUFFER
+## CurrentBuffer
 
     N/A - Variable
 
 Variable. Holds a pointer to the current buffer.
 
-## *BUFFER-OFFSET
+## BufferOffset
 
     N/A - Variable
 
 Variable. Holds the current location in the buffer for reading/writing.
-
-## current-buffer
-
-    - pointer
-
-Return the current buffer.
 
 ## buffer-position
 
@@ -1246,7 +1240,7 @@ Example:
     [ 1 2 3 4 5 ]  9 index-of
     [ 1 2 3 4 5 ]  3 index-of
 
-## *TOB
+## TOB
 
     N/A - Variable
 
@@ -1270,7 +1264,7 @@ Push the values in the *text output buffer* to the stack.
 
 Remove all entries from the *text output buffer*.
 
-## *Internals
+## Internals
 
     - value
 
@@ -1324,7 +1318,7 @@ This would return a new array identical to:
 
     [ 5 7 9 ]
 
-## *Hash-Prime
+## HashPrime
 
     - value
 
@@ -1358,7 +1352,7 @@ A function that calls the preferred hash algorithm. This should be redefined as 
 
     string - number
 
-Hash a string (using **chosen-hash**) and **\*Hash-Prime**.
+Hash a string (using **chosen-hash**) and **HashPrime**.
 
 ## when
 
