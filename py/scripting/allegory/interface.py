@@ -182,7 +182,11 @@ def opcodes(slice, offset, opcode):
         mode = slice_to_string(stack_pop())
         name = slice_to_string(stack_pop())
         if slot != 0:
-            files[int(slot)] = open(name, mode)
+            try:
+                files[int(slot)] = open(name, mode)
+            except:
+                files[int(slot)] = -1
+                report('A10: Unable to open file named ' + name)
         stack_push(slot, TYPE_NUMBER)
     elif opcode == 3001:
         slot = int(stack_pop())
@@ -250,7 +254,7 @@ def opcodes(slice, offset, opcode):
         if os.path.exists(name):
             load_snapshot(name)
         else:
-            report('E99: ' + name + ' not found')
+            report('A20: ' + name + ' not found')
     elif opcode == 9006:
         revert()
         parse_bootstrap(stdlib)
@@ -285,9 +289,14 @@ def load_file(name):
                     interpret(compile(l, slice), opcodes)
             except:
                 pass
-    for e in errors:
-        sys.stdout.write('IN: ' + name + ', ' + e + '\n')
-    clear_errors()
+        for e in errors:
+            sys.stdout.write('IN: ' + name + ', ' + e + '\n')
+        clear_errors()
+    else:
+        report('A10: Unable to open file named ' + name)
+        for e in errors:
+            sys.stdout.write(e + '\n')
+        clear_errors()
     should_abort = False
 
 
