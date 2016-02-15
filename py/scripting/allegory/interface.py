@@ -280,6 +280,7 @@ def opcodes(slice, offset, opcode):
 
 def load_file(name):
     global should_abort
+    should_abort = False
     if os.path.exists(name):
         lines = condense_lines(open(name).readlines())
         for l in lines:
@@ -297,7 +298,7 @@ def load_file(name):
         for e in errors:
             sys.stdout.write(e + '\n')
         clear_errors()
-    should_abort = False
+        should_abort = True
 
 
 def evaluate(s):
