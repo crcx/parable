@@ -87,6 +87,8 @@ def dump_stack():
         sys.stdout.write("\t" + str(i))
         if type == TYPE_NUMBER:
             display_item('\t' + '#', tos)
+        elif type == TYPE_BYTECODE:
+            display_item('\t' + '`', tos)
         elif type == TYPE_CHARACTER:
             display_item('\t' + '$', chr(tos))
         elif type == TYPE_STRING:
