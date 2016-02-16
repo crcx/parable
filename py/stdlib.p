@@ -119,8 +119,8 @@
 
 
 "Simple variables are just named slices, with functions to access the first element. They're useful for holding single values."
-[ "s-"   request swap define ] 'variable' define
 [ "vs-"  [ request [ 0 store ] sip ] dip define ] 'variable!' define
+[ "s-"   #nan swap variable! ] 'variable' define
 [ "p-"   0 swap 0 store ] 'off' define
 [ "p-"   -1 swap 0 store ] 'on' define
 [ "p-"   [ 0 fetch 1 + ] sip 0 store ] 'increment' define
