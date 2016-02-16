@@ -59,7 +59,8 @@
 [ "v-v"    `800 ] 'to-lowercase' define
 [ "v-v"    `801 ] 'to-uppercase' define
 [ "s-"     `900 ] 'report-error' define
-[ "n-n"    `1000 ] 'sin' define
+[ "-p"     `901 ] 'vm.dict<names>' define
+[ "-p"     `902 ] 'vm.dict<slices>' define
 [ "n-n"    `1001 ] 'cos' define
 [ "n-n"    `1002 ] 'tan' define
 [ "n-n"    `1003 ] 'asin' define

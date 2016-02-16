@@ -6,10 +6,6 @@
 [ "s-"  `9005 ] 'reload-snapshot' define
 [ "...-" `9006 ] 'restart' define
 
-"VM State"
-[ "-p"  `9100 ] 'vm.dict<names>' define
-[ "-p"  `9101 ] 'vm.dict<slices>' define
-
 "File Operations"
 [ "string:name string:mode - number:file-id"  `3000 ] 'open-file' define
 [ "number:file-id -"  `3001 ] 'close-file' define

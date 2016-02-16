@@ -259,21 +259,6 @@ def opcodes(slice, offset, opcode):
         revert()
         parse_bootstrap(stdlib)
         parse_bootstrap(extensions)
-    elif opcode == 9100:
-        s = request_slice()
-        i = 0
-        for word in dictionary_names:
-            value = string_to_slice(word)
-            store(value, s, i, TYPE_STRING)
-            i = i + 1
-        stack_push(s, TYPE_POINTER)
-    elif opcode == 9101:
-        s = request_slice()
-        i = 0
-        for slice in dictionary_slices:
-            store(slice, s, i, TYPE_POINTER)
-            i = i + 1
-        stack_push(s, TYPE_POINTER)
     return offset
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-

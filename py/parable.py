@@ -97,6 +97,8 @@ BC_SLICE_REVERSE = 703
 BC_TO_LOWER = 800
 BC_TO_UPPER = 801
 BC_REPORT = 900
+BC_VM_NAMES = 901
+BC_VM_SLICES = 902
 BC_TRIG_SIN = 1000
 BC_TRIG_COS = 1001
 BC_TRIG_TAN = 1002
@@ -762,6 +764,22 @@ def interpret(slice, more=None):
                         a = slice_to_string(stack_pop())
                         report(a)
                 offset = size
+            elif opcode == BC_VM_NAMES:
+                s = request_slice()
+                i = 0
+                for word in dictionary_names:
+                    value = string_to_slice(word)
+                    store(value, s, i, TYPE_STRING)
+                    i = i + 1
+                stack_push(s, TYPE_POINTER)
+            elif opcode == BC_VM_SLICES:
+                s = request_slice()
+                i = 0
+                for word in dictionary_slices:
+                    value = string_to_slice(word)
+                    store(value, s, i, TYPE_POINTER)
+                    i = i + 1
+                stack_push(s, TYPE_POINTER)
             elif opcode == BC_TRIG_SIN:
                 if check_depth(slice, offset, 1):
                     a = stack_pop()

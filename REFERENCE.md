@@ -465,6 +465,18 @@ Primitive. Given a string or character, return the uppercase equivalent.
 
 Primitive. Send a string to the Parable error log.
 
+## vm.dict<names>
+
+    - pointer
+
+Primitive. Return an array of strings corresponding to names in the dictionary.
+
+## vm.dict<slices>
+
+    - pointer
+
+Primitive. Return an array of pointers corresponding to the named items in the dictionary.
+
 ## sin
 
     number - number
