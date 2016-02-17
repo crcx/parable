@@ -1284,23 +1284,26 @@ Variable. Holds a list of function names to create or remove. This is used by **
 
 ## {
 
-    pointer -
+    -
 
-Create functions or values for each item stored in the array specified. Begins a scope sequence that will end with **}**.
+Begin a lexically scoped region.
 
 ## }
 
-    -
+    pointer -
 
-End a sequence begun by **{**. Removes the names created by executing **{**.
+End a lexically scoped area. Removes any headers created after **{** that are not listed in the array at pointer.
 
 Example:
 
-    [ 'a' '*B' ] {
-        ... do something with a and *B ...
+    {
+        [ 'a' 'b' ] variables
+        [ ... do something with a and b ... ] 'c' define
+
+        [ 'c' ]
     }
 
-    "a and *B are no longer in the dictionary at this point"
+    "a and b are no longer in the dictionary at this point"
 
 ## invoke<preserving>
 

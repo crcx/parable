@@ -17,7 +17,8 @@
 [ "string:name -"  `3007 ] 'delete-file' define
 [ "string:name - flag"  `3008 ] 'file-exists?' define
 
-[ 'FID'  'S' ] {
+[ 'slurp-file' ] {
+  [ 'FID' 'S' ] variables
   [ "string:name - string:contents" \
     dup file-exists? \
     [ 'r' open-file !FID \

@@ -255,14 +255,24 @@
 
 
 "Scope"
-'Internals' variable
-[ "q-" \
-  !Internals \
-  @Internals duplicate-slice [ variable ] for-each ] '{' define
-[ "-"  @Internals hide-functions ] '}' define
+[ 'Public'  'Private' ] variables
+[ "-" vm.dict<names> !Private ] '{' define
+[ "p-" \
+  !Public \
+  "Extract names in scope" \
+  vm.dict<names> @Private length? over length? subslice !Private \
+  \
+  "Filter out the functions to keep" \
+  @Private [ @Public swap contains? not ] filter \
+  \
+  "Hide the remaining names" \
+  [ hide-function ] for-each \
+] '}' define
+[ 'Public'  'Private' ] hide-functions
 
 
-[ 'Prior' 'List' ] {
+[ 'invoke<preserving>' ] {
+  [ 'Prior'  'List' ] variables
   [ "qq-" \
     @Prior [ \
       @List [ \
@@ -275,7 +285,9 @@
   ] 'invoke<preserving>' define
 }
 
-[ 'A'  'B'  'X'  'C' ] {
+[ 'zip' ] {
+  [ 'A'  'B'  'X'  'C' ] variables
+
   [ "ppp-p" \
     [ A B X C ] \
     [ !X !B !A request-empty !C \
@@ -287,18 +299,20 @@
 
 
 "Hashing functions"
-[ 'hash:sdbm<n>' ] {
-  389 'Hash-Prime' variable!
-  [ "s-n" 0 swap [ :n xor ] for-each ] 'hash:xor' define
-  [ "s-n" 5381 swap [ over -5 shift + + ] for-each ] 'hash:djb2' define
-  [ :n over -6 shift + over -16 shift + swap - ] 'hash:sdbm<n>' define
-  [ "s-n" 0 swap [ :c swap hash:sdbm<n> ] for-each ] 'hash:sdbm' define
-  [ "s-b" hash:djb2 ] 'chosen-hash' define
-  [ "s-n" chosen-hash @Hash-Prime rem ] 'hash' define
-}
+389 'Hash-Prime' variable!
+[ "s-n" 0 swap [ :n xor ] for-each ] 'hash:xor' define
+[ "s-n" 5381 swap [ over -5 shift + + ] for-each ] 'hash:djb2' define
+[ :n over -6 shift + over -16 shift + swap - ] 'hash:sdbm<n>' define
+[ "s-n" 0 swap [ :c swap hash:sdbm<n> ] for-each ] 'hash:sdbm' define
+[ "s-b" hash:djb2 ] 'chosen-hash' define
+[ "s-n" chosen-hash @Hash-Prime rem ] 'hash' define
+'hash:sdbm<n>' hide-function
 
 
-[ 'Offset'  'Tests'  'Done' ] {
+
+[ 'when' ] {
+  [ 'Offset'  'Tests'  'Done' ] variables
+
   [ "q-" \
     [ Offset Tests Done ] \
     [ !Tests false !Done 0 !Offset \
@@ -311,7 +325,8 @@
 }
 
 
-[ 'Source'  'Value'  'Target'  'extract'  'next-piece' ] {
+[ 'split'  'join' ] {
+  [ 'Source'  'Value'  'Target' ] variables
   [ "n-"  [ @Source 0 ] dip subslice :s ] 'extract' define
   [ "n-"  @Source swap @Value length? + over length? subslice :s !Source ] 'next-piece' define
 
@@ -342,7 +357,9 @@
 [ "sss-s"  [ split ] dip join clean-string ] 'replace' define
 
 
-[ 'Data'  'Source'  'String'  '(accumulate)'  '(next)' ] {
+[ 'interpolate' ] {
+  [ 'Data'  'Source'  'String' ] variables
+
   [ "-"  @String @Source first @Data first type? POINTER eq? [ invoke ] if-true :s + + !String ] '(accumulate)' define
   [ "-"  @Source rest !Source  @Data rest !Data ] '(next)' define
 
@@ -358,7 +375,10 @@
   ] 'interpolate' define
 }
 
-[ 'D'  'S'  'L' ] {
+
+[ 'interpolate<cycling>' ] {
+  [ 'D'  'S'  'L' ] variables
+
   [ "qs-s" \
     [ S D L ] \
     [ !S  !D \
@@ -383,7 +403,9 @@
 ] 'apropos' define
 
 "unsorted"
-[ 'S' ] {
+[ 'stack-values' ] {
+  'S' variable
+
   [ "-p" \
     request-empty !S \
     depth [ @S push ] times \
