@@ -14,7 +14,7 @@
 
 "We'll setup a string to hold these characters."
 
-    'abcdefghijlmnopqrstuvwxyz' 'TAPCODES' define
+    'abcdefghijlmnopqrstuvwxyz' 'TAPCODES' :
 
 "Next, we need to map the tap sequence to the corresponding character."
 
@@ -40,7 +40,7 @@
 
 "Wrapping this up into a function gives:"
 
-    [ [ #1 - ] bi@ [ #5 * ] dip + [ &TAPCODES ] dip fetch :c ] 'tap' define
+    [ [ #1 - ] bi@ [ #5 * ] dip + [ &TAPCODES ] dip fetch :c ] 'tap' :
 
 "Ok, so we have our array of letters and a function to translate tapcodes into them. Now we can test against some known values:"
 
@@ -66,7 +66,7 @@
     #3 #3 tap buffer-store
     #0 buffer-store
 
-    &*CURRENT-BUFFER @ :p :s
+    @CurrentBuffer :p :s
 
 "And now we have the final clue needed to solve the puzzle:"
 

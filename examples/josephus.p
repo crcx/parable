@@ -5,12 +5,12 @@
 "quite agree with the whole 'we should all kill ourselves' idea, figured out"
 "the perfect way to avoid death: be the last man standing."
 
-[ '(josephus)' ] {
-  #40  'SOLDIERS' variable!
-  #3   'VICTIM' variable!
+[ 'josephus' ] {
+  #40  'SOLDIERS' var!
+  #3   'VICTIM' var!
 
-  [ "r i"   swap @VICTIM + over rem swap #1 + dup @SOLDIERS gt? [ (josephus) ] if-false ] '(josephus)' define
-  [ "nn-n"  #0 #1 (josephus) drop #1 + ] 'josephus' define
+  [ "r i"   swap @VICTIM + over rem swap #1 + dup @SOLDIERS gt? [ (josephus) ] if-false ] '(josephus)' :
+  [ "nn-n"  #0 #1 (josephus) drop #1 + ] 'josephus' :
 }	
 
 [ @SOLDIERS @VICTIM josephus ] capture-results reverse

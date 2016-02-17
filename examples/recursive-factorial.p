@@ -1,5 +1,5 @@
-[ ] 'factorial' define
+[ ] 'factorial' :
 [ dup zero? [ #1 + ] [ dup #1 eq? [ dup #1 - factorial * ] if-false ] if ]
-'factorial' define
+'factorial' :
 
 #10 factorial

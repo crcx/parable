@@ -1,10 +1,10 @@
-'Scratch' variable
+'Scratch' var
 [ "s-f" \
   request-empty :s !Scratch \
   to-lowercase \
   [ dup letter? [ dup $a - @Scratch swap store ] [ drop ] if ] for-each \
   'abcdefghijklmnopqrstuvwxyz' @Scratch eq? \
-] 'pangram?' define
+] 'pangram?' :
 
 'is this a pangram?' pangram?
 'a' pangram?

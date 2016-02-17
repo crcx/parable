@@ -1,10 +1,10 @@
 "Return all primes below 1000"
 
-[ '~I'  '*Primes' ] values
+[ 'I'  'Primes' ] ::
 
-3 to ~I
+3 !I
 
-[ "-"  ~I 2 + to ~I ] '(next)' define
+[ "-"  @I 2 + !I ] '(next)' :
 
 "Generate an array of possibilities"
 [ 2 1000 expand-range ] capture-results
@@ -14,8 +14,8 @@
 
 "Filter the rest"
 [ collect-garbage \
-  [ dup ~I eq? swap ~I rem 0 -eq? xor :f ] filter \
-  (next) ~I 1000 lteq? ] while
+  [ dup @I eq? swap ~I rem 0 -eq? xor :f ] filter \
+  (next) @I 1000 lteq? ] while
 
-reverse to *Primes
+reverse !Primes
 
