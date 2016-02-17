@@ -39,7 +39,7 @@ The second part of this is where the work gets done. An example implementation o
         [ [ current-token '[' eq? ]  [ handle-[ ] ] \
         [ [ current-token ']' eq? ]  [ handle-] ] ] \
         [ [ true ]                   [ compile-funcall ] ] \
-      ] when ] 'compile-token' define
+      ] when ] 'compile-token' :
 
 Basically the parser will look at each prefix and invoke a handling function for the specific type.
 
@@ -321,7 +321,7 @@ Parable provides a simple data structures for quickly storing or retrieving a si
 
 Variables are a quick and dirty way to store single values in a slice. Typically access to values is done by using **fetch** and **store**. This can get messy. For instance:
 
-    request 'a' define
+    request 'a' :
     100 &a 0 store
     &a 0 fetch 1 + &a 0 store
 
@@ -337,7 +337,7 @@ The **@** prefix replaces the **0 fetch** and the **!** prefix replaces **0 stor
 
 All slices are effectively usable as arrays. The length is stored by the VM as the size of the slice, with the values stored sequentially in the slice. This is simplistic, but easy to understand and makes working with them at low level easy.
 
-Arrays can be created directly as quotations or from the results of executing a quote (**capture-results**). Attaching a permanent name can be done with **define**. Additionally, strings are just character arrays.:
+Arrays can be created directly as quotations or from the results of executing a quote (**capture-results**). Attaching a permanent name can be done with **:**. Additionally, strings are just character arrays.:
 
     [ 1 2 3 ] capture-results
     'hello world'
