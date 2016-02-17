@@ -1454,7 +1454,7 @@ Example:
 
 Note: if the array has fewer values than the number of replace points this will cycle through the data until all replace points are exhausted.
 
-## apropos
+## ?
 
     string - string | string - string string
 

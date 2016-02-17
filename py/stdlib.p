@@ -132,8 +132,7 @@
 "Number functions"
 [ "nn-n"  over over lt? [ nip ] [ drop ] if ] 'max' :
 [ "nn-n"  over over gt? [ nip ] [ drop ] if ] 'min' :
-[ "n-n"  dup -1 * max ] 'abs' :
-
+[ "n-n"   dup -1 * max ] 'abs' :
 
 "The basic bi/tri combinators provided as part of the primitives allow application of multiple quotes to a single data element. Here we add new forms that are very useful."
 "We consider the bi/tri variants to consist of one of three types."
@@ -391,16 +390,16 @@
 }
 
 
-"apropos"
+"?"
 [ "s-s | s-ss" \
   dup function-exists? \
   [ lookup-function \
     [ first ] [ last ] bi \
     [ remark? [ drop ] if-false ] bi@ \
   ] \
-  [ 'apropos: function "' swap + '" not found' + report-error ] \
+  [ 'function "' swap + '" not found' + report-error ] \
   if \
-] 'apropos' :
+] '?' :
 
 "unsorted"
 [ 'stack-values' ] {
