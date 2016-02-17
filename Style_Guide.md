@@ -43,14 +43,14 @@ Acceptable forms for multi-line definitions:
 
     [ "stack comment" \
         ... code ... \
-        ... code ... ] 'name' define
+        ... code ... ] 'name' :
 
 Or:
 
     [ "stack comment" \
         ... code ... \
         ... code ... \
-    ] 'name' define
+    ] 'name' :
 
 
 ## Comments
