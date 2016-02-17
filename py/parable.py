@@ -1439,7 +1439,7 @@ def prepare_dictionary():
     """setup the initial dictionary"""
     s = request_slice()
     store(BC_QUOTE_NAME, s, 0, TYPE_BYTECODE)
-    add_definition('define', s)
+    add_definition(':', s)
 
 
 def pointer_to_name(ptr):

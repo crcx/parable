@@ -116,10 +116,10 @@ if __name__ == '__main__':
     parable.prepare_dictionary()
     parable.parse_bootstrap(open('stdlib.p').readlines())
 
-    evaluate("[ \"-\"   `9000 ] '.s' define")
-    evaluate("[ \"-\"   `9001 ] 'bye' define")
-    evaluate("[ \"-\"   `9002 ] 'words' define")
-    evaluate("[ \"s-\"  `9003 ] 'include' define")
+    evaluate("[ \"-\"   `9000 ] '.s' :")
+    evaluate("[ \"-\"   `9001 ] 'bye' :")
+    evaluate("[ \"-\"   `9002 ] 'words' :")
+    evaluate("[ \"s-\"  `9003 ] 'include' :")
 
     try:
         home = expanduser("~")

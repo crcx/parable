@@ -1,3 +1,9 @@
+## :
+
+    pointer string -
+
+Primitive. Attach a name to a pointer. 
+
 ## :b
 
     value - bytecode
@@ -673,13 +679,13 @@ Make a copy of a slice, returning a pointer to the copy.
 
 Return the length of a slice.
 
-## variable
+## var
 
     string -
 
 Create a named variable.
 
-## variable!
+## var!
 
     value string -
 
@@ -899,7 +905,7 @@ Remove the old name for a function and assign a new one.
 
 Example:
 
-    'foo' variable
+    'foo' var
     'foo'  'bar' rename
 
 ## redefine
@@ -911,20 +917,20 @@ function with the name pointing to the new pointer.
 
 Example:
 
-    [ "n-n" 10 * ] 'scale' define
-    [ "-n"  5 scale ] 'b' define
+    [ "n-n" 10 * ] 'scale' :
+    [ "-n"  5 scale ] 'b' :
     [ "n-n" 20 * ] 'scale' redefine
-    [ "-n"  5 scale ] 'c' define
+    [ "-n"  5 scale ] 'c' :
     b c
 
-## variables
+## ::
 
     quote -
 
 Given an array of strings, create a new named value for each item.
 
     "Creates new variables named a, b, and c:"
-    [ 'a'  'b'  'c' ] variables
+    [ 'a'  'b'  'c' ] ::
 
 ## string-contains?
 
@@ -1125,9 +1131,9 @@ Bind a value and a quote, returning a new quote which will execute the original 
 Example:
 
     "Use this to create a counting function"
-    [ "s-q" request [ [ first ] [ increment ] bi ] curry ] 'counter' define
+    [ "s-q" request [ [ first ] [ increment ] bi ] curry ] 'counter' :
 
-    counter 'c' define
+    counter 'c' :
     5 [ c ] times
 
 ## first
@@ -1297,8 +1303,8 @@ End a lexically scoped area. Removes any headers created after **{** that are no
 Example:
 
     {
-        [ 'a' 'b' ] variables
-        [ ... do something with a and b ... ] 'c' define
+        [ 'a' 'b' ] ::
+        [ ... do something with a and b ... ] 'c' :
 
         [ 'c' ]
     }
@@ -1313,7 +1319,7 @@ Executes the *code* quotation, preserving and restoring the contents of the vari
 
 Example:
 
-    100 'A' variable!
+    100 'A' var!
     [ A ]  [ 200 !A  @A dup * ] invoke<preserving>
     @A
 
