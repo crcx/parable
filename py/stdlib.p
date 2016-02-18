@@ -407,7 +407,7 @@
 
 
   [ "p-?"  &first &last bi [ remark? &drop if-false ] bi@ ] 'describe-func' :
-  [ "s-s"  drop '-v' 'Variable' &:r bi@ ] 'describe-var' :
+  [ "s-s"  drop 'Variable' &:r bi@ ] 'describe-var' :
 
   [ "s-s | s-ss" \
     dup function-exists? \
