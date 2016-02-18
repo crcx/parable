@@ -2131,7 +2131,8 @@ if __name__ == '__main__':
 
     try:
         src = home + "/.parable/on_startup.p"
-        parse_bootstrap(open(src).readlines())
+        if os.path.exists(src):
+            load_file(src)
     except:
         pass
 
