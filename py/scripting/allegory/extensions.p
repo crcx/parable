@@ -28,7 +28,7 @@
       @FID close-file \
       @S :s \
     ] \
-    [ drop '' duplicate-slice :s 'Unable to to locate file' report-error ] \
+    [ drop '' duplicate-slice :s 'Unable to to locate file' abort<with-error> ] \
     if \
   ] 'slurp-file' :
 }
