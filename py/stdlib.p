@@ -436,3 +436,13 @@
   ] 'stack-values' :
 }
 
+
+
+[ 'vm.dict<names-like>' ] {
+ 'Pattern' var
+ [ "s-f" @Pattern swap string-contains? ] 'matches' :
+ [ "s-p" \
+   !Pattern vm.dict<names> &matches filter \
+   "Return an array of names in the dictionary that match a given substring." \
+ ] 'vm.dict<names-like>' :
+}
