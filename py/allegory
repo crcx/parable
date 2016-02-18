@@ -1359,7 +1359,8 @@ def parse_string(tokens, i, count, delimiter):
                 i = j
                 j = count
             j += 1
-    return i, s.replace("\\", "")
+    final = s.replace("\\n", "\n").replace("\\t", "\t")
+    return i, final.replace("\\", "")
 
 
 def compile(str, slice):
