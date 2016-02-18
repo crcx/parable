@@ -391,15 +391,38 @@
 
 
 "?"
-[ "s-s | s-ss" \
-  dup function-exists? \
-  [ lookup-function \
-    [ first ] [ last ] bi \
-    [ remark? [ drop ] if-false ] bi@ \
-  ] \
-  [ 'function "' swap + '" not found' + report-error ] \
-  if \
-] '?' :
+[ '?' ] {
+  [ 'Probability' ] ::
+  [ "f-"   [ &Probability increment ] if-true ] 'check' :
+  [ "s-s"  first uppercase? check ] 'initial' :
+  [ "s-s"  1 fetch lowercase? check ] 'second' :
+  [ "s-s"  lookup-function first remark? not check drop ] 'no-comment?' :
+  [ "s-f" \
+    0 !Probability \
+    slice-length? \
+    1 eq? [ &initial &no-comment? bi @Probability 2 eq? ] \
+          [ &initial &second &no-comment? tri @Probability 3 eq? ] if \
+    "Given a function name, try to determine if it is a variable." \
+  ] 'var?' :
+
+
+  [ "p-?"  &first &last bi [ remark? &drop if-false ] bi@ ] 'describe-func' :
+  [ "s-s"  drop '-v' 'Variable' &:r bi@ ] 'describe-var' :
+
+  [ "s-s | s-ss" \
+    dup function-exists? \
+    [ dup var? \
+      [ describe-var ] \
+      [ lookup-function \
+        [ first ] [ last ] bi \
+        [ remark? [ drop ] if-false ] bi@ \
+      ] if \
+    ] \
+    [ 'function "' swap + '" not found' + report-error ] \
+    if \
+  ] '?' :
+}
+
 
 "unsorted"
 [ 'stack-values' ] {
