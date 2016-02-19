@@ -89,7 +89,7 @@ Primitive.
 
 For numbers, add them and return the results.
 
-For strings, append the second string to the first one and return the new string.
+For strings and slices, append the second to the first one and return the new slice.
 
 ## -
 
