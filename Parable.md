@@ -13,6 +13,13 @@ Parable code consists of whitespace delimited tokens. Each token can have a pref
     '         String
     "         Comment
 
+Additionally two prefixes exist to simplify working with variables:
+
+    Prefix    Token is...
+    ------    -------------------
+    @         Fetch from variable
+    !         Store into variable
+
 Strings and comments start and end with the delimiter (either ' or "). Either can obtain spaces.
 
 Everything is done using reverse polish notation. There are no functions that parse or modify the input.
@@ -67,13 +74,15 @@ The language is rigidly built around reverse polish structure and the data stack
 
 Parable itself has no user interface. The interface is defined as a separate layer, and can be adapted for specific platform(s) as desired. The user interfaces should provide the *standard library* which defines names for the bytecodes and various commonly used functions.
 
-Parable includes two user interfaces: *pre* and *legend*.
+Parable includes three user interfaces: *allegory*, *listener* and *legend*.
 
-*Pre* is the *Parable Runtime Environment* and is a command line wrapper that processes code in source files and displays the results to the standard output device. It is not interactive.
+*Allegory* is the largest of the standard environments. It provides an interactive, terminal based interface, support for running scripts from the command line, and extends the language with useful I/O functions.
 
-*Legend* is an interactive, terminal based user interface that processes input from the standard input device and displays the results of execution immediately.
+*Legend* is an interactive, full-screen terminal based user interface that processes input from the standard input device and displays the results of execution immediately.
 
-A third option, *Apologue* is available for iOS users. This encompasses a code editor, evaluation of source, documentation, and a decompiler.
+*Listener* is an interactive, terminal based environment similar to a traditional Forth environment.
+
+Other interfaces (such as *Apologue* for iOS) exist as well but are developed and distributed separately.
 
 # Compiler
 
@@ -175,13 +184,15 @@ For numbers, the number is treated as the ASCII character code.
 
 **:p** converts the top item on the stack to a pointer.
 
-**:comment** converts the top item on the stack to a comment.
+**:r** converts the top item on the stack to a remark.
 
 **:f** converts the top item on the stack to a boolean flag.
 
 **:b** converts the top item on the stack to a bytecode.
 
-**:call** converts the top item on the stack to a function call.
+**:x** converts the top item on the stack to a function call.
+
+**:u** converts the top item on the stack to an unknown/unspecified type.
 
 # Data Types
 
@@ -255,6 +266,13 @@ Notes:
 * Make sure to use use single quotes (') for strings. Double quotes are used for comments.
 * All restrictions on characters apply to strings (and comments)
 
+Escape sequences can be used in strings. These start with a \ and are followed by a single character.
+
+    \<space>       Embed a space in a string
+    \n             Embed a newline in a string
+    \t             Embed a tab in a string
+    \\             Embed a \ in a string
+
 Conversions:
 
 * For strings, convert to a string and store in a new slice.
@@ -308,12 +326,12 @@ Conversions:
 
 ## Function Calls
 
-A function call corresponds to a compiled call to a function. When compiling, there is no prefix for this: just refer to a function by name. If you are storing function calls use **:call** to convert the pointer to a function call prior to storing.
+A function call corresponds to a compiled call to a function. When compiling, there is no prefix for this: just refer to a function by name. If you are storing function calls use **:x** to convert the pointer to a function call prior to storing.
 
 Conversions:
 
 * Only numbers and pointers can be converted to function calls.
-* Calling **:call** with any other type will be silently ignored.
+* Calling **:x** with any other type will be silently ignored.
 
 # Variables
 
@@ -327,7 +345,7 @@ Variables are a quick and dirty way to store single values in a slice. Typically
 
 The need to reference the offsets obscures the intent. Variables simplify this to:
 
-    'a' variable
+    'a' var
     100 !a
     @a 1 + !a
 
@@ -391,10 +409,10 @@ The quotation should return a single value; this will replace the original value
 
 **For-each** takes an array and a quote which is applied to each item in the array.
 
-    '*COUNT' value
+    'Count' var
     'this is a string of sorts'
-    [ vowel? [ *COUNT 1 + to *COUNT ] if-true ] for-each
-    *COUNT
+    [ vowel? [ @Count 1 + !Count ] if-true ] for-each
+    @Count
 
 **For-each** executes the quotation passed once for each item in the array. It passes each item on the stack to the quotation.
 
