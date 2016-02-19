@@ -1185,7 +1185,7 @@ def find_references(s):
                 if not fetch(s, 0) in ptrs:
                     ptrs.append(int(xt))
     else:
-        while i < get_last_index(s):
+        while i < get_last_index(s) + 1:
             type = fetch_type(s, i)
             if is_pointer(type):
                 if not fetch(s, i) in ptrs:
