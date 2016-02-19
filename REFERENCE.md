@@ -2,7 +2,7 @@
 
     pointer string -
 
-Primitive. Attach a name to a pointer. 
+Primitive. Attach a name to a pointer.
 
 ## :b
 
@@ -62,6 +62,12 @@ Convert value on stack to a flag.
     value - function-call
 
 Convert value on stack to a function call.
+
+## :u
+
+    value - unknown-value
+
+Convert a value to an **UNKNOWN**/undefined type.
 
 ## set-type
 
@@ -571,6 +577,10 @@ Constant. Type for comments / embedded remarks.
 
 Constant. Type for function calls.
 
+## UNKNOWN
+
+Constant. Type for standard unknown/undefined value.
+
 ## :r
 
     string - comment
@@ -581,49 +591,55 @@ Convert a string to a comment / remark.
 
     value - value flag
 
-Return **true** if the value is a **NUMBER** or ***false** otherwise.
+Return **true** if the value is a **NUMBER** or **false** otherwise.
 
 ## string?
 
     value - value flag
 
-Return **true** if the value is a **STRING** or ***false** otherwise.
+Return **true** if the value is a **STRING** or **false** otherwise.
 
 ## character?
 
     value - value flag
 
-Return **true** if the value is a **CHARACTER** or ***false** otherwise.
+Return **true** if the value is a **CHARACTER** or **false** otherwise.
 
 ## pointer?
 
     value - value flag
 
-Return **true** if the value is a **POINTER** or ***false** otherwise.
+Return **true** if the value is a **POINTER** or **false** otherwise.
 
 ## flag?
 
     value - value flag
 
-Return **true** if the value is a **FLAG** or ***false** otherwise.
+Return **true** if the value is a **FLAG** or **false** otherwise.
 
 ## bytecode?
 
     value - value flag
 
-Return **true** if the value is a **BYTECODE** or ***false** otherwise.
+Return **true** if the value is a **BYTECODE** or **false** otherwise.
 
 ## remark?
 
     value - value flag
 
-Return **true** if the value is a **REMARK** or ***false** otherwise.
+Return **true** if the value is a **REMARK** or **false** otherwise.
 
 ## funcall?
 
     value - value flag
 
-Return **true** if the value is a **FUNCALL** or ***false** otherwise.
+Return **true** if the value is a **FUNCALL** or **false** otherwise.
+
+## unknown?
+
+    value - value flag
+
+Return **true** if the value is **UNKNOWN** or **false** otherwise.
 
 ## dup-pair
 
@@ -683,7 +699,7 @@ Return the length of a slice.
 
     string -
 
-Create a named variable.
+Create a named variable. This will have an **UNKNOWN** type initially.
 
 ## var!
 

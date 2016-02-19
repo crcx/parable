@@ -83,6 +83,7 @@
 [ "-n"  600 ] 'BYTECODE' :
 [ "-n"  700 ] 'REMARK' :
 [ "-n"  800 ] 'FUNCALL' :
+[ "-n"    0 ] 'UNKNOWN' :
 
 [ "v-b" BYTECODE  set-type ] ':b' :
 [ "v-n" NUMBER    set-type ] ':n' :
@@ -92,16 +93,17 @@
 [ "v-f" FLAG      set-type ] ':f' :
 [ "v-f" FUNCALL   set-type ] ':x' :
 [ "v-c" REMARK    set-type ] ':r' :
+[ "v-v" UNKNOWN   set-type ] ':u' :
 
-[ "v-f" type? NUMBER    eq? ] 'number?' :
-[ "v-f" type? STRING    eq? ] 'string?' :
-[ "v-f" type? CHARACTER eq? ] 'character?' :
-[ "v-f" type? POINTER   eq? ] 'pointer?' :
-[ "v-f" type? FLAG      eq? ] 'flag?' :
-[ "v-f" type? BYTECODE  eq? ] 'bytecode?' :
-[ "v-f" type? REMARK    eq? ] 'remark?' :
-[ "v-f" type? FUNCALL   eq? ] 'funcall?' :
-
+[ "v-vf" type? NUMBER    eq? ] 'number?' :
+[ "v-vf" type? STRING    eq? ] 'string?' :
+[ "v-vf" type? CHARACTER eq? ] 'character?' :
+[ "v-vf" type? POINTER   eq? ] 'pointer?' :
+[ "v-vf" type? FLAG      eq? ] 'flag?' :
+[ "v-vf" type? BYTECODE  eq? ] 'bytecode?' :
+[ "v-vf" type? REMARK    eq? ] 'remark?' :
+[ "v-vf" type? FUNCALL   eq? ] 'funcall?' :
+[ "v-vf" type? UNKNOWN   eq? ] 'unknown?' :
 
 "Stack Flow"
 [ "vV-vVvV"  over over ] 'dup-pair' :
@@ -120,7 +122,7 @@
 
 "Simple variables are just named slices, with functions to access the first element. They're useful for holding single values."
 [ "vs-"  [ request [ 0 store ] sip ] dip : ] 'var!' :
-[ "s-"   #nan swap var! ] 'var' :
+[ "s-"   0 :u swap var! ] 'var' :
 [ "p-"   0 swap 0 store ] 'off' :
 [ "p-"   -1 swap 0 store ] 'on' :
 [ "p-"   [ 0 fetch 1 + ] sip 0 store ] 'increment' :
