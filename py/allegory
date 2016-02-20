@@ -1171,7 +1171,36 @@ def is_pointer(type):
     return flag
 
 
+def scan_slice(s):
+    ptrs = []
+    i = get_last_index(s)
+    while i >= 0:
+        t = fetch_type(s, i)
+        v = int(fetch(s, i))
+        if is_pointer(t):
+            if not v in ptrs:
+                ptrs.append(v)
+        i = i - 1
+    return ptrs
+
+
+def scan_for_references(s):
+    ptrs = scan_slice(s)
+    l = len(ptrs)
+    ln = 0
+    while l != ln:
+        l = len(ptrs)
+        for x in ptrs:
+            new = scan_slice(x)
+            for n in new:
+                if not n in ptrs:
+                    ptrs.append(n)
+        ln = len(ptrs)
+    return ptrs
+
+
 def find_references(s):
+    return scan_for_references(s)
     """given a slice, return a list of all references in it"""
     ptrs = []
     i = 0
@@ -1187,7 +1216,7 @@ def find_references(s):
                 if not fetch(s, 0) in ptrs:
                     ptrs.append(int(xt))
     else:
-        while i < get_last_index(s) + 1:
+        while i < get_last_index(s):
             type = fetch_type(s, i)
             if is_pointer(type):
                 if not fetch(s, i) in ptrs:
