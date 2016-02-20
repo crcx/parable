@@ -979,6 +979,7 @@ def stack_change_type(desired):
 # to the slices for each named item.
 #
 
+dictionary_warnings = False
 dictionary_names = []
 dictionary_slices = []
 dictionary_hidden_slices = []
@@ -1002,6 +1003,8 @@ def add_definition(name, slice):
         dictionary_names.append(name)
         dictionary_slices.append(slice)
     else:
+        if dictionary_warnings:
+            report('W10: ' + name + ' redefined')
         target = dictionary_slices[dictionary_names.index(name)]
         copy_slice(slice, target)
     return dictionary_names.index(name)
@@ -1769,6 +1772,7 @@ stdlib.append(""" [ "s-f" @Pattern swap string-contains? ] 'matches' : """)
 stdlib.append(""" [ "s-p" !Pattern vm.dict<names> &matches filter "Return an array of names in the dictionary that match a given substring."  ] 'vm.dict<names-like>' : """)
 stdlib.append(""" } """)
 extensions = []
+extensions.append(""" [ "-"   `2000 ] 'toggle-warnings' : """)
 extensions.append(""" [ "-"   `9000 ] '.s' : """)
 extensions.append(""" [ "-"   `9001 ] 'bye' : """)
 extensions.append(""" [ "-"   `9002 ] 'words' : """)
@@ -1972,6 +1976,12 @@ def revert():
 files = []
 
 def opcodes(slice, offset, opcode):
+    global dictionary_warnings
+    if opcode == 2000:
+        if dictionary_warnings:
+            dictionary_warnings = False
+        else:
+            dictionary_warnings = True
     if opcode == 3000:
         slot = 0
         i = 1

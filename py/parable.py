@@ -977,6 +977,7 @@ def stack_change_type(desired):
 # to the slices for each named item.
 #
 
+dictionary_warnings = False
 dictionary_names = []
 dictionary_slices = []
 dictionary_hidden_slices = []
@@ -1000,6 +1001,8 @@ def add_definition(name, slice):
         dictionary_names.append(name)
         dictionary_slices.append(slice)
     else:
+        if dictionary_warnings:
+            report('W10: ' + name + ' redefined')
         target = dictionary_slices[dictionary_names.index(name)]
         copy_slice(slice, target)
     return dictionary_names.index(name)
