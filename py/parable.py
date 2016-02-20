@@ -1363,7 +1363,8 @@ def compile_function_call(name, slice, offset):
         store(lookup_pointer(name), slice, offset, TYPE_FUNCTION_CALL)
         offset += 1
     else:
-        report('E03: Compile Error: Unable to map ' + name + ' to a pointer')
+        if name != "":
+            report('E03: Compile Error: Unable to map `' + name + '` to a pointer')
     return offset
 
 
