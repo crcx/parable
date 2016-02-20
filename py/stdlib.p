@@ -72,7 +72,7 @@
 [ "vV-VvV" [ swap ] sip ] 'tuck' :
 [ "vV-V"   swap drop ] 'nip' :
 [ "...-"   depth [ drop ] times ] 'reset' :
-
+[ "sp-"    swap : ] '.' define
 
 "Symbolic names for data types"
 [ "-n"  100 ] 'NUMBER' :
@@ -250,7 +250,7 @@
 
 "Text Output Buffer"
 'TOB' var
-[ "v-"   &TOB push ] '.' :
+[ "v-"   &TOB push ] 'to-tob' :
 [ "-..." &TOB get-last-index [ &TOB pop ] times ] 'show-tob' :
 [ "-"    0 &TOB set-last-index ] 'clear-tob' :
 

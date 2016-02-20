@@ -4,6 +4,12 @@
 
 Primitive. Attach a name to a pointer.
 
+## .
+
+    string pointer -
+
+Attach a name to a pointer.
+
 ## :b
 
     value - bytecode
@@ -1280,7 +1286,7 @@ Example:
 
 Variable. This is an array that contains values intended for later display.
 
-## .
+## to-tob
 
     value -
 
