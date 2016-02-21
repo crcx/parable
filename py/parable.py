@@ -1177,7 +1177,10 @@ def scan_slice(s):
     i = get_last_index(s)
     while i >= 0:
         t = fetch_type(s, i)
-        v = int(fetch(s, i))
+        try:
+            v = int(fetch(s, i))
+        except:
+            v = 0
         if is_pointer(t):
             if not v in ptrs:
                 ptrs.append(v)
@@ -1185,7 +1188,7 @@ def scan_slice(s):
     return ptrs
 
 
-def scan_for_references(s):
+def find_references(s):
     ptrs = scan_slice(s)
     l = len(ptrs)
     ln = 0
@@ -1198,36 +1201,6 @@ def scan_for_references(s):
                     ptrs.append(n)
         ln = len(ptrs)
     return ptrs
-
-
-def find_references(s):
-    return scan_for_references(s)
-    """given a slice, return a list of all references in it"""
-    ptrs = []
-    i = 0
-    if s < 0:
-        return []
-    if get_last_index(s) <= 0:
-        type = fetch_type(s, 0)
-        if is_pointer(type):
-            if not fetch(s, 0) in ptrs:
-                ptrs.append(int(fetch(s, 0)))
-        if type == TYPE_POINTER or type == TYPE_FUNCTION_CALL:
-            for xt in find_references(int(fetch(s, 0))):
-                if not fetch(s, 0) in ptrs:
-                    ptrs.append(int(xt))
-    else:
-        while i < get_last_index(s):
-            type = fetch_type(s, i)
-            if is_pointer(type):
-                if not fetch(s, i) in ptrs:
-                    ptrs.append(int(fetch(s, i)))
-            if type == TYPE_POINTER or type == TYPE_FUNCTION_CALL:
-                for xt in find_references(int(fetch(s, i))):
-                    if not xt in ptrs:
-                        ptrs.append(int(xt))
-            i += 1
-    return list(set(ptrs))
 
 
 def seek_all_references():
@@ -1274,6 +1247,7 @@ def collect_garbage():
         if not i in refs and memory_map[i] == 1:
             release_slice(i)
         i = i + 1
+
 
 #
 # the compiler is pretty trivial.
