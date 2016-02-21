@@ -777,9 +777,8 @@ def interpret(slice, more=None):
             elif opcode == BC_VM_SLICES:
                 s = request_slice()
                 i = 0
-                for word in dictionary_slices:
-                    value = string_to_slice(word)
-                    store(value, s, i, TYPE_POINTER)
+                for ptr in dictionary_slices:
+                    store(ptr, s, i, TYPE_POINTER)
                     i = i + 1
                 stack_push(s, TYPE_POINTER)
             elif opcode == BC_TRIG_SIN:
