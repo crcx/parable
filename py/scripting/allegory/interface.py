@@ -174,10 +174,9 @@ files = []
 def opcodes(slice, offset, opcode):
     global dictionary_warnings
     if opcode == 2000:
-        if dictionary_warnings:
-            dictionary_warnings = False
-        else:
-            dictionary_warnings = True
+        dictionary_warnings = True
+    if opcode == 2001:
+        dictionary_warnings = False
     if opcode == 3000:
         slot = 0
         i = 1

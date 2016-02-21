@@ -72,7 +72,7 @@
 [ "vV-VvV" [ swap ] sip ] 'tuck' :
 [ "vV-V"   swap drop ] 'nip' :
 [ "...-"   depth [ drop ] times ] 'reset' :
-[ "sp-"    swap : ] '.' define
+[ "sp-"    swap : ] '.' :
 
 "Symbolic names for data types"
 [ "-n"  100 ] 'NUMBER' :

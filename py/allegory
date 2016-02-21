@@ -1560,7 +1560,7 @@ stdlib.append(""" [ "vV-vVv" [ dup ] dip swap ] 'over' : """)
 stdlib.append(""" [ "vV-VvV" [ swap ] sip ] 'tuck' : """)
 stdlib.append(""" [ "vV-V"   swap drop ] 'nip' : """)
 stdlib.append(""" [ "...-"   depth [ drop ] times ] 'reset' : """)
-stdlib.append(""" [ "sp-"    swap : ] '.' define """)
+stdlib.append(""" [ "sp-"    swap : ] '.' : """)
 stdlib.append(""" "Symbolic names for data types" """)
 stdlib.append(""" [ "-n"  100 ] 'NUMBER' : """)
 stdlib.append(""" [ "-n"  200 ] 'STRING' : """)
@@ -1773,7 +1773,8 @@ stdlib.append(""" [ "s-f" @Pattern swap string-contains? ] 'matches' : """)
 stdlib.append(""" [ "s-p" !Pattern vm.dict<names> &matches filter "Return an array of names in the dictionary that match a given substring."  ] 'vm.dict<names-like>' : """)
 stdlib.append(""" } """)
 extensions = []
-extensions.append(""" [ "-"   `2000 ] 'toggle-warnings' : """)
+extensions.append(""" [ "-"   `2000 ] '+warnings' : """)
+extensions.append(""" [ "-"   `2001 ] '-warnings' : """)
 extensions.append(""" [ "-"   `9000 ] '.s' : """)
 extensions.append(""" [ "-"   `9001 ] 'bye' : """)
 extensions.append(""" [ "-"   `9002 ] 'words' : """)
@@ -1979,10 +1980,9 @@ files = []
 def opcodes(slice, offset, opcode):
     global dictionary_warnings
     if opcode == 2000:
-        if dictionary_warnings:
-            dictionary_warnings = False
-        else:
-            dictionary_warnings = True
+        dictionary_warnings = True
+    if opcode == 2001:
+        dictionary_warnings = False
     if opcode == 3000:
         slot = 0
         i = 1
