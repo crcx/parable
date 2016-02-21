@@ -267,6 +267,20 @@ def opcodes(slice, offset, opcode):
     return offset
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+ignore_depth = 0
+
+def allegory_evaluate(src):
+    global ignore_depth
+    if src == "+ignore":
+        ignore_depth = ignore_depth + 1
+    elif src == "-ignore":
+        ignore_depth = ignore_depth - 1
+    elif ignore_depth <= 0:
+        slice = request_slice()
+        interpret(compile(src, slice), opcodes)
+    if ignore_depth < 0:
+        ignore_depth = 0
+
 
 def load_file(name):
     global should_abort
@@ -276,8 +290,7 @@ def load_file(name):
         for l in lines:
             try:
                 if l != "#!/usr/bin/env allegory" and should_abort == False:
-                    slice = request_slice()
-                    interpret(compile(l, slice), opcodes)
+                    allegory_evaluate(l)
             except:
                 pass
         for e in errors:
@@ -351,9 +364,8 @@ def interactive():
             exit()
 
         if len(src) >= 1:
-            slice = request_slice()
             try:
-                interpret(compile(src, slice), opcodes)
+                allegory_evaluate(src)
             except KeyboardInterrupt:
                 sys.stdout.write("\n")
                 pass
