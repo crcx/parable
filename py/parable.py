@@ -1411,13 +1411,17 @@ def compile(str, slice):
             slice = request_slice()
             offset = 0
         elif current == "]":
-            old = slice
-            if offset == 0:
-                store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
-            offset = nest.pop()
-            slice = nest.pop()
-            store(old, slice, offset, TYPE_POINTER)
-            offset += 1
+            if len(nest) == 0:
+                report('E03: Compile Error - quotations not balanced')
+                return slice
+            else:
+                old = slice
+                if offset == 0:
+                    store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
+                offset = nest.pop()
+                slice = nest.pop()
+                store(old, slice, offset, TYPE_POINTER)
+                offset += 1
         else:
             if is_number(current):
                 offset = compile_number(current, slice, offset)
@@ -1426,6 +1430,8 @@ def compile(str, slice):
         i += 1
         if offset == 0:
             store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
+    if len(nest) != 0:
+        report('E03: Compile Error - quotations not balanced')
     return slice
 
 
