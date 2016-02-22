@@ -721,6 +721,7 @@ def interpret(slice, more=None):
                 if check_depth(slice, offset, 1):
                     a = stack_pop()
                     memory_values[int(a)] = memory_values[int(a)][::-1]
+                    memory_types[int(a)] = memory_types[int(a)][::-1]
                     stack_push(a, TYPE_POINTER)
                 else:
                     offset = size
