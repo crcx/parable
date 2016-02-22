@@ -195,12 +195,6 @@
 [ "v-f"  dup to-uppercase eq? ] 'uppercase?' :
 [ "p-s"  invoke<depth?> 1 - [ [ :s ] bi@ + ] times ] 'build-string' :
 
-"Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
-[ "s-s"  :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while 1 - [ last-index? ] dip swap subslice :s ] 'trim-left' :
-[ ] 'trim-right' :
-[ "s-s"  :s last-index? dup-pair 1 - fetch :n nip 32 eq? [ last-index? 1 - 0 swap subslice :s trim-right ] if-true ] 'trim-right' :
-[ "s-s"  trim-left trim-right ] 'trim' :
-
 
 "Slice as a linear buffer"
 [ 'CurrentBuffer'  'BufferOffset' ] ::
@@ -246,6 +240,12 @@
 [ "pv-n"   [ !Target !Source 0 !Offset -1 !Found @Source length? [ @Source @Offset fetch @Target eq? [ @Offset !Found ] if-true @Offset 1 + !Offset ] times @Found ] localize ] 'index-of' :
 
 [ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset'  'localize' ] hide-functions
+
+
+"Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
+[ "s-s" :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while 1 - [ last-index? 1 + ] dip swap subslice :s ] 'trim-left' :
+[ "s-s" reverse trim-left reverse :s ] 'trim-right' :
+[ "s-s" trim-right trim-left ] 'trim' :
 
 
 "Text Output Buffer"
