@@ -1454,7 +1454,7 @@ def parse_bootstrap(f):
 def prepare_dictionary():
     """setup the initial dictionary"""
     s = request_slice()
-    store(BC_QUOTE_NAME, s, 0, TYPE_BYTECODE)
+    compile('"ps-" `600', s)
     add_definition(':', s)
 
 

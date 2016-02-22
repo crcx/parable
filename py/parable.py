@@ -968,7 +968,7 @@ def stack_change_type(desired):
             stack_push(a, TYPE_FUNCTION_CALL)
     else:
         a = stack_pop()
-        stack_push(a, desired)          
+        stack_push(a, desired)
 
 
 #
@@ -1452,7 +1452,7 @@ def parse_bootstrap(f):
 def prepare_dictionary():
     """setup the initial dictionary"""
     s = request_slice()
-    store(BC_QUOTE_NAME, s, 0, TYPE_BYTECODE)
+    compile('"ps-" `600', s)
     add_definition(':', s)
 
 
