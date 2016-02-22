@@ -259,7 +259,7 @@
 [ 'Public'  'Private' ] ::
 [ "-" vm.dict<names> !Private ] '{' :
 [ "p-" \
-  !Public \
+  [ string? nip ] filter !Public \
   "Extract names in scope" \
   vm.dict<names> @Private length? over length? subslice !Private \
   \
