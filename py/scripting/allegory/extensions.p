@@ -38,6 +38,16 @@
 
 
 "Command Line Arguments and System Integration"
+[ "- pointer"        `226 \
+  "Return an array of all command line arguments. Typically the \
+   first two items will be the scripting engine name and the source \
+   file being run." \
+] 'sys.args' :
+
+[ "string - number"  `227 \
+  "Run an external program. Returns the execution status." \
+] 'sys.run' :
+
 [ "- number"  `4000 ] 'arg-count' :
 [ "number - string"  `4001 ] 'get-arg' :
 [ "s-s"  `5000 ] 'value-for-key' :

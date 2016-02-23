@@ -226,6 +226,18 @@ def opcodes(slice, offset, opcode):
             stack_push(-1, TYPE_FLAG)
         else:
             stack_push(0, TYPE_FLAG)
+    elif opcode == 226:
+        s = request_slice()
+        i = 0
+        while i < len(sys.argv):
+            store(string_to_slice(sys.argv[i]), s, i, TYPE_STRING)
+            i = i + 1
+        stack_push(s, TYPE_POINTER)
+    elif opcode == 227:
+        from subprocess import call
+        s = slice_to_string(stack_pop())
+        n = call(s, shell = True)
+        stack_push(n, TYPE_NUMBER)
     elif opcode == 4000:
         stack_push(len(sys.argv) - 2, TYPE_NUMBER)
     elif opcode == 4001:
