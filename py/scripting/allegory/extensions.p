@@ -48,6 +48,11 @@
   "Run an external program. Returns the execution status." \
 ] 'sys.run' :
 
+
+[ "-p" `250 ] 'vm.memory<map>' :
+[ "-p" `251 ] 'vm.memory<sizes>' :
+[ "-p" `252 ] 'vm.memory<allocated>' :
+
 [ "- number"  `4000 ] 'arg-count' :
 [ "number - string"  `4001 ] 'get-arg' :
 [ "s-s"  `5000 ] 'value-for-key' :

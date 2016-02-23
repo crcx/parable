@@ -1779,6 +1779,9 @@ extensions.append(""" } """)
 extensions.append(""" "Command Line Arguments and System Integration" """)
 extensions.append(""" [ "- pointer"        `226 "Return an array of all command line arguments. Typically the first two items will be the scripting engine name and the source file being run." ] 'sys.args' : """)
 extensions.append(""" [ "string - number"  `227 "Run an external program. Returns the execution status." ] 'sys.run' : """)
+extensions.append(""" [ "-p" `250 ] 'vm.memory<map>' : """)
+extensions.append(""" [ "-p" `251 ] 'vm.memory<sizes>' : """)
+extensions.append(""" [ "-p" `252 ] 'vm.memory<allocated>' : """)
 extensions.append(""" [ "- number"  `4000 ] 'arg-count' : """)
 extensions.append(""" [ "number - string"  `4001 ] 'get-arg' : """)
 extensions.append(""" [ "s-s"  `5000 ] 'value-for-key' : """)
@@ -2026,6 +2029,30 @@ def opcodes(slice, offset, opcode):
         s = slice_to_string(stack_pop())
         n = call(s, shell = True)
         stack_push(n, TYPE_NUMBER)
+    elif opcode == 250:
+        s = request_slice()
+        i = 0
+        for a in memory_map:
+            store(a, s, i, TYPE_NUMBER)
+            i = i + 1
+        stack_push(s, TYPE_POINTER)
+    elif opcode == 251:
+        s = request_slice()
+        i = 0
+        for a in memory_size:
+            store(a, s, i, TYPE_NUMBER)
+            i = i + 1
+        stack_push(s, TYPE_POINTER)
+    elif opcode == 252:
+        s = request_slice()
+        i = 0
+        n = 0
+        while i < len(memory_map):
+            if memory_map[i] == 1:
+                store(i, s, n, TYPE_POINTER)
+                n = n + 1
+            i = i + 1
+        stack_push(s, TYPE_POINTER)
     elif opcode == 4000:
         stack_push(len(sys.argv) - 2, TYPE_NUMBER)
     elif opcode == 4001:
