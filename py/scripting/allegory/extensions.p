@@ -10,15 +10,15 @@
 
 
 "File Operations"
-[ "string:name string:mode - number:file-id"  `3000 ] 'open-file' :
-[ "number:file-id -"  `3001 ] 'close-file' :
-[ "number:file-id - character"  `3002 :c ] 'read-file' :
-[ "character number:file-id -"  `3003 ] 'write-file' :
-[ "number:file-id - number:position"  `3004 ] 'file-position' :
-[ "number:offset number:file-id -"  `3005 ] 'file-seek' :
-[ "number:file-id - number:length"  `3006 ] 'file-size' :
-[ "string:name -"  `3007 ] 'delete-file' :
-[ "string:name - flag"  `3008 ] 'file-exists?' :
+[ "string:name string:mode - number:file-id"  `201 ] 'open-file' :
+[ "number:file-id -"  `202 ] 'close-file' :
+[ "number:file-id - character"  `203 :c ] 'read-file' :
+[ "character number:file-id -"  `204 ] 'write-file' :
+[ "number:file-id - number:position"  `205 ] 'file-position' :
+[ "number:offset number:file-id -"  `206 ] 'file-seek' :
+[ "number:file-id - number:length"  `207 ] 'file-size' :
+[ "string:name -"  `208 ] 'delete-file' :
+[ "string:name - flag"  `209 ] 'file-exists?' :
 
 [ 'slurp-file' ] {
   [ 'FID' 'S' ] ::

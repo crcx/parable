@@ -177,7 +177,7 @@ def opcodes(slice, offset, opcode):
         dictionary_warnings = True
     if opcode == 2001:
         dictionary_warnings = False
-    if opcode == 3000:
+    if opcode == 201:
         slot = 0
         i = 1
         while i < 8:
@@ -193,34 +193,34 @@ def opcodes(slice, offset, opcode):
                 files[int(slot)] = -1
                 report('A10: Unable to open file named ' + name)
         stack_push(slot, TYPE_NUMBER)
-    elif opcode == 3001:
+    elif opcode == 202:
         slot = int(stack_pop())
         files[slot].close()
         files[slot] = 0
-    elif opcode == 3002:
+    elif opcode == 203:
         slot = int(stack_pop())
         stack_push(ord(files[slot].read(1)), TYPE_NUMBER)
-    elif opcode == 3003:
+    elif opcode == 204:
         slot = int(stack_pop())
         files[slot].write(chr(int(stack_pop())))
-    elif opcode == 3004:
+    elif opcode == 205:
         slot = int(stack_pop())
         stack_push(files[slot].tell(), TYPE_NUMBER)
-    elif opcode == 3005:
+    elif opcode == 206:
         slot = int(stack_pop())
         pos = int(stack_pop())
         stack_push(files[slot].seek(pos, 0), TYPE_NUMBER)
-    elif opcode == 3006:
+    elif opcode == 207:
         slot = int(stack_pop())
         at = files[slot].tell()
         files[slot].seek(0, 2) # SEEK_END
         stack_push(files[slot].tell(), TYPE_NUMBER)
         files[slot].seek(at, 0) # SEEK_SET
-    elif opcode == 3007:
+    elif opcode == 208:
         name = slice_to_string(stack_pop())
         if os.path.exists(name):
             os.remove(name)
-    elif opcode == 3008:
+    elif opcode == 209:
         name = slice_to_string(stack_pop())
         if os.path.exists(name):
             stack_push(-1, TYPE_FLAG)

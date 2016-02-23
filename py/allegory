@@ -1763,15 +1763,15 @@ extensions.append(""" [ "s-"  `9004 ] 'save-snapshot' : """)
 extensions.append(""" [ "s-"  `9005 ] 'reload-snapshot' : """)
 extensions.append(""" [ "...-" `9006 ] 'restart' : """)
 extensions.append(""" "File Operations" """)
-extensions.append(""" [ "string:name string:mode - number:file-id"  `3000 ] 'open-file' : """)
-extensions.append(""" [ "number:file-id -"  `3001 ] 'close-file' : """)
-extensions.append(""" [ "number:file-id - character"  `3002 :c ] 'read-file' : """)
-extensions.append(""" [ "character number:file-id -"  `3003 ] 'write-file' : """)
-extensions.append(""" [ "number:file-id - number:position"  `3004 ] 'file-position' : """)
-extensions.append(""" [ "number:offset number:file-id -"  `3005 ] 'file-seek' : """)
-extensions.append(""" [ "number:file-id - number:length"  `3006 ] 'file-size' : """)
-extensions.append(""" [ "string:name -"  `3007 ] 'delete-file' : """)
-extensions.append(""" [ "string:name - flag"  `3008 ] 'file-exists?' : """)
+extensions.append(""" [ "string:name string:mode - number:file-id"  `201 ] 'open-file' : """)
+extensions.append(""" [ "number:file-id -"  `202 ] 'close-file' : """)
+extensions.append(""" [ "number:file-id - character"  `203 :c ] 'read-file' : """)
+extensions.append(""" [ "character number:file-id -"  `204 ] 'write-file' : """)
+extensions.append(""" [ "number:file-id - number:position"  `205 ] 'file-position' : """)
+extensions.append(""" [ "number:offset number:file-id -"  `206 ] 'file-seek' : """)
+extensions.append(""" [ "number:file-id - number:length"  `207 ] 'file-size' : """)
+extensions.append(""" [ "string:name -"  `208 ] 'delete-file' : """)
+extensions.append(""" [ "string:name - flag"  `209 ] 'file-exists?' : """)
 extensions.append(""" [ 'slurp-file' ] { """)
 extensions.append(""" [ 'FID' 'S' ] :: """)
 extensions.append(""" [ "string:name - string:contents" dup file-exists? [ 'r' open-file !FID request !S @S pop drop @FID file-size [ @FID read-file @S push ] times @FID close-file @S :s ] [ drop '' duplicate-slice :s 'Unable to to locate file' abort<with-error> ] if   ] 'slurp-file' : """)
@@ -1963,7 +1963,7 @@ def opcodes(slice, offset, opcode):
         dictionary_warnings = True
     if opcode == 2001:
         dictionary_warnings = False
-    if opcode == 3000:
+    if opcode == 201:
         slot = 0
         i = 1
         while i < 8:
@@ -1979,34 +1979,34 @@ def opcodes(slice, offset, opcode):
                 files[int(slot)] = -1
                 report('A10: Unable to open file named ' + name)
         stack_push(slot, TYPE_NUMBER)
-    elif opcode == 3001:
+    elif opcode == 202:
         slot = int(stack_pop())
         files[slot].close()
         files[slot] = 0
-    elif opcode == 3002:
+    elif opcode == 203:
         slot = int(stack_pop())
         stack_push(ord(files[slot].read(1)), TYPE_NUMBER)
-    elif opcode == 3003:
+    elif opcode == 204:
         slot = int(stack_pop())
         files[slot].write(chr(int(stack_pop())))
-    elif opcode == 3004:
+    elif opcode == 205:
         slot = int(stack_pop())
         stack_push(files[slot].tell(), TYPE_NUMBER)
-    elif opcode == 3005:
+    elif opcode == 206:
         slot = int(stack_pop())
         pos = int(stack_pop())
         stack_push(files[slot].seek(pos, 0), TYPE_NUMBER)
-    elif opcode == 3006:
+    elif opcode == 207:
         slot = int(stack_pop())
         at = files[slot].tell()
         files[slot].seek(0, 2) # SEEK_END
         stack_push(files[slot].tell(), TYPE_NUMBER)
         files[slot].seek(at, 0) # SEEK_SET
-    elif opcode == 3007:
+    elif opcode == 208:
         name = slice_to_string(stack_pop())
         if os.path.exists(name):
             os.remove(name)
-    elif opcode == 3008:
+    elif opcode == 209:
         name = slice_to_string(stack_pop())
         if os.path.exists(name):
             stack_push(-1, TYPE_FLAG)
