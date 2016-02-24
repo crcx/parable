@@ -1184,7 +1184,7 @@ Example:
     counter 'c' :
     5 [ c ] times
 
-## first
+## head
 
     pointer - value
 
@@ -1192,9 +1192,9 @@ Return the first value in a slice.
 
 Example:
 
-    [ 1 2 3 4 5 ] first
+    [ 1 2 3 4 5 ] head
 
-## rest
+## body
 
     pointer - pointer
 
@@ -1202,9 +1202,9 @@ Given a slice, construct a new slice with all but the first element and return a
 
 Example:
 
-    'Eggs Are Tasty' rest :s
+    'Eggs Are Tasty' body :s
 
-## last
+## tail
 
     pointer - value
 
@@ -1212,7 +1212,7 @@ Given a slice, return the last value in it.
 
 Example:
 
-    'hello world!' last
+    'hello world!' tail
 
 ## push
 

@@ -6,13 +6,13 @@
 
 "Helper functions for dealing with the current token."
 [ "-s"  @Tokens @Offset fetch ] 'current-token' :
-[ "-s"  current-token rest :s ] 'cleaned-token' :
-[ "-c"  current-token first ] 'current-prefix' :
+[ "-s"  current-token tail :s ] 'cleaned-token' :
+[ "-c"  current-token head ] 'current-prefix' :
 [ "-"  @Offset 1 + !Offset ] 'next-token' :
 
 "Strings (and remarks) can contain spaces. This constructs a string from the tokens, ending when the token has the delimiter as the last character."
 [ 'S'  'Delimiter' ] ::
-[ "-f"  current-token last @Delimiter eq? ] 'final-token-in-string?' :
+[ "-f"  current-token tail @Delimiter eq? ] 'final-token-in-string?' :
 [ "-"  @S ' ' + current-token + !S ] 'append-to-string' :
 [ "c-s" \
   !Delimiter \
@@ -34,7 +34,7 @@
 [ "-"  $" gather-string c, ] 'compile-remark' :
 [ "s-p"  dup function-exists? [ lookup-function ] [ :n :p ] if ] 'resolve-pointer' :
 [ "-" \
-  current-token rest :s resolve-pointer c, ] 'compile-pointer' :
+  current-token body :s resolve-pointer c, ] 'compile-pointer' :
 [ "-" \
   current-token dup function-exists? \
   [ lookup-function :x c, ] \

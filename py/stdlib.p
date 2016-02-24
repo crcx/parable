@@ -225,9 +225,9 @@
 
 
 "Arrays and Operations on Quotations"
-[ "q-v"  0 fetch ] 'first' :
-[ "q-q"  1 over length? subslice ] 'rest' :
-[ "p-v"  slice-length? 1 - fetch ] 'last' :
+[ "q-v"  0 fetch ] 'head' :
+[ "q-q"  1 over length? subslice ] 'body' :
+[ "p-v"  slice-length? 1 - fetch ] 'tail' :
 
 [ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset' ] ::
 [ "q-" \
@@ -283,7 +283,7 @@
     @Prior [ \
       @List [ \
         swap duplicate-slice !List \
-        [ @List [ first ] for-each ] capture-results reverse !Prior \
+        [ @List [ head ] for-each ] capture-results reverse !Prior \
         invoke \
         @Prior length? [ @Prior pop @List pop 0 store ] times \
       ] dip !List \
@@ -297,7 +297,7 @@
   [ "ppp-p" \
     [ A B X C ] \
     [ !X !B !A request-empty !C \
-      @A length? [ @A first @B first @X invoke @C push @A rest !A @B rest !B ] times \
+      @A length? [ @A head @B head @X invoke @C push @A body !A @B body !B ] times \
       @C duplicate-slice \
     ] invoke<preserving> \
   ] 'zip' :
@@ -322,7 +322,7 @@
   [ "q-" \
     [ Offset Tests Done ] \
     [ !Tests false !Done 0 !Offset \
-      [ @Tests @Offset fetch first invoke \
+      [ @Tests @Offset fetch head invoke \
         [ true !Done @Tests @Offset fetch 1 fetch invoke ] if-true \
         @Offset 1 + !Offset @Done \
       ] until \
@@ -366,8 +366,8 @@
 [ 'interpolate' ] {
   [ 'Data'  'Source'  'String' ] ::
 
-  [ "-"  @String @Source first @Data first type? POINTER eq? [ invoke ] if-true :s + + !String ] '(accumulate)' :
-  [ "-"  @Source rest !Source  @Data rest !Data ] '(next)' :
+  [ "-"  @String @Source head @Data head type? POINTER eq? [ invoke ] if-true :s + + !String ] '(accumulate)' :
+  [ "-"  @Source body !Source  @Data body !Data ] '(next)' :
 
   [ "ps-s" \
     [ Data Source String ] \
@@ -401,9 +401,9 @@
 [ '?' ] {
   [ 'Probability' ] ::
   [ "f-"   [ &Probability increment ] if-true ] 'check' :
-  [ "s-s"  first uppercase? check ] 'initial' :
+  [ "s-s"  head uppercase? check ] 'initial' :
   [ "s-s"  1 fetch lowercase? check ] 'second' :
-  [ "s-s"  lookup-function first remark? not check drop ] 'no-comment?' :
+  [ "s-s"  lookup-function head remark? not check drop ] 'no-comment?' :
   [ "s-f" \
     0 !Probability \
     slice-length? \
@@ -413,7 +413,7 @@
   ] 'var?' :
 
 
-  [ "p-?"  &first &last bi [ remark? &drop if-false ] bi@ ] 'describe-func' :
+  [ "p-?"  &head &tail bi [ remark? &drop if-false ] bi@ ] 'describe-func' :
   [ "s-s"  drop 'Variable' &:r bi@ ] 'describe-var' :
 
   [ "s-s | s-ss" \
@@ -421,7 +421,7 @@
     [ dup var? \
       [ describe-var ] \
       [ lookup-function \
-        [ first ] [ last ] bi \
+        [ head ] [ tail ] bi \
         [ remark? [ drop ] if-false ] bi@ \
       ] if \
     ] \
