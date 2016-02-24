@@ -10,6 +10,12 @@ Primitive. Attach a name to a pointer.
 
 Attach a name to a pointer.
 
+## nop
+
+    -
+
+Does nothing.
+
 ## :b
 
     value - bytecode

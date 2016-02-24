@@ -1,4 +1,5 @@
 "Name the byte codes"
+[ "-"      `0 ] 'nop' :
 [ "vt-v"   `1 ] 'set-type' :
 [ "v-vn"   `2 ] 'type?' :
 [ "nn-n"   `3 ] '+' :
