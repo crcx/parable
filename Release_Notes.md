@@ -9,12 +9,16 @@
     *Current-Buffer  ->  CurrentBuffer
     *Buffer-Offset   ->  BufferOffset
     *TOB             ->  TOB
+    .                ->  to-tob
     *Hash-Prime      ->  HashPrime
     define           ->  :
     variable         ->  var
     variable!        ->  var!
     variables        ->  ::
     apropos          ->  ?
+    first            ->  head
+    last             ->  tail
+    rest             ->  body
 
 ### Removed
 
@@ -33,6 +37,7 @@
 
 ### New Functions
 
+* .
 * abort
 * abort<with-error>
 * bytecode?
@@ -41,6 +46,7 @@
 * funcall?
 * invoke<preserving>
 * lookup-name
+* nop
 * number?
 * pointer?
 * round
@@ -54,6 +60,9 @@
 * vm.dict<slices>
 * vm.dict<names>
 * vm.dict<names-like>
+* vm.memory<allocated>
+* vm.memory<map>
+* vm.memory<sizes>
 * zip
 
 ### New Prefixes
