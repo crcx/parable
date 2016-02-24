@@ -62,12 +62,16 @@
 [ "s-"     `63 ] 'report-error' :
 [ "-p"     `64 ] 'vm.dict<names>' :
 [ "-p"     `65 ] 'vm.dict<slices>' :
-[ "n-n"    `66 ] 'cos' :
-[ "n-n"    `67 ] 'tan' :
-[ "n-n"    `68 ] 'asin' :
-[ "n-n"    `69 ] 'acos' :
-[ "n-n"    `70 ] 'atan' :
+[ "n-n"    `66 ] 'sin' :
+[ "n-n"    `67 ] 'cos' :
+[ "n-n"    `68 ] 'tan' :
+[ "n-n"    `69 ] 'asin' :
+[ "n-n"    `70 ] 'acos' :
+[ "n-n"    `71 ] 'atan' :
 [ "n-n"    `72 ] 'atan2' :
+[ "-p"     `73 ] 'vm.memory<map>' :
+[ "-p"     `74 ] 'vm.memory<sizes>' :
+[ "-p"     `75 ] 'vm.memory<allocated>' :
 
 [ "vV-vVv" [ dup ] dip swap ] 'over' :
 [ "vV-VvV" [ swap ] sip ] 'tuck' :

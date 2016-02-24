@@ -109,6 +109,9 @@ BC_TRIG_ASIN = 69
 BC_TRIG_ACOS = 70
 BC_TRIG_ATAN = 71
 BC_TRIG_ATAN2 = 72
+BC_VM_MEM_MAP = 73
+BC_VM_MEM_SIZES = 74
+BC_VM_MEM_ALLOC = 75
 
 
 #
@@ -826,6 +829,30 @@ def interpret(slice, more=None):
                     stack_push(math.atan2(b, a), TYPE_NUMBER)
                 else:
                     offset = size
+            elif opcode == BC_VM_MEM_MAP:
+                s = request_slice()
+                i = 0
+                for a in memory_map:
+                    store(a, s, i, TYPE_NUMBER)
+                    i = i + 1
+                stack_push(s, TYPE_POINTER)
+            elif opcode == BC_VM_MEM_SIZES:
+                s = request_slice()
+                i = 0
+                for a in memory_size:
+                    store(a, s, i, TYPE_NUMBER)
+                    i = i + 1
+                stack_push(s, TYPE_POINTER)
+            elif opcode == BC_VM_MEM_ALLOC:
+                s = request_slice()
+                i = 0
+                n = 0
+                while i < len(memory_map):
+                    if memory_map[i] == 1:
+                        store(i, s, n, TYPE_POINTER)
+                        n = n + 1
+                    i = i + 1
+                stack_push(s, TYPE_POINTER)
             if more is not None:
                 offset = more(slice, offset, opcode)
 
@@ -1469,6 +1496,7 @@ def pointer_to_name(ptr):
     return s
 stdlib = []
 stdlib.append(""" "Name the byte codes" """)
+stdlib.append(""" [ "-"      `0 ] 'nop' : """)
 stdlib.append(""" [ "vt-v"   `1 ] 'set-type' : """)
 stdlib.append(""" [ "v-vn"   `2 ] 'type?' : """)
 stdlib.append(""" [ "nn-n"   `3 ] '+' : """)
@@ -1531,12 +1559,16 @@ stdlib.append(""" [ "v-v"    `62 ] 'to-uppercase' : """)
 stdlib.append(""" [ "s-"     `63 ] 'report-error' : """)
 stdlib.append(""" [ "-p"     `64 ] 'vm.dict<names>' : """)
 stdlib.append(""" [ "-p"     `65 ] 'vm.dict<slices>' : """)
-stdlib.append(""" [ "n-n"    `66 ] 'cos' : """)
-stdlib.append(""" [ "n-n"    `67 ] 'tan' : """)
-stdlib.append(""" [ "n-n"    `68 ] 'asin' : """)
-stdlib.append(""" [ "n-n"    `69 ] 'acos' : """)
-stdlib.append(""" [ "n-n"    `70 ] 'atan' : """)
+stdlib.append(""" [ "n-n"    `66 ] 'sin' : """)
+stdlib.append(""" [ "n-n"    `67 ] 'cos' : """)
+stdlib.append(""" [ "n-n"    `68 ] 'tan' : """)
+stdlib.append(""" [ "n-n"    `69 ] 'asin' : """)
+stdlib.append(""" [ "n-n"    `70 ] 'acos' : """)
+stdlib.append(""" [ "n-n"    `71 ] 'atan' : """)
 stdlib.append(""" [ "n-n"    `72 ] 'atan2' : """)
+stdlib.append(""" [ "-p"     `73 ] 'vm.memory<map>' : """)
+stdlib.append(""" [ "-p"     `74 ] 'vm.memory<sizes>' : """)
+stdlib.append(""" [ "-p"     `75 ] 'vm.memory<allocated>' : """)
 stdlib.append(""" [ "vV-vVv" [ dup ] dip swap ] 'over' : """)
 stdlib.append(""" [ "vV-VvV" [ swap ] sip ] 'tuck' : """)
 stdlib.append(""" [ "vV-V"   swap drop ] 'nip' : """)
@@ -1779,9 +1811,6 @@ extensions.append(""" } """)
 extensions.append(""" "Command Line Arguments and System Integration" """)
 extensions.append(""" [ "- pointer"        `226 "Return an array of all command line arguments. Typically the first two items will be the scripting engine name and the source file being run." ] 'sys.args' : """)
 extensions.append(""" [ "string - number"  `227 "Run an external program. Returns the execution status." ] 'sys.run' : """)
-extensions.append(""" [ "-p" `250 ] 'vm.memory<map>' : """)
-extensions.append(""" [ "-p" `251 ] 'vm.memory<sizes>' : """)
-extensions.append(""" [ "-p" `252 ] 'vm.memory<allocated>' : """)
 extensions.append(""" [ "- number"  `4000 ] 'arg-count' : """)
 extensions.append(""" [ "number - string"  `4001 ] 'get-arg' : """)
 extensions.append(""" [ "s-s"  `5000 ] 'value-for-key' : """)
@@ -2029,30 +2058,6 @@ def opcodes(slice, offset, opcode):
         s = slice_to_string(stack_pop())
         n = call(s, shell = True)
         stack_push(n, TYPE_NUMBER)
-    elif opcode == 250:
-        s = request_slice()
-        i = 0
-        for a in memory_map:
-            store(a, s, i, TYPE_NUMBER)
-            i = i + 1
-        stack_push(s, TYPE_POINTER)
-    elif opcode == 251:
-        s = request_slice()
-        i = 0
-        for a in memory_size:
-            store(a, s, i, TYPE_NUMBER)
-            i = i + 1
-        stack_push(s, TYPE_POINTER)
-    elif opcode == 252:
-        s = request_slice()
-        i = 0
-        n = 0
-        while i < len(memory_map):
-            if memory_map[i] == 1:
-                store(i, s, n, TYPE_POINTER)
-                n = n + 1
-            i = i + 1
-        stack_push(s, TYPE_POINTER)
     elif opcode == 4000:
         stack_push(len(sys.argv) - 2, TYPE_NUMBER)
     elif opcode == 4001:

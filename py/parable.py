@@ -107,6 +107,9 @@ BC_TRIG_ASIN = 69
 BC_TRIG_ACOS = 70
 BC_TRIG_ATAN = 71
 BC_TRIG_ATAN2 = 72
+BC_VM_MEM_MAP = 73
+BC_VM_MEM_SIZES = 74
+BC_VM_MEM_ALLOC = 75
 
 
 #
@@ -824,6 +827,30 @@ def interpret(slice, more=None):
                     stack_push(math.atan2(b, a), TYPE_NUMBER)
                 else:
                     offset = size
+            elif opcode == BC_VM_MEM_MAP:
+                s = request_slice()
+                i = 0
+                for a in memory_map:
+                    store(a, s, i, TYPE_NUMBER)
+                    i = i + 1
+                stack_push(s, TYPE_POINTER)
+            elif opcode == BC_VM_MEM_SIZES:
+                s = request_slice()
+                i = 0
+                for a in memory_size:
+                    store(a, s, i, TYPE_NUMBER)
+                    i = i + 1
+                stack_push(s, TYPE_POINTER)
+            elif opcode == BC_VM_MEM_ALLOC:
+                s = request_slice()
+                i = 0
+                n = 0
+                while i < len(memory_map):
+                    if memory_map[i] == 1:
+                        store(i, s, n, TYPE_POINTER)
+                        n = n + 1
+                    i = i + 1
+                stack_push(s, TYPE_POINTER)
             if more is not None:
                 offset = more(slice, offset, opcode)
 

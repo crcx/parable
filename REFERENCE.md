@@ -541,6 +541,26 @@ Primitive. Return the arc tangent of a number.
 
     number - number
 
+Primitive.
+
+## vm.memory<map>
+
+    - pointer
+
+Primitive. Return an array indicating which slices are allocated and which are free. Each index corresponds to a slice. If the stored value is 0, the slice is free. If 1, the slice is allocated.
+
+## vm.memory<sizes>
+
+    - pointer
+
+Primitive. Return an array indicating the size of each slice (in cells). Each index corresponds to a slice; the stored value is the length of the slice.
+
+## vm.memory<allocated>
+
+    - pointer
+
+Primitive. Return an array of slice numbers which are currently marked as allocated.
+
 ## NUMBER
 
     - number

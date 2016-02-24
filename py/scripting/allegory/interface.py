@@ -238,30 +238,6 @@ def opcodes(slice, offset, opcode):
         s = slice_to_string(stack_pop())
         n = call(s, shell = True)
         stack_push(n, TYPE_NUMBER)
-    elif opcode == 250:
-        s = request_slice()
-        i = 0
-        for a in memory_map:
-            store(a, s, i, TYPE_NUMBER)
-            i = i + 1
-        stack_push(s, TYPE_POINTER)
-    elif opcode == 251:
-        s = request_slice()
-        i = 0
-        for a in memory_size:
-            store(a, s, i, TYPE_NUMBER)
-            i = i + 1
-        stack_push(s, TYPE_POINTER)
-    elif opcode == 252:
-        s = request_slice()
-        i = 0
-        n = 0
-        while i < len(memory_map):
-            if memory_map[i] == 1:
-                store(i, s, n, TYPE_POINTER)
-                n = n + 1
-            i = i + 1
-        stack_push(s, TYPE_POINTER)
     elif opcode == 4000:
         stack_push(len(sys.argv) - 2, TYPE_NUMBER)
     elif opcode == 4001:
