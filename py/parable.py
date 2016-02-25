@@ -323,7 +323,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_BITWISE_SHIFT:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
                     a = int(stack_pop())
                     b = int(stack_pop())
                     if a < 0:
@@ -333,24 +333,36 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_BITWISE_AND:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
                     a = int(stack_pop())
                     b = int(stack_pop())
                     stack_push(b & a, TYPE_NUMBER)
+                elif precheck(slice, offset, [TYPE_FLAG, TYPE_FLAG]):
+                    a = int(stack_pop())
+                    b = int(stack_pop())
+                    stack_push(b & a, TYPE_FLAG)
                 else:
                     offset = size
             elif opcode == BC_BITWISE_OR:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
                     a = int(stack_pop())
                     b = int(stack_pop())
                     stack_push(b | a, TYPE_NUMBER)
+                elif precheck(slice, offset, [TYPE_FLAG, TYPE_FLAG]):
+                    a = int(stack_pop())
+                    b = int(stack_pop())
+                    stack_push(b | a, TYPE_FLAG)
                 else:
                     offset = size
             elif opcode == BC_BITWISE_XOR:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
                     a = int(stack_pop())
                     b = int(stack_pop())
                     stack_push(b ^ a, TYPE_NUMBER)
+                elif precheck(slice, offset, [TYPE_FLAG, TYPE_FLAG]):
+                    a = int(stack_pop())
+                    b = int(stack_pop())
+                    stack_push(b ^ a, TYPE_FLAG)
                 else:
                     offset = size
             elif opcode == BC_RANDOM:
@@ -491,8 +503,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_FLOW_CALL:
-                offset += 1
-                interpret(int(fetch(slice, offset)), more)
+                offset = size
             elif opcode == BC_FLOW_CALL_F:
                 if precheck(slice, offset, [TYPE_POINTER]):
                     a = stack_pop()
@@ -585,10 +596,11 @@ def interpret(slice, more=None):
             elif opcode == BC_MEM_COLLECT:
                 collect_garbage()
             elif opcode == BC_MEM_GET_LAST:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_POINTER]):
                     a = stack_pop()
                     stack_push(get_last_index(a), TYPE_NUMBER)
                 else:
+                    report('ERROR in ' + str(opcode))
                     offset = size
             elif opcode == BC_MEM_SET_LAST:
                 if check_depth(slice, offset, 2):
@@ -598,15 +610,16 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_MEM_SET_TYPE:
-                if check_depth(slice, offset, 3):
+                if precheck(slice, offset, [TYPE_NUMBER, TYPE_POINTER, TYPE_NUMBER]):
                     a = stack_pop()  # offset
                     b = stack_pop()  # slice
                     c = stack_pop()  # type
                     store_type(b, a, c)
                 else:
+                    report('ERROR in ' + str(opcode))
                     offset = size
             elif opcode == BC_MEM_GET_TYPE:
-                if check_depth(slice, offset, 1):
+                if check_depth(slice, offset, 2):
                     a = stack_pop()
                     b = stack_pop()
                     c = fetch_type(b, a)
@@ -638,23 +651,11 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_FUNCTION_EXISTS:
-                if check_depth(slice, offset, 1):
-                    name = slice_to_string(stack_pop())
-                    if lookup_pointer(name) != -1:
-                        stack_push(-1, TYPE_FLAG)
-                    else:
-                        stack_push(0, TYPE_FLAG)
-                else:
-                    offset = size
+                report('NOT IMPLEMENTED: ' + str(opcode))
+                offset = size
             elif opcode == BC_FUNCTION_LOOKUP:
-                if check_depth(slice, offset, 1):
-                    name = slice_to_string(stack_pop())
-                    if lookup_pointer(name) != -1:
-                        stack_push(lookup_pointer(name), TYPE_POINTER)
-                    else:
-                        stack_push(-1, TYPE_POINTER)
-                else:
-                    offset = size
+                report('NOT IMPLEMENTED: ' + str(opcode))
+                offset = size
             elif opcode == BC_FUNCTION_HIDE:
                 if check_depth(slice, offset, 1):
                     name = slice_to_string(stack_pop())
@@ -663,11 +664,8 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_FUNCTION_NAME:
-                if check_depth(slice, offset, 1):
-                    a = pointer_to_name(stack_pop())
-                    stack_push(string_to_slice(a), TYPE_STRING)
-                else:
-                    offset = size
+                report('NOT IMPLEMENTED: ' + str(opcode))
+                offset = size
             elif opcode == BC_STRING_SEEK:
                 if check_depth(slice, offset, 2):
                     a = slice_to_string(stack_pop())
@@ -767,43 +765,43 @@ def interpret(slice, more=None):
                     i = i + 1
                 stack_push(s, TYPE_POINTER)
             elif opcode == BC_TRIG_SIN:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_NUMBER]):
                     a = stack_pop()
                     stack_push(math.sin(a), TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_TRIG_COS:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_NUMBER]):
                     a = stack_pop()
                     stack_push(math.cos(a), TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_TRIG_TAN:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_NUMBER]):
                     a = stack_pop()
                     stack_push(math.tan(a), TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_TRIG_ASIN:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_NUMBER]):
                     a = stack_pop()
                     stack_push(math.asin(a), TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_TRIG_ACOS:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_NUMBER]):
                     a = stack_pop()
                     stack_push(math.acos(a), TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_TRIG_ATAN:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_NUMBER]):
                     a = stack_pop()
                     stack_push(math.atan(a), TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_TRIG_ATAN2:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(math.atan2(b, a), TYPE_NUMBER)
