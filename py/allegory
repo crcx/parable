@@ -1106,24 +1106,23 @@ def fetch_type(slice, offset):
 
 
 def store_type(slice, offset, type):
-    global memory_values, memory_types, memory_map
-    if get_last_index(slice) < offset:
-        set_slice_last_index(slice, offset)
+    global memory_types
+    if get_last_index(slice) < abs(offset):
+        set_slice_last_index(slice, abs(offset))
     memory_types[int(slice)][int(offset)] = type
 
 
 def store(value, slice, offset, type=100):
     """store a value into a slice"""
-    global memory_values, memory_types, memory_map
-    if get_last_index(slice) < offset:
-        set_slice_last_index(slice, offset)
+    global memory_values, memory_types
+    if get_last_index(slice) < abs(offset):
+        set_slice_last_index(slice, abs(offset))
     memory_values[int(slice)][int(offset)] = value
     memory_types[int(slice)][int(offset)] = type
 
 
 def get_last_index(slice):
     """get the length of a slice"""
-    global memory_size
     return memory_size[int(slice)]
 
 
@@ -1529,10 +1528,7 @@ stdlib.append(""" [ "v-vv"   `48 ] 'dup' : """)
 stdlib.append(""" [ "v-"     `49 ] 'drop' : """)
 stdlib.append(""" [ "vV-Vv"  `50 ] 'swap' : """)
 stdlib.append(""" [ "-n"     `51 ] 'depth' : """)
-stdlib.append(""" [ "s-f"    `53 ] 'function-exists?' : """)
-stdlib.append(""" [ "s-p"    `54 ] 'lookup-function' : """)
 stdlib.append(""" [ "s-"     `55 ] 'hide-function' : """)
-stdlib.append(""" [ "p-s"    `56 ] 'lookup-name' : """)
 stdlib.append(""" [ "ss-n"   `57 ] 'find' : """)
 stdlib.append(""" [ "pnn-p"  `58 ] 'subslice' : """)
 stdlib.append(""" [ "s-f"    `59 ] 'numeric?' : """)
@@ -1640,7 +1636,6 @@ stdlib.append(""" [ "nn-..."  dup-pair lt? [ [ [ dup 1 + ] dip dup-pair eq? ] un
 stdlib.append(""" [ "...n-n"  1 - [ + ] times ] 'sum-range' : """)
 stdlib.append(""" "Misc" """)
 stdlib.append(""" [ "p-"   invoke<depth?> [ hide-function ] times ] 'hide-functions' : """)
-stdlib.append(""" [ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap : ] [ drop ] if ] 'rename-function' : """)
 stdlib.append(""" [ "ps-"  dup hide-function : ] 'redefine' : """)
 stdlib.append(""" [ "p-"   invoke<depth?> [ var ] times ] '::' : """)
 stdlib.append(""" "String and Character" """)
@@ -1691,6 +1686,10 @@ stdlib.append(""" [ "pq-"    [ !XT duplicate-slice !Source 0 !Offset @Source len
 stdlib.append(""" [ "p-p"    [ request !Target invoke<depth?> 0 max [ @Target push ] times @Target 1 over length? subslice :p ] localize ] 'capture-results' : """)
 stdlib.append(""" [ "pv-n" [ dup-pair !Value !Source contains? [ 0 !Offset #nan !Found @Source length? [ @Source @Offset fetch @Value types-match? [ eq? [ @Offset !Found ] if-true ] [ drop-pair ] if @Offset 1 + !Offset ] times @Found ] [ #nan ] if ] localize ] 'index-of' : """)
 stdlib.append(""" [ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset'  'localize' ] hide-functions """)
+stdlib.append(""" [ "s-f"  vm.dict<names> swap contains? ] 'function-exists?' : """)
+stdlib.append(""" [ "s-p"  vm.dict<names> swap index-of vm.dict<slices> swap fetch ] 'lookup-function' : """)
+stdlib.append(""" [ "p-s"  vm.dict<slices> over contains? [ vm.dict<slices> swap index-of vm.dict<names> swap fetch ] [ drop '' ] if ] 'lookup-name' : """)
+stdlib.append(""" [ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap : ] [ drop ] if ] 'rename-function' : """)
 stdlib.append(""" "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive." """)
 stdlib.append(""" [ "s-s" :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while 1 - [ last-index? 1 + ] dip swap subslice :s ] 'trim-left' : """)
 stdlib.append(""" [ "s-s" reverse trim-left reverse :s ] 'trim-right' : """)

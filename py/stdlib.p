@@ -49,10 +49,7 @@
 [ "v-"     `49 ] 'drop' :
 [ "vV-Vv"  `50 ] 'swap' :
 [ "-n"     `51 ] 'depth' :
-[ "s-f"    `53 ] 'function-exists?' :
-[ "s-p"    `54 ] 'lookup-function' :
 [ "s-"     `55 ] 'hide-function' :
-[ "p-s"    `56 ] 'lookup-name' :
 [ "ss-n"   `57 ] 'find' :
 [ "pnn-p"  `58 ] 'subslice' :
 [ "s-f"    `59 ] 'numeric?' :
@@ -182,7 +179,6 @@
 
 "Misc"
 [ "p-"   invoke<depth?> [ hide-function ] times ] 'hide-functions' :
-[ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap : ] [ drop ] if ] 'rename-function' :
 [ "ps-"  dup hide-function : ] 'redefine' :
 [ "p-"   invoke<depth?> [ var ] times ] '::' :
 
@@ -252,6 +248,14 @@
 ] 'index-of' :
 
 [ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset'  'localize' ] hide-functions
+
+
+[ "s-f"  vm.dict<names> swap contains? ] 'function-exists?' :
+[ "s-p"  vm.dict<names> swap index-of vm.dict<slices> swap fetch ] 'lookup-function' :
+[ "p-s"  vm.dict<slices> over contains? [ vm.dict<slices> swap index-of vm.dict<names> swap fetch ] [ drop '' ] if ] 'lookup-name' :
+
+
+[ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap : ] [ drop ] if ] 'rename-function' :
 
 "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
 [ "s-s" :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while 1 - [ last-index? 1 + ] dip swap subslice :s ] 'trim-left' :
