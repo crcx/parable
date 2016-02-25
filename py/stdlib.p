@@ -242,7 +242,7 @@
 [ "pq-p"   [ !XT !Source request-empty !Target 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke [ @Source @Offset fetch @Target push ] if-true @Offset 1 + !Offset ] times @Target ] localize ] 'filter' :
 [ "pq-"    [ !XT duplicate-slice !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke @Source @Offset store @Offset 1 + !Offset ] times @Source ] localize ] 'map' :
 [ "p-p"    [ request !Target invoke<depth?> 0 max [ @Target push ] times @Target 1 over length? subslice :p ] localize ] 'capture-results' :
-[ "pv-n"   [ !Target !Source 0 !Offset -1 !Found @Source length? [ @Source @Offset fetch @Target eq? [ @Offset !Found ] if-true @Offset 1 + !Offset ] times @Found ] localize ] 'index-of' :
+[ "pv-n"   [ !Target !Source 0 !Offset #nan !Found @Source length? [ @Source @Offset fetch @Target eq? [ @Offset !Found ] if-true @Offset 1 + !Offset ] times @Found ] localize ] 'index-of' :
 
 [ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset'  'localize' ] hide-functions
 
