@@ -1104,24 +1104,23 @@ def fetch_type(slice, offset):
 
 
 def store_type(slice, offset, type):
-    global memory_values, memory_types, memory_map
-    if get_last_index(slice) < offset:
-        set_slice_last_index(slice, offset)
+    global memory_types
+    if get_last_index(slice) < abs(offset):
+        set_slice_last_index(slice, abs(offset))
     memory_types[int(slice)][int(offset)] = type
 
 
 def store(value, slice, offset, type=100):
     """store a value into a slice"""
-    global memory_values, memory_types, memory_map
-    if get_last_index(slice) < offset:
-        set_slice_last_index(slice, offset)
+    global memory_values, memory_types
+    if get_last_index(slice) < abs(offset):
+        set_slice_last_index(slice, abs(offset))
     memory_values[int(slice)][int(offset)] = value
     memory_types[int(slice)][int(offset)] = type
 
 
 def get_last_index(slice):
     """get the length of a slice"""
-    global memory_size
     return memory_size[int(slice)]
 
 
