@@ -242,10 +242,16 @@
 [ "pq-p"   [ !XT !Source request-empty !Target 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke [ @Source @Offset fetch @Target push ] if-true @Offset 1 + !Offset ] times @Target ] localize ] 'filter' :
 [ "pq-"    [ !XT duplicate-slice !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke @Source @Offset store @Offset 1 + !Offset ] times @Source ] localize ] 'map' :
 [ "p-p"    [ request !Target invoke<depth?> 0 max [ @Target push ] times @Target 1 over length? subslice :p ] localize ] 'capture-results' :
-[ "pv-n"   [ !Target !Source 0 !Offset #nan !Found @Source length? [ @Source @Offset fetch @Target eq? [ @Offset !Found ] if-true @Offset 1 + !Offset ] times @Found ] localize ] 'index-of' :
+
+[ "pv-n" \
+  [ dup-pair !Value !Source \
+    contains? \
+    [ 0 !Offset #nan !Found @Source length? [ @Source @Offset fetch @Value types-match? [ eq? [ @Offset !Found ] if-true ] [ drop-pair ] if @Offset 1 + !Offset ] times @Found ] \
+    [ #nan ] if \
+  ] localize \
+] 'index-of' :
 
 [ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset'  'localize' ] hide-functions
-
 
 "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
 [ "s-s" :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while 1 - [ last-index? 1 + ] dip swap subslice :s ] 'trim-left' :
