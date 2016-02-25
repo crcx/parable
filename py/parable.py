@@ -236,28 +236,27 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_ADD:
-                if check_depth(slice, offset, 2):
-                    x = stack_type()
+                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
-                    y = stack_type()
                     b = stack_pop()
-                    if x == TYPE_STRING and y == TYPE_STRING:
-                        a = slice_to_string(a)
-                        b = slice_to_string(b)
-                        stack_push(string_to_slice(b + a), TYPE_STRING)
-                    elif x == TYPE_REMARK and y == TYPE_REMARK:
-                        a = slice_to_string(a)
-                        b = slice_to_string(b)
-                        stack_push(string_to_slice(b + a), TYPE_REMARK)
-                    elif x == TYPE_POINTER and y == TYPE_POINTER:
-                        c = request_slice()
-                        d = get_last_index(b) + get_last_index(a) + 1
-                        set_slice_last_index(c, d)
-                        memory_values[c] = memory_values[b] + memory_values[a]
-                        memory_types[c] = memory_types[b] + memory_types[a]
-                        stack_push(c, TYPE_POINTER)
-                    else:
-                        stack_push(a + b, TYPE_NUMBER)
+                    stack_push(b + a, TYPE_NUMBER)
+                elif precheck(slice, offset, [TYPE_STRING, TYPE_STRING]):
+                    a = slice_to_string(stack_pop())
+                    b = slice_to_string(stack_pop())
+                    stack_push(string_to_slice(b + a), TYPE_STRING)
+                elif precheck(slice, offset, [TYPE_REMARK, TYPE_REMARK]):
+                    a = slice_to_string(stack_pop())
+                    b = slice_to_string(stack_pop())
+                    stack_push(string_to_slice(b + a), TYPE_REMARK)
+                elif precheck(slice, offset, [TYPE_POINTER, TYPE_POINTER]):
+                    a = stack_pop()
+                    b = stack_pop()
+                    c = request_slice()
+                    d = get_last_index(b) + get_last_index(a) + 1
+                    set_slice_last_index(c, d)
+                    memory_values[c] = memory_values[b] + memory_values[a]
+                    memory_types[c] = memory_types[b] + memory_types[a]
+                    stack_push(c, TYPE_POINTER)
                 else:
                     offset = size
             elif opcode == BC_SUBTRACT:
