@@ -367,75 +367,43 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_COMPARE_LT:
-                if check_depth(slice, offset, 2):
-                    x = stack_type()
+                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
-                    y = stack_type()
                     b = stack_pop()
-                    if x == TYPE_NUMBER and y == TYPE_NUMBER:
-                        if b < a:
-                            stack_push(-1, TYPE_FLAG)
-                        else:
-                            stack_push(0, TYPE_FLAG)
+                    if b < a:
+                        stack_push(-1, TYPE_FLAG)
                     else:
-                        offset = size
-                        details = 'Slice ' + str(slice)
-                        details = details + ' Offset: ' + str(offset)
-                        report('E02: Type mismatch: ' + details)
+                        stack_push(0, TYPE_FLAG)
                 else:
                     offset = size
             elif opcode == BC_COMPARE_GT:
-                if check_depth(slice, offset, 2):
-                    x = stack_type()
+                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
-                    y = stack_type()
                     b = stack_pop()
-                    if x == TYPE_NUMBER and y == TYPE_NUMBER:
-                        if b > a:
-                            stack_push(-1, TYPE_FLAG)
-                        else:
-                            stack_push(0, TYPE_FLAG)
+                    if b > a:
+                        stack_push(-1, TYPE_FLAG)
                     else:
-                        offset = size
-                        details = 'Slice ' + str(slice)
-                        details = details + ' Offset: ' + str(offset)
-                        report('E02: Type mismatch: ' + details)
+                        stack_push(0, TYPE_FLAG)
                 else:
                     offset = size
             elif opcode == BC_COMPARE_LTEQ:
-                if check_depth(slice, offset, 2):
-                    x = stack_type()
+                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
-                    y = stack_type()
                     b = stack_pop()
-                    if x == TYPE_NUMBER and y == TYPE_NUMBER:
-                        if b <= a:
-                            stack_push(-1, TYPE_FLAG)
-                        else:
-                            stack_push(0, TYPE_FLAG)
+                    if b <= a:
+                        stack_push(-1, TYPE_FLAG)
                     else:
-                        offset = size
-                        details = 'Slice ' + str(slice)
-                        details = details + ' Offset: ' + str(offset)
-                        report('E02: Type mismatch: ' + details)
+                        stack_push(0, TYPE_FLAG)
                 else:
                     offset = size
             elif opcode == BC_COMPARE_GTEQ:
-                if check_depth(slice, offset, 2):
-                    x = stack_type()
+                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
-                    y = stack_type()
                     b = stack_pop()
-                    if x == TYPE_NUMBER and y == TYPE_NUMBER:
-                        if b >= a:
-                            stack_push(-1, TYPE_FLAG)
-                        else:
-                            stack_push(0, TYPE_FLAG)
+                    if b >= a:
+                        stack_push(-1, TYPE_FLAG)
                     else:
-                        offset = size
-                        details = 'Slice ' + str(slice)
-                        details = details + ' Offset: ' + str(offset)
-                        report('E02: Type mismatch: ' + details)
+                        stack_push(0, TYPE_FLAG)
                 else:
                     offset = size
             elif opcode == BC_COMPARE_EQ:
@@ -515,7 +483,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_FLOW_TIMES:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_NUMBER, TYPE_POINTER]):
                     quote = stack_pop()
                     count = stack_pop()
                     while count > 0:
@@ -527,7 +495,7 @@ def interpret(slice, more=None):
                 offset += 1
                 interpret(int(fetch(slice, offset)), more)
             elif opcode == BC_FLOW_CALL_F:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_POINTER]):
                     a = stack_pop()
                     interpret(a, more)
                 else:
@@ -586,14 +554,14 @@ def interpret(slice, more=None):
             elif opcode == BC_FLOW_RETURN:
                 offset = size
             elif opcode == BC_MEM_COPY:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_POINTER, TYPE_POINTER]):
                     a = stack_pop()
                     b = stack_pop()
                     copy_slice(b, a)
                 else:
                     offset = size
             elif opcode == BC_MEM_FETCH:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_POINTER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(fetch(b, a), fetch_type(b, a))
@@ -611,7 +579,7 @@ def interpret(slice, more=None):
             elif opcode == BC_MEM_REQUEST:
                 stack_push(request_slice(), TYPE_POINTER)
             elif opcode == BC_MEM_RELEASE:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_POINTER]):
                     release_slice(stack_pop())
                 else:
                     offset = size
