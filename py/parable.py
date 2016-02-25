@@ -188,7 +188,21 @@ def check_depth(slice, offset, cells):
 #
 
 current_slice = 0
+
+
 should_abort = False
+
+def precheck(slice, offset, req):
+    global should_abort
+    flag = True
+    if len(stack) < len(req):
+        flag = False
+    i = len(stack) - 1
+    for t in reversed(req):
+        if types[i] != t:
+            flag = False
+        i = i - 1
+    return flag
 
 
 def interpret(slice, more=None):
@@ -247,21 +261,21 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_SUBTRACT:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(b - a, TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_MULTIPLY:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(a * b, TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_DIVIDE:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     if a == 0 or b == 0:
@@ -272,38 +286,38 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_REMAINDER:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(b % a, TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_FLOOR:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_NUMBER]):
                     stack_push(math.floor(float(stack_pop())), TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_POW:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(math.pow(b, a), TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_LOG:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_NUMBER]):
                     a = stack_pop()
                     stack_push(math.log(a), TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_LOG10:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_NUMBER]):
                     a = stack_pop()
                     stack_push(math.log10(a), TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_LOGN:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(math.log(b, a), TYPE_NUMBER)
@@ -343,12 +357,12 @@ def interpret(slice, more=None):
             elif opcode == BC_RANDOM:
                 stack_push(random.SystemRandom().random(), TYPE_NUMBER)
             elif opcode == BC_SQRT:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_NUMBER]):
                     stack_push(math.sqrt(stack_pop()), TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_ROUND:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_NUMBER]):
                     stack_push(round(stack_pop()), TYPE_NUMBER)
                 else:
                     offset = size
@@ -471,7 +485,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_FLOW_IF:
-                if check_depth(slice, offset, 3):
+                if precheck(slice, offset, [TYPE_FLAG, TYPE_POINTER, TYPE_POINTER]):
                     a = stack_pop()  # false
                     b = stack_pop()  # true
                     c = stack_pop()  # flag
@@ -480,6 +494,7 @@ def interpret(slice, more=None):
                     else:
                         interpret(a, more)
                 else:
+                    report('BC_FLOW_IF: type mismatch')
                     offset = size
             elif opcode == BC_FLOW_WHILE:
                 if check_depth(slice, offset, 1):
