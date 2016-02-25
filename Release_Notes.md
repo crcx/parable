@@ -1,4 +1,22 @@
+## Parable 2016.03
+
+**Work in Progress - This is subject to change**
+
+### Virtual Machine
+
+* added type checking to the byte code interpreter
+* fetch now allows for negative offsets (fetch with index starting at tail end of slice)
+
+### Standard Library
+
+* index-of now returns #nan when no matching item is in the slice
+* index-of no longer crashes on slices with mixed types
+
+----
+
 ## Parable 2016.02
+
+*Released February 24, 2016*
 
 ### Renamed
 
