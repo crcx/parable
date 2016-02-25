@@ -1092,16 +1092,16 @@ def prepare_slices():
 def fetch(slice, offset):
     """obtain a value stored in a slice"""
     global memory_values, memory_map
-    if get_last_index(slice) < offset:
-        set_slice_last_index(slice, offset)
+    if get_last_index(slice) < abs(offset):
+        set_slice_last_index(slice, abs(offset))
     return memory_values[int(slice)][int(offset)]
 
 
 def fetch_type(slice, offset):
     """obtain a value stored in a slice"""
     global memory_types, memory_map
-    if get_last_index(slice) < offset:
-        set_slice_last_index(slice, offset)
+    if get_last_index(slice) < abs(offset):
+        set_slice_last_index(slice, abs(offset))
     return memory_types[int(slice)][int(offset)]
 
 
