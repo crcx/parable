@@ -1,15 +1,17 @@
 "Infix to Postfix Evaluator"
 
-[ 'Operators'  'Numbers'  'Tokens'  'Offset'  'End'  'tokenize'  'current-token'  'next-token'  'more?'  'process-token'  'translate'  '_n'  '_o' ] {
+[ 'evaluate-infix' ] {
 
-  [ "s-"  ' ' split !Tokens 0 !Offset @Tokens length? !End ] 'tokenize' define
+  [ 'Operators'  'Numbers'  'Tokens'  'Offset'  'End' ] ::
+
+  [ "s-"  ' ' split !Tokens 0 !Offset @Tokens length? !End ] 'tokenize' :
 
   "Helper functions for dealing with the current token."
-  [ "-s"  @Tokens @Offset fetch ] 'current-token' define
-  [ "-"  @Offset 1 + !Offset ] 'next-token' define
+  [ "-s"  @Tokens @Offset fetch ] 'current-token' :
+  [ "-"  @Offset 1 + !Offset ] 'next-token' :
 
   "Token Handler"
-  [ "-f"  @Offset @End lt? ] 'more?' define
+  [ "-f"  @Offset @End lt? ] 'more?' :
   [ "s-..." \
     [ [ [ current-token numeric? ] [ current-token :n @Numbers push ] ] \
       [ [ current-token '+' eq?  ] [ &+ @Operators push ] ] \
@@ -18,20 +20,20 @@
       [ [ current-token '/' eq?  ] [ &/ @Operators push ] ] \
       [ [ current-token '%' eq?  ] [ &rem @Operators push ] ] \
       [ [ true                   ] [ '...Unknown...' ] ] \
-    ] when ] 'process-token' define
+    ] when ] 'process-token' :
 
   "And finally, the top level compiler loop"
-  [ "s-p"  tokenize [ process-token next-token more? ] while ] 'translate' define
+  [ "s-p"  tokenize [ process-token next-token more? ] while ] 'translate' :
 
-  [ @Numbers first @Numbers rest !Numbers ] '_n' define
-  [ @Operators first @Operators rest !Operators ] '_o' define
+  [ @Numbers head @Numbers body !Numbers ] '_n' :
+  [ @Operators head @Operators body !Operators ] '_o' :
 
   [ "s-n" \
     request-empty !Numbers \
     request-empty !Operators \
     translate \
     _n _n _o invoke @Operators length? [ _n _o invoke ] times \
-  ] 'evaluate-infix' define
+  ] 'evaluate-infix' :
 }
 
 
