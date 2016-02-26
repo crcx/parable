@@ -171,19 +171,6 @@ def report(text):
     errors.append(text)
 
 
-def check_depth(slice, offset, cells):
-    """returns True if the stack has at least *cells* number of items, or"""
-    """False otherwise. If False, reports an underflow error."""
-    global stack
-    if len(stack) < cells:
-        details = 'Slice ' + str(slice) + ' Offset: ' + str(offset)
-        expected = str(cells) + ' values required'
-        report('E01: Stack underflow: ' + details + ': ' + expected)
-        return False
-    else:
-        return True
-
-
 #
 # Byte code interpreter
 #
@@ -193,7 +180,13 @@ current_slice = 0
 
 should_abort = False
 
-def precheck(slice, offset, req):
+def abort_run(opcode):
+    global should_abort
+    report('E__: Stack underflow or type mismatch. Opcode # ' + str(opcode))
+    should_abort = True
+
+
+def precheck(req):
     global should_abort
     flag = True
     if len(stack) < len(req):
@@ -227,31 +220,30 @@ def interpret(slice, more=None):
                 interpret(stack_pop(), more)
         else:
             if opcode == BC_SET_TYPE:
-                if precheck(slice, offset, [TYPE_ANY, TYPE_NUMBER]):
+                if precheck([TYPE_ANY, TYPE_NUMBER]):
                     a = stack_pop()
                     stack_change_type(a)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_GET_TYPE:
-                if precheck(slice, offset, [TYPE_ANY]):
+                if precheck([TYPE_ANY]):
                     stack_push(stack_type(), TYPE_NUMBER)
                 else:
-                    report('BC_GET_TYPE')
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_ADD:
-                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(b + a, TYPE_NUMBER)
-                elif precheck(slice, offset, [TYPE_STRING, TYPE_STRING]):
+                elif precheck([TYPE_STRING, TYPE_STRING]):
                     a = slice_to_string(stack_pop())
                     b = slice_to_string(stack_pop())
                     stack_push(string_to_slice(b + a), TYPE_STRING)
-                elif precheck(slice, offset, [TYPE_REMARK, TYPE_REMARK]):
+                elif precheck([TYPE_REMARK, TYPE_REMARK]):
                     a = slice_to_string(stack_pop())
                     b = slice_to_string(stack_pop())
                     stack_push(string_to_slice(b + a), TYPE_REMARK)
-                elif precheck(slice, offset, [TYPE_POINTER, TYPE_POINTER]):
+                elif precheck([TYPE_POINTER, TYPE_POINTER]):
                     a = stack_pop()
                     b = stack_pop()
                     c = request_slice()
@@ -261,72 +253,73 @@ def interpret(slice, more=None):
                     memory_types[c] = memory_types[b] + memory_types[a]
                     stack_push(c, TYPE_POINTER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_SUBTRACT:
-                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(b - a, TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_MULTIPLY:
-                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(a * b, TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_DIVIDE:
-                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     if a == 0 or b == 0:
                         stack_push(float('nan'), TYPE_NUMBER)
                         report('E04: Divide by Zero')
+                        abort_run(opcode)
                     else:
                         stack_push(b / a, TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_REMAINDER:
-                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(b % a, TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_FLOOR:
-                if precheck(slice, offset, [TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER]):
                     stack_push(math.floor(float(stack_pop())), TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_POW:
-                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(math.pow(b, a), TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_LOG:
-                if precheck(slice, offset, [TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER]):
                     a = stack_pop()
                     stack_push(math.log(a), TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_LOG10:
-                if precheck(slice, offset, [TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER]):
                     a = stack_pop()
                     stack_push(math.log10(a), TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_LOGN:
-                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(math.log(b, a), TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_BITWISE_SHIFT:
-                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
                     a = int(stack_pop())
                     b = int(stack_pop())
                     if a < 0:
@@ -334,54 +327,54 @@ def interpret(slice, more=None):
                     else:
                         stack_push(b >> a, TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_BITWISE_AND:
-                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
                     a = int(stack_pop())
                     b = int(stack_pop())
                     stack_push(b & a, TYPE_NUMBER)
-                elif precheck(slice, offset, [TYPE_FLAG, TYPE_FLAG]):
+                elif precheck([TYPE_FLAG, TYPE_FLAG]):
                     a = int(stack_pop())
                     b = int(stack_pop())
                     stack_push(b & a, TYPE_FLAG)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_BITWISE_OR:
-                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
                     a = int(stack_pop())
                     b = int(stack_pop())
                     stack_push(b | a, TYPE_NUMBER)
-                elif precheck(slice, offset, [TYPE_FLAG, TYPE_FLAG]):
+                elif precheck([TYPE_FLAG, TYPE_FLAG]):
                     a = int(stack_pop())
                     b = int(stack_pop())
                     stack_push(b | a, TYPE_FLAG)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_BITWISE_XOR:
-                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
                     a = int(stack_pop())
                     b = int(stack_pop())
                     stack_push(b ^ a, TYPE_NUMBER)
-                elif precheck(slice, offset, [TYPE_FLAG, TYPE_FLAG]):
+                elif precheck([TYPE_FLAG, TYPE_FLAG]):
                     a = int(stack_pop())
                     b = int(stack_pop())
                     stack_push(b ^ a, TYPE_FLAG)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_RANDOM:
                 stack_push(random.SystemRandom().random(), TYPE_NUMBER)
             elif opcode == BC_SQRT:
-                if precheck(slice, offset, [TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER]):
                     stack_push(math.sqrt(stack_pop()), TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_ROUND:
-                if precheck(slice, offset, [TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER]):
                     stack_push(round(stack_pop()), TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_COMPARE_LT:
-                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     if b < a:
@@ -389,9 +382,9 @@ def interpret(slice, more=None):
                     else:
                         stack_push(0, TYPE_FLAG)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_COMPARE_GT:
-                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     if b > a:
@@ -399,9 +392,9 @@ def interpret(slice, more=None):
                     else:
                         stack_push(0, TYPE_FLAG)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_COMPARE_LTEQ:
-                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     if b <= a:
@@ -409,9 +402,9 @@ def interpret(slice, more=None):
                     else:
                         stack_push(0, TYPE_FLAG)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_COMPARE_GTEQ:
-                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     if b >= a:
@@ -419,10 +412,10 @@ def interpret(slice, more=None):
                     else:
                         stack_push(0, TYPE_FLAG)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_COMPARE_EQ:
-                if precheck(slice, offset, [TYPE_STRING, TYPE_STRING]) or \
-                   precheck(slice, offset, [TYPE_REMARK, TYPE_REMARK]):
+                if precheck([TYPE_STRING, TYPE_STRING]) or \
+                   precheck([TYPE_REMARK, TYPE_REMARK]):
                     a = slice_to_string(stack_pop())
                     b = slice_to_string(stack_pop())
                 else:
@@ -433,8 +426,8 @@ def interpret(slice, more=None):
                 else:
                     stack_push(0, TYPE_FLAG)
             elif opcode == BC_COMPARE_NEQ:
-                if precheck(slice, offset, [TYPE_STRING, TYPE_STRING]) or \
-                   precheck(slice, offset, [TYPE_REMARK, TYPE_REMARK]):
+                if precheck([TYPE_STRING, TYPE_STRING]) or \
+                   precheck([TYPE_REMARK, TYPE_REMARK]):
                     a = slice_to_string(stack_pop())
                     b = slice_to_string(stack_pop())
                 else:
@@ -445,7 +438,7 @@ def interpret(slice, more=None):
                 else:
                     stack_push(0, TYPE_FLAG)
             elif opcode == BC_FLOW_IF:
-                if precheck(slice, offset, [TYPE_FLAG, TYPE_POINTER, TYPE_POINTER]):
+                if precheck([TYPE_FLAG, TYPE_POINTER, TYPE_POINTER]):
                     a = stack_pop()  # false
                     b = stack_pop()  # true
                     c = stack_pop()  # flag
@@ -454,54 +447,53 @@ def interpret(slice, more=None):
                     else:
                         interpret(a, more)
                 else:
-                    report('BC_FLOW_IF: type mismatch')
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_FLOW_WHILE:
-                if precheck(slice, offset, [TYPE_POINTER]):
+                if precheck([TYPE_POINTER]):
                     quote = stack_pop()
                     a = -1
                     while a == -1:
                         interpret(quote, more)
                         a = stack_pop()
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_FLOW_UNTIL:
-                if precheck(slice, offset, [TYPE_POINTER]):
+                if precheck([TYPE_POINTER]):
                     quote = stack_pop()
                     a = 0
                     while a == 0:
                         interpret(quote, more)
                         a = stack_pop()
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_FLOW_TIMES:
-                if precheck(slice, offset, [TYPE_NUMBER, TYPE_POINTER]):
+                if precheck([TYPE_NUMBER, TYPE_POINTER]):
                     quote = stack_pop()
                     count = stack_pop()
                     while count > 0:
                         interpret(quote, more)
                         count -= 1
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_FLOW_CALL:
-                offset = size
+                abort_run(opcode)
             elif opcode == BC_FLOW_CALL_F:
-                if precheck(slice, offset, [TYPE_POINTER]):
+                if precheck([TYPE_POINTER]):
                     a = stack_pop()
                     interpret(a, more)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_FLOW_DIP:
-                if precheck(slice, offset, [TYPE_ANY, TYPE_POINTER]):
+                if precheck([TYPE_ANY, TYPE_POINTER]):
                     quote = stack_pop()
                     vtype = stack_type()
                     value = stack_pop()
                     interpret(quote, more)
                     stack_push(value, vtype)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_FLOW_SIP:
-                if precheck(slice, offset, [TYPE_ANY, TYPE_POINTER]):
+                if precheck([TYPE_ANY, TYPE_POINTER]):
                     quote = stack_pop()
                     stack_dup()
                     vtype = stack_type()
@@ -509,9 +501,9 @@ def interpret(slice, more=None):
                     interpret(quote, more)
                     stack_push(value, vtype)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_FLOW_BI:
-                if precheck(slice, offset, [TYPE_ANY, TYPE_POINTER, TYPE_POINTER]):
+                if precheck([TYPE_ANY, TYPE_POINTER, TYPE_POINTER]):
                     a = stack_pop()
                     b = stack_pop()
                     stack_dup()
@@ -521,9 +513,9 @@ def interpret(slice, more=None):
                     stack_push(y, x)
                     interpret(a, more)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_FLOW_TRI:
-                if precheck(slice, offset, [TYPE_ANY, TYPE_POINTER, TYPE_POINTER, TYPE_POINTER]):
+                if precheck([TYPE_ANY, TYPE_POINTER, TYPE_POINTER, TYPE_POINTER]):
                     a = stack_pop()
                     b = stack_pop()
                     c = stack_pop()
@@ -539,125 +531,128 @@ def interpret(slice, more=None):
                     stack_push(y, x)
                     interpret(a, more)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_FLOW_ABORT:
                 should_abort = True
             elif opcode == BC_FLOW_RETURN:
                 offset = size
             elif opcode == BC_MEM_COPY:
-                if precheck(slice, offset, [TYPE_POINTER, TYPE_POINTER]):
+                if precheck([TYPE_POINTER, TYPE_POINTER]):
                     a = stack_pop()
                     b = stack_pop()
                     copy_slice(b, a)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_MEM_FETCH:
-                if precheck(slice, offset, [TYPE_POINTER, TYPE_NUMBER]):
+                if precheck([TYPE_POINTER, TYPE_NUMBER]) or \
+                   precheck([TYPE_STRING, TYPE_NUMBER]) or \
+                   precheck([TYPE_REMARK, TYPE_NUMBER]) or \
+                   precheck([TYPE_FUNCTION_CALL, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(fetch(b, a), fetch_type(b, a))
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_MEM_STORE:
-                if precheck(slice, offset, [TYPE_ANY, TYPE_POINTER, TYPE_NUMBER]):
+                if precheck([TYPE_ANY, TYPE_POINTER, TYPE_NUMBER]) or \
+                   precheck([TYPE_ANY, TYPE_STRING, TYPE_NUMBER]) or \
+                   precheck([TYPE_REMARK, TYPE_NUMBER]) or \
+                   precheck([TYPE_FUNCTION_CALL, TYPE_NUMBER]):
                     a = stack_pop()   # offset
                     b = stack_pop()   # slice
                     t = stack_type()  # type
                     c = stack_pop()   # value
                     store(c, b, a, t)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_MEM_REQUEST:
                 stack_push(request_slice(), TYPE_POINTER)
             elif opcode == BC_MEM_RELEASE:
-                if precheck(slice, offset, [TYPE_POINTER]):
+                if precheck([TYPE_POINTER]):
                     release_slice(stack_pop())
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_MEM_COLLECT:
                 collect_garbage()
             elif opcode == BC_MEM_GET_LAST:
-                if precheck(slice, offset, [TYPE_POINTER]) or \
-                   precheck(slice, offset, [TYPE_STRING]) or \
-                   precheck(slice, offset, [TYPE_REMARK]):
+                if precheck([TYPE_POINTER]) or \
+                   precheck([TYPE_STRING]) or \
+                   precheck([TYPE_REMARK]):
                     a = stack_pop()
                     stack_push(get_last_index(a), TYPE_NUMBER)
                 else:
-                    report('ERROR in ' + str(opcode))
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_MEM_SET_LAST:
-                if precheck(slice, offset, [TYPE_NUMBER, TYPE_POINTER]):
+                if precheck([TYPE_NUMBER, TYPE_POINTER]):
                     a = stack_pop()
                     b = stack_pop()
                     set_slice_last_index(a, b)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_MEM_SET_TYPE:
-                if precheck(slice, offset, [TYPE_NUMBER, TYPE_POINTER, TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER, TYPE_POINTER, TYPE_NUMBER]):
                     a = stack_pop()  # offset
                     b = stack_pop()  # slice
                     c = stack_pop()  # type
                     store_type(b, a, c)
                 else:
-                    report('ERROR in ' + str(opcode))
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_MEM_GET_TYPE:
-                if precheck(slice, offset, [TYPE_POINTER, TYPE_NUMBER]):
+                if precheck([TYPE_POINTER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     c = fetch_type(b, a)
                     stack_push(int(c), TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_STACK_DUP:
-                if precheck(slice, offset, [TYPE_ANY]):
+                if precheck([TYPE_ANY]):
                     stack_dup()
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_STACK_DROP:
-                if precheck(slice, offset, [TYPE_ANY]):
+                if precheck([TYPE_ANY]):
                     stack_drop()
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_STACK_SWAP:
-                if precheck(slice, offset, [TYPE_ANY, TYPE_ANY]):
+                if precheck([TYPE_ANY, TYPE_ANY]):
                     stack_swap()
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_STACK_DEPTH:
                 stack_push(len(stack), TYPE_NUMBER)
             elif opcode == BC_QUOTE_NAME:
-                if precheck(slice, offset, [TYPE_POINTER, TYPE_STRING]):
+                if precheck([TYPE_POINTER, TYPE_STRING]):
                     name = slice_to_string(stack_pop())
                     ptr = stack_pop()
                     add_definition(name, ptr)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_FUNCTION_EXISTS:
-                report('NOT IMPLEMENTED: ' + str(opcode))
-                offset = size
+                abort_run(opcode)
             elif opcode == BC_FUNCTION_LOOKUP:
-                report('NOT IMPLEMENTED: ' + str(opcode))
-                offset = size
+                abort_run(opcode)
             elif opcode == BC_FUNCTION_HIDE:
-                if precheck(slice, offset, [TYPE_STRING]):
+                if precheck([TYPE_STRING]):
                     name = slice_to_string(stack_pop())
                     if lookup_pointer(name) != -1:
                         remove_name(name)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_FUNCTION_NAME:
-                report('NOT IMPLEMENTED: ' + str(opcode))
-                offset = size
+                abort_run(opcode)
             elif opcode == BC_STRING_SEEK:
-                if precheck(slice, offset, [TYPE_STRING, TYPE_STRING]):
+                if precheck([TYPE_STRING, TYPE_STRING]):
                     a = slice_to_string(stack_pop())
                     b = slice_to_string(stack_pop())
                     stack_push(b.find(a), TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_SLICE_SUBSLICE:
-                if precheck(slice, offset, [TYPE_POINTER, TYPE_NUMBER, TYPE_NUMBER]):
+                if precheck([TYPE_POINTER, TYPE_NUMBER, TYPE_NUMBER]) or \
+                   precheck([TYPE_STRING, TYPE_NUMBER, TYPE_NUMBER]) or \
+                   precheck([TYPE_REMARK, TYPE_NUMBER, TYPE_NUMBER]):
                     a = int(stack_pop())
                     b = int(stack_pop())
                     s = int(stack_pop())
@@ -672,56 +667,56 @@ def interpret(slice, more=None):
                         i = i + 1
                     stack_push(e, TYPE_POINTER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_STRING_NUMERIC:
-                if precheck(slice, offset, [TYPE_STRING]):
+                if precheck([TYPE_STRING]):
                     a = slice_to_string(stack_pop())
                     if is_number(a):
                         stack_push(-1, TYPE_FLAG)
                     else:
                         stack_push(0, TYPE_FLAG)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_SLICE_REVERSE:
-                if precheck(slice, offset, [TYPE_POINTER]) or \
-                   precheck(slice, offset, [TYPE_STRING]) or \
-                   precheck(slice, offset, [TYPE_REMARK]):
+                if precheck([TYPE_POINTER]) or \
+                   precheck([TYPE_STRING]) or \
+                   precheck([TYPE_REMARK]):
                     a = stack_pop()
                     memory_values[int(a)] = memory_values[int(a)][::-1]
                     memory_types[int(a)] = memory_types[int(a)][::-1]
                     stack_push(a, TYPE_POINTER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_TO_UPPER:
-                if precheck(slice, offset, [TYPE_STRING]):
+                if precheck([TYPE_STRING]):
                     ptr = stack_pop()
                     a = slice_to_string(ptr).upper()
                     stack_push(string_to_slice(a), TYPE_STRING)
-                elif precheck(slice, offset, [TYPE_CHARACTER]):
+                elif precheck([TYPE_CHARACTER]):
                     a = stack_pop()
                     b = ''.join(chr(a))
                     a = b.upper()
                     stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_TO_LOWER:
-                if precheck(slice, offset, [TYPE_STRING]):
+                if precheck([TYPE_STRING]):
                     ptr = stack_pop()
                     a = slice_to_string(ptr).lower()
                     stack_push(string_to_slice(a), TYPE_STRING)
-                elif precheck(slice, offset, [TYPE_CHARACTER]):
+                elif precheck([TYPE_CHARACTER]):
                     a = stack_pop()
                     b = ''.join(chr(a))
                     a = b.lower()
                     stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_REPORT:
-                if precheck(slice, offset, [TYPE_STRING]):
+                if precheck([TYPE_STRING]):
                     if stack_type() == TYPE_STRING:
                         a = slice_to_string(stack_pop())
                         report(a)
-                offset = size
+                abort_run(opcode)
             elif opcode == BC_VM_NAMES:
                 s = request_slice()
                 i = 0
@@ -738,48 +733,48 @@ def interpret(slice, more=None):
                     i = i + 1
                 stack_push(s, TYPE_POINTER)
             elif opcode == BC_TRIG_SIN:
-                if precheck(slice, offset, [TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER]):
                     a = stack_pop()
                     stack_push(math.sin(a), TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_TRIG_COS:
-                if precheck(slice, offset, [TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER]):
                     a = stack_pop()
                     stack_push(math.cos(a), TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_TRIG_TAN:
-                if precheck(slice, offset, [TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER]):
                     a = stack_pop()
                     stack_push(math.tan(a), TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_TRIG_ASIN:
-                if precheck(slice, offset, [TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER]):
                     a = stack_pop()
                     stack_push(math.asin(a), TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_TRIG_ACOS:
-                if precheck(slice, offset, [TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER]):
                     a = stack_pop()
                     stack_push(math.acos(a), TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_TRIG_ATAN:
-                if precheck(slice, offset, [TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER]):
                     a = stack_pop()
                     stack_push(math.atan(a), TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_TRIG_ATAN2:
-                if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
+                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(math.atan2(b, a), TYPE_NUMBER)
                 else:
-                    offset = size
+                    abort_run(opcode)
             elif opcode == BC_VM_MEM_MAP:
                 s = request_slice()
                 i = 0
