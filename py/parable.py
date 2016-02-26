@@ -199,10 +199,11 @@ def precheck(slice, offset, req):
     if len(stack) < len(req):
         flag = False
     i = len(stack) - 1
-    for t in reversed(req):
-        if t != types[i] and t != TYPE_ANY:
-            flag = False
-        i = i - 1
+    if flag:
+        for t in reversed(req):
+            if t != types[i] and t != TYPE_ANY:
+                flag = False
+            i = i - 1
     return flag
 
 
@@ -456,7 +457,7 @@ def interpret(slice, more=None):
                     report('BC_FLOW_IF: type mismatch')
                     offset = size
             elif opcode == BC_FLOW_WHILE:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_POINTER]):
                     quote = stack_pop()
                     a = -1
                     while a == -1:
@@ -465,7 +466,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_FLOW_UNTIL:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_POINTER]):
                     quote = stack_pop()
                     a = 0
                     while a == 0:
@@ -491,7 +492,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_FLOW_DIP:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_ANY, TYPE_POINTER]):
                     quote = stack_pop()
                     vtype = stack_type()
                     value = stack_pop()
@@ -500,7 +501,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_FLOW_SIP:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_ANY, TYPE_POINTER]):
                     quote = stack_pop()
                     stack_dup()
                     vtype = stack_type()
@@ -558,7 +559,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_MEM_STORE:
-                if check_depth(slice, offset, 3):
+                if precheck(slice, offset, [TYPE_ANY, TYPE_POINTER, TYPE_NUMBER]):
                     a = stack_pop()   # offset
                     b = stack_pop()   # slice
                     t = stack_type()  # type
@@ -609,24 +610,24 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_STACK_DUP:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_ANY]):
                     stack_dup()
                 else:
                     offset = size
             elif opcode == BC_STACK_DROP:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_ANY]):
                     stack_drop()
                 else:
                     offset = size
             elif opcode == BC_STACK_SWAP:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_ANY, TYPE_ANY]):
                     stack_swap()
                 else:
                     offset = size
             elif opcode == BC_STACK_DEPTH:
                 stack_push(len(stack), TYPE_NUMBER)
             elif opcode == BC_QUOTE_NAME:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_POINTER, TYPE_STRING]):
                     name = slice_to_string(stack_pop())
                     ptr = stack_pop()
                     add_definition(name, ptr)
@@ -639,7 +640,7 @@ def interpret(slice, more=None):
                 report('NOT IMPLEMENTED: ' + str(opcode))
                 offset = size
             elif opcode == BC_FUNCTION_HIDE:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_STRING]):
                     name = slice_to_string(stack_pop())
                     if lookup_pointer(name) != -1:
                         remove_name(name)
