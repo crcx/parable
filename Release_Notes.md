@@ -11,6 +11,10 @@
 
 * index-of now returns #nan when no matching item is in the slice
 * index-of no longer crashes on slices with mixed types
+* find-function now written in Parable
+* lookup-function now written in Parable
+* lookup-name now written in Parable
+
 
 ----
 

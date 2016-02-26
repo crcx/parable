@@ -418,51 +418,29 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_COMPARE_EQ:
-                if check_depth(slice, offset, 2):
-                    x = stack_type()
-                    a = stack_pop()
-                    y = stack_type()
-                    b = stack_pop()
-                    if x == y and x != TYPE_STRING:
-                        if b == a:
-                            stack_push(-1, TYPE_FLAG)
-                        else:
-                            stack_push(0, TYPE_FLAG)
-                    elif x == y and x == TYPE_STRING:
-                        if slice_to_string(b) == slice_to_string(a):
-                            stack_push(-1, TYPE_FLAG)
-                        else:
-                            stack_push(0, TYPE_FLAG)
-                    else:
-                        offset = size
-                        details = 'Slice ' + str(slice)
-                        details = details + ' Offset: ' + str(offset)
-                        report('E02: Type mismatch: ' + details)
+                if precheck(slice, offset, [TYPE_STRING, TYPE_STRING]) or \
+                   precheck(slice, offset, [TYPE_REMARK, TYPE_REMARK]):
+                    a = slice_to_string(stack_pop())
+                    b = slice_to_string(stack_pop())
                 else:
-                    offset = size
+                    a = stack_pop()
+                    b = stack_pop()
+                if b == a:
+                    stack_push(-1, TYPE_FLAG)
+                else:
+                    stack_push(0, TYPE_FLAG)
             elif opcode == BC_COMPARE_NEQ:
-                if check_depth(slice, offset, 2):
-                    x = stack_type()
-                    a = stack_pop()
-                    y = stack_type()
-                    b = stack_pop()
-                    if x == y and x != TYPE_STRING:
-                        if b != a:
-                            stack_push(-1, TYPE_FLAG)
-                        else:
-                            stack_push(0, TYPE_FLAG)
-                    elif x == y and x == TYPE_STRING:
-                        if slice_to_string(b) != slice_to_string(a):
-                            stack_push(-1, TYPE_FLAG)
-                        else:
-                            stack_push(0, TYPE_FLAG)
-                    else:
-                        offset = size
-                        details = 'Slice ' + str(slice)
-                        details = details + ' Offset: ' + str(offset)
-                        report('E02: Type mismatch: ' + details)
+                if precheck(slice, offset, [TYPE_STRING, TYPE_STRING]) or \
+                   precheck(slice, offset, [TYPE_REMARK, TYPE_REMARK]):
+                    a = slice_to_string(stack_pop())
+                    b = slice_to_string(stack_pop())
                 else:
-                    offset = size
+                    a = stack_pop()
+                    b = stack_pop()
+                if b != a:
+                    stack_push(-1, TYPE_FLAG)
+                else:
+                    stack_push(0, TYPE_FLAG)
             elif opcode == BC_FLOW_IF:
                 if precheck(slice, offset, [TYPE_FLAG, TYPE_POINTER, TYPE_POINTER]):
                     a = stack_pop()  # false
@@ -596,7 +574,9 @@ def interpret(slice, more=None):
             elif opcode == BC_MEM_COLLECT:
                 collect_garbage()
             elif opcode == BC_MEM_GET_LAST:
-                if precheck(slice, offset, [TYPE_POINTER]):
+                if precheck(slice, offset, [TYPE_POINTER]) or \
+                   precheck(slice, offset, [TYPE_STRING]) or \
+                   precheck(slice, offset, [TYPE_REMARK]):
                     a = stack_pop()
                     stack_push(get_last_index(a), TYPE_NUMBER)
                 else:
@@ -708,39 +688,27 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_TO_UPPER:
-                if check_depth(slice, offset, 1):
-                    t = stack_type()
-                    if t == TYPE_STRING:
-                        ptr = stack_pop()
-                        a = slice_to_string(ptr).upper()
-                        stack_push(string_to_slice(a), TYPE_STRING)
-                    elif t == TYPE_CHARACTER:
-                        a = stack_pop()
-                        b = ''.join(chr(a))
-                        a = b.upper()
-                        stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
-                    else:
-                        details = 'Slice ' + str(slice)
-                        details = details + ' Offset: ' + str(offset)
-                        report('E02: Type mismatch: ' + details)
+                if precheck(slice, offset, [TYPE_STRING]):
+                    ptr = stack_pop()
+                    a = slice_to_string(ptr).upper()
+                    stack_push(string_to_slice(a), TYPE_STRING)
+                elif precheck(slice, offset, [TYPE_CHARACTER]):
+                    a = stack_pop()
+                    b = ''.join(chr(a))
+                    a = b.upper()
+                    stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                 else:
                     offset = size
             elif opcode == BC_TO_LOWER:
-                if check_depth(slice, offset, 1):
-                    t = stack_type()
-                    if t == TYPE_STRING:
-                        ptr = stack_pop()
-                        a = slice_to_string(ptr).lower()
-                        stack_push(string_to_slice(a), TYPE_STRING)
-                    elif t == TYPE_CHARACTER:
-                        a = stack_pop()
-                        b = ''.join(chr(a))
-                        a = b.lower()
-                        stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
-                    else:
-                        details = 'Slice ' + str(slice)
-                        details = details + ' Offset: ' + str(offset)
-                        report('E02: Type mismatch: ' + details)
+                if precheck(slice, offset, [TYPE_STRING]):
+                    ptr = stack_pop()
+                    a = slice_to_string(ptr).lower()
+                    stack_push(string_to_slice(a), TYPE_STRING)
+                elif precheck(slice, offset, [TYPE_CHARACTER]):
+                    a = stack_pop()
+                    b = ''.join(chr(a))
+                    a = b.lower()
+                    stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
                 else:
                     offset = size
             elif opcode == BC_REPORT:
