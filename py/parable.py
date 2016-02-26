@@ -227,7 +227,7 @@ def interpret(slice, more=None):
                 interpret(stack_pop(), more)
         else:
             if opcode == BC_SET_TYPE:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_ANY, TYPE_NUMBER]):
                     a = stack_pop()
                     stack_change_type(a)
                 else:
@@ -511,7 +511,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_FLOW_BI:
-                if check_depth(slice, offset, 3):
+                if precheck(slice, offset, [TYPE_ANY, TYPE_POINTER, TYPE_POINTER]):
                     a = stack_pop()
                     b = stack_pop()
                     stack_dup()
@@ -523,7 +523,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_FLOW_TRI:
-                if check_depth(slice, offset, 4):
+                if precheck(slice, offset, [TYPE_ANY, TYPE_POINTER, TYPE_POINTER, TYPE_POINTER]):
                     a = stack_pop()
                     b = stack_pop()
                     c = stack_pop()
@@ -586,7 +586,7 @@ def interpret(slice, more=None):
                     report('ERROR in ' + str(opcode))
                     offset = size
             elif opcode == BC_MEM_SET_LAST:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_NUMBER, TYPE_POINTER]):
                     a = stack_pop()
                     b = stack_pop()
                     set_slice_last_index(a, b)
@@ -602,7 +602,7 @@ def interpret(slice, more=None):
                     report('ERROR in ' + str(opcode))
                     offset = size
             elif opcode == BC_MEM_GET_TYPE:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_POINTER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     c = fetch_type(b, a)
@@ -650,14 +650,14 @@ def interpret(slice, more=None):
                 report('NOT IMPLEMENTED: ' + str(opcode))
                 offset = size
             elif opcode == BC_STRING_SEEK:
-                if check_depth(slice, offset, 2):
+                if precheck(slice, offset, [TYPE_STRING, TYPE_STRING]):
                     a = slice_to_string(stack_pop())
                     b = slice_to_string(stack_pop())
                     stack_push(b.find(a), TYPE_NUMBER)
                 else:
                     offset = size
             elif opcode == BC_SLICE_SUBSLICE:
-                if check_depth(slice, offset, 3):
+                if precheck(slice, offset, [TYPE_POINTER, TYPE_NUMBER, TYPE_NUMBER]):
                     a = int(stack_pop())
                     b = int(stack_pop())
                     s = int(stack_pop())
@@ -674,7 +674,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_STRING_NUMERIC:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_STRING]):
                     a = slice_to_string(stack_pop())
                     if is_number(a):
                         stack_push(-1, TYPE_FLAG)
@@ -683,7 +683,9 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_SLICE_REVERSE:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_POINTER]) or \
+                   precheck(slice, offset, [TYPE_STRING]) or \
+                   precheck(slice, offset, [TYPE_REMARK]):
                     a = stack_pop()
                     memory_values[int(a)] = memory_values[int(a)][::-1]
                     memory_types[int(a)] = memory_types[int(a)][::-1]
@@ -715,7 +717,7 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_REPORT:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_STRING]):
                     if stack_type() == TYPE_STRING:
                         a = slice_to_string(stack_pop())
                         report(a)
