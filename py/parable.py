@@ -20,6 +20,7 @@ MAX_SLICES = 100000
 # Constants for data types
 #
 
+TYPE_ANY = 000
 TYPE_NUMBER = 100
 TYPE_STRING = 200
 TYPE_CHARACTER = 300
@@ -199,7 +200,7 @@ def precheck(slice, offset, req):
         flag = False
     i = len(stack) - 1
     for t in reversed(req):
-        if types[i] != t:
+        if t != types[i] and t != TYPE_ANY:
             flag = False
         i = i - 1
     return flag
@@ -231,9 +232,10 @@ def interpret(slice, more=None):
                 else:
                     offset = size
             elif opcode == BC_GET_TYPE:
-                if check_depth(slice, offset, 1):
+                if precheck(slice, offset, [TYPE_ANY]):
                     stack_push(stack_type(), TYPE_NUMBER)
                 else:
+                    report('BC_GET_TYPE')
                     offset = size
             elif opcode == BC_ADD:
                 if precheck(slice, offset, [TYPE_NUMBER, TYPE_NUMBER]):
