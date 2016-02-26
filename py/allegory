@@ -23,6 +23,7 @@ MAX_SLICES = 100000
 #
 
 TYPE_ANY = 000
+TYPE_ANY_PTR = 001
 TYPE_NUMBER = 100
 TYPE_STRING = 200
 TYPE_CHARACTER = 300
@@ -131,12 +132,11 @@ def is_number(s):
 def condense_lines(code):
     """Take an array of code, join lines ending with a \, and return"""
     """the new array"""
-    m = len(code)
     s = ''
     r = []
     i = 0
     c = 0
-    while i < m:
+    while i < len(code):
         if code[i].endswith(' \\\n'):
             s = s + ' ' + code[i][:-2].strip()
             c = 1
@@ -189,14 +189,19 @@ def abort_run(opcode):
 
 
 def precheck(req):
-    global should_abort
     flag = True
     if len(stack) < len(req):
         flag = False
     i = len(stack) - 1
     if flag:
         for t in reversed(req):
-            if t != types[i] and t != TYPE_ANY:
+            if t == TYPE_ANY_PTR:
+                if types[i] != TYPE_POINTER and \
+                   types[i] != TYPE_STRING and \
+                   types[i] != TYPE_REMARK and \
+                   types[i] != TYPE_FUNCTION_CALL:
+                    flag = False
+            elif t != types[i] and t != TYPE_ANY:
                 flag = False
             i = i - 1
     return flag
@@ -546,20 +551,14 @@ def interpret(slice, more=None):
                 else:
                     abort_run(opcode)
             elif opcode == BC_MEM_FETCH:
-                if precheck([TYPE_POINTER, TYPE_NUMBER]) or \
-                   precheck([TYPE_STRING, TYPE_NUMBER]) or \
-                   precheck([TYPE_REMARK, TYPE_NUMBER]) or \
-                   precheck([TYPE_FUNCTION_CALL, TYPE_NUMBER]):
+                if precheck([TYPE_ANY_PTR, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
                     stack_push(fetch(b, a), fetch_type(b, a))
                 else:
                     abort_run(opcode)
             elif opcode == BC_MEM_STORE:
-                if precheck([TYPE_ANY, TYPE_POINTER, TYPE_NUMBER]) or \
-                   precheck([TYPE_ANY, TYPE_STRING, TYPE_NUMBER]) or \
-                   precheck([TYPE_REMARK, TYPE_NUMBER]) or \
-                   precheck([TYPE_FUNCTION_CALL, TYPE_NUMBER]):
+                if precheck([TYPE_ANY, TYPE_ANY_PTR, TYPE_NUMBER]):
                     a = stack_pop()   # offset
                     b = stack_pop()   # slice
                     t = stack_type()  # type
