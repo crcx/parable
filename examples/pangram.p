@@ -2,7 +2,7 @@
 [ "s-f" \
   request-empty :s !Scratch \
   to-lowercase \
-  [ dup letter? [ dup $a - @Scratch swap store ] [ drop ] if ] for-each \
+  [ dup letter? [ dup :n $a :n - @Scratch swap store ] [ drop ] if ] for-each \
   'abcdefghijklmnopqrstuvwxyz' @Scratch eq? \
 ] 'pangram?' :
 
