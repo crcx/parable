@@ -180,7 +180,7 @@ def opcodes(slice, offset, opcode):
     if opcode == 201:
         slot = 0
         i = 1
-        while i < 8:
+        while i < (len(files) - 1):
             if files[i] == 0:
                 slot = i
             i = i + 1
@@ -391,14 +391,8 @@ def interactive():
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 if __name__ == '__main__':
-    files.append(0)
-    files.append(0)
-    files.append(0)
-    files.append(0)
-    files.append(0)
-    files.append(0)
-    files.append(0)
-    files.append(0)
+    for i in range(0, 32):
+        files.append(0)
 
     prepare_slices()
     prepare_dictionary()
@@ -409,6 +403,13 @@ if __name__ == '__main__':
 
     try:
         src = home + "/.parable/on_startup.p"
+        if os.path.exists(src):
+            load_file(src)
+    except:
+        pass
+
+    try:
+        src = "on_startup.p"
         if os.path.exists(src):
             load_file(src)
     except:
