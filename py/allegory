@@ -624,7 +624,7 @@ def interpret(slice, more=None):
             elif opcode == BC_STACK_DEPTH:
                 stack_push(len(stack), TYPE_NUMBER)
             elif opcode == BC_QUOTE_NAME:
-                if precheck([TYPE_POINTER, TYPE_STRING]):
+                if precheck([TYPE_ANY_PTR, TYPE_STRING]):
                     name = slice_to_string(stack_pop())
                     ptr = stack_pop()
                     add_definition(name, ptr)
@@ -1125,7 +1125,8 @@ def slice_to_string(slice):
     i = 0
     size = get_last_index(int(slice))
     while i <= size:
-        s.append(chr(int(fetch(slice, i))))
+        try: s.append(chr(int(fetch(slice, i))))
+        except: pass
         i += 1
     return ''.join(s)
 
@@ -1700,7 +1701,7 @@ stdlib.append(""" [ "s-s"  [ :n 32 128 between? ] filter :s ] 'clean-string' : "
 stdlib.append(""" [ "sss-s"  [ split ] dip join clean-string ] 'replace' : """)
 stdlib.append(""" [ 'interpolate' ] { """)
 stdlib.append(""" [ 'Data'  'Source'  'String' ] :: """)
-stdlib.append(""" [ "-"  @String @Source head @Data head type? POINTER eq? [ invoke ] if-true :s + + !String ] '(accumulate)' : """)
+stdlib.append(""" [ "-"  @String @Source head @Data head pointer? [ invoke ] if-true :s + + !String ] '(accumulate)' : """)
 stdlib.append(""" [ "-"  @Source body !Source  @Data body !Data ] '(next)' : """)
 stdlib.append(""" [ "ps-s" [ Data Source String ] [ '{v}' split !Source !Data request-empty :s !String @Data length? [ (accumulate) (next) ] times "Merge any remaining items" @String @Source '' join + clean-string ] invoke<preserving>   ] 'interpolate' : """)
 stdlib.append(""" } """)

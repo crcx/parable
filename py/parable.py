@@ -622,7 +622,7 @@ def interpret(slice, more=None):
             elif opcode == BC_STACK_DEPTH:
                 stack_push(len(stack), TYPE_NUMBER)
             elif opcode == BC_QUOTE_NAME:
-                if precheck([TYPE_POINTER, TYPE_STRING]):
+                if precheck([TYPE_ANY_PTR, TYPE_STRING]):
                     name = slice_to_string(stack_pop())
                     ptr = stack_pop()
                     add_definition(name, ptr)
@@ -1123,7 +1123,8 @@ def slice_to_string(slice):
     i = 0
     size = get_last_index(int(slice))
     while i <= size:
-        s.append(chr(int(fetch(slice, i))))
+        try: s.append(chr(int(fetch(slice, i))))
+        except: pass
         i += 1
     return ''.join(s)
 

@@ -376,7 +376,7 @@
 [ 'interpolate' ] {
   [ 'Data'  'Source'  'String' ] ::
 
-  [ "-"  @String @Source head @Data head type? POINTER eq? [ invoke ] if-true :s + + !String ] '(accumulate)' :
+  [ "-"  @String @Source head @Data head pointer? [ invoke ] if-true :s + + !String ] '(accumulate)' :
   [ "-"  @Source body !Source  @Data body !Data ] '(next)' :
 
   [ "ps-s" \
