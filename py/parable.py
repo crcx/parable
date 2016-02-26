@@ -1011,7 +1011,7 @@ def request_slice(attempts=1):
     while i < MAX_SLICES:
         if memory_map[i] == 0:
             memory_map[i] = 1
-            memory_values[i] = [0]
+            memory_values[i] = [float('nan')]
             memory_types[i] = [TYPE_NUMBER]
             memory_size[i] = 0
             return i
