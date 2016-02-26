@@ -33,7 +33,6 @@ TYPE_FUNCTION_CALL = 800
 
 #
 # Constants for byte codes
-# These are loosely grouped by type
 #
 
 BC_NOP = 0
@@ -66,7 +65,7 @@ BC_FLOW_IF = 26
 BC_FLOW_WHILE = 27
 BC_FLOW_UNTIL = 28
 BC_FLOW_TIMES = 29
-BC_FLOW_CALL = 30
+# BC_FLOW_CALL = 30
 BC_FLOW_CALL_F = 31
 BC_FLOW_DIP = 32
 BC_FLOW_SIP = 33
@@ -89,10 +88,10 @@ BC_STACK_DROP = 49
 BC_STACK_SWAP = 50
 BC_STACK_DEPTH = 51
 BC_QUOTE_NAME = 52
-BC_FUNCTION_EXISTS = 53
-BC_FUNCTION_LOOKUP = 54
+# BC_FUNCTION_EXISTS = 53
+# BC_FUNCTION_LOOKUP = 54
 BC_FUNCTION_HIDE = 55
-BC_FUNCTION_NAME = 56
+# BC_FUNCTION_NAME = 56
 BC_STRING_SEEK = 57
 BC_SLICE_SUBSLICE = 58
 BC_STRING_NUMERIC = 59
@@ -480,8 +479,6 @@ def interpret(slice, more=None):
                         count -= 1
                 else:
                     abort_run(opcode)
-            elif opcode == BC_FLOW_CALL:
-                abort_run(opcode)
             elif opcode == BC_FLOW_CALL_F:
                 if precheck([TYPE_POINTER]):
                     a = stack_pop()
@@ -628,10 +625,6 @@ def interpret(slice, more=None):
                     add_definition(name, ptr)
                 else:
                     abort_run(opcode)
-            elif opcode == BC_FUNCTION_EXISTS:
-                abort_run(opcode)
-            elif opcode == BC_FUNCTION_LOOKUP:
-                abort_run(opcode)
             elif opcode == BC_FUNCTION_HIDE:
                 if precheck([TYPE_STRING]):
                     name = slice_to_string(stack_pop())
@@ -639,8 +632,6 @@ def interpret(slice, more=None):
                         remove_name(name)
                 else:
                     abort_run(opcode)
-            elif opcode == BC_FUNCTION_NAME:
-                abort_run(opcode)
             elif opcode == BC_STRING_SEEK:
                 if precheck([TYPE_STRING, TYPE_STRING]):
                     a = slice_to_string(stack_pop())
