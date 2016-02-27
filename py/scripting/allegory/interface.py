@@ -104,6 +104,8 @@ def dump_stack():
                 display_item('\t' + "", "false")
             else:
                 display_item('\t' + "", "malformed flag")
+        elif type == TYPE_FUNCTION_CALL:
+            display_item('\tCALL to ' + '&', tos)
         else:
             display_item('\t' + "", "unmatched type on the stack")
         sys.stdout.write("\n")
