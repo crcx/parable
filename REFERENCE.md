@@ -1184,6 +1184,16 @@ Example:
     counter 'c' :
     5 [ c ] times
 
+## enquote
+
+    pointer - pointer
+
+Wrap a function call into a new quote. These are essentially the same:
+
+    [ dup ]
+
+    &dup enquote
+
 ## head
 
     pointer - value

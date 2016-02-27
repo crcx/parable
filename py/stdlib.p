@@ -218,7 +218,7 @@
 "Programatic Creation of Quotes"
 [ "vv-p"  swap request [ 0 store ] sip [ 1 store ] sip ] 'cons' :
 [ "vp-p"  :x cons ] 'curry' :
-
+[ "p-p"   :x request [ 0 store ] sip ] 'enquote' :
 
 "Arrays and Operations on Quotations"
 [ "q-v"  0 fetch ] 'head' :
@@ -252,7 +252,7 @@
 
 [ "s-f"  vm.dict<names> swap contains? ] 'function-exists?' :
 [ "s-p"  vm.dict<names> swap index-of vm.dict<slices> swap fetch ] 'lookup-function' :
-[ "p-s"  vm.dict<slices> over contains? [ vm.dict<slices> swap index-of vm.dict<names> swap fetch ] [ drop '' ] if ] 'lookup-name' :
+[ "p-s"  :p vm.dict<slices> over contains? [ vm.dict<slices> swap index-of vm.dict<names> swap fetch ] [ drop '' ] if ] 'lookup-name' :
 
 
 [ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap : ] [ drop ] if ] 'rename-function' :
