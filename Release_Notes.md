@@ -18,7 +18,7 @@
 * find-function now written in Parable
 * lookup-function now written in Parable
 * lookup-name now written in Parable
-
+* added *enquote*
 
 ----
 
