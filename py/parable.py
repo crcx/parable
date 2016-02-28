@@ -130,14 +130,14 @@ def bytecode_set_type(opcode, offset, more):
         a = stack_pop()
         stack_change_type(a)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_get_type(opcode, offset, more):
     if precheck([TYPE_ANY]):
         stack_push(stack_type(), TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_add(opcode, offset, more):
@@ -163,7 +163,7 @@ def bytecode_add(opcode, offset, more):
         memory_types[c] = memory_types[b] + memory_types[a]
         stack_push(c, TYPE_POINTER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_subtract(opcode, offset, more):
@@ -172,7 +172,7 @@ def bytecode_subtract(opcode, offset, more):
         b = stack_pop()
         stack_push(b - a, TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_multiply(opcode, offset, more):
@@ -181,7 +181,7 @@ def bytecode_multiply(opcode, offset, more):
         b = stack_pop()
         stack_push(b * a, TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_divide(opcode, offset, more):
@@ -193,9 +193,9 @@ def bytecode_divide(opcode, offset, more):
         except:
             stack_push(float('nan'), TYPE_NUMBER)
             report('E04: Divide by Zero')
-            abort_run(opcode)
+            abort_run(opcode, offset)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_remainder(opcode, offset, more):
@@ -207,16 +207,16 @@ def bytecode_remainder(opcode, offset, more):
         except:
             stack_push(float('nan'), TYPE_NUMBER)
             report('E04: Divide by Zero')
-            abort_run(opcode)
+            abort_run(opcode, offset)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_floor(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
         stack_push(math.floor(float(stack_pop())), TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_pow(opcode, offset, more):
@@ -225,21 +225,21 @@ def bytecode_pow(opcode, offset, more):
         b = stack_pop()
         stack_push(math.pow(b, a), TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_log(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
         stack_push(math.log(stack_pop()), TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_log10(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
         stack_push(math.log10(stack_pop()), TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_logn(opcode, offset, more):
@@ -248,7 +248,7 @@ def bytecode_logn(opcode, offset, more):
         b = stack_pop()
         stack_push(math.log(b, a), TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_bitwise_shift(opcode, offset, more):
@@ -260,7 +260,7 @@ def bytecode_bitwise_shift(opcode, offset, more):
         else:
             stack_push(b >> a, TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_bitwise_and(opcode, offset, more):
@@ -273,7 +273,7 @@ def bytecode_bitwise_and(opcode, offset, more):
         b = int(stack_pop())
         stack_push(b & a, TYPE_FLAG)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_bitwise_or(opcode, offset, more):
@@ -286,7 +286,7 @@ def bytecode_bitwise_or(opcode, offset, more):
         b = int(stack_pop())
         stack_push(b | a, TYPE_FLAG)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_bitwise_xor(opcode, offset, more):
@@ -299,7 +299,7 @@ def bytecode_bitwise_xor(opcode, offset, more):
         b = int(stack_pop())
         stack_push(b ^ a, TYPE_FLAG)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_random(opcode, offset, more):
@@ -310,14 +310,14 @@ def bytecode_sqrt(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
         stack_push(math.sqrt(stack_pop()), TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_round(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
         stack_push(round(stack_pop()), TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_compare_lt(opcode, offset, more):
@@ -329,7 +329,7 @@ def bytecode_compare_lt(opcode, offset, more):
         else:
             stack_push(0, TYPE_FLAG)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_compare_gt(opcode, offset, more):
@@ -341,7 +341,7 @@ def bytecode_compare_gt(opcode, offset, more):
         else:
             stack_push(0, TYPE_FLAG)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_compare_lteq(opcode, offset, more):
@@ -353,7 +353,7 @@ def bytecode_compare_lteq(opcode, offset, more):
         else:
             stack_push(0, TYPE_FLAG)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_compare_gteq(opcode, offset, more):
@@ -365,7 +365,7 @@ def bytecode_compare_gteq(opcode, offset, more):
         else:
             stack_push(0, TYPE_FLAG)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_compare_eq(opcode, offset, more):
@@ -406,7 +406,7 @@ def bytecode_flow_if(opcode, offset, more):
         else:
             interpret(a, more)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_flow_while(opcode, offset, more):
@@ -418,10 +418,10 @@ def bytecode_flow_while(opcode, offset, more):
             if precheck([TYPE_FLAG]):
                 a = stack_pop()
             else:
-                abort_run(opcode)
+                abort_run(opcode, offset)
                 a = 0
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_flow_until(opcode, offset, more):
@@ -433,10 +433,10 @@ def bytecode_flow_until(opcode, offset, more):
             if precheck([TYPE_FLAG]):
                 a = stack_pop()
             else:
-                abort_run(opcode)
+                abort_run(opcode, offset)
                 a = 0
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_flow_times(opcode, offset, more):
@@ -447,7 +447,7 @@ def bytecode_flow_times(opcode, offset, more):
             interpret(quote, more)
             count -= 1
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_flow_call_f(opcode, offset, more):
@@ -455,7 +455,7 @@ def bytecode_flow_call_f(opcode, offset, more):
         a = stack_pop()
         interpret(a, more)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_flow_dip(opcode, offset, more):
@@ -465,7 +465,7 @@ def bytecode_flow_dip(opcode, offset, more):
         interpret(quote, more)
         stack_push(v, t)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_flow_sip(opcode, offset, more):
@@ -476,7 +476,7 @@ def bytecode_flow_sip(opcode, offset, more):
         interpret(quote, more)
         stack_push(v, t)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_flow_bi(opcode, offset, more):
@@ -489,7 +489,7 @@ def bytecode_flow_bi(opcode, offset, more):
         stack_push(y, x)
         interpret(a, more)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_flow_tri(opcode, offset, more):
@@ -507,7 +507,7 @@ def bytecode_flow_tri(opcode, offset, more):
         stack_push(y, x)
         interpret(a, more)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_flow_abort(opcode, offset, more):
@@ -525,7 +525,7 @@ def bytecode_mem_copy(opcode, offset, more):
         b = stack_pop()
         copy_slice(b, a)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_mem_fetch(opcode, offset, more):
@@ -535,7 +535,7 @@ def bytecode_mem_fetch(opcode, offset, more):
         v, t = fetch(b, a)
         stack_push(v, t)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_mem_store(opcode, offset, more):
@@ -545,7 +545,7 @@ def bytecode_mem_store(opcode, offset, more):
         c, t = stack_pop(type = True)   # value
         store(c, b, a, t)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_mem_request(opcode, offset, more):
@@ -556,7 +556,7 @@ def bytecode_mem_release(opcode, offset, more):
     if precheck([TYPE_POINTER]):
         release_slice(stack_pop())
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_mem_collect(opcode, offset, more):
@@ -570,7 +570,7 @@ def bytecode_mem_get_last(opcode, offset, more):
         a = stack_pop()
         stack_push(get_last_index(a), TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_mem_set_last(opcode, offset, more):
@@ -579,7 +579,7 @@ def bytecode_mem_set_last(opcode, offset, more):
         b = stack_pop()
         set_slice_last_index(a, b)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_mem_set_type(opcode, offset, more):
@@ -589,7 +589,7 @@ def bytecode_mem_set_type(opcode, offset, more):
         c = stack_pop()  # type
         store_type(b, a, c)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_mem_get_type(opcode, offset, more):
@@ -599,28 +599,28 @@ def bytecode_mem_get_type(opcode, offset, more):
         v, t = fetch(b, a)
         stack_push(int(t), TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_stack_dup(opcode, offset, more):
     if precheck([TYPE_ANY]):
         stack_dup()
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_stack_drop(opcode, offset, more):
     if precheck([TYPE_ANY]):
         stack_drop()
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_stack_swap(opcode, offset, more):
     if precheck([TYPE_ANY, TYPE_ANY]):
         stack_swap()
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_stack_depth(opcode, offset, more):
@@ -633,7 +633,7 @@ def bytecode_quote_name(opcode, offset, more):
         ptr = stack_pop()
         add_definition(name, ptr)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_function_hide(opcode, offset, more):
@@ -642,7 +642,7 @@ def bytecode_function_hide(opcode, offset, more):
         if lookup_pointer(name) != -1:
             remove_name(name)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_string_seek(opcode, offset, more):
@@ -651,7 +651,7 @@ def bytecode_string_seek(opcode, offset, more):
         b = slice_to_string(stack_pop())
         stack_push(b.find(a), TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_slice_subslice(opcode, offset, more):
@@ -672,7 +672,7 @@ def bytecode_slice_subslice(opcode, offset, more):
             i = i + 1
         stack_push(e, TYPE_POINTER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_string_numeric(opcode, offset, more):
@@ -683,7 +683,7 @@ def bytecode_string_numeric(opcode, offset, more):
         else:
             stack_push(0, TYPE_FLAG)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_slice_reverse(opcode, offset, more):
@@ -695,7 +695,7 @@ def bytecode_slice_reverse(opcode, offset, more):
         memory_types[int(a)] = memory_types[int(a)][::-1]
         stack_push(a, TYPE_POINTER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_to_upper(opcode, offset, more):
@@ -709,7 +709,7 @@ def bytecode_to_upper(opcode, offset, more):
         a = b.upper()
         stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_to_lower(opcode, offset, more):
@@ -723,14 +723,14 @@ def bytecode_to_lower(opcode, offset, more):
         a = b.lower()
         stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_report(opcode, offset, more):
     if precheck([TYPE_STRING]):
         report(slice_to_string(stack_pop()))
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_vm_names(opcode, offset, more):
@@ -757,7 +757,7 @@ def bytecode_trig_sin(opcode, offset, more):
         a = stack_pop()
         stack_push(math.sin(a), TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_trig_cos(opcode, offset, more):
@@ -765,7 +765,7 @@ def bytecode_trig_cos(opcode, offset, more):
         a = stack_pop()
         stack_push(math.cos(a), TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_trig_tan(opcode, offset, more):
@@ -773,7 +773,7 @@ def bytecode_trig_tan(opcode, offset, more):
         a = stack_pop()
         stack_push(math.tan(a), TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_trig_asin(opcode, offset, more):
@@ -781,7 +781,7 @@ def bytecode_trig_asin(opcode, offset, more):
         a = stack_pop()
         stack_push(math.asin(a), TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_trig_acos(opcode, offset, more):
@@ -789,7 +789,7 @@ def bytecode_trig_acos(opcode, offset, more):
         a = stack_pop()
         stack_push(math.acos(a), TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_trig_atan(opcode, offset, more):
@@ -797,7 +797,7 @@ def bytecode_trig_atan(opcode, offset, more):
         a = stack_pop()
         stack_push(math.atan(a), TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_trig_atan2(opcode, offset, more):
@@ -806,7 +806,7 @@ def bytecode_trig_atan2(opcode, offset, more):
         b = stack_pop()
         stack_push(math.atan2(b, a), TYPE_NUMBER)
     else:
-        abort_run(opcode)
+        abort_run(opcode, offset)
 
 
 def bytecode_vm_mem_map(opcode, offset, more):
@@ -982,9 +982,13 @@ current_slice = 0
 
 should_abort = False
 
-def abort_run(opcode):
+def abort_run(opcode, offset):
     global should_abort
-    report('E__: Stack underflow or type mismatch. Opcode # ' + str(opcode))
+    emsg = "E__: "
+    emsg = emsg + "Error processing `" + str(opcode) + " "
+    emsg = emsg + "at offset " + str(offset) + " in slice "
+    emsg = emsg + str(current_slice)
+    report(emsg)
     should_abort = True
 
 
