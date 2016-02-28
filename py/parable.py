@@ -1158,7 +1158,7 @@ def stack_change_type(desired):
             stack_push(string_to_slice(str(stack_pop())), TYPE_STRING)
         elif original == TYPE_CHARACTER:
             v = stack_pop()
-            if v >= 32 and v <= 128:
+            if (v >= 32 and v <= 128) or v == 10 or v == 13:
                 stack_push(string_to_slice(str(chr(v))), TYPE_STRING)
             else:
                 stack_push(string_to_slice(str(chr(0))), TYPE_STRING)
