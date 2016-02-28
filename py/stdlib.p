@@ -1,74 +1,73 @@
-"Name the byte codes"
-[ "-"      `0 ] 'nop' :
-[ "vt-v"   `1 ] 'set-type' :
-[ "v-vn"   `2 ] 'type?' :
-[ "nn-n"   `3 ] '+' :
-[ "nn-n"   `4 ] '-' :
-[ "nn-n"   `5 ] '*' :
-[ "nn-n"   `6 ] '/' :
-[ "nn-n"   `7 ] 'rem' :
-[ "n-n"    `8 ] 'floor' :
-[ "nn-n"   `9 ] '^' :
-[ "n-n"    `10 ] 'log' :
-[ "n-n"    `11 ] 'log10' :
-[ "nn-n"   `12 ] 'log<n>' :
-[ "nn-n"   `13 ] 'shift' :
-[ "nn-n"   `14 ] 'and' :
-[ "nn-n"   `15 ] 'or' :
-[ "nn-n"   `16 ] 'xor' :
-[ "-n"     `17 ] 'random' :
-[ "n-n"    `18 ] 'sqrt' :
-[ "n-n"    `19 ] 'round' :
-[ "nn-f"   `20 ] 'lt?' :
-[ "nn-f"   `21 ] 'gt?' :
-[ "nn-f"   `22 ] 'lteq?' :
-[ "nn-f"   `23 ] 'gteq?' :
-[ "vv-f"   `24 ] 'eq?' :
-[ "vv-f"   `25 ] '-eq?' :
-[ "fpp-"   `26 ] 'if' :
-[ "p-"     `27 ] 'while' :
-[ "p-"     `28 ] 'until' :
-[ "np-"    `29 ] 'times' :
-[ "p-"     `31 ] 'invoke' :
-[ "vp-v"   `32 ] 'dip' :
-[ "vp-v"   `33 ] 'sip' :
-[ "vpp-?"  `34 ] 'bi' :
-[ "vppp-?" `35 ] 'tri' :
-[ "-"      `36 ] 'abort' :
-[ "pp-"    `38 ] 'copy' :
-[ "pn-v"   `39 ] 'fetch' :
-[ "vpn-"   `40 ] 'store' :
-[ "-p"     `41 ] 'request' :
-[ "p-"     `42 ] 'release' :
-[ "-"      `43 ] 'collect-garbage' :
-[ "p-n"    `44 ] 'get-last-index' :
-[ "np-"    `45 ] 'set-last-index' :
-[ "tpn-"   `46 ] 'set-stored-type' :
-[ "pn-n"   `47 ] 'get-stored-type' :
-[ "v-vv"   `48 ] 'dup' :
-[ "v-"     `49 ] 'drop' :
-[ "vV-Vv"  `50 ] 'swap' :
-[ "-n"     `51 ] 'depth' :
-[ "s-"     `55 ] 'hide-function' :
-[ "ss-n"   `57 ] 'find' :
-[ "pnn-p"  `58 ] 'subslice' :
-[ "s-f"    `59 ] 'numeric?' :
-[ "p-p"    `60 ] 'reverse' :
-[ "v-v"    `61 ] 'to-lowercase' :
-[ "v-v"    `62 ] 'to-uppercase' :
-[ "s-"     `63 ] 'report-error' :
-[ "-p"     `64 ] 'vm.dict<names>' :
-[ "-p"     `65 ] 'vm.dict<slices>' :
-[ "n-n"    `66 ] 'sin' :
-[ "n-n"    `67 ] 'cos' :
-[ "n-n"    `68 ] 'tan' :
-[ "n-n"    `69 ] 'asin' :
-[ "n-n"    `70 ] 'acos' :
-[ "n-n"    `71 ] 'atan' :
-[ "n-n"    `72 ] 'atan2' :
-[ "-p"     `73 ] 'vm.memory<map>' :
-[ "-p"     `74 ] 'vm.memory<sizes>' :
-[ "-p"     `75 ] 'vm.memory<allocated>' :
+[ "-"      `0   "Does nothing" ] 'nop' :
+[ "vt-v"   `1   "Convert a value from one type to the specified type" ] 'set-type' :
+[ "v-vn"   `2   "Return the type constant for a value" ] 'type?' :
+[ "nn-n"   `3   "Add two numbers or concatenate two strings, remarks, or slices" ] '+' :
+[ "nn-n"   `4   "Subtract n2 from n1" ] '-' :
+[ "nn-n"   `5   "Multiply two numbers" ] '*' :
+[ "nn-n"   `6   "Divide n1 by n2" ] '/' :
+[ "nn-n"   `7.  "Divide n1 by n2, returning the remainder" ] 'rem' :
+[ "n-n"    `8   "Return the smallest integer less than or equal to the starting value" ] 'floor' :
+[ "nn-n"   `9   "Return n1 to the power n2" ] '^' :
+[ "n-n"    `10  "Return the natural logarithim of a number" ] 'log' :
+[ "n-n"    `11  "Return the base 10 logarithim of a number" ] 'log10' :
+[ "nn-n"   `12  "Return the logarithim of a number in the specified base" ] 'log<n>' :
+[ "nn-n"   `13  "Perform a bitwise shift" ] 'shift' :
+[ "nn-n"   `14. "Bitwise AND operation" ] 'and' :
+[ "nn-n"   `15  "Bitwise OR operation"  ] 'or' :
+[ "nn-n"   `16  "Bitwise XOR operation" ] 'xor' :
+[ "-n"     `17  "Return a random number" ] 'random' :
+[ "n-n"    `18  "Obtain the square root of a number" ] 'sqrt' :
+[ "n-n"    `19  "Round a number to the nearest integer value" ] 'round' :
+[ "nm-f"   `20  "True if n < m or false otherwise" ] 'lt?' :
+[ "nm-f"   `21  "True if n > m or false otherwise" ] 'gt?' :
+[ "nm-f"   `22  "True if n <= m or false otherwise" ] 'lteq?' :
+[ "nm-f"   `23  "True if n >= m or false otherwise" ] 'gteq?' :
+[ "vv-f"   `24  "True if v1 == v2 or false otherwise" ] 'eq?' :
+[ "vv-f"   `25  "True if v1 != v2 or false otherwise" ] '-eq?' :
+[ "fpp-"   `26  "If flag is true, invoke p1; otherwise invoke p2" ] 'if' :
+[ "p-"     `27  "Invoke p (which should return a flag) until the returned flag is false" ] 'while' :
+[ "p-"     `28  "Invoke p (which should return a flag) until the returned flag is true" ] 'until' :
+[ "np-"    `29. "Invoke slice p the specified number of times" ] 'times' :
+[ "p-"     `31  "Run the code in slice p" ] 'invoke' :
+[ "vp-v"   `32  "Invoke code in slice p, with value v moved out of the way first" ] 'dip' :
+[ "vp-v"   `33  "Invoke code in slice p, restoring a copy of v to the stack after execution completes" ] 'sip' :
+[ "vpp-?"  `34. "Apply p1 and p2 to copies of v" ] 'bi' :
+[ "vppp-?" `35. "Apply p1, p2, and p3 to copies of v" ] 'tri' :
+[ "-"      `36  "Terminate current execution" ] 'abort' :
+[ "pp-"    `38. "Copy contents of slice p1 to slice p2" ] 'copy' :
+[ "pn-v"   `39  "Fetch a value stored in p at offset n" ] 'fetch' :
+[ "vpn-"   `40  "Store a value into slice p at offset n" ] 'store' :
+[ "-p"     `41  "Request a new slice" ] 'request' :
+[ "p-"     `42  "Release an allocated slice" ] 'release' :
+[ "-"      `43  "Reclaim unused slices" ] 'collect-garbage' :
+[ "p-n"    `44  "Get the final valid offset for a slice" ] 'get-last-index' :
+[ "np-"    `45  "Set the final valid offset for a slice" ] 'set-last-index' :
+[ "tpn-"   `46. "Update the type hint for the value stored in slice p, offset n" ] 'set-stored-type' :
+[ "pn-n"   `47  "Retrieve the type hint for the value stored in slice p, offset n" ] 'get-stored-type' :
+[ "v-vv"   `48  "Make a copy of a value" ] 'dup' :
+[ "v-"     `49  "Remove the top value from the stack" ] 'drop' :
+[ "vV-Vv"  `50  "Switch the positions of the top two items on the stack" ] 'swap' :
+[ "-n"     `51  "Return the number of items on the stack" ] 'depth' :
+[ "s-"     `55. "Hide a named function" ] 'hide-function' :
+[ "ss-n"   `57  "Return the offset of p2 if it exists in p1, or #nan otherwise" ] 'find' :
+[ "pnn-p"  `58. "Return a new slice with the values in p, starting at n1 and ending at n2" ] 'subslice' :
+[ "s-f"    `59  "Return true if the string is a number, or false otherwise" ] 'numeric?' :
+[ "p-p"    `60  "Reverse the order of values in a slice" ] 'reverse' :
+[ "v-v"    `61  "Convert a string or character to lowercase" ] 'to-lowercase' :
+[ "v-v"    `62  "Convert a string or character to upperacase" ] 'to-uppercase' :
+[ "s-"     `63  "Send a string to the error log" ] 'report-error' :
+[ "-p"     `64  "Return an array of names in the dictionary" ] 'vm.dict<names>' :
+[ "-p"     `65  "Return an array of the pointers in the dictionary" ] 'vm.dict<slices>' :
+[ "n-n"    `66  "Return the sine" ] 'sin' :
+[ "n-n"    `67  "Return the cosine" ] 'cos' :
+[ "n-n"    `68  "Return the tangent" ] 'tan' :
+[ "n-n"    `69  "Return the arc sine" ] 'asin' :
+[ "n-n"    `70  "Return the arc cosine" ] 'acos' :
+[ "n-n"    `71  "Return the arc tangent" ] 'atan' :
+[ "nn-n"   `72  "Like atan, but with two inputs" ] 'atan2' :
+[ "-p"     `73  "Return an array showing which slices are used and which are free" ] 'vm.memory<map>' :
+[ "-p"     `74  "Return an array showing the size of each slice" ] 'vm.memory<sizes>' :
+[ "-p"     `75  "Return an array with pointers to each currently allocated slice" ] 'vm.memory<allocated>' :
 
 [ "vV-vVv" [ dup ] dip swap ] 'over' :
 [ "vV-VvV" [ swap ] sip ] 'tuck' :
