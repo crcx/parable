@@ -67,7 +67,7 @@ BC_FLOW_IF = 26
 BC_FLOW_WHILE = 27
 BC_FLOW_UNTIL = 28
 BC_FLOW_TIMES = 29
-# BC_FLOW_CALL = 30
+# BC_FLOW_CALL = 30 ## REMOVE
 BC_FLOW_CALL_F = 31
 BC_FLOW_DIP = 32
 BC_FLOW_SIP = 33
@@ -90,10 +90,10 @@ BC_STACK_DROP = 49
 BC_STACK_SWAP = 50
 BC_STACK_DEPTH = 51
 BC_QUOTE_NAME = 52
-# BC_FUNCTION_EXISTS = 53
-# BC_FUNCTION_LOOKUP = 54
+# BC_FUNCTION_EXISTS = 53 ## REMOVE
+# BC_FUNCTION_LOOKUP = 54 ## REMOVE
 BC_FUNCTION_HIDE = 55
-# BC_FUNCTION_NAME = 56
+# BC_FUNCTION_NAME = 56 ## REMOVE
 BC_STRING_SEEK = 57
 BC_SLICE_SUBSLICE = 58
 BC_STRING_NUMERIC = 59
@@ -215,8 +215,7 @@ def interpret(slice, more=None):
     if current_slice == 0:
         current_slice = slice
     while offset <= size and should_abort is not True:
-        opcode = fetch(slice, offset)
-        optype = fetch_type(slice, offset)
+        opcode, optype = fetch(slice, offset)
 
         if optype != TYPE_BYTECODE:
             stack_push(opcode, optype)
@@ -551,7 +550,8 @@ def interpret(slice, more=None):
                 if precheck([TYPE_ANY_PTR, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
-                    stack_push(fetch(b, a), fetch_type(b, a))
+                    v, t = fetch(b, a)
+                    stack_push(v, t)
                 else:
                     abort_run(opcode)
             elif opcode == BC_MEM_STORE:
@@ -599,8 +599,8 @@ def interpret(slice, more=None):
                 if precheck([TYPE_POINTER, TYPE_NUMBER]):
                     a = stack_pop()
                     b = stack_pop()
-                    c = fetch_type(b, a)
-                    stack_push(int(c), TYPE_NUMBER)
+                    v, t = fetch(b, a)
+                    stack_push(int(t), TYPE_NUMBER)
                 else:
                     abort_run(opcode)
             elif opcode == BC_STACK_DUP:
@@ -1028,8 +1028,7 @@ def copy_slice(source, dest):
     i = 0
     l = memory_size[int(source)]
     while i <= l:
-        v = fetch(int(source), i)
-        t = fetch_type(int(source), i)
+        v, t = fetch(int(source), i)
         store(v, int(dest), i, t)
         i += 1
     memory_size[int(dest)] = memory_size[int(source)]
@@ -1045,19 +1044,10 @@ def prepare_slices():
 
 
 def fetch(slice, offset):
-    """obtain a value stored in a slice"""
-    global memory_values, memory_map
+    """return a stored value and type"""
     if get_last_index(slice) < abs(offset):
         set_slice_last_index(slice, abs(offset))
-    return memory_values[int(slice)][int(offset)]
-
-
-def fetch_type(slice, offset):
-    """obtain a value stored in a slice"""
-    global memory_types, memory_map
-    if get_last_index(slice) < abs(offset):
-        set_slice_last_index(slice, abs(offset))
-    return memory_types[int(slice)][int(offset)]
+    return memory_values[int(slice)][int(offset)], memory_types[int(slice)][int(offset)]
 
 
 def store_type(slice, offset, type):
@@ -1116,7 +1106,7 @@ def slice_to_string(slice):
     i = 0
     size = get_last_index(int(slice))
     while i <= size:
-        try: s.append(chr(int(fetch(slice, i))))
+        try: s.append(chr(int(fetch(slice, i)[0])))
         except: pass
         i += 1
     return ''.join(s)
@@ -1144,10 +1134,11 @@ def scan_slice(s):
     ptrs = []
     i = get_last_index(s)
     while i >= 0:
-        t = fetch_type(s, i)
         try:
-            v = int(fetch(s, i))
+            t, v = fetch(s, i)
+            v = int(v)
         except:
+            t = 0
             v = 0
         if is_pointer(t):
             if not v in ptrs:
