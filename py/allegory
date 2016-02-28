@@ -707,9 +707,13 @@ def bytecode_to_upper(opcode, offset, more):
         stack_push(string_to_slice(a), TYPE_STRING)
     elif precheck([TYPE_CHARACTER]):
         a = stack_pop()
-        b = ''.join(chr(a))
-        a = b.upper()
-        stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
+        if a >= 32 and a <= 128:
+            b = ''.join(chr(a))
+            a = b.upper()
+            stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
+        else:
+            report('CHARACTER not in valid range (32 .. 128)')
+            abort_run(opcode, offset)
     else:
         abort_run(opcode, offset)
 
@@ -721,9 +725,13 @@ def bytecode_to_lower(opcode, offset, more):
         stack_push(string_to_slice(a), TYPE_STRING)
     elif precheck([TYPE_CHARACTER]):
         a = stack_pop()
-        b = ''.join(chr(a))
-        a = b.lower()
-        stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
+        if a >= 32 and a <= 128:
+            b = ''.join(chr(a))
+            a = b.lower()
+            stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
+        else:
+            report('CHARACTER not in valid range (32 .. 128)')
+            abort_run(opcode, offset)
     else:
         abort_run(opcode, offset)
 
@@ -1132,7 +1140,11 @@ def stack_change_type(desired):
         if original == TYPE_NUMBER:
             stack_push(string_to_slice(str(stack_pop())), TYPE_STRING)
         elif original == TYPE_CHARACTER:
-            stack_push(string_to_slice(str(chr(stack_pop()))), TYPE_STRING)
+            v = stack_pop()
+            if v >= 32 and v <= 128:
+                stack_push(string_to_slice(str(chr(stack_pop()))), TYPE_STRING)
+            else:
+                stack_push(string_to_slice(' '), TYPE_STRING)
         elif original == TYPE_FLAG:
             s = stack_pop()
             if s == -1:
