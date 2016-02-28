@@ -421,7 +421,7 @@ def interpret(slice, more=None):
                    precheck([TYPE_REMARK, TYPE_REMARK]):
                     a = slice_to_string(stack_pop())
                     b = slice_to_string(stack_pop())
-                else:
+                elif precheck([TYPE_ANY, TYPE_ANY]):
                     a = stack_pop()
                     b = stack_pop()
                 if b == a:
@@ -433,7 +433,7 @@ def interpret(slice, more=None):
                    precheck([TYPE_REMARK, TYPE_REMARK]):
                     a = slice_to_string(stack_pop())
                     b = slice_to_string(stack_pop())
-                else:
+                elif precheck([TYPE_ANY, TYPE_ANY]):
                     a = stack_pop()
                     b = stack_pop()
                 if b != a:
