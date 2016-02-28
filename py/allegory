@@ -119,6 +119,8 @@ BC_VM_MEM_ALLOC = 75
 #
 #
 
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
 #
 # Byte Codes
 #
@@ -515,10 +517,6 @@ def bytecode_flow_tri(opcode, offset, more):
 def bytecode_flow_abort(opcode, offset, more):
     global should_abort
     should_abort = True
-
-
-def bytecode_flow_return(opcode, offset, more):
-    offset = size
 
 
 def bytecode_mem_copy(opcode, offset, more):
@@ -1142,9 +1140,9 @@ def stack_change_type(desired):
         elif original == TYPE_CHARACTER:
             v = stack_pop()
             if v >= 32 and v <= 128:
-                stack_push(string_to_slice(str(chr(stack_pop()))), TYPE_STRING)
+                stack_push(string_to_slice(str(chr(v))), TYPE_STRING)
             else:
-                stack_push(string_to_slice(' '), TYPE_STRING)
+                stack_push(string_to_slice(str(chr(0))), TYPE_STRING)
         elif original == TYPE_FLAG:
             s = stack_pop()
             if s == -1:
