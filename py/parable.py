@@ -20,8 +20,6 @@ MAX_SLICES = 100000
 # Constants for data types
 #
 
-TYPE_ANY = 0
-TYPE_ANY_PTR = 1
 TYPE_NUMBER = 100
 TYPE_STRING = 200
 TYPE_CHARACTER = 300
@@ -31,9 +29,57 @@ TYPE_BYTECODE = 600
 TYPE_REMARK = 700
 TYPE_FUNCTION_CALL = 800
 
+# For precheck(), we also allow matching agains two "generic" types:
+
+TYPE_ANY = 0
+TYPE_ANY_PTR = 1
+
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+# Support code used later on
+
+def is_number(s):
+    """return True if s is a number, or False otherwise"""
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+
+def condense_lines(code):
+    """Take an array of code, join lines ending with a \, and return"""
+    """the new array"""
+    s = ''
+    r = []
+    i = 0
+    c = 0
+    while i < len(code):
+        if code[i].endswith(' \\\n'):
+            s = s + ' ' + code[i][:-2].strip()
+            c = 1
+        else:
+            c = 0
+            s = s + ' ' + code[i]
+        if c == 0:
+            if s != '' and s != ' \n':
+                r.append(s.strip())
+            s = ''
+        i = i + 1
+    return r
+
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+# Byte Codes
 #
+# The Parable virtual machine is byte coded; each byte code corresponds to a
+# single instruction. In this section we assign each byte code a symbolic
+# name and value, provide an implementation for each (with one exception:
+# see interpet() for details on this), and then build a dispatch table that
+# maps each instuction to its handler.
+
+
 # Constants for byte codes
-#
 
 BC_NOP = 0
 BC_SET_TYPE = 1
@@ -66,7 +112,7 @@ BC_FLOW_WHILE = 27
 BC_FLOW_UNTIL = 28
 BC_FLOW_TIMES = 29
 # BC_FLOW_CALL = 30 ## REMOVE
-BC_FLOW_CALL_F = 31
+BC_FLOW_CALL = 31
 BC_FLOW_DIP = 32
 BC_FLOW_SIP = 33
 BC_FLOW_BI = 34
@@ -113,15 +159,7 @@ BC_VM_MEM_SIZES = 74
 BC_VM_MEM_ALLOC = 75
 
 
-#
-#
-#
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-#
-# Byte Codes
-#
+# Implement the byte code functions
 
 def bytecode_nop(opcode, offset, more):
     return
@@ -452,7 +490,7 @@ def bytecode_flow_times(opcode, offset, more):
         abort_run(opcode, offset)
 
 
-def bytecode_flow_call_f(opcode, offset, more):
+def bytecode_flow_call(opcode, offset, more):
     if precheck([TYPE_POINTER]):
         a = stack_pop()
         interpret(a, more)
@@ -845,124 +883,91 @@ def bytecode_vm_mem_alloc(opcode, offset, more):
     stack_push(s, TYPE_POINTER)
 
 
+# Create the dispatch table mapping byte code numbers to their implementations
+
 bytecodes = {
-    BC_NOP: bytecode_nop,
-    BC_SET_TYPE: bytecode_set_type,
-    BC_GET_TYPE: bytecode_get_type,
-    BC_ADD: bytecode_add,
-    BC_SUBTRACT: bytecode_subtract,
-    BC_MULTIPLY: bytecode_multiply,
-    BC_DIVIDE: bytecode_divide,
-    BC_REMAINDER: bytecode_remainder,
-    BC_FLOOR: bytecode_floor,
-    BC_POW: bytecode_pow,
-    BC_LOG: bytecode_log,
-    BC_LOG10: bytecode_log10,
-    BC_LOGN: bytecode_logn,
-    BC_BITWISE_SHIFT: bytecode_bitwise_shift,
-    BC_BITWISE_AND: bytecode_bitwise_and,
-    BC_BITWISE_OR: bytecode_bitwise_or,
-    BC_BITWISE_XOR: bytecode_bitwise_xor,
-    BC_RANDOM: bytecode_random,
-    BC_SQRT: bytecode_sqrt,
-    BC_ROUND: bytecode_round,
-    BC_COMPARE_LT: bytecode_compare_lt,
-    BC_COMPARE_GT: bytecode_compare_gt,
-    BC_COMPARE_LTEQ: bytecode_compare_lteq,
-    BC_COMPARE_GTEQ: bytecode_compare_gteq,
-    BC_COMPARE_EQ: bytecode_compare_eq,
-    BC_COMPARE_NEQ: bytecode_compare_neq,
-    BC_FLOW_IF: bytecode_flow_if,
-    BC_FLOW_WHILE: bytecode_flow_while,
-    BC_FLOW_UNTIL: bytecode_flow_until,
-    BC_FLOW_TIMES: bytecode_flow_times,
-    BC_FLOW_CALL_F: bytecode_flow_call_f,
-    BC_FLOW_DIP: bytecode_flow_dip,
-    BC_FLOW_SIP: bytecode_flow_sip,
-    BC_FLOW_BI: bytecode_flow_bi,
-    BC_FLOW_TRI: bytecode_flow_tri,
-    BC_FLOW_ABORT: bytecode_flow_abort,
-    BC_MEM_COPY: bytecode_mem_copy,
-    BC_MEM_FETCH: bytecode_mem_fetch,
-    BC_MEM_STORE: bytecode_mem_store,
-    BC_MEM_REQUEST: bytecode_mem_request,
-    BC_MEM_RELEASE: bytecode_mem_release,
-    BC_MEM_COLLECT: bytecode_mem_collect,
-    BC_MEM_GET_LAST: bytecode_mem_get_last,
-    BC_MEM_SET_LAST: bytecode_mem_set_last,
-    BC_MEM_SET_TYPE: bytecode_mem_set_type,
-    BC_MEM_GET_TYPE: bytecode_mem_get_type,
-    BC_STACK_DUP: bytecode_stack_dup,
-    BC_STACK_DROP: bytecode_stack_drop,
-    BC_STACK_SWAP: bytecode_stack_swap,
-    BC_STACK_DEPTH: bytecode_stack_depth,
-    BC_QUOTE_NAME: bytecode_quote_name,
-    BC_FUNCTION_HIDE: bytecode_function_hide,
-    BC_STRING_SEEK: bytecode_string_seek,
+    BC_NOP:            bytecode_nop,
+    BC_SET_TYPE:       bytecode_set_type,
+    BC_GET_TYPE:       bytecode_get_type,
+    BC_ADD:            bytecode_add,
+    BC_SUBTRACT:       bytecode_subtract,
+    BC_MULTIPLY:       bytecode_multiply,
+    BC_DIVIDE:         bytecode_divide,
+    BC_REMAINDER:      bytecode_remainder,
+    BC_FLOOR:          bytecode_floor,
+    BC_POW:            bytecode_pow,
+    BC_LOG:            bytecode_log,
+    BC_LOG10:          bytecode_log10,
+    BC_LOGN:           bytecode_logn,
+    BC_BITWISE_SHIFT:  bytecode_bitwise_shift,
+    BC_BITWISE_AND:    bytecode_bitwise_and,
+    BC_BITWISE_OR:     bytecode_bitwise_or,
+    BC_BITWISE_XOR:    bytecode_bitwise_xor,
+    BC_RANDOM:         bytecode_random,
+    BC_SQRT:           bytecode_sqrt,
+    BC_ROUND:          bytecode_round,
+    BC_COMPARE_LT:     bytecode_compare_lt,
+    BC_COMPARE_GT:     bytecode_compare_gt,
+    BC_COMPARE_LTEQ:   bytecode_compare_lteq,
+    BC_COMPARE_GTEQ:   bytecode_compare_gteq,
+    BC_COMPARE_EQ:     bytecode_compare_eq,
+    BC_COMPARE_NEQ:    bytecode_compare_neq,
+    BC_FLOW_IF:        bytecode_flow_if,
+    BC_FLOW_WHILE:     bytecode_flow_while,
+    BC_FLOW_UNTIL:     bytecode_flow_until,
+    BC_FLOW_TIMES:     bytecode_flow_times,
+    BC_FLOW_CALL:      bytecode_flow_call,
+    BC_FLOW_DIP:       bytecode_flow_dip,
+    BC_FLOW_SIP:       bytecode_flow_sip,
+    BC_FLOW_BI:        bytecode_flow_bi,
+    BC_FLOW_TRI:       bytecode_flow_tri,
+    BC_FLOW_ABORT:     bytecode_flow_abort,
+    BC_MEM_COPY:       bytecode_mem_copy,
+    BC_MEM_FETCH:      bytecode_mem_fetch,
+    BC_MEM_STORE:      bytecode_mem_store,
+    BC_MEM_REQUEST:    bytecode_mem_request,
+    BC_MEM_RELEASE:    bytecode_mem_release,
+    BC_MEM_COLLECT:    bytecode_mem_collect,
+    BC_MEM_GET_LAST:   bytecode_mem_get_last,
+    BC_MEM_SET_LAST:   bytecode_mem_set_last,
+    BC_MEM_SET_TYPE:   bytecode_mem_set_type,
+    BC_MEM_GET_TYPE:   bytecode_mem_get_type,
+    BC_STACK_DUP:      bytecode_stack_dup,
+    BC_STACK_DROP:     bytecode_stack_drop,
+    BC_STACK_SWAP:     bytecode_stack_swap,
+    BC_STACK_DEPTH:    bytecode_stack_depth,
+    BC_QUOTE_NAME:     bytecode_quote_name,
+    BC_FUNCTION_HIDE:  bytecode_function_hide,
+    BC_STRING_SEEK:    bytecode_string_seek,
     BC_SLICE_SUBSLICE: bytecode_slice_subslice,
     BC_STRING_NUMERIC: bytecode_string_numeric,
-    BC_SLICE_REVERSE: bytecode_slice_reverse,
-    BC_TO_LOWER: bytecode_to_lower,
-    BC_TO_UPPER: bytecode_to_upper,
-    BC_REPORT: bytecode_report,
-    BC_VM_NAMES: bytecode_vm_names,
-    BC_VM_SLICES: bytecode_vm_slices,
-    BC_TRIG_SIN: bytecode_trig_sin,
-    BC_TRIG_COS: bytecode_trig_cos,
-    BC_TRIG_TAN: bytecode_trig_tan,
-    BC_TRIG_ASIN: bytecode_trig_asin,
-    BC_TRIG_ACOS: bytecode_trig_acos,
-    BC_TRIG_ATAN: bytecode_trig_atan,
-    BC_TRIG_ATAN2: bytecode_trig_atan2,
-    BC_VM_MEM_MAP: bytecode_vm_mem_map,
-    BC_VM_MEM_SIZES: bytecode_vm_mem_sizes,
-    BC_VM_MEM_ALLOC: bytecode_vm_mem_alloc,
+    BC_SLICE_REVERSE:  bytecode_slice_reverse,
+    BC_TO_LOWER:       bytecode_to_lower,
+    BC_TO_UPPER:       bytecode_to_upper,
+    BC_REPORT:         bytecode_report,
+    BC_VM_NAMES:       bytecode_vm_names,
+    BC_VM_SLICES:      bytecode_vm_slices,
+    BC_TRIG_SIN:       bytecode_trig_sin,
+    BC_TRIG_COS:       bytecode_trig_cos,
+    BC_TRIG_TAN:       bytecode_trig_tan,
+    BC_TRIG_ASIN:      bytecode_trig_asin,
+    BC_TRIG_ACOS:      bytecode_trig_acos,
+    BC_TRIG_ATAN:      bytecode_trig_atan,
+    BC_TRIG_ATAN2:     bytecode_trig_atan2,
+    BC_VM_MEM_MAP:     bytecode_vm_mem_map,
+    BC_VM_MEM_SIZES:   bytecode_vm_mem_sizes,
+    BC_VM_MEM_ALLOC:   bytecode_vm_mem_alloc,
 }
 
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+# Error logging
 
-
+# Errors are stored in an array, with a couple of helper functions to record
+# and clear them.
 #
-# Support code
-#
-
-def is_number(s):
-    """return True if s is a number, or False otherwise"""
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
-
-
-def condense_lines(code):
-    """Take an array of code, join lines ending with a \, and return"""
-    """the new array"""
-    s = ''
-    r = []
-    i = 0
-    c = 0
-    while i < len(code):
-        if code[i].endswith(' \\\n'):
-            s = s + ' ' + code[i][:-2].strip()
-            c = 1
-        else:
-            c = 0
-            s = s + ' ' + code[i]
-        if c == 0:
-            if s != '' and s != ' \n':
-                r.append(s.strip())
-            s = ''
-        i = i + 1
-    return r
-
-
-#
-# logging of errors
-#
-# errors are stored in an array, with helper functions to
-# record and clear them
-#
+# The interface layer should provide access to the the log (displaying when
+# appropriate).
 
 errors = []
 
@@ -978,15 +983,21 @@ def report(text):
     global errors
     errors.append(text)
 
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+# Byte Code Interpreter
 #
-# Byte code interpreter
-#
-
-current_slice = 0
+# This is the heart of the virtual machine: it's responsible for actually
+# running the code stored in a slice.
 
 
-should_abort = False
+current_slice = 0           # This is set by interpret() to the slice being run
+                            # It's used for error reports, and as a guard to
+                            # prevent garbage collection of a slice being run.
+
+should_abort = False        # Used to indicate if an error was detected during
+                            # the current run.
+
 
 def abort_run(opcode, offset):
     global should_abort
@@ -1017,6 +1028,14 @@ def precheck(req):
     return flag
 
 
+# The interpret() function handles:
+#
+# - pushing values to the stack (based on stored type)
+# - invoking the handler for each byte code
+# - the BC_FLOW_RETURN instruction (which jumps to the end of the slice,
+#   halting execution).
+# - sets / clears the **current_slice** variable
+
 def interpret(slice, more=None):
     """Interpret the byte codes contained in a slice."""
     global current_slice
@@ -1043,13 +1062,16 @@ def interpret(slice, more=None):
         offset += 1
     current_slice = 0
 
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+# Data Stack
 #
-# Data stack implementation
-#
+# The data stack holds all non-permanent items. It's a basic, Forth-style
+# last-in, first-out (LIFO) model. But it does track types as well as the raw
+# values.
 
-stack = []
-types = []
+stack = []    # holds the data items
+types = []    # holds the types for data items
 
 
 def stack_clear():
@@ -1069,8 +1091,7 @@ def stack_push(value, type):
 def stack_drop():
     """remove a value from the stack"""
     global stack, types
-    stack.pop()
-    types.pop()
+    stack_pop()
 
 
 def stack_pop(type = False):
@@ -1184,25 +1205,24 @@ def stack_change_type(desired):
         a = stack_pop()
         stack_push(a, desired)
 
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+# The Dictionary
 #
-# Parable's dictionary consists of two related arrays.
-# The first contains the names. The second contains pointers
-# to the slices for each named item.
-#
+# Like Forth, Parable uses a dictionary to map names to pointers. Ours consists
+# of two arrays: one for the names and a second one for the pointers.
 
-dictionary_warnings = False
-dictionary_names = []
-dictionary_slices = []
-dictionary_hidden_slices = []
+dictionary_warnings = False     # Used to trigger a warning if a name is redefined
+dictionary_names = []           # Holds the names for each slice
+dictionary_slices = []          # Holds the slice for each name
+dictionary_hidden_slices = []   # Holds a list of slices that previously had names
+
 
 def in_dictionary(s):
-    global dictionary_names, dictionary_slices
     return s in dictionary_names
 
 
 def lookup_pointer(name):
-    global dictionary_names, dictionary_slices
     if in_dictionary(name) is False:
         return -1
     else:
@@ -1230,16 +1250,21 @@ def remove_name(name):
         dictionary_hidden_slices.append(dictionary_slices[i])
         del dictionary_slices[i]
 
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+# Memory
 #
-# in parable, memory is divided into regions called slices
-# compiled code, strings, and other data are stored in these.
+# Parable has a segmented memory model. Memory is divided into regions called
+# slices. Each slice stores values, and has a shadow slice which stores the
+# associated types.
 #
+# Parable implements this over several arrays:
 
-memory_values = []
-memory_types = []
-memory_map = []
-memory_size = []
+memory_values = []    # Contains the slices for storing data
+memory_types = []     # Contains the slices for storing types
+memory_map = []       # A simple structure for indicating which slices are in use
+memory_size = []      # A simple structure for indicating the number of items
+                      # in each slice
 
 
 def request_slice(attempts=1):
@@ -1357,12 +1382,17 @@ def slice_to_string(slice):
         i += 1
     return ''.join(s)
 
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+# Garbage Collection
 #
-# unused slices can be reclaimed either manually using release_slice(),
-# or parable can attempt to identify them and reclaim them automatically.
-# the code here implements the garbage collector.
+# Parable's memory model is flexible, but prone to wasting memory due to the
+# existance of short-lived allocations. This isn't generally a problem, but
+# it's useful to be able to reclaim memory if/when the memory space begins
+# getting restricted.
 #
+# The solution to this is the garbage collector. It's a piece of code that
+# scans memory for slices that aren't referenced, and reclaims them.
 
 def is_pointer(type):
     flag = False
@@ -1453,39 +1483,50 @@ def collect_garbage():
             release_slice(i)
         i = i + 1
 
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+# The Compiler
 #
-# the compiler is pretty trivial.
-# we take a string, break it into tokens, then lay down bytecode based on
-# single character prefixes.
+# This is the core of the user-facing language. It takes a string, breaks it
+# into tokens, then lays down code based on the prefix each token has.
 #
-# #  Numbers
-# $  Characters
-# &  Pointers
-# `  Bytecodes
-# '  Strings
-# "  Comments
+# Prefixes are:
 #
-# the bytecode forms are kept simple:
+#   #   Numbers
+#   $   Characters
+#   &   Pointers
+#   `   Bytecodes
+#   '   Strings
+#   "   Comments
 #
-# type           stored         type
-# ==========     ============================
-# Functions      pointer        function call
-# Strings        pointer        string
-# Numbers        VALUE          number
-# Characters     ASCII_VALUE    character
-# Pointers       pointer        pointer
-# Bytecodes      bytecode       bytecode
-# Comments       pointer        comment
+# The bytecode forms are kept simple:
 #
-# for two functions ([ and ]), new quotes are started or closed. These are
-# the only case where the corresponding action is run automatically rather
-# than being compiled.
+#   type           stored         type
+#   ==========     ============================
+#   Functions      pointer        function call
+#   Strings        pointer        string
+#   Numbers        VALUE          number
+#   Characters     ASCII_VALUE    character
+#   Pointers       pointer        pointer
+#   Bytecodes      bytecode       bytecode
+#   Comments       pointer        comment
 #
-# bytecodes get wrapped into named functions. At this point they are not
+# There are two special prefixes:
+#
+#   @<pointer>
+#   !<pointer>
+#
+# These correspond to the following bytecode sequences:
+#
+#   &<pointer> #0 fetch
+#   &<pointer> #0 store
+#
+# The compiler handle two implicit pieces of functionality: [ and ]. These
+# are used to begin and end quotations.
+#
+# Bytecodes get wrapped into named functions. At this point they are not
 # inlined. This hurts performance, but makes the implementation much simpler.
 #
-
 # The compile_ functions take a parameter, a slice, and the current offset
 # in that slice. They lay down the appropriate byte codes for the type of
 # item they are compiling. When done, they return the new offset.
