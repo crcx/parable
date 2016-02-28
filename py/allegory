@@ -497,20 +497,18 @@ def interpret(slice, more=None):
             elif opcode == BC_FLOW_DIP:
                 if precheck([TYPE_ANY, TYPE_POINTER]):
                     quote = stack_pop()
-                    vtype = stack_type()
-                    value = stack_pop()
+                    v, t = stack_pop(type = True)
                     interpret(quote, more)
-                    stack_push(value, vtype)
+                    stack_push(v, t)
                 else:
                     abort_run(opcode)
             elif opcode == BC_FLOW_SIP:
                 if precheck([TYPE_ANY, TYPE_POINTER]):
                     quote = stack_pop()
                     stack_dup()
-                    vtype = stack_type()
-                    value = stack_pop()
+                    v, t = stack_pop(type = True)
                     interpret(quote, more)
-                    stack_push(value, vtype)
+                    stack_push(v, t)
                 else:
                     abort_run(opcode)
             elif opcode == BC_FLOW_BI:
@@ -518,8 +516,7 @@ def interpret(slice, more=None):
                     a = stack_pop()
                     b = stack_pop()
                     stack_dup()
-                    x = stack_type()
-                    y = stack_pop()
+                    y, x = stack_pop(type = True)
                     interpret(b, more)
                     stack_push(y, x)
                     interpret(a, more)
@@ -531,11 +528,9 @@ def interpret(slice, more=None):
                     b = stack_pop()
                     c = stack_pop()
                     stack_dup()
-                    x = stack_type()
-                    y = stack_pop()
+                    y, x = stack_pop(type = True)
                     stack_dup()
-                    m = stack_type()
-                    q = stack_pop()
+                    q, m = stack_pop(type = True)
                     interpret(c, more)
                     stack_push(q, m)
                     interpret(b, more)
@@ -564,10 +559,9 @@ def interpret(slice, more=None):
                     abort_run(opcode)
             elif opcode == BC_MEM_STORE:
                 if precheck([TYPE_ANY, TYPE_ANY_PTR, TYPE_NUMBER]):
-                    a = stack_pop()   # offset
-                    b = stack_pop()   # slice
-                    t = stack_type()  # type
-                    c = stack_pop()   # value
+                    a = stack_pop()                 # offset
+                    b = stack_pop()                 # slice
+                    c, t = stack_pop(type = True)   # value
                     store(c, b, a, t)
                 else:
                     abort_run(opcode)
@@ -816,10 +810,8 @@ types = []
 def stack_clear():
     """remove all values from the stack"""
     global stack, types
-    i = 0
-    while i < len(stack):
-        stack.pop()
-        types.pop()
+    stack = []
+    types = []
 
 
 def stack_push(value, type):
@@ -836,31 +828,30 @@ def stack_drop():
     types.pop()
 
 
-def stack_pop():
+def stack_pop(type = False):
     """remove and return a value from the stack"""
     global stack, types
-    types.pop()
-    return stack.pop()
+    if type:
+        return stack.pop(), types.pop()
+    else:
+        types.pop()
+        return stack.pop()
 
 
 def tos():
     """return a pointer to the top element in the stack"""
-    global stack, types
     return len(stack) - 1
 
 
 def stack_type():
     """return the type identifier for the top item on the stack"""
-    global stack, types
     return types[tos()]
 
 
 def stack_swap():
     """switch the positions of the top items on the stack"""
-    at = stack_type()
-    av = stack_pop()
-    bt = stack_type()
-    bv = stack_pop()
+    av, at = stack_pop(type = True)
+    bv, bt = stack_pop(type = True)
     stack_push(av, at)
     stack_push(bv, bt)
 
@@ -868,8 +859,7 @@ def stack_swap():
 def stack_dup():
     """duplicate the top item on the stack"""
     """if the value is a string, makes a copy of it"""
-    at = stack_type()
-    av = stack_pop()
+    av, at = stack_pop(type = True)
     stack_push(av, at)
     if at == TYPE_STRING:
         s = request_slice()
