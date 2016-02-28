@@ -190,12 +190,12 @@ def bytecode_divide(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
         b = stack_pop()
-        if a == 0 or b == 0:
+        try:
+            stack_push(b % a, TYPE_NUMBER)
+        except:
             stack_push(float('nan'), TYPE_NUMBER)
             report('E04: Divide by Zero')
             abort_run(opcode)
-        else:
-            stack_push(b / a, TYPE_NUMBER)
     else:
         abort_run(opcode)
 
@@ -204,12 +204,12 @@ def bytecode_remainder(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
         b = stack_pop()
-        if a == 0 or b == 0:
+        try:
+            stack_push(b % a, TYPE_NUMBER)
+        except:
             stack_push(float('nan'), TYPE_NUMBER)
             report('E04: Divide by Zero')
             abort_run(opcode)
-        else:
-            stack_push(b % a, TYPE_NUMBER)
     else:
         abort_run(opcode)
 
