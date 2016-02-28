@@ -1250,6 +1250,16 @@ def remove_name(name):
         dictionary_hidden_slices.append(dictionary_slices[i])
         del dictionary_slices[i]
 
+
+def pointer_to_name(ptr):
+    """given a parable pointer, return the corresponding name, or"""
+    """an empty string"""
+    global dictionary_names, dictionary_slices
+    s = ""
+    if ptr in dictionary_slices:
+        s = dictionary_names[dictionary_slices.index(ptr)]
+    return s
+
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 # Memory
@@ -1680,6 +1690,11 @@ def compile(str, slice):
         report('E03: Compile Error - quotations not balanced')
     return slice
 
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+# Final Bits
+#
+# A few things to help get the initial environment up and running.
 
 def parse_bootstrap(f):
     """compile the bootstrap package it into memory"""
@@ -1688,25 +1703,13 @@ def parse_bootstrap(f):
             interpret(compile(line, request_slice()))
 
 
-#
 # some parts of the language (prefixes, brackets) are understood as part of
 # the parser. but one important bit, the ability to give a name to an item,
 # is not. this routine sets up an initial dictionary containing the *define*
 # function. with this loaded, all else can be built.
-#
 
 def prepare_dictionary():
     """setup the initial dictionary"""
     s = request_slice()
     compile('"ps-" `52', s)
     add_definition(':', s)
-
-
-def pointer_to_name(ptr):
-    """given a parable pointer, return the corresponding name, or"""
-    """an empty string"""
-    global dictionary_names, dictionary_slices
-    s = ""
-    if ptr in dictionary_slices:
-        s = dictionary_names[dictionary_slices.index(ptr)]
-    return s
