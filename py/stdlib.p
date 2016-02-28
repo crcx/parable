@@ -76,15 +76,15 @@
 [ "sp-"    swap : ] '.' :
 
 "Symbolic names for data types"
-[ "-n"  100 ] 'NUMBER' :
-[ "-n"  200 ] 'STRING' :
-[ "-n"  300 ] 'CHARACTER' :
-[ "-n"  400 ] 'POINTER' :
-[ "-n"  500 ] 'FLAG' :
-[ "-n"  600 ] 'BYTECODE' :
-[ "-n"  700 ] 'REMARK' :
-[ "-n"  800 ] 'FUNCALL' :
-[ "-n"    0 ] 'UNKNOWN' :
+[ "-n"  100  "Constant for NUMBER type"    ] 'NUMBER' :
+[ "-n"  200  "Constant for STRING type"    ] 'STRING' :
+[ "-n"  300  "Constant for CHARACTER type" ] 'CHARACTER' :
+[ "-n"  400  "Constant for POINTER type"   ] 'POINTER' :
+[ "-n"  500  "Constant for FLAG type"      ] 'FLAG' :
+[ "-n"  600  "Constant for BYTECODE type"  ] 'BYTECODE' :
+[ "-n"  700  "Constant for REMARK type"    ] 'REMARK' :
+[ "-n"  800  "Constant for FUNCALL type"   ] 'FUNCALL' :
+[ "-n"    0  "Constant for UNKNOWN type"   ] 'UNKNOWN' :
 
 [ "v-b" BYTECODE  set-type ] ':b' :
 [ "v-n" NUMBER    set-type ] ':n' :
@@ -107,10 +107,10 @@
 [ "v-vf" type? UNKNOWN   eq? ] 'unknown?' :
 
 "Stack Flow"
-[ "vV-vVvV"  over over ] 'dup-pair' :
-[ "vv-"      drop drop ] 'drop-pair' :
-[ "?n-"      [ drop ] times ] 'drop-multiple' :
-[ "q-...n"   depth [ invoke ] dip depth swap - ] 'invoke<depth?>' :
+[ "vV-vVvV"  over over  "Duplicate the top two values on the stack" ] 'dup-pair' :
+[ "vv-"      drop drop  "Discard the top two values on the stack" ] 'drop-pair' :
+[ "?n-"      [ drop ] times  "Drop n number of items from the stack" ] 'drop-multiple' :
+[ "q-...n"   depth [ invoke ] dip depth swap -  "Invoke a quote and return the number of items pushed or consumed" ] 'invoke<depth?>' :
 
 
 "Slice Functions"
@@ -122,10 +122,10 @@
 
 
 "Simple variables are just named slices, with functions to access the first element. They're useful for holding single values."
-[ "vs-"  [ request [ 0 store ] sip ] dip : ] 'var!' :
-[ "s-"   0 :u swap var! ] 'var' :
-[ "p-"   0 swap 0 store ] 'off' :
-[ "p-"   -1 swap 0 store ] 'on' :
+[ "vs-"  [ request [ 0 store ] sip ] dip : "Create a new variable with an initial value of v" ] 'var!' :
+[ "s-"   0 :u swap var! "Create a new variable" ] 'var' :
+[ "p-"   0 swap 0 store "Set a variable to a value of 0" ] 'off' :
+[ "p-"   -1 swap 0 store "Set a variable to a value of -1" ] 'on' :
 [ "p-"   [ 0 fetch 1 + ] sip 0 store ] 'increment' :
 [ "p-"   [ 0 fetch 1 - ] sip 0 store ] 'decrement' :
 [ "p-"   request swap copy ] 'zero-out' :
@@ -133,9 +133,9 @@
 
 
 "Number functions"
-[ "nn-n"  over over lt? [ nip ] [ drop ] if ] 'max' :
-[ "nn-n"  over over gt? [ nip ] [ drop ] if ] 'min' :
-[ "n-n"   dup -1 * max ] 'abs' :
+[ "nn-n"  over over lt? [ nip ] [ drop ] if  "Return the greater of two numbers" ] 'max' :
+[ "nn-n"  over over gt? [ nip ] [ drop ] if  "Returm the lesser of two numbers" ] 'min' :
+[ "n-n"   dup -1 * max "Returm the absolute value of a number" ] 'abs' :
 
 "The basic bi/tri combinators provided as part of the primitives allow application of multiple quotes to a single data element. Here we add new forms that are very useful."
 "We consider the bi/tri variants to consist of one of three types."
@@ -165,10 +165,10 @@
 [ "v-f"  :f :n zero? ] 'false?' :
 [ "n-f"  2 rem zero? ] 'even?' :
 [ "n-f"  2 rem zero? not ] 'odd?' :
-[ "n-f"  0 lt? ] 'negative?' :
-[ "n-f"  0 gteq? ] 'positive?' :
+[ "n-f"  0 lt?    "True if number is negative, false otherwise" ] 'negative?' :
+[ "n-f"  0 gteq?  "True if number is positive, false otherwise" ] 'positive?' :
 [ "nnn-f"  [ [ :n ] bi@ ] dip :n dup-pair gt? [ swap ] if-true [ over ] dip lteq? [ gteq? ] dip and :f ] 'between?' :
-[ "vv-vvf"  [ type? ] dip type? swap [ eq? ] dip swap ] 'types-match?' :
+[ "vv-vvf"  [ type? ] dip type? swap [ eq? ] dip swap  "Return true if the two values have the same type or false otherwise" ] 'types-match?' :
 
 
 "numeric ranges"
@@ -177,9 +177,9 @@
 
 
 "Misc"
-[ "p-"   invoke<depth?> [ hide-function ] times ] 'hide-functions' :
-[ "ps-"  dup hide-function : ] 'redefine' :
-[ "p-"   invoke<depth?> [ var ] times ] '::' :
+[ "p-"   invoke<depth?> [ hide-function ] times "For each name in the array, remove it from the dictionary" ] 'hide-functions' :
+[ "ps-"  dup hide-function : "Attach a name to a new slice, but does so without removing the old definition" ] 'redefine' :
+[ "p-"   invoke<depth?> [ var ] times "Ceate a new variable for each name in the array" ] '::' :
 
 
 "String and Character"
@@ -220,9 +220,9 @@
 [ "p-p"   :x request [ 0 store ] sip ] 'enquote' :
 
 "Arrays and Operations on Quotations"
-[ "q-v"  0 fetch ] 'head' :
-[ "q-q"  1 over length? subslice ] 'body' :
-[ "p-v"  slice-length? 1 - fetch ] 'tail' :
+[ "q-v"  0 fetch                  "Return the first item in a slice" ] 'head' :
+[ "q-q"  1 over length? subslice  "Return all but the first item in a slice" ] 'body' :
+[ "p-v"  slice-length? 1 - fetch  "Return the last item in a slice" ] 'tail' :
 
 [ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset' ] ::
 [ "q-" \
@@ -462,3 +462,4 @@
    "Return an array of names in the dictionary that match a given substring." \
  ] 'vm.dict<names-like>' :
 }
+
