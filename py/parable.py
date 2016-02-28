@@ -114,6 +114,809 @@ BC_VM_MEM_ALLOC = 75
 
 
 #
+#
+#
+
+#
+# Byte Codes
+#
+
+def bytecode_nop(opcode, offset, more):
+    return
+
+
+def bytecode_set_type(opcode, offset, more):
+    if precheck([TYPE_ANY, TYPE_NUMBER]):
+        a = stack_pop()
+        stack_change_type(a)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_get_type(opcode, offset, more):
+    if precheck([TYPE_ANY]):
+        stack_push(stack_type(), TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_add(opcode, offset, more):
+    if precheck([TYPE_NUMBER, TYPE_NUMBER]):
+        a = stack_pop()
+        b = stack_pop()
+        stack_push(b + a, TYPE_NUMBER)
+    elif precheck([TYPE_STRING, TYPE_STRING]):
+        a = slice_to_string(stack_pop())
+        b = slice_to_string(stack_pop())
+        stack_push(string_to_slice(b + a), TYPE_STRING)
+    elif precheck([TYPE_REMARK, TYPE_REMARK]):
+        a = slice_to_string(stack_pop())
+        b = slice_to_string(stack_pop())
+        stack_push(string_to_slice(b + a), TYPE_REMARK)
+    elif precheck([TYPE_POINTER, TYPE_POINTER]):
+        a = stack_pop()
+        b = stack_pop()
+        c = request_slice()
+        d = get_last_index(b) + get_last_index(a) + 1
+        set_slice_last_index(c, d)
+        memory_values[c] = memory_values[b] + memory_values[a]
+        memory_types[c] = memory_types[b] + memory_types[a]
+        stack_push(c, TYPE_POINTER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_subtract(opcode, offset, more):
+    if precheck([TYPE_NUMBER, TYPE_NUMBER]):
+        a = stack_pop()
+        b = stack_pop()
+        stack_push(b - a, TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_multiply(opcode, offset, more):
+    if precheck([TYPE_NUMBER, TYPE_NUMBER]):
+        a = stack_pop()
+        b = stack_pop()
+        stack_push(b * a, TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_divide(opcode, offset, more):
+    if precheck([TYPE_NUMBER, TYPE_NUMBER]):
+        a = stack_pop()
+        b = stack_pop()
+        if a == 0 or b == 0:
+            stack_push(float('nan'), TYPE_NUMBER)
+            report('E04: Divide by Zero')
+            abort_run(opcode)
+        else:
+            stack_push(b / a, TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_remainder(opcode, offset, more):
+    if precheck([TYPE_NUMBER, TYPE_NUMBER]):
+        a = stack_pop()
+        b = stack_pop()
+        if a == 0 or b == 0:
+            stack_push(float('nan'), TYPE_NUMBER)
+            report('E04: Divide by Zero')
+            abort_run(opcode)
+        else:
+            stack_push(b % a, TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_floor(opcode, offset, more):
+    if precheck([TYPE_NUMBER]):
+        stack_push(math.floor(float(stack_pop())), TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_pow(opcode, offset, more):
+    if precheck([TYPE_NUMBER, TYPE_NUMBER]):
+        a = stack_pop()
+        b = stack_pop()
+        stack_push(math.pow(b, a), TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_log(opcode, offset, more):
+    if precheck([TYPE_NUMBER]):
+        stack_push(math.log(stack_pop()), TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_log10(opcode, offset, more):
+    if precheck([TYPE_NUMBER]):
+        stack_push(math.log10(stack_pop()), TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_logn(opcode, offset, more):
+    if precheck([TYPE_NUMBER, TYPE_NUMBER]):
+        a = stack_pop()
+        b = stack_pop()
+        stack_push(math.log(b, a), TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_bitwise_shift(opcode, offset, more):
+    if precheck([TYPE_NUMBER, TYPE_NUMBER]):
+        a = int(stack_pop())
+        b = int(stack_pop())
+        if a < 0:
+            stack_push(b << abs(a), TYPE_NUMBER)
+        else:
+            stack_push(b >> a, TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_bitwise_and(opcode, offset, more):
+    if precheck([TYPE_NUMBER, TYPE_NUMBER]):
+        a = int(stack_pop())
+        b = int(stack_pop())
+        stack_push(b & a, TYPE_NUMBER)
+    elif precheck([TYPE_FLAG, TYPE_FLAG]):
+        a = int(stack_pop())
+        b = int(stack_pop())
+        stack_push(b & a, TYPE_FLAG)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_bitwise_or(opcode, offset, more):
+    if precheck([TYPE_NUMBER, TYPE_NUMBER]):
+        a = int(stack_pop())
+        b = int(stack_pop())
+        stack_push(b | a, TYPE_NUMBER)
+    elif precheck([TYPE_FLAG, TYPE_FLAG]):
+        a = int(stack_pop())
+        b = int(stack_pop())
+        stack_push(b | a, TYPE_FLAG)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_bitwise_xor(opcode, offset, more):
+    if precheck([TYPE_NUMBER, TYPE_NUMBER]):
+        a = int(stack_pop())
+        b = int(stack_pop())
+        stack_push(b ^ a, TYPE_NUMBER)
+    elif precheck([TYPE_FLAG, TYPE_FLAG]):
+        a = int(stack_pop())
+        b = int(stack_pop())
+        stack_push(b ^ a, TYPE_FLAG)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_random(opcode, offset, more):
+    stack_push(random.SystemRandom.random(), TYPE_NUMBER)
+
+
+def bytecode_sqrt(opcode, offset, more):
+    if precheck([TYPE_NUMBER]):
+        stack_push(math.sqrt(stack_pop()), TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_round(opcode, offset, more):
+    if precheck([TYPE_NUMBER]):
+        stack_push(round(stack_pop()), TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_compare_lt(opcode, offset, more):
+    if precheck([TYPE_NUMBER, TYPE_NUMBER]):
+        a = stack_pop()
+        b = stack_pop()
+        if b < a:
+            stack_push(-1, TYPE_FLAG)
+        else:
+            stack_push(0, TYPE_FLAG)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_compare_gt(opcode, offset, more):
+    if precheck([TYPE_NUMBER, TYPE_NUMBER]):
+        a = stack_pop()
+        b = stack_pop()
+        if b > a:
+            stack_push(-1, TYPE_FLAG)
+        else:
+            stack_push(0, TYPE_FLAG)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_compare_lteq(opcode, offset, more):
+    if precheck([TYPE_NUMBER, TYPE_NUMBER]):
+        a = stack_pop()
+        b = stack_pop()
+        if b <= a:
+            stack_push(-1, TYPE_FLAG)
+        else:
+            stack_push(0, TYPE_FLAG)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_compare_gteq(opcode, offset, more):
+    if precheck([TYPE_NUMBER, TYPE_NUMBER]):
+        a = stack_pop()
+        b = stack_pop()
+        if b >= a:
+            stack_push(-1, TYPE_FLAG)
+        else:
+            stack_push(0, TYPE_FLAG)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_compare_eq(opcode, offset, more):
+    if precheck([TYPE_STRING, TYPE_STRING]) or \
+       precheck([TYPE_REMARK, TYPE_REMARK]):
+        a = slice_to_string(stack_pop())
+        b = slice_to_string(stack_pop())
+    elif precheck([TYPE_ANY, TYPE_ANY]):
+        a = stack_pop()
+        b = stack_pop()
+    if b == a:
+        stack_push(-1, TYPE_FLAG)
+    else:
+        stack_push(0, TYPE_FLAG)
+
+
+def bytecode_compare_neq(opcode, offset, more):
+    if precheck([TYPE_STRING, TYPE_STRING]) or \
+       precheck([TYPE_REMARK, TYPE_REMARK]):
+        a = slice_to_string(stack_pop())
+        b = slice_to_string(stack_pop())
+    elif precheck([TYPE_ANY, TYPE_ANY]):
+        a = stack_pop()
+        b = stack_pop()
+    if b != a:
+        stack_push(-1, TYPE_FLAG)
+    else:
+        stack_push(0, TYPE_FLAG)
+
+
+def bytecode_flow_if(opcode, offset, more):
+    if precheck([TYPE_FLAG, TYPE_POINTER, TYPE_POINTER]):
+        a = stack_pop()  # false
+        b = stack_pop()  # true
+        c = stack_pop()  # flag
+        if c == -1:
+            interpret(b, more)
+        else:
+            interpret(a, more)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_flow_while(opcode, offset, more):
+    if precheck([TYPE_POINTER]):
+        quote = stack_pop()
+        a = -1
+        while a == -1:
+            interpret(quote, more)
+            if precheck([TYPE_FLAG]):
+                a = stack_pop()
+            else:
+                abort_run(opcode)
+                a = 0
+    else:
+        abort_run(opcode)
+
+
+def bytecode_flow_until(opcode, offset, more):
+    if precheck([TYPE_POINTER]):
+        quote = stack_pop()
+        a = 0
+        while a == 0:
+            interpret(quote, more)
+            if precheck([TYPE_FLAG]):
+                a = stack_pop()
+            else:
+                abort_run(opcode)
+                a = 0
+    else:
+        abort_run(opcode)
+
+
+def bytecode_flow_times(opcode, offset, more):
+    if precheck([TYPE_NUMBER, TYPE_POINTER]):
+        quote = stack_pop()
+        count = stack_pop()
+        while count > 0:
+            interpret(quote, more)
+            count -= 1
+    else:
+        abort_run(opcode)
+
+
+def bytecode_flow_call_f(opcode, offset, more):
+    if precheck([TYPE_POINTER]):
+        a = stack_pop()
+        interpret(a, more)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_flow_dip(opcode, offset, more):
+    if precheck([TYPE_ANY, TYPE_POINTER]):
+        quote = stack_pop()
+        v, t = stack_pop(type = True)
+        interpret(quote, more)
+        stack_push(v, t)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_flow_sip(opcode, offset, more):
+    if precheck([TYPE_ANY, TYPE_POINTER]):
+        quote = stack_pop()
+        stack_dup()
+        v, t = stack_pop(type = True)
+        interpret(quote, more)
+        stack_push(v, t)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_flow_bi(opcode, offset, more):
+    if precheck([TYPE_ANY, TYPE_POINTER, TYPE_POINTER]):
+        a = stack_pop()
+        b = stack_pop()
+        stack_dup()
+        y, x = stack_pop(type = True)
+        interpret(b, more)
+        stack_push(y, x)
+        interpret(a, more)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_flow_tri(opcode, offset, more):
+    if precheck([TYPE_ANY, TYPE_POINTER, TYPE_POINTER, TYPE_POINTER]):
+        a = stack_pop()
+        b = stack_pop()
+        c = stack_pop()
+        stack_dup()
+        y, x = stack_pop(type = True)
+        stack_dup()
+        q, m = stack_pop(type = True)
+        interpret(c, more)
+        stack_push(q, m)
+        interpret(b, more)
+        stack_push(y, x)
+        interpret(a, more)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_flow_abort(opcode, offset, more):
+    global should_abort
+    should_abort = True
+
+
+def bytecode_flow_return(opcode, offset, more):
+    offset = size
+
+
+def bytecode_mem_copy(opcode, offset, more):
+    if precheck([TYPE_POINTER, TYPE_POINTER]):
+        a = stack_pop()
+        b = stack_pop()
+        copy_slice(b, a)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_mem_fetch(opcode, offset, more):
+    if precheck([TYPE_ANY_PTR, TYPE_NUMBER]):
+        a = stack_pop()
+        b = stack_pop()
+        v, t = fetch(b, a)
+        stack_push(v, t)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_mem_store(opcode, offset, more):
+    if precheck([TYPE_ANY, TYPE_ANY_PTR, TYPE_NUMBER]):
+        a = stack_pop()     # offset
+        b = stack_pop()     # slice
+        c, t = stack_pop(type = True)   # value
+        store(c, b, a, t)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_mem_request(opcode, offset, more):
+    stack_push(request_slice(), TYPE_POINTER)
+
+
+def bytecode_mem_release(opcode, offset, more):
+    if precheck([TYPE_POINTER]):
+        release_slice(stack_pop())
+    else:
+        abort_run(opcode)
+
+
+def bytecode_mem_collect(opcode, offset, more):
+    collect_garbage()
+
+
+def bytecode_mem_get_last(opcode, offset, more):
+    if precheck([TYPE_POINTER]) or \
+       precheck([TYPE_STRING]) or \
+       precheck([TYPE_REMARK]):
+        a = stack_pop()
+        stack_push(get_last_index(a), TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_mem_set_last(opcode, offset, more):
+    if precheck([TYPE_NUMBER, TYPE_POINTER]):
+        a = stack_pop()
+        b = stack_pop()
+        set_slice_last_index(a, b)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_mem_set_type(opcode, offset, more):
+    if precheck([TYPE_NUMBER, TYPE_POINTER, TYPE_NUMBER]):
+        a = stack_pop()  # offset
+        b = stack_pop()  # slice
+        c = stack_pop()  # type
+        store_type(b, a, c)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_mem_get_type(opcode, offset, more):
+    if precheck([TYPE_POINTER, TYPE_NUMBER]):
+        a = stack_pop()
+        b = stack_pop()
+        v, t = fetch(b, a)
+        stack_push(int(t), TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_stack_dup(opcode, offset, more):
+    if precheck([TYPE_ANY]):
+        stack_dup()
+    else:
+        abort_run(opcode)
+
+
+def bytecode_stack_drop(opcode, offset, more):
+    if precheck([TYPE_ANY]):
+        stack_drop()
+    else:
+        abort_run(opcode)
+
+
+def bytecode_stack_swap(opcode, offset, more):
+    if precheck([TYPE_ANY, TYPE_ANY]):
+        stack_swap()
+    else:
+        abort_run(opcode)
+
+
+def bytecode_stack_depth(opcode, offset, more):
+    stack_push(len(stack), TYPE_NUMBER)
+
+
+def bytecode_quote_name(opcode, offset, more):
+    if precheck([TYPE_ANY_PTR, TYPE_STRING]):
+        name = slice_to_string(stack_pop())
+        ptr = stack_pop()
+        add_definition(name, ptr)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_function_hide(opcode, offset, more):
+    if precheck([TYPE_STRING]):
+        name = slice_to_string(stack_pop())
+        if lookup_pointer(name) != -1:
+            remove_name(name)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_string_seek(opcode, offset, more):
+    if precheck([TYPE_STRING, TYPE_STRING]):
+        a = slice_to_string(stack_pop())
+        b = slice_to_string(stack_pop())
+        stack_push(b.find(a), TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_slice_subslice(opcode, offset, more):
+    if precheck([TYPE_POINTER, TYPE_NUMBER, TYPE_NUMBER]) or \
+       precheck([TYPE_STRING, TYPE_NUMBER, TYPE_NUMBER]) or \
+       precheck([TYPE_REMARK, TYPE_NUMBER, TYPE_NUMBER]):
+        a = int(stack_pop())
+        b = int(stack_pop())
+        s = int(stack_pop())
+        c = memory_values[s]
+        d = c[b:a]
+        dt = memory_types[s]
+        dt = dt[b:a]
+        e = request_slice()
+        i = 0
+        while i < len(d):
+            store(d[i], e, i, dt[i])
+            i = i + 1
+        stack_push(e, TYPE_POINTER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_string_numeric(opcode, offset, more):
+    if precheck([TYPE_STRING]):
+        a = slice_to_string(stack_pop())
+        if is_number(a):
+            stack_push(-1, TYPE_FLAG)
+        else:
+            stack_push(0, TYPE_FLAG)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_slice_reverse(opcode, offset, more):
+    if precheck([TYPE_POINTER]) or \
+       precheck([TYPE_STRING]) or \
+       precheck([TYPE_REMARK]):
+        a = stack_pop()
+        memory_values[int(a)] = memory_values[int(a)][::-1]
+        memory_types[int(a)] = memory_types[int(a)][::-1]
+        stack_push(a, TYPE_POINTER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_to_upper(opcode, offset, more):
+    if precheck([TYPE_STRING]):
+        ptr = stack_pop()
+        a = slice_to_string(ptr).upper()
+        stack_push(string_to_slice(a), TYPE_STRING)
+    elif precheck([TYPE_CHARACTER]):
+        a = stack_pop()
+        b = ''.join(chr(a))
+        a = b.upper()
+        stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_to_lower(opcode, offset, more):
+    if precheck([TYPE_STRING]):
+        ptr = stack_pop()
+        a = slice_to_string(ptr).lower()
+        stack_push(string_to_slice(a), TYPE_STRING)
+    elif precheck([TYPE_CHARACTER]):
+        a = stack_pop()
+        b = ''.join(chr(a))
+        a = b.lower()
+        stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_report(opcode, offset, more):
+    if precheck([TYPE_STRING]):
+        report(slice_to_string(stack_pop()))
+    else:
+        abort_run(opcode)
+
+
+def bytecode_vm_names(opcode, offset, more):
+    s = request_slice()
+    i = 0
+    for word in dictionary_names:
+        value = string_to_slice(word)
+        store(value, s, i, TYPE_STRING)
+        i = i + 1
+    stack_push(s, TYPE_POINTER)
+
+
+def bytecode_vm_slices(opcode, offset, more):
+    s = request_slice()
+    i = 0
+    for ptr in dictionary_slices:
+        store(ptr, s, i, TYPE_POINTER)
+        i = i + 1
+    stack_push(s, TYPE_POINTER)
+
+
+def bytecode_trig_sin(opcode, offset, more):
+    if precheck([TYPE_NUMBER]):
+        a = stack_pop()
+        stack_push(math.sin(a), TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_trig_cos(opcode, offset, more):
+    if precheck([TYPE_NUMBER]):
+        a = stack_pop()
+        stack_push(math.cos(a), TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_trig_tan(opcode, offset, more):
+    if precheck([TYPE_NUMBER]):
+        a = stack_pop()
+        stack_push(math.tan(a), TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_trig_asin(opcode, offset, more):
+    if precheck([TYPE_NUMBER]):
+        a = stack_pop()
+        stack_push(math.asin(a), TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_trig_acos(opcode, offset, more):
+    if precheck([TYPE_NUMBER]):
+        a = stack_pop()
+        stack_push(math.acos(a), TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_trig_atan(opcode, offset, more):
+    if precheck([TYPE_NUMBER]):
+        a = stack_pop()
+        stack_push(math.atan(a), TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_trig_atan2(opcode, offset, more):
+    if precheck([TYPE_NUMBER, TYPE_NUMBER]):
+        a = stack_pop()
+        b = stack_pop()
+        stack_push(math.atan2(b, a), TYPE_NUMBER)
+    else:
+        abort_run(opcode)
+
+
+def bytecode_vm_mem_map(opcode, offset, more):
+    s = request_slice()
+    i = 0
+    for a in memory_map:
+        store(a, s, i, TYPE_NUMBER)
+        i = i + 1
+    stack_push(s, TYPE_POINTER)
+
+
+def bytecode_vm_mem_sizes(opcode, offset, more):
+    s = request_slice()
+    i = 0
+    for a in memory_size:
+        store(a, s, i, TYPE_NUMBER)
+        i = i + 1
+    stack_push(s, TYPE_POINTER)
+
+
+def bytecode_vm_mem_alloc(opcode, offset, more):
+    s = request_slice()
+    i = 0
+    n = 0
+    while i < len(memory_map):
+        if memory_map[i] == 1:
+            store(i, s, n, TYPE_POINTER)
+            n = n + 1
+        i = i + 1
+    stack_push(s, TYPE_POINTER)
+
+
+bytecodes = {
+    BC_NOP: bytecode_nop,
+    BC_SET_TYPE: bytecode_set_type,
+    BC_GET_TYPE: bytecode_get_type,
+    BC_ADD: bytecode_add,
+    BC_SUBTRACT: bytecode_subtract,
+    BC_MULTIPLY: bytecode_multiply,
+    BC_DIVIDE: bytecode_divide,
+    BC_REMAINDER: bytecode_remainder,
+    BC_FLOOR: bytecode_floor,
+    BC_POW: bytecode_pow,
+    BC_LOG: bytecode_log,
+    BC_LOG10: bytecode_log10,
+    BC_LOGN: bytecode_logn,
+    BC_BITWISE_SHIFT: bytecode_bitwise_shift,
+    BC_BITWISE_AND: bytecode_bitwise_and,
+    BC_BITWISE_OR: bytecode_bitwise_or,
+    BC_BITWISE_XOR: bytecode_bitwise_xor,
+    BC_RANDOM: bytecode_random,
+    BC_SQRT: bytecode_sqrt,
+    BC_ROUND: bytecode_round,
+    BC_COMPARE_LT: bytecode_compare_lt,
+    BC_COMPARE_GT: bytecode_compare_gt,
+    BC_COMPARE_LTEQ: bytecode_compare_lteq,
+    BC_COMPARE_GTEQ: bytecode_compare_gteq,
+    BC_COMPARE_EQ: bytecode_compare_eq,
+    BC_COMPARE_NEQ: bytecode_compare_neq,
+    BC_FLOW_IF: bytecode_flow_if,
+    BC_FLOW_WHILE: bytecode_flow_while,
+    BC_FLOW_UNTIL: bytecode_flow_until,
+    BC_FLOW_TIMES: bytecode_flow_times,
+    BC_FLOW_CALL_F: bytecode_flow_call_f,
+    BC_FLOW_DIP: bytecode_flow_dip,
+    BC_FLOW_SIP: bytecode_flow_sip,
+    BC_FLOW_BI: bytecode_flow_bi,
+    BC_FLOW_TRI: bytecode_flow_tri,
+    BC_FLOW_ABORT: bytecode_flow_abort,
+    BC_MEM_COPY: bytecode_mem_copy,
+    BC_MEM_FETCH: bytecode_mem_fetch,
+    BC_MEM_STORE: bytecode_mem_store,
+    BC_MEM_REQUEST: bytecode_mem_request,
+    BC_MEM_RELEASE: bytecode_mem_release,
+    BC_MEM_COLLECT: bytecode_mem_collect,
+    BC_MEM_GET_LAST: bytecode_mem_get_last,
+    BC_MEM_SET_LAST: bytecode_mem_set_last,
+    BC_MEM_SET_TYPE: bytecode_mem_set_type,
+    BC_MEM_GET_TYPE: bytecode_mem_get_type,
+    BC_STACK_DUP: bytecode_stack_dup,
+    BC_STACK_DROP: bytecode_stack_drop,
+    BC_STACK_SWAP: bytecode_stack_swap,
+    BC_STACK_DEPTH: bytecode_stack_depth,
+    BC_QUOTE_NAME: bytecode_quote_name,
+    BC_FUNCTION_HIDE: bytecode_function_hide,
+    BC_STRING_SEEK: bytecode_string_seek,
+    BC_SLICE_SUBSLICE: bytecode_slice_subslice,
+    BC_STRING_NUMERIC: bytecode_string_numeric,
+    BC_SLICE_REVERSE: bytecode_slice_reverse,
+    BC_TO_LOWER: bytecode_to_lower,
+    BC_TO_UPPER: bytecode_to_upper,
+    BC_REPORT: bytecode_report,
+    BC_VM_NAMES: bytecode_vm_names,
+    BC_VM_SLICES: bytecode_vm_slices,
+    BC_TRIG_SIN: bytecode_trig_sin,
+    BC_TRIG_COS: bytecode_trig_cos,
+    BC_TRIG_TAN: bytecode_trig_tan,
+    BC_TRIG_ASIN: bytecode_trig_asin,
+    BC_TRIG_ACOS: bytecode_trig_acos,
+    BC_TRIG_ATAN: bytecode_trig_atan,
+    BC_TRIG_ATAN2: bytecode_trig_atan2,
+    BC_VM_MEM_MAP: bytecode_vm_mem_map,
+    BC_VM_MEM_SIZES: bytecode_vm_mem_sizes,
+    BC_VM_MEM_ALLOC: bytecode_vm_mem_alloc,
+}
+
+
+
+
+#
 # Support code
 #
 
@@ -214,7 +1017,6 @@ def interpret(slice, more=None):
         current_slice = slice
     while offset <= size and should_abort is not True:
         opcode, optype = fetch(slice, offset)
-
         if optype != TYPE_BYTECODE:
             stack_push(opcode, optype)
             if optype == TYPE_REMARK:
@@ -222,577 +1024,12 @@ def interpret(slice, more=None):
             if optype == TYPE_FUNCTION_CALL:
                 interpret(stack_pop(), more)
         else:
-            if opcode == BC_SET_TYPE:
-                if precheck([TYPE_ANY, TYPE_NUMBER]):
-                    a = stack_pop()
-                    stack_change_type(a)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_GET_TYPE:
-                if precheck([TYPE_ANY]):
-                    stack_push(stack_type(), TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_ADD:
-                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
-                    a = stack_pop()
-                    b = stack_pop()
-                    stack_push(b + a, TYPE_NUMBER)
-                elif precheck([TYPE_STRING, TYPE_STRING]):
-                    a = slice_to_string(stack_pop())
-                    b = slice_to_string(stack_pop())
-                    stack_push(string_to_slice(b + a), TYPE_STRING)
-                elif precheck([TYPE_REMARK, TYPE_REMARK]):
-                    a = slice_to_string(stack_pop())
-                    b = slice_to_string(stack_pop())
-                    stack_push(string_to_slice(b + a), TYPE_REMARK)
-                elif precheck([TYPE_POINTER, TYPE_POINTER]):
-                    a = stack_pop()
-                    b = stack_pop()
-                    c = request_slice()
-                    d = get_last_index(b) + get_last_index(a) + 1
-                    set_slice_last_index(c, d)
-                    memory_values[c] = memory_values[b] + memory_values[a]
-                    memory_types[c] = memory_types[b] + memory_types[a]
-                    stack_push(c, TYPE_POINTER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_SUBTRACT:
-                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
-                    a = stack_pop()
-                    b = stack_pop()
-                    stack_push(b - a, TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_MULTIPLY:
-                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
-                    a = stack_pop()
-                    b = stack_pop()
-                    stack_push(a * b, TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_DIVIDE:
-                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
-                    a = stack_pop()
-                    b = stack_pop()
-                    if a == 0 or b == 0:
-                        stack_push(float('nan'), TYPE_NUMBER)
-                        report('E04: Divide by Zero')
-                        abort_run(opcode)
-                    else:
-                        stack_push(b / a, TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_REMAINDER:
-                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
-                    a = stack_pop()
-                    b = stack_pop()
-                    stack_push(b % a, TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_FLOOR:
-                if precheck([TYPE_NUMBER]):
-                    stack_push(math.floor(float(stack_pop())), TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_POW:
-                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
-                    a = stack_pop()
-                    b = stack_pop()
-                    stack_push(math.pow(b, a), TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_LOG:
-                if precheck([TYPE_NUMBER]):
-                    a = stack_pop()
-                    stack_push(math.log(a), TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_LOG10:
-                if precheck([TYPE_NUMBER]):
-                    a = stack_pop()
-                    stack_push(math.log10(a), TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_LOGN:
-                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
-                    a = stack_pop()
-                    b = stack_pop()
-                    stack_push(math.log(b, a), TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_BITWISE_SHIFT:
-                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
-                    a = int(stack_pop())
-                    b = int(stack_pop())
-                    if a < 0:
-                        stack_push(b << abs(a), TYPE_NUMBER)
-                    else:
-                        stack_push(b >> a, TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_BITWISE_AND:
-                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
-                    a = int(stack_pop())
-                    b = int(stack_pop())
-                    stack_push(b & a, TYPE_NUMBER)
-                elif precheck([TYPE_FLAG, TYPE_FLAG]):
-                    a = int(stack_pop())
-                    b = int(stack_pop())
-                    stack_push(b & a, TYPE_FLAG)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_BITWISE_OR:
-                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
-                    a = int(stack_pop())
-                    b = int(stack_pop())
-                    stack_push(b | a, TYPE_NUMBER)
-                elif precheck([TYPE_FLAG, TYPE_FLAG]):
-                    a = int(stack_pop())
-                    b = int(stack_pop())
-                    stack_push(b | a, TYPE_FLAG)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_BITWISE_XOR:
-                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
-                    a = int(stack_pop())
-                    b = int(stack_pop())
-                    stack_push(b ^ a, TYPE_NUMBER)
-                elif precheck([TYPE_FLAG, TYPE_FLAG]):
-                    a = int(stack_pop())
-                    b = int(stack_pop())
-                    stack_push(b ^ a, TYPE_FLAG)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_RANDOM:
-                stack_push(random.SystemRandom().random(), TYPE_NUMBER)
-            elif opcode == BC_SQRT:
-                if precheck([TYPE_NUMBER]):
-                    stack_push(math.sqrt(stack_pop()), TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_ROUND:
-                if precheck([TYPE_NUMBER]):
-                    stack_push(round(stack_pop()), TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_COMPARE_LT:
-                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
-                    a = stack_pop()
-                    b = stack_pop()
-                    if b < a:
-                        stack_push(-1, TYPE_FLAG)
-                    else:
-                        stack_push(0, TYPE_FLAG)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_COMPARE_GT:
-                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
-                    a = stack_pop()
-                    b = stack_pop()
-                    if b > a:
-                        stack_push(-1, TYPE_FLAG)
-                    else:
-                        stack_push(0, TYPE_FLAG)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_COMPARE_LTEQ:
-                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
-                    a = stack_pop()
-                    b = stack_pop()
-                    if b <= a:
-                        stack_push(-1, TYPE_FLAG)
-                    else:
-                        stack_push(0, TYPE_FLAG)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_COMPARE_GTEQ:
-                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
-                    a = stack_pop()
-                    b = stack_pop()
-                    if b >= a:
-                        stack_push(-1, TYPE_FLAG)
-                    else:
-                        stack_push(0, TYPE_FLAG)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_COMPARE_EQ:
-                if precheck([TYPE_STRING, TYPE_STRING]) or \
-                   precheck([TYPE_REMARK, TYPE_REMARK]):
-                    a = slice_to_string(stack_pop())
-                    b = slice_to_string(stack_pop())
-                elif precheck([TYPE_ANY, TYPE_ANY]):
-                    a = stack_pop()
-                    b = stack_pop()
-                if b == a:
-                    stack_push(-1, TYPE_FLAG)
-                else:
-                    stack_push(0, TYPE_FLAG)
-            elif opcode == BC_COMPARE_NEQ:
-                if precheck([TYPE_STRING, TYPE_STRING]) or \
-                   precheck([TYPE_REMARK, TYPE_REMARK]):
-                    a = slice_to_string(stack_pop())
-                    b = slice_to_string(stack_pop())
-                elif precheck([TYPE_ANY, TYPE_ANY]):
-                    a = stack_pop()
-                    b = stack_pop()
-                if b != a:
-                    stack_push(-1, TYPE_FLAG)
-                else:
-                    stack_push(0, TYPE_FLAG)
-            elif opcode == BC_FLOW_IF:
-                if precheck([TYPE_FLAG, TYPE_POINTER, TYPE_POINTER]):
-                    a = stack_pop()  # false
-                    b = stack_pop()  # true
-                    c = stack_pop()  # flag
-                    if c == -1:
-                        interpret(b, more)
-                    else:
-                        interpret(a, more)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_FLOW_WHILE:
-                if precheck([TYPE_POINTER]):
-                    quote = stack_pop()
-                    a = -1
-                    while a == -1:
-                        interpret(quote, more)
-                        if precheck([TYPE_FLAG]):
-                            a = stack_pop()
-                        else:
-                            abort_run(opcode)
-                            a = 0
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_FLOW_UNTIL:
-                if precheck([TYPE_POINTER]):
-                    quote = stack_pop()
-                    a = 0
-                    while a == 0:
-                        interpret(quote, more)
-                        if precheck([TYPE_FLAG]):
-                            a = stack_pop()
-                        else:
-                            abort_run(opcode)
-                            a = 0
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_FLOW_TIMES:
-                if precheck([TYPE_NUMBER, TYPE_POINTER]):
-                    quote = stack_pop()
-                    count = stack_pop()
-                    while count > 0:
-                        interpret(quote, more)
-                        count -= 1
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_FLOW_CALL_F:
-                if precheck([TYPE_POINTER]):
-                    a = stack_pop()
-                    interpret(a, more)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_FLOW_DIP:
-                if precheck([TYPE_ANY, TYPE_POINTER]):
-                    quote = stack_pop()
-                    v, t = stack_pop(type = True)
-                    interpret(quote, more)
-                    stack_push(v, t)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_FLOW_SIP:
-                if precheck([TYPE_ANY, TYPE_POINTER]):
-                    quote = stack_pop()
-                    stack_dup()
-                    v, t = stack_pop(type = True)
-                    interpret(quote, more)
-                    stack_push(v, t)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_FLOW_BI:
-                if precheck([TYPE_ANY, TYPE_POINTER, TYPE_POINTER]):
-                    a = stack_pop()
-                    b = stack_pop()
-                    stack_dup()
-                    y, x = stack_pop(type = True)
-                    interpret(b, more)
-                    stack_push(y, x)
-                    interpret(a, more)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_FLOW_TRI:
-                if precheck([TYPE_ANY, TYPE_POINTER, TYPE_POINTER, TYPE_POINTER]):
-                    a = stack_pop()
-                    b = stack_pop()
-                    c = stack_pop()
-                    stack_dup()
-                    y, x = stack_pop(type = True)
-                    stack_dup()
-                    q, m = stack_pop(type = True)
-                    interpret(c, more)
-                    stack_push(q, m)
-                    interpret(b, more)
-                    stack_push(y, x)
-                    interpret(a, more)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_FLOW_ABORT:
-                should_abort = True
+            if opcode in bytecodes:
+                bytecodes[opcode](opcode, offset, more)
             elif opcode == BC_FLOW_RETURN:
                 offset = size
-            elif opcode == BC_MEM_COPY:
-                if precheck([TYPE_POINTER, TYPE_POINTER]):
-                    a = stack_pop()
-                    b = stack_pop()
-                    copy_slice(b, a)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_MEM_FETCH:
-                if precheck([TYPE_ANY_PTR, TYPE_NUMBER]):
-                    a = stack_pop()
-                    b = stack_pop()
-                    v, t = fetch(b, a)
-                    stack_push(v, t)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_MEM_STORE:
-                if precheck([TYPE_ANY, TYPE_ANY_PTR, TYPE_NUMBER]):
-                    a = stack_pop()                 # offset
-                    b = stack_pop()                 # slice
-                    c, t = stack_pop(type = True)   # value
-                    store(c, b, a, t)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_MEM_REQUEST:
-                stack_push(request_slice(), TYPE_POINTER)
-            elif opcode == BC_MEM_RELEASE:
-                if precheck([TYPE_POINTER]):
-                    release_slice(stack_pop())
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_MEM_COLLECT:
-                collect_garbage()
-            elif opcode == BC_MEM_GET_LAST:
-                if precheck([TYPE_POINTER]) or \
-                   precheck([TYPE_STRING]) or \
-                   precheck([TYPE_REMARK]):
-                    a = stack_pop()
-                    stack_push(get_last_index(a), TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_MEM_SET_LAST:
-                if precheck([TYPE_NUMBER, TYPE_POINTER]):
-                    a = stack_pop()
-                    b = stack_pop()
-                    set_slice_last_index(a, b)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_MEM_SET_TYPE:
-                if precheck([TYPE_NUMBER, TYPE_POINTER, TYPE_NUMBER]):
-                    a = stack_pop()  # offset
-                    b = stack_pop()  # slice
-                    c = stack_pop()  # type
-                    store_type(b, a, c)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_MEM_GET_TYPE:
-                if precheck([TYPE_POINTER, TYPE_NUMBER]):
-                    a = stack_pop()
-                    b = stack_pop()
-                    v, t = fetch(b, a)
-                    stack_push(int(t), TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_STACK_DUP:
-                if precheck([TYPE_ANY]):
-                    stack_dup()
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_STACK_DROP:
-                if precheck([TYPE_ANY]):
-                    stack_drop()
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_STACK_SWAP:
-                if precheck([TYPE_ANY, TYPE_ANY]):
-                    stack_swap()
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_STACK_DEPTH:
-                stack_push(len(stack), TYPE_NUMBER)
-            elif opcode == BC_QUOTE_NAME:
-                if precheck([TYPE_ANY_PTR, TYPE_STRING]):
-                    name = slice_to_string(stack_pop())
-                    ptr = stack_pop()
-                    add_definition(name, ptr)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_FUNCTION_HIDE:
-                if precheck([TYPE_STRING]):
-                    name = slice_to_string(stack_pop())
-                    if lookup_pointer(name) != -1:
-                        remove_name(name)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_STRING_SEEK:
-                if precheck([TYPE_STRING, TYPE_STRING]):
-                    a = slice_to_string(stack_pop())
-                    b = slice_to_string(stack_pop())
-                    stack_push(b.find(a), TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_SLICE_SUBSLICE:
-                if precheck([TYPE_POINTER, TYPE_NUMBER, TYPE_NUMBER]) or \
-                   precheck([TYPE_STRING, TYPE_NUMBER, TYPE_NUMBER]) or \
-                   precheck([TYPE_REMARK, TYPE_NUMBER, TYPE_NUMBER]):
-                    a = int(stack_pop())
-                    b = int(stack_pop())
-                    s = int(stack_pop())
-                    c = memory_values[s]
-                    d = c[b:a]
-                    dt = memory_types[s]
-                    dt = dt[b:a]
-                    e = request_slice()
-                    i = 0
-                    while i < len(d):
-                        store(d[i], e, i, dt[i])
-                        i = i + 1
-                    stack_push(e, TYPE_POINTER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_STRING_NUMERIC:
-                if precheck([TYPE_STRING]):
-                    a = slice_to_string(stack_pop())
-                    if is_number(a):
-                        stack_push(-1, TYPE_FLAG)
-                    else:
-                        stack_push(0, TYPE_FLAG)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_SLICE_REVERSE:
-                if precheck([TYPE_POINTER]) or \
-                   precheck([TYPE_STRING]) or \
-                   precheck([TYPE_REMARK]):
-                    a = stack_pop()
-                    memory_values[int(a)] = memory_values[int(a)][::-1]
-                    memory_types[int(a)] = memory_types[int(a)][::-1]
-                    stack_push(a, TYPE_POINTER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_TO_UPPER:
-                if precheck([TYPE_STRING]):
-                    ptr = stack_pop()
-                    a = slice_to_string(ptr).upper()
-                    stack_push(string_to_slice(a), TYPE_STRING)
-                elif precheck([TYPE_CHARACTER]):
-                    a = stack_pop()
-                    b = ''.join(chr(a))
-                    a = b.upper()
-                    stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_TO_LOWER:
-                if precheck([TYPE_STRING]):
-                    ptr = stack_pop()
-                    a = slice_to_string(ptr).lower()
-                    stack_push(string_to_slice(a), TYPE_STRING)
-                elif precheck([TYPE_CHARACTER]):
-                    a = stack_pop()
-                    b = ''.join(chr(a))
-                    a = b.lower()
-                    stack_push(ord(a[0].encode('utf-8')), TYPE_CHARACTER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_REPORT:
-                if precheck([TYPE_STRING]):
-                    report(slice_to_string(stack_pop()))
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_VM_NAMES:
-                s = request_slice()
-                i = 0
-                for word in dictionary_names:
-                    value = string_to_slice(word)
-                    store(value, s, i, TYPE_STRING)
-                    i = i + 1
-                stack_push(s, TYPE_POINTER)
-            elif opcode == BC_VM_SLICES:
-                s = request_slice()
-                i = 0
-                for ptr in dictionary_slices:
-                    store(ptr, s, i, TYPE_POINTER)
-                    i = i + 1
-                stack_push(s, TYPE_POINTER)
-            elif opcode == BC_TRIG_SIN:
-                if precheck([TYPE_NUMBER]):
-                    a = stack_pop()
-                    stack_push(math.sin(a), TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_TRIG_COS:
-                if precheck([TYPE_NUMBER]):
-                    a = stack_pop()
-                    stack_push(math.cos(a), TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_TRIG_TAN:
-                if precheck([TYPE_NUMBER]):
-                    a = stack_pop()
-                    stack_push(math.tan(a), TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_TRIG_ASIN:
-                if precheck([TYPE_NUMBER]):
-                    a = stack_pop()
-                    stack_push(math.asin(a), TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_TRIG_ACOS:
-                if precheck([TYPE_NUMBER]):
-                    a = stack_pop()
-                    stack_push(math.acos(a), TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_TRIG_ATAN:
-                if precheck([TYPE_NUMBER]):
-                    a = stack_pop()
-                    stack_push(math.atan(a), TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_TRIG_ATAN2:
-                if precheck([TYPE_NUMBER, TYPE_NUMBER]):
-                    a = stack_pop()
-                    b = stack_pop()
-                    stack_push(math.atan2(b, a), TYPE_NUMBER)
-                else:
-                    abort_run(opcode)
-            elif opcode == BC_VM_MEM_MAP:
-                s = request_slice()
-                i = 0
-                for a in memory_map:
-                    store(a, s, i, TYPE_NUMBER)
-                    i = i + 1
-                stack_push(s, TYPE_POINTER)
-            elif opcode == BC_VM_MEM_SIZES:
-                s = request_slice()
-                i = 0
-                for a in memory_size:
-                    store(a, s, i, TYPE_NUMBER)
-                    i = i + 1
-                stack_push(s, TYPE_POINTER)
-            elif opcode == BC_VM_MEM_ALLOC:
-                s = request_slice()
-                i = 0
-                n = 0
-                while i < len(memory_map):
-                    if memory_map[i] == 1:
-                        store(i, s, n, TYPE_POINTER)
-                        n = n + 1
-                    i = i + 1
-                stack_push(s, TYPE_POINTER)
             if more is not None:
                 offset = more(slice, offset, opcode)
-
         offset += 1
     current_slice = 0
 
