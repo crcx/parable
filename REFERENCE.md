@@ -347,7 +347,7 @@ Primitive. Return the last offset in a specified slice.
 
 Primitive. Set the last index in a slice to the specified offset.
 
-## set-stored-type
+## store<type>
 
     number pointer offset -
 
@@ -357,7 +357,7 @@ Notes:
 
 * This is not limited to the built-in types.
 
-## get-stored-type
+## fetch<type>
 
     pointer offset - number
 

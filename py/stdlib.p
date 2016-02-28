@@ -43,8 +43,8 @@
 [ "-"      `43 ] 'collect-garbage' :
 [ "p-n"    `44 ] 'get-last-index' :
 [ "np-"    `45 ] 'set-last-index' :
-[ "tpn-"   `46 ] 'set-stored-type' :
-[ "pn-n"   `47 ] 'get-stored-type' :
+[ "tpn-"   `46 ] 'store<type>' :
+[ "pn-n"   `47 ] 'fetch<type>' :
 [ "v-vv"   `48 ] 'dup' :
 [ "v-"     `49 ] 'drop' :
 [ "vV-Vv"  `50 ] 'swap' :
