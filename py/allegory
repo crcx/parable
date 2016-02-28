@@ -713,10 +713,9 @@ def interpret(slice, more=None):
                     abort_run(opcode)
             elif opcode == BC_REPORT:
                 if precheck([TYPE_STRING]):
-                    if stack_type() == TYPE_STRING:
-                        a = slice_to_string(stack_pop())
-                        report(a)
-                abort_run(opcode)
+                    report(slice_to_string(stack_pop()))
+                else:
+                    abort_run(opcode)
             elif opcode == BC_VM_NAMES:
                 s = request_slice()
                 i = 0
