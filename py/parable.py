@@ -202,7 +202,7 @@ def bytecode_remainder(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
         b = stack_pop()
-        if a == 0 or b == 0:
+        if a == 0:
             stack_push(float('nan'), TYPE_NUMBER)
             report('E04: Divide by Zero')
             abort_run(opcode)
