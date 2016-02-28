@@ -4,7 +4,8 @@
 
 ### Virtual Machine
 
-* added type checking to the byte code interpreter
+* now using a dispatch table for the byte codes
+* added type checking to the byte codes
 * fetch now allows for negative offsets (fetch with index starting at tail end of slice)
 * disabled some redundant byte codes
 * error report and abort on type or depth errors
