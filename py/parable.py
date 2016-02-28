@@ -457,7 +457,11 @@ def interpret(slice, more=None):
                     a = -1
                     while a == -1:
                         interpret(quote, more)
-                        a = stack_pop()
+                        if precheck([TYPE_FLAG]):
+                            a = stack_pop()
+                        else:
+                            abort_run(opcode)
+                            a = 0
                 else:
                     abort_run(opcode)
             elif opcode == BC_FLOW_UNTIL:
@@ -466,7 +470,11 @@ def interpret(slice, more=None):
                     a = 0
                     while a == 0:
                         interpret(quote, more)
-                        a = stack_pop()
+                        if precheck([TYPE_FLAG]):
+                            a = stack_pop()
+                        else:
+                            abort_run(opcode)
+                            a = 0
                 else:
                     abort_run(opcode)
             elif opcode == BC_FLOW_TIMES:
