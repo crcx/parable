@@ -9,8 +9,6 @@
 [ "nn-n"   `7 ] 'rem' :
 [ "n-n"    `8 ] 'floor' :
 [ "nn-n"   `9 ] '^' :
-[ "n-n"    `10 ] 'log' :
-[ "n-n"    `11 ] 'log10' :
 [ "nn-n"   `12 ] 'log<n>' :
 [ "nn-n"   `13 ] 'shift' :
 [ "nn-n"   `14 ] 'and' :
@@ -463,5 +461,7 @@
 }
 
 
-[ "ss-" dup function-exists? [ [ :r ] dip lookup-function push ] [ drop-pair ] if ] 'describe' :
-
+[ "-n"   2.71828 ] 'math.e' :
+[ "-n"   3.14159 ] 'math.pi' :
+[ "n-n"  math.e log<n> ] 'log' :
+[ "n-n"  10 log<n> ] 'log10' :

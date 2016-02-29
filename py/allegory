@@ -93,8 +93,8 @@ BC_DIVIDE = 6
 BC_REMAINDER = 7
 BC_FLOOR = 8
 BC_POW = 9
-BC_LOG = 10
-BC_LOG10 = 11
+# BC_LOG = 10  ## REMOVE
+# BC_LOG10 = 11  ## REMOVE
 BC_LOGN = 12
 BC_BITWISE_SHIFT = 13
 BC_BITWISE_AND = 14
@@ -266,20 +266,6 @@ def bytecode_pow(opcode, offset, more):
         a = stack_pop()
         b = stack_pop()
         stack_push(math.pow(b, a), TYPE_NUMBER)
-    else:
-        abort_run(opcode, offset)
-
-
-def bytecode_log(opcode, offset, more):
-    if precheck([TYPE_NUMBER]):
-        stack_push(math.log(stack_pop()), TYPE_NUMBER)
-    else:
-        abort_run(opcode, offset)
-
-
-def bytecode_log10(opcode, offset, more):
-    if precheck([TYPE_NUMBER]):
-        stack_push(math.log10(stack_pop()), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
 
@@ -904,8 +890,6 @@ bytecodes = {
     BC_REMAINDER:      bytecode_remainder,
     BC_FLOOR:          bytecode_floor,
     BC_POW:            bytecode_pow,
-    BC_LOG:            bytecode_log,
-    BC_LOG10:          bytecode_log10,
     BC_LOGN:           bytecode_logn,
     BC_BITWISE_SHIFT:  bytecode_bitwise_shift,
     BC_BITWISE_AND:    bytecode_bitwise_and,
@@ -1635,6 +1619,7 @@ def parse_string(tokens, i, count, delimiter):
 def compile(str, slice):
     global should_abort
     should_abort = False
+    prefixes = { '`', '#', '$', '&', '\'', '"', '@', '!', }
     nest = []
     tokens = ' '.join(str.split()).split(' ')
     count = len(tokens)
@@ -1645,6 +1630,10 @@ def compile(str, slice):
     while i < count:
         current = tokens[i]
         prefix = tokens[i][:1]
+        if prefix in prefixes:
+            current = tokens[i][1:]
+        else:
+            current = tokens[i]
         s = ""
         if prefix == '"':
             i, s = parse_string(tokens, i, count, '"')
@@ -1653,20 +1642,20 @@ def compile(str, slice):
             i, s = parse_string(tokens, i, count, '\'')
             offset = compile_string(s[1:-1], slice, offset)
         elif prefix == "$":
-            v = ord(current[1:][0].encode('utf-8'))
+            v = ord(current[0].encode('utf-8'))
             offset = compile_character(v, slice, offset)
         elif prefix == "&":
-            offset = compile_pointer(current[1:], slice, offset)
+            offset = compile_pointer(current, slice, offset)
         elif prefix == "#":
-            offset = compile_number(current[1:], slice, offset)
+            offset = compile_number(current, slice, offset)
         elif prefix == "`":
-            offset = compile_bytecode(current[1:], slice, offset)
+            offset = compile_bytecode(current, slice, offset)
         elif prefix == "@":
-            offset = compile_pointer(current[1:], slice, offset)
+            offset = compile_pointer(current, slice, offset)
             offset = compile_number(0, slice, offset)
             offset = compile_bytecode(BC_MEM_FETCH, slice, offset)
         elif prefix == "!":
-            offset = compile_pointer(current[1:], slice, offset)
+            offset = compile_pointer(current, slice, offset)
             offset = compile_number(0, slice, offset)
             offset = compile_bytecode(BC_MEM_STORE, slice, offset)
         elif current == "[":
@@ -1733,8 +1722,6 @@ stdlib.append(""" [ "nn-n"   `6 ] '/' : """)
 stdlib.append(""" [ "nn-n"   `7 ] 'rem' : """)
 stdlib.append(""" [ "n-n"    `8 ] 'floor' : """)
 stdlib.append(""" [ "nn-n"   `9 ] '^' : """)
-stdlib.append(""" [ "n-n"    `10 ] 'log' : """)
-stdlib.append(""" [ "n-n"    `11 ] 'log10' : """)
 stdlib.append(""" [ "nn-n"   `12 ] 'log<n>' : """)
 stdlib.append(""" [ "nn-n"   `13 ] 'shift' : """)
 stdlib.append(""" [ "nn-n"   `14 ] 'and' : """)
@@ -2010,7 +1997,10 @@ stdlib.append(""" 'Pattern' var """)
 stdlib.append(""" [ "s-f" @Pattern swap string-contains? ] 'matches' : """)
 stdlib.append(""" [ "s-p" !Pattern vm.dict<names> &matches filter "Return an array of names in the dictionary that match a given substring."  ] 'vm.dict<names-like>' : """)
 stdlib.append(""" } """)
-stdlib.append(""" [ "ss-" dup function-exists? [ [ :r ] dip lookup-function push ] [ drop-pair ] if ] 'describe' : """)
+stdlib.append(""" [ "-n"   2.71828 ] 'math.e' : """)
+stdlib.append(""" [ "-n"   3.14159 ] 'math.pi' : """)
+stdlib.append(""" [ "n-n"  math.e log<n> ] 'log' : """)
+stdlib.append(""" [ "n-n"  10 log<n> ] 'log10' : """)
 extensions = []
 extensions.append(""" [ "-"   `2000 ] '+warnings' : """)
 extensions.append(""" [ "-"   `2001 ] '-warnings' : """)
