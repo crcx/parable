@@ -566,10 +566,13 @@ def bytecode_mem_copy(opcode, offset, more):
 
 def bytecode_mem_fetch(opcode, offset, more):
     if precheck([TYPE_ANY_PTR, TYPE_NUMBER]):
-        a = stack_pop()
-        b = stack_pop()
-        v, t = fetch(b, a)
-        stack_push(v, t)
+        a = stack_pop()     # offset
+        b = stack_pop()     # slice
+        if a == float('nan'):
+            abort_run(opcode, offset)
+        else:
+            v, t = fetch(b, a)
+            stack_push(v, t)
     else:
         abort_run(opcode, offset)
 
@@ -579,7 +582,10 @@ def bytecode_mem_store(opcode, offset, more):
         a = stack_pop()     # offset
         b = stack_pop()     # slice
         c, t = stack_pop(type = True)   # value
-        store(c, b, a, t)
+        if a == float('nan'):
+            abort_run(opcode, offset)
+        else:
+            store(c, b, a, t)
     else:
         abort_run(opcode, offset)
 

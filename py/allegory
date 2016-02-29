@@ -568,10 +568,13 @@ def bytecode_mem_copy(opcode, offset, more):
 
 def bytecode_mem_fetch(opcode, offset, more):
     if precheck([TYPE_ANY_PTR, TYPE_NUMBER]):
-        a = stack_pop()
-        b = stack_pop()
-        v, t = fetch(b, a)
-        stack_push(v, t)
+        a = stack_pop()     # offset
+        b = stack_pop()     # slice
+        if a == float('nan'):
+            abort_run(opcode, offset)
+        else:
+            v, t = fetch(b, a)
+            stack_push(v, t)
     else:
         abort_run(opcode, offset)
 
@@ -581,7 +584,10 @@ def bytecode_mem_store(opcode, offset, more):
         a = stack_pop()     # offset
         b = stack_pop()     # slice
         c, t = stack_pop(type = True)   # value
-        store(c, b, a, t)
+        if a == float('nan'):
+            abort_run(opcode, offset)
+        else:
+            store(c, b, a, t)
     else:
         abort_run(opcode, offset)
 
@@ -2006,7 +2012,7 @@ stdlib.append(""" 'Pattern' var """)
 stdlib.append(""" [ "s-f" @Pattern swap string-contains? ] 'matches' : """)
 stdlib.append(""" [ "s-p" !Pattern vm.dict<names> &matches filter "Return an array of names in the dictionary that match a given substring."  ] 'vm.dict<names-like>' : """)
 stdlib.append(""" } """)
-stdlib.append(""" [ "ss-" dup function-exists? [ [ :r ] dip lookup-function push ] [ drop-pair ] if ] 'describe' : """)
+stdlib.append(""" [ "ss-" dup function-exists? [ [ :r ] dip lookup-function push ] [ drop-pair ] if collect-garbage ] 'describe' : """)
 extensions = []
 extensions.append(""" [ "-"   `2000 ] '+warnings' : """)
 extensions.append(""" [ "-"   `2001 ] '-warnings' : """)
