@@ -1633,6 +1633,7 @@ def parse_string(tokens, i, count, delimiter):
 def compile(str, slice):
     global should_abort
     should_abort = False
+    prefixes = { '`', '#', '$', '&', '\'', '"', '@', '!', }
     nest = []
     tokens = ' '.join(str.split()).split(' ')
     count = len(tokens)
@@ -1643,6 +1644,10 @@ def compile(str, slice):
     while i < count:
         current = tokens[i]
         prefix = tokens[i][:1]
+        if prefix in prefixes:
+            current = tokens[i][1:]
+        else:
+            current = tokens[i]
         s = ""
         if prefix == '"':
             i, s = parse_string(tokens, i, count, '"')
@@ -1651,20 +1656,20 @@ def compile(str, slice):
             i, s = parse_string(tokens, i, count, '\'')
             offset = compile_string(s[1:-1], slice, offset)
         elif prefix == "$":
-            v = ord(current[1:][0].encode('utf-8'))
+            v = ord(current[0].encode('utf-8'))
             offset = compile_character(v, slice, offset)
         elif prefix == "&":
-            offset = compile_pointer(current[1:], slice, offset)
+            offset = compile_pointer(current, slice, offset)
         elif prefix == "#":
-            offset = compile_number(current[1:], slice, offset)
+            offset = compile_number(current, slice, offset)
         elif prefix == "`":
-            offset = compile_bytecode(current[1:], slice, offset)
+            offset = compile_bytecode(current, slice, offset)
         elif prefix == "@":
-            offset = compile_pointer(current[1:], slice, offset)
+            offset = compile_pointer(current, slice, offset)
             offset = compile_number(0, slice, offset)
             offset = compile_bytecode(BC_MEM_FETCH, slice, offset)
         elif prefix == "!":
-            offset = compile_pointer(current[1:], slice, offset)
+            offset = compile_pointer(current, slice, offset)
             offset = compile_number(0, slice, offset)
             offset = compile_bytecode(BC_MEM_STORE, slice, offset)
         elif current == "[":
