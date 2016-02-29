@@ -282,6 +282,20 @@
 ] '}' :
 [ 'Public'  'Private' ] hide-functions
 
+"Vocabularies"
+[ "p-"  [ invoke : ] for-each "Add words in a vocabulary to the dictionary" ] 'with' :
+[ "p-"  [ invoke hide-function drop ] for-each "Remove words in a vocabulary from the dictionary" ] 'without' :
+
+[ "ps-" \
+  swap new-buffer \
+  [ dup lookup-function swap cons buffer-store ] for-each \
+  @CurrentBuffer swap : \
+  @CurrentBuffer without \
+  "Create a new vocabulary" \
+] 'vocab' :
+
+[ "ps-p" over } vocab "Start a lexically scoped sequence, with the visible words in a new vocabulary" ] '}vocab' :
+
 
 [ 'invoke<preserving>' ] {
   [ 'Prior'  'List' ] ::
@@ -461,7 +475,7 @@
 }
 
 
-[ "-n"   2.71828 ] 'math.e' :
-[ "-n"   3.14159 ] 'math.pi' :
-[ "n-n"  math.e log<n> ] 'log' :
+[ "-n"   2.71828182846 ] 'E' :
+[ "-n"   3.14159265359 ] 'PI' :
+[ "n-n"  E log<n> ] 'log' :
 [ "n-n"  10 log<n> ] 'log10' :
