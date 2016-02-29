@@ -283,18 +283,20 @@
 [ 'Public'  'Private' ] hide-functions
 
 "Vocabularies"
-[ "p-"  [ invoke : ] for-each "Add words in a vocabulary to the dictionary" ] 'with' :
-[ "p-"  [ invoke hide-function drop ] for-each "Remove words in a vocabulary from the dictionary" ] 'without' :
+[ 'with' 'without' 'vocab' '}vocab' ] {
+  [ 'Vocabulary' ] ::
 
-[ "ps-" \
-  swap new-buffer \
-  [ dup lookup-function swap cons buffer-store ] for-each \
-  @CurrentBuffer swap : \
-  @CurrentBuffer without \
-  "Create a new vocabulary" \
-] 'vocab' :
+  [ "p-"  [ invoke : ] for-each "Add words in a vocabulary to the dictionary" ] 'with' :
+  [ "p-"  [ tail hide-function ] for-each "Remove words in a vocabulary from the dictionary" ] 'without' :
 
-[ "ps-p" over } vocab "Start a lexically scoped sequence, with the visible words in a new vocabulary" ] '}vocab' :
+  [ "ps-" \
+    request-empty !Vocabulary \
+    @Vocabulary swap : \
+    [ dup lookup-function swap cons @Vocabulary push ] for-each \
+    @Vocabulary without \
+    "Create a new vocabulary" \
+  ] 'vocab' :
+}
 
 
 [ 'invoke<preserving>' ] {
