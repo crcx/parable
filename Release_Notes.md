@@ -19,6 +19,10 @@
 * lookup-function now written in Parable
 * lookup-name now written in Parable
 * added *enquote*
+* get-last-index renamed to get<final-offset>
+* set-last-index renamed to set<final-offset>
+* removed last-index?
+* removed slice-length?
 
 ----
 

@@ -41,8 +41,8 @@
 [ "-p"     `41 ] 'request' :
 [ "p-"     `42 ] 'release' :
 [ "-"      `43 ] 'collect-garbage' :
-[ "p-n"    `44 ] 'get-last-index' :
-[ "np-"    `45 ] 'set-last-index' :
+[ "p-n"    `44 ] 'get<final-offset>' :
+[ "np-"    `45 ] 'set<final-offset>' :
 [ "tpn-"   `46 ] 'store<type>' :
 [ "pn-n"   `47 ] 'fetch<type>' :
 [ "v-vv"   `48 ] 'dup' :
@@ -115,11 +115,9 @@
 
 
 "Slice Functions"
-[ "p-pn"  dup get-last-index ] 'last-index?' :
-[ "p-pn"  last-index? 1 + ] 'slice-length?' :
-[ "np-"   [ get-last-index + ] sip set-last-index ] 'adjust-slice-length' :
+[ "np-"   [ get<final-offset> + ] sip set<final-offset> ] 'adjust-slice-length' :
 [ "p-p"   request [ copy ] sip ] 'duplicate-slice' :
-[ "p-n"   get-last-index 1 + ] 'length?' :
+[ "p-n"   get<final-offset> 1 + ] 'length?' :
 
 
 "Simple variables are just named slices, with functions to access the first element. They're useful for holding single values."
@@ -223,14 +221,14 @@
 "Arrays and Operations on Quotations"
 [ "q-v"  0 fetch ] 'head' :
 [ "q-q"  1 over length? subslice ] 'body' :
-[ "p-v"  slice-length? 1 - fetch ] 'tail' :
+[ "p-v"  dup length? 1 - fetch ] 'tail' :
 
 [ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset' ] ::
 [ "q-" \
   @Found [ @Value [ @XT [ @Source [ @Target [ @Offset [ invoke ] dip !Offset ] dip !Target ] dip !Source ] dip !XT ] dip !Value ] dip !Found ] 'localize' :
 
 [ "vp-"    :p dup length? store ] 'push' :
-[ "p-v"    :p [ dup get-last-index fetch ] sip dup length? 2 - swap set-last-index ] 'pop' :
+[ "p-v"    :p [ dup get<final-offset> fetch ] sip dup length? 2 - swap set<final-offset> ] 'pop' :
 [ "-p"     request [ pop drop ] sip ] 'request-empty' :
 [ "pnp-n"  [ !XT over length? [ over pop @XT invoke ] times nip ] localize ] 'reduce' :
 [ "pp-?"   [ !XT !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke @Offset 1 + !Offset ] times ] localize ] 'for-each' :
@@ -258,7 +256,7 @@
 [ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap : ] [ drop ] if ] 'rename-function' :
 
 "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
-[ "s-s" :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while 1 - [ last-index? 1 + ] dip swap subslice :s ] 'trim-left' :
+[ "s-s" :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while 1 - [ dup get<final-offset> 1 + ] dip swap subslice :s ] 'trim-left' :
 [ "s-s" reverse trim-left reverse :s ] 'trim-right' :
 [ "s-s" trim-right trim-left ] 'trim' :
 
@@ -266,8 +264,8 @@
 "Text Output Buffer"
 'TOB' var
 [ "v-"   &TOB push ] 'to-tob' :
-[ "-..." &TOB get-last-index [ &TOB pop ] times ] 'show-tob' :
-[ "-"    0 &TOB set-last-index ] 'clear-tob' :
+[ "-..." &TOB get<final-offset> [ &TOB pop ] times ] 'show-tob' :
+[ "-"    0 &TOB set<final-offset> ] 'clear-tob' :
 
 
 "Scope"
@@ -347,7 +345,7 @@
   [ "n-"  @Source swap @Value length? + over length? subslice :s !Source ] 'next-piece' :
 
   [ "ss-p" \
-    slice-length? 0 eq? \
+    dup length? 0 eq? \
     [ drop [ :s ] map ] \
     [ :s !Value \
       !Source \
@@ -416,7 +414,7 @@
   [ "s-s"  lookup-function head remark? not check drop ] 'no-comment?' :
   [ "s-f" \
     0 !Probability \
-    slice-length? \
+    dup length? \
     1 eq? [ &initial &no-comment? bi @Probability 2 eq? ] \
           [ &initial &second &no-comment? tri @Probability 3 eq? ] if \
     "Given a function name, try to determine if it is a variable." \
