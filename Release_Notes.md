@@ -13,16 +13,37 @@
 
 ### Standard Library
 
-* index-of now returns #nan when no matching item is in the slice
-* index-of no longer crashes on slices with mixed types
-* find-function now written in Parable
-* lookup-function now written in Parable
-* lookup-name now written in Parable
-* added *enquote*
-* get-last-index renamed to get<final-offset>
-* set-last-index renamed to set<final-offset>
-* removed last-index?
-* removed slice-length?
+* Bugfixes
+
+  * index-of now returns #nan when no matching item is in the slice
+  * index-of no longer crashes on slices with mixed types
+
+* Improvements
+
+  * find-function now written in Parable
+  * lookup-function now written in Parable
+  * lookup-name now written in Parable
+  * log now written in Parable
+  * log10 now written in Parable
+
+* Additions
+
+  * enquote
+  * with
+  * without
+  * vocab
+  * {{
+
+* Removals
+
+  * last-index?
+  * slice-length?
+
+* Renamed
+
+  * get-last-index renamed to get<final-offset>
+  * set-last-index renamed to set<final-offset>
+
 
 ----
 
