@@ -444,7 +444,8 @@ def bytecode_flow_while(opcode, offset, more):
             if precheck([TYPE_FLAG]):
                 a = stack_pop()
             else:
-                abort_run(opcode, offset)
+                if abort_run == False:
+                    abort_run(opcode, offset)
                 a = 0
     else:
         abort_run(opcode, offset)
@@ -459,7 +460,8 @@ def bytecode_flow_until(opcode, offset, more):
             if precheck([TYPE_FLAG]):
                 a = stack_pop()
             else:
-                abort_run(opcode, offset)
+                if abort_run == False:
+                    abort_run(opcode, offset)
                 a = -1
     else:
         abort_run(opcode, offset)
