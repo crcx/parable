@@ -68,11 +68,30 @@
 [ "-p"     `74 "Return an array indicating the size of each slice (in cells). Each index corresponds to a slice; the stored value is the length of the slice." ] 'vm.memory<sizes>' :
 [ "-p"     `75 "Return an array of slice numbers which are currently marked as allocated." ] 'vm.memory<allocated>' :
 
-[ "vV-vVv" [ dup ] dip swap "Put a copy of the second item on top of the stack" ] 'over' :
-[ "vV-VvV" [ swap ] sip "Put a copy of the top item below the second item" ] 'tuck' :
-[ "vV-V"   swap drop "Remove the item below the top item on the stack" ] 'nip' :
-[ "...-"   depth [ drop ] times "Remove all items from the stack" ] 'reset' :
-[ "sp-"    swap : "Attach a name to a slice" ] '.' :
+[ "vV-vVv" \
+  [ dup ] dip swap \
+  "Put a copy of the second item on top of the stack" \
+] 'over' :
+
+[ "vV-VvV" \
+  [ swap ] sip \
+  "Put a copy of the top item below the second item" \
+] 'tuck' :
+
+[ "vV-V" \
+  swap drop \
+  "Remove the item below the top item on the stack" \
+] 'nip' :
+
+[ "...-" \
+  depth [ drop ] times \
+  "Remove all items from the stack" \
+] 'reset' :
+
+[ "sp-" \
+  swap : \
+  "Attach a name to a slice" \
+] '.' :
 
 "Symbolic names for data types"
 [ "-n"  100 "Type constant" ] 'NUMBER' :
@@ -85,31 +104,33 @@
 [ "-n"  800 "Type constant" ] 'FUNCALL' :
 [ "-n"    0 "Type constant" ] 'UNKNOWN' :
 
-[ "v-b" BYTECODE  set-type "Convert value to a BYTECODE" ] ':b' :
-[ "v-n" NUMBER    set-type "Convert value to a NUMBER" ] ':n' :
-[ "v-s" STRING    set-type "Convert value to a STRING" ] ':s' :
-[ "v-c" CHARACTER set-type "Convert value to a CHARACTER" ] ':c' :
-[ "v-p" POINTER   set-type "Convert value to a POINTER" ] ':p' :
-[ "v-f" FLAG      set-type "Convert value to a FLAG" ] ':f' :
-[ "v-f" FUNCALL   set-type "Convert value to a FUNCALL" ] ':x' :
-[ "v-c" REMARK    set-type "Convert value to a REMARK" ] ':r' :
-[ "v-v" UNKNOWN   set-type "Convert value to a UNKNOWN" ] ':u' :
+[ "v-b" BYTECODE  set-type  "Convert value to a BYTECODE" ] ':b' :
+[ "v-n" NUMBER    set-type  "Convert value to a NUMBER" ] ':n' :
+[ "v-s" STRING    set-type  "Convert value to a STRING" ] ':s' :
+[ "v-c" CHARACTER set-type  "Convert value to a CHARACTER" ] ':c' :
+[ "v-p" POINTER   set-type  "Convert value to a POINTER" ] ':p' :
+[ "v-f" FLAG      set-type  "Convert value to a FLAG" ] ':f' :
+[ "v-f" FUNCALL   set-type  "Convert value to a FUNCALL" ] ':x' :
+[ "v-c" REMARK    set-type  "Convert value to a REMARK" ] ':r' :
+[ "v-v" UNKNOWN   set-type  "Convert value to a UNKNOWN" ] ':u' :
 
-[ "v-vf" type? NUMBER    eq? "Return true if value is a NUMBER or false otherwise" ] 'number?' :
-[ "v-vf" type? STRING    eq? "Return true if value is a STRING or false otherwise" ] 'string?' :
-[ "v-vf" type? CHARACTER eq? "Return true if value is a CHARACTER or false otherwise" ] 'character?' :
-[ "v-vf" type? POINTER   eq? "Return true if value is a POINTER or false otherwise" ] 'pointer?' :
-[ "v-vf" type? FLAG      eq? "Return true if value is a FLAG or false otherwise" ] 'flag?' :
-[ "v-vf" type? BYTECODE  eq? "Return true if value is a BYTECODE or false otherwise" ] 'bytecode?' :
-[ "v-vf" type? REMARK    eq? "Return true if value is a REMARK or false otherwise" ] 'remark?' :
-[ "v-vf" type? FUNCALL   eq? "Return true if value is a FUNCALL or false otherwise" ] 'funcall?' :
-[ "v-vf" type? UNKNOWN   eq? "Return true if value is UNKNOWN or false otherwise" ] 'unknown?' :
+[ "v-vf" type? NUMBER    eq?  "Return true if value is a NUMBER or false otherwise" ] 'number?' :
+[ "v-vf" type? STRING    eq?  "Return true if value is a STRING or false otherwise" ] 'string?' :
+[ "v-vf" type? CHARACTER eq?  "Return true if value is a CHARACTER or false otherwise" ] 'character?' :
+[ "v-vf" type? POINTER   eq?  "Return true if value is a POINTER or false otherwise" ] 'pointer?' :
+[ "v-vf" type? FLAG      eq?  "Return true if value is a FLAG or false otherwise" ] 'flag?' :
+[ "v-vf" type? BYTECODE  eq?  "Return true if value is a BYTECODE or false otherwise" ] 'bytecode?' :
+[ "v-vf" type? REMARK    eq?  "Return true if value is a REMARK or false otherwise" ] 'remark?' :
+[ "v-vf" type? FUNCALL   eq?  "Return true if value is a FUNCALL or false otherwise" ] 'funcall?' :
+[ "v-vf" type? UNKNOWN   eq?  "Return true if value is UNKNOWN or false otherwise" ] 'unknown?' :
 
 "Stack Flow"
-[ "vV-vVvV"  over over "Duplicate the top two items on the stack" ] 'dup-pair' :
-[ "vv-"      drop drop "Discard the top two items on the stack" ] 'drop-pair' :
-[ "?n-"      [ drop ] times "Discard an arbitrary number of items from the stack" ] 'drop-multiple' :
-[ "q-...n"   depth [ invoke ] dip depth swap - "Execute a quotation, returning a value indicating th stack depth change as a result" ] 'invoke<depth?>' :
+[ "vV-vVvV"  over over   "Duplicate the top two items on the stack" ] 'dup-pair' :
+[ "vv-"      drop drop   "Discard the top two items on the stack" ] 'drop-pair' :
+[ "?n-"      [ drop ] times   "Discard an arbitrary number of items from the stack" ] 'drop-multiple' :
+[ "q-...n"   depth [ invoke ] dip depth swap - \
+  "Execute a quotation, returning a value indicating th stack depth change as a result" \
+] 'invoke<depth?>' :
 
 
 "Slice Functions"
@@ -117,9 +138,8 @@
   "Given a number, adjust the length of the specified slice by the requested amount." \
 ] 'adjust-slice-length' :
 
-[ "p-p"   request [ copy ] sip "Make a copy of a slice, returning a pointer to the copy" ] 'duplicate-slice' :
-
-[ "p-n"   get<final-offset> 1 + "Return the length of a slice" ] 'length?' :
+[ "p-p"   request [ copy ] sip   "Make a copy of a slice, returning a pointer to the copy" ] 'duplicate-slice' :
+[ "p-n"   get<final-offset> 1 +  "Return the length of a slice" ] 'length?' :
 
 
 "Simple variables are just named slices, with functions to access the first element. They're useful for holding single values."
@@ -129,9 +149,7 @@
 ] 'var!' :
 
 [ "s-"   0 :u swap var! "Create a variable" ] 'var' :
-
 [ "p-"   0 swap 0 store "Set a variable to a value of 0" ] 'off' :
-
 [ "p-"   -1 swap 0 store "Set a variable to a value of -1" ] 'on' :
 
 [ "p-"   [ 0 fetch 1 + ] sip 0 store \
