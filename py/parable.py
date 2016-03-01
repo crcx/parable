@@ -229,7 +229,7 @@ def bytecode_divide(opcode, offset, more):
         a = stack_pop()
         b = stack_pop()
         try:
-            stack_push(b % a, TYPE_NUMBER)
+            stack_push(float(b / a), TYPE_NUMBER)
         except:
             stack_push(float('nan'), TYPE_NUMBER)
             report('E04: Divide by Zero')
@@ -243,7 +243,7 @@ def bytecode_remainder(opcode, offset, more):
         a = stack_pop()
         b = stack_pop()
         try:
-            stack_push(b % a, TYPE_NUMBER)
+            stack_push(float(b % a), TYPE_NUMBER)
         except:
             stack_push(float('nan'), TYPE_NUMBER)
             report('E04: Divide by Zero')

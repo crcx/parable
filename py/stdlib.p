@@ -43,7 +43,7 @@
 [ "np-"    `45 "Set the last index in a slice (can be used to shrink or grow a slice)" ] 'set<final-offset>' :
 [ "tpn-"   `46 "Set the stored type for the value at offset with the slice to the specified type." ] 'store<type>' :
 [ "pn-n"   `47 "Get the stored type for a value within a slice." ] 'fetch<type>' :
-[ "v-vv"   `48 "Duplicate the top value on the stack"] 'dup' :
+[ "v-vv"   `48 "Duplicate the top value on the stack" ] 'dup' :
 [ "v-"     `49 "Discard the top value on the stack" ] 'drop' :
 [ "vV-Vv"  `50 "Switch the positions of the top two items on the stack" ] 'swap' :
 [ "-n"     `51 "Return the number of items on the stack" ] 'depth' :
