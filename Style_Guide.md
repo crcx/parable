@@ -56,7 +56,8 @@ Or:
 ## Comments
 
 * Avoid superfluous comments
-* All functions should have stack comments
+* All functions should have stack comments at the start
+* All permanently named functions should have a descriptive comment at the end
 
 Stack comments in Parable are a compact form, using short codes in place of actual words. These codes are listed in the next section.
 
