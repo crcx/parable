@@ -460,7 +460,7 @@ def bytecode_flow_until(opcode, offset, more):
                 a = stack_pop()
             else:
                 abort_run(opcode, offset)
-                a = 0
+                a = -1
     else:
         abort_run(opcode, offset)
 
