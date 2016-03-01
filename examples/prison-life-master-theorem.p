@@ -53,20 +53,19 @@
 
 "We will build a string to hold the answer."
 
-    new-buffer
-    #4 #4 tap buffer-store
-    #2 #3 tap buffer-store
-    #1 #5 tap buffer-store
-    #1 #2 tap buffer-store
-    #2 #4 tap buffer-store
-    #4 #2 tap buffer-store
-    #1 #4 tap buffer-store
-    #3 #2 tap buffer-store
-    #1 #1 tap buffer-store
-    #3 #3 tap buffer-store
-    #0 buffer-store
+    request-empty 'answer' var!
+    #4 #4 tap @answer push
+    #2 #3 tap @answer push
+    #1 #5 tap @answer push
+    #1 #2 tap @answer push
+    #2 #4 tap @answer push
+    #4 #2 tap @answer push
+    #1 #4 tap @answer push
+    #3 #2 tap @answer push
+    #1 #1 tap @answer push
+    #3 #3 tap @answer push
 
-    @CurrentBuffer :p :s
+    @answer :p :s
 
 "And now we have the final clue needed to solve the puzzle:"
 
