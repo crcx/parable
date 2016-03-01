@@ -244,28 +244,50 @@
 
 
 "Programatic Creation of Quotes"
-[ "vv-p"  swap request [ 0 store ] sip [ 1 store ] sip ] 'cons' :
-[ "vp-p"  :x cons ] 'curry' :
-[ "p-p"   :x request [ 0 store ] sip ] 'enquote' :
+[ "vv-p"  swap request [ 0 store ] sip [ 1 store ] sip \
+  "Bind two values into a new slice" \
+] 'cons' :
+[ "vp-p"  :x cons "Bind a value and a quote, returning a new quote which executes the specified one against the provided value" ] 'curry' :
+[ "p-p"   :x request [ 0 store ] sip "Wrap a pointer into a new quote, converting the pointer into a FUNCALL" ] 'enquote' :
 
 "Arrays and Operations on Quotations"
-[ "q-v"  0 fetch ] 'head' :
+[ "q-v"  0 fetch "Return the first item in a slice" ] 'head' :
 [ "q-q"  1 over length? subslice ] 'body' :
-[ "p-v"  dup length? 1 - fetch ] 'tail' :
+[ "p-v"  dup length? 1 - fetch "Return the second through last items in a slice" "Return the last item in a slice" ] 'tail' :
 
 [ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset' ] ::
 [ "q-" \
   @Found [ @Value [ @XT [ @Source [ @Target [ @Offset [ invoke ] dip !Offset ] dip !Target ] dip !Source ] dip !XT ] dip !Value ] dip !Found ] 'localize' :
 
-[ "vp-"    :p dup length? store ] 'push' :
-[ "p-v"    :p [ dup get<final-offset> fetch ] sip dup length? 2 - swap set<final-offset> ] 'pop' :
-[ "-p"     request [ pop drop ] sip ] 'request-empty' :
-[ "pnp-n"  [ !XT over length? [ over pop @XT invoke ] times nip ] localize ] 'reduce' :
-[ "pp-?"   [ !XT !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke @Offset 1 + !Offset ] times ] localize ] 'for-each' :
-[ "pv-f"   false !Found !Value dup length? 0 swap [ dup-pair fetch @Value types-match? [ eq? @Found or :f !Found ] [ drop-pair ] if 1 + ] times drop-pair @Found ] 'contains?' :
-[ "pq-p"   [ !XT !Source request-empty !Target 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke [ @Source @Offset fetch @Target push ] if-true @Offset 1 + !Offset ] times @Target ] localize ] 'filter' :
-[ "pq-"    [ !XT duplicate-slice !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke @Source @Offset store @Offset 1 + !Offset ] times @Source ] localize ] 'map' :
-[ "p-p"    [ request !Target invoke<depth?> 0 max [ @Target push ] times @Target 1 over length? subslice :p ] localize ] 'capture-results' :
+[ "vp-"    :p dup length? store "Append a value to the specified slice. This modifies the original slice." ] 'push' :
+
+[ "p-v"    :p [ dup get<final-offset> fetch ] sip dup length? 2 - swap set<final-offset> "Remove the last value from the specified slice. This modifies the original slice." ] 'pop' :
+
+[ "-p"     request [ pop drop ] sip "Request a slice with no stored values" ] 'request-empty' :
+
+[ "pnp-n"  [ !XT over length? [ over pop @XT invoke ] times nip ] localize \
+  "Takes a slice, a starting value, and a quote. It executes the quote once for each item in the slice, passing the item and the value to the quote. The quote should consume both and return a new value." \
+] 'reduce' :
+
+[ "pp-?"   [ !XT !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke @Offset 1 + !Offset ] times ] localize \
+  "Takes a slice and a quotation. It then executes the quote once for each item in the slice, passing the individual items to the quote." \
+] 'for-each' :
+
+[ "pv-f"   false !Found !Value dup length? 0 swap [ dup-pair fetch @Value types-match? [ eq? @Found or :f !Found ] [ drop-pair ] if 1 + ] times drop-pair @Found \
+  "Given a slice and a value, return true if the value is found in the slice, or false otherwise." \
+ ] 'contains?' :
+
+[ "pq-p"   [ !XT !Source request-empty !Target 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke [ @Source @Offset fetch @Target push ] if-true @Offset 1 + !Offset ] times @Target ] localize \
+  "Given a slice and a quotation, this will pass each value to the quotation (executing it once per item in the slice). The quotation should return a Boolean flag. If the flag is true, copy the value to a new slice. Otherwise discard it." \
+] 'filter' :
+
+[ "pq-"    [ !XT duplicate-slice !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke @Source @Offset store @Offset 1 + !Offset ] times @Source ] localize \
+  "Given a pointer to an array and a quotation, execute the quotation once for each item in the array. Construct a new array from the value returned by the quotation and return a pointer to it." \
+] 'map' :
+
+[ "p-p"    [ request !Target invoke<depth?> 0 max [ @Target push ] times @Target 1 over length? subslice :p ] localize \
+  "Invoke a quote and capture the results into a new array" \
+] 'capture-results' :
 
 [ "pv-n" \
   [ dup-pair !Value !Source \
@@ -273,34 +295,37 @@
     [ 0 !Offset #nan !Found @Source length? [ @Source @Offset fetch @Value types-match? [ eq? [ @Offset !Found ] if-true ] [ drop-pair ] if @Offset 1 + !Offset ] times @Found ] \
     [ #nan ] if \
   ] localize \
+  "Given a slice and a value, return the offset the value is located at, or #nan if not found" \
 ] 'index-of' :
 
 [ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset'  'localize' ] hide-functions
 
 
-[ "s-f"  vm.dict<names> swap contains? ] 'function-exists?' :
-[ "s-p"  vm.dict<names> swap index-of vm.dict<slices> swap fetch ] 'lookup-function' :
-[ "p-s"  :p vm.dict<slices> over contains? [ vm.dict<slices> swap index-of vm.dict<names> swap fetch ] [ drop '' ] if ] 'lookup-name' :
+[ "s-f"  vm.dict<names> swap contains? "Return true if the named function exists or false otherwise" ] 'function-exists?' :
+
+[ "s-p"  vm.dict<names> swap index-of vm.dict<slices> swap fetch "Return a pointer to the named function if it exists, or #nan otherwise" ] 'lookup-function' :
+
+[ "p-s"  :p vm.dict<slices> over contains? [ vm.dict<slices> swap index-of vm.dict<names> swap fetch ] [ drop '' ] if "If the pointer corresponds to a named item, return the name. Otherwise return an empty string." ] 'lookup-name' :
 
 
-[ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap : ] [ drop ] if ] 'rename-function' :
+[ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap : ] [ drop ] if "Change a name from s1 to s2" ] 'rename-function' :
 
 "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
-[ "s-s" :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while 1 - [ dup get<final-offset> 1 + ] dip swap subslice :s ] 'trim-left' :
-[ "s-s" reverse trim-left reverse :s ] 'trim-right' :
-[ "s-s" trim-right trim-left ] 'trim' :
+[ "s-s" :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while 1 - [ dup get<final-offset> 1 + ] dip swap subslice :s "Remove leading whitespace from a string" ] 'trim-left' :
+[ "s-s" reverse trim-left reverse :s "Remove trailing whitespace from a string" ] 'trim-right' :
+[ "s-s" trim-right trim-left "Remove leading and trailing whitespace from a string" ] 'trim' :
 
 
 "Text Output Buffer"
 'TOB' var
-[ "v-"   &TOB push ] 'to-tob' :
-[ "-..." &TOB get<final-offset> [ &TOB pop ] times ] 'show-tob' :
-[ "-"    0 &TOB set<final-offset> ] 'clear-tob' :
+[ "v-"   &TOB push "Append a value to the TOB" ] 'to-tob' :
+[ "-..." &TOB get<final-offset> [ &TOB pop ] times "Push each item in the TOB to the stack" ] 'show-tob' :
+[ "-"    0 &TOB set<final-offset> "Remove all items in the TOB" ] 'clear-tob' :
 
 
 "Scope"
 [ 'Public'  'Private' ] ::
-[ "-" vm.dict<names> !Private ] '{' :
+[ "-" vm.dict<names> !Private "Begin a lexically scoped area" ] '{' :
 [ "p-" \
   [ string? nip ] filter !Public \
   "Extract names in scope" \
@@ -311,6 +336,7 @@
   \
   "Hide the remaining names" \
   [ hide-function ] for-each \
+  "End a lexically scoped region, removing any headers not specified in the provided array." \
 ] '}' :
 [ 'Public'  'Private' ] hide-functions
 
@@ -347,6 +373,7 @@
         @Prior length? [ @Prior pop @List pop 0 store ] times \
       ] dip !List \
     ] dip !Prior \
+    "Executes the code quotation, preserving and restoring the contents of the variables specified." \
   ] 'invoke<preserving>' :
 }
 
@@ -359,18 +386,19 @@
       @A length? [ @A head @B head @X invoke @C push @A body !A @B body !B ] times \
       @C duplicate-slice \
     ] invoke<preserving> \
+    "For each item in source1, push the item and the corresponding item from source2 to the stack. Execute the specified code. Push results into a new array, repeating until all items are exhausted. Returns the new array. This expects the code to return a single value as a result. It also assumes that both sources are the same size (or at least that the second does not contain less than the first" \
   ] 'zip' :
 }
 
 
 "Hashing functions"
 389 'Hash-Prime' var!
-[ "s-n" 0 swap [ :n xor ] for-each ] 'hash:xor' :
-[ "s-n" 5381 swap [ over -5 shift + + ] for-each ] 'hash:djb2' :
+[ "s-n" 0 swap [ :n xor ] for-each "Hash a string using the XOR algorithim" ] 'hash:xor' :
+[ "s-n" 5381 swap [ over -5 shift + + ] for-each "Hash a string using the DJB2 algorithim" ] 'hash:djb2' :
 [ :n over -6 shift + over -16 shift + swap - ] 'hash:sdbm<n>' :
-[ "s-n" 0 swap [ :c swap hash:sdbm<n> ] for-each ] 'hash:sdbm' :
-[ "s-b" hash:djb2 ] 'chosen-hash' :
-[ "s-n" chosen-hash @Hash-Prime rem ] 'hash' :
+[ "s-n" 0 swap [ :c swap hash:sdbm<n> ] for-each "Hash a string using the SDBM algorithim" ] 'hash:sdbm' :
+[ "s-b" hash:djb2 "The preferred hash algorithim (defaults to DJB2)" ] 'chosen-hash' :
+[ "s-n" chosen-hash @Hash-Prime rem "Hash a string using chosen-hash and HashPrime" ] 'hash' :
 'hash:sdbm<n>' hide-function
 
 
@@ -386,6 +414,7 @@
         @Offset 1 + !Offset @Done \
       ] until \
     ] invoke<preserving> \
+    "Takes a pointer to a set of quotations. Each quote in the set should consist of two other quotes: one that returns a flag, and one to be executed if the condition returns true. Executes each until one returns true, then exits." \
   ] 'when' :
 }
 
@@ -407,6 +436,7 @@
       ] while \
       @Target \
     ] if \
+    "Given a string and a delimiter, split the string into an array" \
   ] 'split' :
 
   [ "pv-s" \
@@ -414,12 +444,13 @@
     reverse '' [ :s + @Value + ] reduce \
     "This leaves the join value appended to the string. Remove it." \
     0 over length? @Value length? - subslice :s \
+    "Given an array of values and a string, convert each value to a string and merge, using the provided string between them" \
   ] 'join' :
 }
 
-[ "s-s"  [ :n 32 128 between? ] filter :s ] 'clean-string' :
+[ "s-s"  [ :n 32 128 between? ] filter :s "Remove any non-printable characters from a string" ] 'clean-string' :
 
-[ "sss-s"  [ split ] dip join clean-string ] 'replace' :
+[ "sss-s"  [ split ] dip join clean-string "Replace all instances of s2 in s1 with s3" ] 'replace' :
 
 
 [ 'interpolate' ] {
@@ -437,6 +468,7 @@
       "Merge any remaining items" \
       @String @Source '' join + clean-string \
     ] invoke<preserving> \
+    "Given an array of values and a string with insertion points, construct a new string, copying the values into the insertion points." \
   ] 'interpolate' :
 }
 
@@ -452,6 +484,7 @@
       [ @D length? @L lt? dup [ @D pop drop ] if-false ] until \
       @D @S interpolate \
     ] invoke<preserving> \
+    "Given an array of values and a string with insertion points, construct a new string, copying the values into the insertion points. If the array of values is less than the number of insertion points, cycle through them again." \
   ] 'interpolate<cycling>' :
 }
 
@@ -486,6 +519,7 @@
     ] \
     [ 'function "' swap + '" not found' + report-error ] \
     if \
+    "Lookup the stack comment and description (if existing) for a named item" \
   ] '?' :
 }
 
@@ -499,6 +533,7 @@
     depth [ @S push ] times \
     @S reverse dup !S invoke \
     @S \
+    "Return an array with the items currently on the stack" \
   ] 'stack-values' :
 }
 
