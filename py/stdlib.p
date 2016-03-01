@@ -1,125 +1,129 @@
 "Name the byte codes"
-[ "-"      `0 ] 'nop' :
-[ "vt-v"   `1 ] 'set-type' :
-[ "v-vn"   `2 ] 'type?' :
-[ "nn-n"   `3 ] '+' :
-[ "nn-n"   `4 ] '-' :
-[ "nn-n"   `5 ] '*' :
-[ "nn-n"   `6 ] '/' :
-[ "nn-n"   `7 ] 'rem' :
-[ "n-n"    `8 ] 'floor' :
-[ "nn-n"   `9 ] '^' :
-[ "nn-n"   `12 ] 'log<n>' :
-[ "nn-n"   `13 ] 'shift' :
-[ "nn-n"   `14 ] 'and' :
-[ "nn-n"   `15 ] 'or' :
-[ "nn-n"   `16 ] 'xor' :
-[ "-n"     `17 ] 'random' :
-[ "n-n"    `18 ] 'sqrt' :
-[ "n-n"    `19 ] 'round' :
-[ "nn-f"   `20 ] 'lt?' :
-[ "nn-f"   `21 ] 'gt?' :
-[ "nn-f"   `22 ] 'lteq?' :
-[ "nn-f"   `23 ] 'gteq?' :
-[ "vv-f"   `24 ] 'eq?' :
-[ "vv-f"   `25 ] '-eq?' :
-[ "fpp-"   `26 ] 'if' :
-[ "p-"     `27 ] 'while' :
-[ "p-"     `28 ] 'until' :
-[ "np-"    `29 ] 'times' :
-[ "p-"     `31 ] 'invoke' :
-[ "vp-v"   `32 ] 'dip' :
-[ "vp-v"   `33 ] 'sip' :
-[ "vpp-?"  `34 ] 'bi' :
-[ "vppp-?" `35 ] 'tri' :
-[ "-"      `36 ] 'abort' :
-[ "pp-"    `38 ] 'copy' :
-[ "pn-v"   `39 ] 'fetch' :
-[ "vpn-"   `40 ] 'store' :
-[ "-p"     `41 ] 'request' :
-[ "p-"     `42 ] 'release' :
-[ "-"      `43 ] 'collect-garbage' :
-[ "p-n"    `44 ] 'get<final-offset>' :
-[ "np-"    `45 ] 'set<final-offset>' :
-[ "tpn-"   `46 ] 'store<type>' :
-[ "pn-n"   `47 ] 'fetch<type>' :
-[ "v-vv"   `48 ] 'dup' :
-[ "v-"     `49 ] 'drop' :
-[ "vV-Vv"  `50 ] 'swap' :
-[ "-n"     `51 ] 'depth' :
-[ "s-"     `55 ] 'hide-function' :
-[ "ss-n"   `57 ] 'find' :
-[ "pnn-p"  `58 ] 'subslice' :
-[ "s-f"    `59 ] 'numeric?' :
-[ "p-p"    `60 ] 'reverse' :
-[ "v-v"    `61 ] 'to-lowercase' :
-[ "v-v"    `62 ] 'to-uppercase' :
-[ "s-"     `63 ] 'report-error' :
-[ "-p"     `64 ] 'vm.dict<names>' :
-[ "-p"     `65 ] 'vm.dict<slices>' :
-[ "n-n"    `66 ] 'sin' :
-[ "n-n"    `67 ] 'cos' :
-[ "n-n"    `68 ] 'tan' :
-[ "n-n"    `69 ] 'asin' :
-[ "n-n"    `70 ] 'acos' :
-[ "n-n"    `71 ] 'atan' :
-[ "n-n"    `72 ] 'atan2' :
-[ "-p"     `73 ] 'vm.memory<map>' :
-[ "-p"     `74 ] 'vm.memory<sizes>' :
-[ "-p"     `75 ] 'vm.memory<allocated>' :
+[ "-"      `0  "Does nothing" ] 'nop' :
+[ "vt-v"   `1  "Convert a value to the specified type" ] 'set-type' :
+[ "v-vn"   `2  "Return the type constant for a value" ] 'type?' :
+[ "nn-n"   `3  "Add two numbers or concatenate two strings, remarks, or slices" ] '+' :
+[ "nn-n"   `4  "Subtract n2 from n1" ] '-' :
+[ "nn-n"   `5. "Multiply two numbers" ] '*' :
+[ "nn-n"   `6  "Divide n1 by n2" ] '/' :
+[ "nn-n"   `7  "Divide n1 by n2, returning the remainder" ] 'rem' :
+[ "n-n"    `8  "Return the smallest integer less than or equal to the starting value" ] 'floor' :
+[ "nn-n"   `9  "Return n1 to the power n2" ] '^' :
+[ "nn-n"   `12 "Return the logarithim of a number in the specified base" ] 'log<n>' :
+[ "nn-n"   `13 "Perform a bitwise shift" ] 'shift' :
+[ "nn-n"   `14 "Bitwise AND operation" ] 'and' :
+[ "nn-n"   `15 "Bitwise OR operation" ] 'or' :
+[ "nn-n"   `16 "Bitwise XOR operation" ] 'xor' :
+[ "-n"     `17 "Return a random number" ] 'random' :
+[ "n-n"    `18 "Obtain the square root of a number" ] 'sqrt' :
+[ "n-n"    `19 "Round a number to the nearest integer value" ] 'round' :
+[ "nn-f"   `20 "True if n1 < n2 or false otherwise" ] 'lt?' :
+[ "nn-f"   `21 "True if n1 > n2 or false otherwise" ] 'gt?' :
+[ "nn-f"   `22 "True if n1 <= n2 or false otherwise" ] 'lteq?' :
+[ "nn-f"   `23 "True if n1 >= n2 or false otherwise" ] 'gteq?' :
+[ "vv-f"   `24 "True if n1 == n2 or false otherwise" ] 'eq?' :
+[ "vv-f"   `25 "True if n1 != n2 or false otherwise" ] '-eq?' :
+[ "fpp-"   `26 "If flag is true, invoke p1; otherwise invoke p2" ] 'if' :
+[ "p-"     `27 "Invoke p (which should return a flag) until the returned flag is false" ] 'while' :
+[ "p-"     `28 "Invoke p (which should return a flag) until the returned flag is true" ] 'until' :
+[ "np-"    `29 "Invoke slice p the specified number of times" ] 'times' :
+[ "p-"     `31 "Run the code in slice p" ] 'invoke' :
+[ "vp-v"   `32 "Remove value and invoke the quote. Restore value when execution completes." ] 'dip' :
+[ "vp-v"   `33 "Invoke the quote. After execution complets, restore a copy of the value to the stack" ] 'sip' :
+[ "vpp-?"  `34 "Apply each quote to a copy of the value" ] 'bi' :
+[ "vppp-?" `35 "Apply each quote to a copy of the value" ] 'tri' :
+[ "-"      `36 "Abort the current execution cycle" ] 'abort' :
+[ "pp-"    `38 "Copy the contents of the first slice to the second one" ] 'copy' :
+[ "pn-v"   `39 "Fetch a value stored at the specified offset within the specified slice" ] 'fetch' :
+[ "vpn-"   `40 "Store a value into the specified offset within the specified slice" ] 'store' :
+[ "-p"     `41 "Request a new slice and return a pointer to it" ] 'request' :
+[ "p-"     `42 "Release a previously allocated slice" ] 'release' :
+[ "-"      `43 "Tell Parable that this is a good time to scan memory for unused slices and reclaim them" ] 'collect-garbage' :
+[ "p-n"    `44 "Return the last offset in a slice" ] 'get<final-offset>' :
+[ "np-"    `45 "Set the last index in a slice (can be used to shrink or grow a slice)" ] 'set<final-offset>' :
+[ "tpn-"   `46 "Set the stored type for the value at offset with the slice to the specified type." ] 'store<type>' :
+[ "pn-n"   `47 "Get the stored type for a value within a slice." ] 'fetch<type>' :
+[ "v-vv"   `48 "Duplicate the top value on the stack"] 'dup' :
+[ "v-"     `49 "Discard the top value on the stack" ] 'drop' :
+[ "vV-Vv"  `50 "Switch the positions of the top two items on the stack" ] 'swap' :
+[ "-n"     `51 "Return the number of items on the stack" ] 'depth' :
+[ "s-"     `55 "Remove the named item from the dictionary" ] 'hide-function' :
+[ "ss-n"   `57 "Search for substring (s2) in a source string (s1). Returns #nan if not found." ] 'find' :
+[ "pnn-p"  `58 "Return a new slice containing the contents of the original slice, starting from the specified offset and ending at (but not including) the ending offset." ] 'subslice' :
+[ "s-f"    `59 "If string can be converted to a number, return true, otherwise return false" ] 'numeric?' :
+[ "p-p"    `60 "Reverse the order of items in a slice. This modifies the original slice." ] 'reverse' :
+[ "v-v"    `61 "Convert a string or character to lowercase" ] 'to-lowercase' :
+[ "v-v"    `62 "Convert a string or character to uppercase" ] 'to-uppercase' :
+[ "s-"     `63 "Add a string to the error log" ] 'report-error' :
+[ "-p"     `64 "Return an array of strings corresponding to names in the dictionary" ] 'vm.dict<names>' :
+[ "-p"     `65 "Return an array of slices corresponding to the named items in the dictionary" ] 'vm.dict<slices>' :
+[ "n-n"    `66 "Return the sine of a number" ] 'sin' :
+[ "n-n"    `67 "Return the cosine of a number" ] 'cos' :
+[ "n-n"    `68 "Return the tangent of a number" ] 'tan' :
+[ "n-n"    `69 "Return the arc sine of a number" ] 'asin' :
+[ "n-n"    `70 "Return the arc cosine of a number" ] 'acos' :
+[ "n-n"    `71 "Return the arc tangent of a number" ] 'atan' :
+[ "n-n"    `72 "Return the arc tangent of a number" ] 'atan2' :
+[ "-p"     `73 "Return an array indicating which slices are allocated and which are free. Each index corresponds to a slice. If the stored value is 0, the slice is free. If 1, the slice is allocated." ] 'vm.memory<map>' :
+[ "-p"     `74 "Return an array indicating the size of each slice (in cells). Each index corresponds to a slice; the stored value is the length of the slice." ] 'vm.memory<sizes>' :
+[ "-p"     `75 "Return an array of slice numbers which are currently marked as allocated." ] 'vm.memory<allocated>' :
 
-[ "vV-vVv" [ dup ] dip swap ] 'over' :
-[ "vV-VvV" [ swap ] sip ] 'tuck' :
-[ "vV-V"   swap drop ] 'nip' :
-[ "...-"   depth [ drop ] times ] 'reset' :
-[ "sp-"    swap : ] '.' :
+[ "vV-vVv" [ dup ] dip swap "Put a copy of the second item on top of the stack" ] 'over' :
+[ "vV-VvV" [ swap ] sip "Put a copy of the top item below the second item" ] 'tuck' :
+[ "vV-V"   swap drop "Remove the item below the top item on the stack" ] 'nip' :
+[ "...-"   depth [ drop ] times "Remove all items from the stack" ] 'reset' :
+[ "sp-"    swap : "Attach a name to a slice" ] '.' :
 
 "Symbolic names for data types"
-[ "-n"  100 ] 'NUMBER' :
-[ "-n"  200 ] 'STRING' :
-[ "-n"  300 ] 'CHARACTER' :
-[ "-n"  400 ] 'POINTER' :
-[ "-n"  500 ] 'FLAG' :
-[ "-n"  600 ] 'BYTECODE' :
-[ "-n"  700 ] 'REMARK' :
-[ "-n"  800 ] 'FUNCALL' :
-[ "-n"    0 ] 'UNKNOWN' :
+[ "-n"  100 "Type constant" ] 'NUMBER' :
+[ "-n"  200 "Type constant" ] 'STRING' :
+[ "-n"  300 "Type constant" ] 'CHARACTER' :
+[ "-n"  400 "Type constant" ] 'POINTER' :
+[ "-n"  500 "Type constant" ] 'FLAG' :
+[ "-n"  600 "Type constant" ] 'BYTECODE' :
+[ "-n"  700 "Type constant" ] 'REMARK' :
+[ "-n"  800 "Type constant" ] 'FUNCALL' :
+[ "-n"    0 "Type constant" ] 'UNKNOWN' :
 
-[ "v-b" BYTECODE  set-type ] ':b' :
-[ "v-n" NUMBER    set-type ] ':n' :
-[ "v-s" STRING    set-type ] ':s' :
-[ "v-c" CHARACTER set-type ] ':c' :
-[ "v-p" POINTER   set-type ] ':p' :
-[ "v-f" FLAG      set-type ] ':f' :
-[ "v-f" FUNCALL   set-type ] ':x' :
-[ "v-c" REMARK    set-type ] ':r' :
-[ "v-v" UNKNOWN   set-type ] ':u' :
+[ "v-b" BYTECODE  set-type "Convert value to a BYTECODE" ] ':b' :
+[ "v-n" NUMBER    set-type "Convert value to a NUMBER" ] ':n' :
+[ "v-s" STRING    set-type "Convert value to a STRING" ] ':s' :
+[ "v-c" CHARACTER set-type "Convert value to a CHARACTER" ] ':c' :
+[ "v-p" POINTER   set-type "Convert value to a POINTER" ] ':p' :
+[ "v-f" FLAG      set-type "Convert value to a FLAG" ] ':f' :
+[ "v-f" FUNCALL   set-type "Convert value to a FUNCALL" ] ':x' :
+[ "v-c" REMARK    set-type "Convert value to a REMARK" ] ':r' :
+[ "v-v" UNKNOWN   set-type "Convert value to a UNKNOWN" ] ':u' :
 
-[ "v-vf" type? NUMBER    eq? ] 'number?' :
-[ "v-vf" type? STRING    eq? ] 'string?' :
-[ "v-vf" type? CHARACTER eq? ] 'character?' :
-[ "v-vf" type? POINTER   eq? ] 'pointer?' :
-[ "v-vf" type? FLAG      eq? ] 'flag?' :
-[ "v-vf" type? BYTECODE  eq? ] 'bytecode?' :
-[ "v-vf" type? REMARK    eq? ] 'remark?' :
-[ "v-vf" type? FUNCALL   eq? ] 'funcall?' :
-[ "v-vf" type? UNKNOWN   eq? ] 'unknown?' :
+[ "v-vf" type? NUMBER    eq? "Return true if value is a NUMBER or false otherwise" ] 'number?' :
+[ "v-vf" type? STRING    eq? "Return true if value is a STRING or false otherwise" ] 'string?' :
+[ "v-vf" type? CHARACTER eq? "Return true if value is a CHARACTER or false otherwise" ] 'character?' :
+[ "v-vf" type? POINTER   eq? "Return true if value is a POINTER or false otherwise" ] 'pointer?' :
+[ "v-vf" type? FLAG      eq? "Return true if value is a FLAG or false otherwise" ] 'flag?' :
+[ "v-vf" type? BYTECODE  eq? "Return true if value is a BYTECODE or false otherwise" ] 'bytecode?' :
+[ "v-vf" type? REMARK    eq? "Return true if value is a REMARK or false otherwise" ] 'remark?' :
+[ "v-vf" type? FUNCALL   eq? "Return true if value is a FUNCALL or false otherwise" ] 'funcall?' :
+[ "v-vf" type? UNKNOWN   eq? "Return true if value is UNKNOWN or false otherwise" ] 'unknown?' :
 
 "Stack Flow"
-[ "vV-vVvV"  over over ] 'dup-pair' :
-[ "vv-"      drop drop ] 'drop-pair' :
-[ "?n-"      [ drop ] times ] 'drop-multiple' :
-[ "q-...n"   depth [ invoke ] dip depth swap - ] 'invoke<depth?>' :
+[ "vV-vVvV"  over over "Duplicate the top two items on the stack" ] 'dup-pair' :
+[ "vv-"      drop drop "Discard the top two items on the stack" ] 'drop-pair' :
+[ "?n-"      [ drop ] times "Discard an arbitrary number of items from the stack" ] 'drop-multiple' :
+[ "q-...n"   depth [ invoke ] dip depth swap - "Execute a quotation, returning a value indicating th stack depth change as a result" ] 'invoke<depth?>' :
 
 
 "Slice Functions"
-[ "np-"   [ get<final-offset> + ] sip set<final-offset> ] 'adjust-slice-length' :
-[ "p-p"   request [ copy ] sip ] 'duplicate-slice' :
-[ "p-n"   get<final-offset> 1 + ] 'length?' :
+[ "np-"   [ get<final-offset> + ] sip set<final-offset> \
+  "Given a number, adjust the length of the specified slice by the requested amount." \
+] 'adjust-slice-length' :
+[ "p-p"   request [ copy ] sip "Make a copy of a slice, returning a pointer to the copy" ] 'duplicate-slice' :
+[ "p-n"   get<final-offset> 1 + "Return the length of a slice" ] 'length?' :
 
 
 "Simple variables are just named slices, with functions to access the first element. They're useful for holding single values."
-[ "vs-"  [ request [ 0 store ] sip ] dip : ] 'var!' :
+[ "vs-"  [ request [ 0 store ] sip ] dip : \
+  "Create a variable with an initial value" \
+] 'var!' :
 [ "s-"   0 :u swap var! ] 'var' :
 [ "p-"   0 swap 0 store ] 'off' :
 [ "p-"   -1 swap 0 store ] 'on' :
