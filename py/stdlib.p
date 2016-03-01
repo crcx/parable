@@ -283,7 +283,7 @@
 [ 'Public'  'Private' ] hide-functions
 
 "Vocabularies"
-[ 'with' 'without' 'vocab' '}vocab' ] {
+[ 'with' 'without' 'vocab' '}vocab' '}}' ] {
   [ 'Vocabulary' ] ::
 
   [ "p-"  [ invoke : ] for-each "Add words in a vocabulary to the dictionary" ] 'with' :
@@ -296,6 +296,11 @@
     @Vocabulary without \
     "Create a new vocabulary" \
   ] 'vocab' :
+
+  [ "ps-" \
+    over } vocab \
+    "Close a lexical scope and create a vocabulary with the exposed functions" \
+  ] '}}' :
 }
 
 
