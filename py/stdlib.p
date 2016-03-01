@@ -116,27 +116,43 @@
 [ "np-"   [ get<final-offset> + ] sip set<final-offset> \
   "Given a number, adjust the length of the specified slice by the requested amount." \
 ] 'adjust-slice-length' :
+
 [ "p-p"   request [ copy ] sip "Make a copy of a slice, returning a pointer to the copy" ] 'duplicate-slice' :
+
 [ "p-n"   get<final-offset> 1 + "Return the length of a slice" ] 'length?' :
 
 
 "Simple variables are just named slices, with functions to access the first element. They're useful for holding single values."
+
 [ "vs-"  [ request [ 0 store ] sip ] dip : \
   "Create a variable with an initial value" \
 ] 'var!' :
-[ "s-"   0 :u swap var! ] 'var' :
-[ "p-"   0 swap 0 store ] 'off' :
-[ "p-"   -1 swap 0 store ] 'on' :
-[ "p-"   [ 0 fetch 1 + ] sip 0 store ] 'increment' :
-[ "p-"   [ 0 fetch 1 - ] sip 0 store ] 'decrement' :
-[ "p-"   request swap copy ] 'zero-out' :
-[ "pp-"  swap request dup-pair copy swap [ [ invoke ] dip ] dip copy ] 'preserve' :
+
+[ "s-"   0 :u swap var! "Create a variable" ] 'var' :
+
+[ "p-"   0 swap 0 store "Set a variable to a value of 0" ] 'off' :
+
+[ "p-"   -1 swap 0 store "Set a variable to a value of -1" ] 'on' :
+
+[ "p-"   [ 0 fetch 1 + ] sip 0 store \
+  "Increment a variables value by 1" \
+] 'increment' :
+
+[ "p-"   [ 0 fetch 1 - ] sip 0 store \
+  "Increment a variables value by 1" \
+] 'decrement' :
+
+[ "p-"   request swap copy "Erase all values in a slice" ] 'zero-out' :
+
+[ "pp-"  swap request dup-pair copy swap [ [ invoke ] dip ] dip copy \
+  "Backup the contents of a slice and remove the pointer from the stack. Execute the quotation. Then restore the contents of the specified slice to their original state." \
+] 'preserve' :
 
 
 "Number functions"
-[ "nn-n"  over over lt? [ nip ] [ drop ] if ] 'max' :
-[ "nn-n"  over over gt? [ nip ] [ drop ] if ] 'min' :
-[ "n-n"   dup -1 * max ] 'abs' :
+[ "nn-n"  over over lt? [ nip ] [ drop ] if "Return the greater of two values" ] 'max' :
+[ "nn-n"  over over gt? [ nip ] [ drop ] if "Return the smaller of two values" ] 'min' :
+[ "n-n"   dup -1 * max "Return the absolute value of a number" ] 'abs' :
 
 "The basic bi/tri combinators provided as part of the primitives allow application of multiple quotes to a single data element. Here we add new forms that are very useful."
 "We consider the bi/tri variants to consist of one of three types."
@@ -144,58 +160,70 @@
 
 
 "Spread combinators (bi*, tri*) apply multiple quotations to multiple values."
-[ "vvpp-?"   [ dip ] dip invoke ] 'bi*' :
-[ "vvvppp-?" [ [ swap [ dip ] dip ] dip dip ] dip invoke ] 'tri*' :
+[ "vvpp-?"   [ dip ] dip invoke "Invoke p1 against v1 and p2 against v2" ] 'bi*' :
+
+[ "vvvppp-?" [ [ swap [ dip ] dip ] dip dip ] dip invoke \
+  "Invoke p1 against v1, p2 against v2, and p3 against v3" \
+] 'tri*' :
 
 
 "Apply combinators (bi@, tri@) apply a single quotation to multiple values."
-[ "vvp-?"    dup bi* ] 'bi@' :
-[ "vvvp-?"   dup dup tri* ] 'tri@' :
+[ "vvp-?"    dup bi* "Invoke p1 against v1 and again against v2" ] 'bi@' :
+[ "vvvp-?"   dup dup tri* "Invoke p1 against v1, then v2, then v3" ] 'tri@' :
 
 
 "Expand the basic conditionals into a more useful set."
-[ "s-"   report-error abort ] 'abort<with-error>' :
-[ "-f"   -1 :f ] 'true' :
-[ "-f"   0  :f ] 'false' :
-[ "f-f"  :f :n -1 xor :f ] 'not' :
-[ "fp-"  [ ] if ] 'if-true' :
-[ "fp-"  [ ] swap if ] 'if-false' :
-[ "v-f"  :s 'nan' eq? ] 'nan?' :
-[ "v-f"  0 eq? ] 'zero?' :
-[ "v-f"  :f :n zero? not ] 'true?' :
-[ "v-f"  :f :n zero? ] 'false?' :
-[ "n-f"  2 rem zero? ] 'even?' :
-[ "n-f"  2 rem zero? not ] 'odd?' :
-[ "n-f"  0 lt? ] 'negative?' :
-[ "n-f"  0 gteq? ] 'positive?' :
-[ "nnn-f"  [ [ :n ] bi@ ] dip :n dup-pair gt? [ swap ] if-true [ over ] dip lteq? [ gteq? ] dip and :f ] 'between?' :
-[ "vv-vvf"  [ type? ] dip type? swap [ eq? ] dip swap ] 'types-match?' :
+[ "s-"   report-error abort "Push a string to the error log and abort execution" ] 'abort<with-error>' :
+[ "-f"   -1 :f "Return a true flag" ] 'true' :
+[ "-f"   0  :f "Return a false flag" ] 'false' :
+[ "f-f"  :f :n -1 xor :f "Invert a flag" ] 'not' :
+[ "fp-"  [ ] if "Invoke quote if flag is true" ] 'if-true' :
+[ "fp-"  [ ] swap if "Invoke quote if flag is false" ] 'if-false' :
+[ "v-f"  :s 'nan' eq? "Return true if number is #nan or false otherwise" ] 'nan?' :
+[ "v-f"  0 eq? "Return true if number is #0 or false otherwise" ] 'zero?' :
+[ "v-f"  :f :n zero? not "Return true if flag is true or false otherwise" ] 'true?' :
+[ "v-f"  :f :n zero? "Return true if flag is false or false otherwise" ] 'false?' :
+[ "n-f"  2 rem zero? "Return true if number is even or false otherwise" ] 'even?' :
+[ "n-f"  2 rem zero? not "Return true if number is odd or false otherwise" ] 'odd?' :
+[ "n-f"  0 lt? "Return true if number is less than zero or false otherwise" ] 'negative?' :
+[ "n-f"  0 gteq? "Return true if number is greater than or equal to zero or false otherwise" ] 'positive?' :
+[ "nnn-f"  [ [ :n ] bi@ ] dip :n dup-pair gt? [ swap ] if-true [ over ] dip lteq? [ gteq? ] dip and :f \
+  "Return true if the number (n1) is betwen n2 and n3, inclusive or false otherwise" \
+] 'between?' :
+[ "vv-vvf"  [ type? ] dip type? swap [ eq? ] dip swap \
+  "Return true if the type of both values is the same, or false otherwise" \
+] 'types-match?' :
 
 
 "numeric ranges"
-[ "nn-..."  dup-pair lt? [ [ [ dup 1 + ] dip dup-pair eq? ] until ] [ [ [ dup 1 - ] dip dup-pair eq? ] until ] if drop ] 'expand-range' :
-[ "...n-n"  1 - [ + ] times ] 'sum-range' :
+[ "nn-..." \
+  dup-pair lt? \
+    [ [ [ dup 1 + ] dip dup-pair eq? ] until ] \
+    [ [ [ dup 1 - ] dip dup-pair eq? ] until ] if \
+  drop \
+  "Given two values, expand the range" \
+] 'expand-range' :
+[ "...n-n"  1 - [ + ] times "Given a series of values and a count, sum the values" ] 'sum-range' :
 
 
 "Misc"
-[ "p-"   invoke<depth?> [ hide-function ] times ] 'hide-functions' :
-[ "ps-"  dup hide-function : ] 'redefine' :
-[ "p-"   invoke<depth?> [ var ] times ] '::' :
+[ "p-"   invoke<depth?> [ hide-function ] times "Given an array of names, hide each named item" ] 'hide-functions' :
+[ "ps-"  dup hide-function : "Remove the old name for a function and assign it to a new one" ] 'redefine' :
+[ "p-"   invoke<depth?> [ var ] times "Given a list of names, create a variable for each one" ] '::' :
 
 
 "String and Character"
 "Note that this is only supporting the basic ASCII character set presently."
-[ "vs-f" swap :s find not true? ] 'string-contains?' :
-[ "v-f"  :c $0 $9 between? ] 'digit?' :
-[ "v-f"  '`~!@#$%^&*()'"<>,.:;[]{}\|-_=+'                    string-contains? ] 'symbol?' :
-[ "v-f"  to-lowercase 'abcdefghijklmnopqrstuvwxyz'           string-contains? ] 'letter?' :
-[ "v-f"  to-lowercase 'abcdefghijklmnopqrstuvwxyz1234567890' string-contains? ] 'alphanumeric?' :
-[ "v-f"  to-lowercase 'bcdfghjklmnpqrstvwxyz'                string-contains? ] 'consonant?' :
-[ "v-f"  to-lowercase 'aeiou'                                string-contains? ] 'vowel?' :
-[ "v-f"  dup to-lowercase eq? ] 'lowercase?' :
-[ "v-f"  dup to-uppercase eq? ] 'uppercase?' :
-[ "p-s"  invoke<depth?> 1 - [ [ :s ] bi@ + ] times ] 'build-string' :
-
+[ "vs-f" swap :s find not true? "Return true if the value is found in the specified string, or false otherwise" ] 'string-contains?' :
+[ "v-f"  :c $0 $9 between? "Return true if value is a decimal digit, or false otherwise" ] 'digit?' :
+[ "v-f"  '`~!@#$%^&*()<>,.:;[]{}\|-_=+"'' string-contains? "Return true if value is an ASCII symbol, or false otherwise" ] 'symbol?' :
+[ "v-f"  to-lowercase 'abcdefghijklmnopqrstuvwxyz'           string-contains? "Return true if value is an ASCII letter, or false otherwise" ] 'letter?' :
+[ "v-f"  to-lowercase 'abcdefghijklmnopqrstuvwxyz1234567890' string-contains? "Return true if value is a ASCII letter or digit, or false otherwise" ] 'alphanumeric?' :
+[ "v-f"  to-lowercase 'bcdfghjklmnpqrstvwxyz'                string-contains? "Return true if value is a consonant, or false otherwise" ] 'consonant?' :
+[ "v-f"  to-lowercase 'aeiou'                                string-contains? "Return true if value is a vowel, or false otherwise" ] 'vowel?' :
+[ "v-f"  dup to-lowercase eq? "Return true if value is a lowercase string or ASCII character, or false otherwise" ] 'lowercase?' :
+[ "v-f"  dup to-uppercase eq? "Return true if value is an uppercase string or ASCII character, or false otherwise" ] 'uppercase?' :
+[ "p-s"  invoke<depth?> 1 - [ [ :s ] bi@ + ] times "Execute a quotation, constructing a string from the values it returns." ] 'build-string' :
 
 "Slice as a linear buffer"
 [ 'CurrentBuffer'  'BufferOffset' ] ::
@@ -486,7 +514,7 @@
 }
 
 
-[ "-n"   2.71828182846 ] 'E' :
-[ "-n"   3.14159265359 ] 'PI' :
-[ "n-n"  E log<n> ] 'log' :
-[ "n-n"  10 log<n> ] 'log10' :
+[ "-n"   2.71828182846 "Mathmatical constant for Euler's Number" ] 'E' :
+[ "-n"   3.14159265359 "Mathmatical constant for PI" ] 'PI' :
+[ "n-n"  E log<n> "Return the base E logarithim of a number" ] 'log' :
+[ "n-n"  10 log<n> "Return the base 10 logarithim of a number" ] 'log10' :
