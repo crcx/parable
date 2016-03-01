@@ -25,6 +25,7 @@
   * lookup-name now written in Parable
   * log now written in Parable
   * log10 now written in Parable
+  * all functions now have documentation strings embedded
 
 * Additions
 
@@ -38,6 +39,7 @@
 
   * last-index?
   * slice-length?
+  * all of the functions in the buffer- family
 
 * Renamed
 
