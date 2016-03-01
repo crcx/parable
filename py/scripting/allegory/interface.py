@@ -63,6 +63,28 @@ def load_snapshot(filename):
     memory_map = j['memory_map']
     memory_size = j['memory_sizes']
 
+def bootstrap(str):
+    global dictionary_names, \
+           dictionary_slices, \
+           errors, \
+           stack, \
+           types, \
+           memory_values, \
+           memory_types, \
+           memory_map, \
+           memory_size
+
+    j = json.loads(str)
+    dictionary_names = j['symbols']
+    dictionary_slices = j['symbol_map']
+    errors = j['errors']
+    stack = j['stack_values']
+    types = j['stack_types']
+    memory_values = j['memory_contents']
+    memory_types = j['memory_types']
+    memory_map = j['memory_map']
+    memory_size = j['memory_sizes']
+
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 def completer(text, state):
@@ -398,7 +420,8 @@ if __name__ == '__main__':
 
     prepare_slices()
     prepare_dictionary()
-    parse_bootstrap(stdlib)
+    bootstrap(stdlib)
+#    parse_bootstrap(stdlib)
     parse_bootstrap(extensions)
 
     home = expanduser("~")

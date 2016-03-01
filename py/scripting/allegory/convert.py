@@ -25,11 +25,8 @@ f = open('../../parable.py').readlines()
 for line in f:
     print line.rstrip()
 
-print "stdlib = []"
-f = condense_lines(open('../../stdlib.p').readlines())
-for line in f:
-    if len(line) > 0:
-        print 'stdlib.append(""" ' + line.strip() + ' """)'
+f = condense_lines(open('parable.snapshot').readlines())
+print 'stdlib = \"' + f[0].replace('"', '\\"') + '"'
 
 print "extensions = []"
 f = condense_lines(open('extensions.p').readlines())
