@@ -225,23 +225,6 @@
 [ "v-f"  dup to-uppercase eq? "Return true if value is an uppercase string or ASCII character, or false otherwise" ] 'uppercase?' :
 [ "p-s"  invoke<depth?> 1 - [ [ :s ] bi@ + ] times "Execute a quotation, constructing a string from the values it returns." ] 'build-string' :
 
-"Slice as a linear buffer"
-[ 'CurrentBuffer'  'BufferOffset' ] ::
-[ "-pn"    @CurrentBuffer @BufferOffset ] 'buffer-position' :
-[ "-"      &BufferOffset increment ] 'buffer-advance' :
-[ "-"      &BufferOffset decrement ] 'buffer-retreat' :
-[ "n-"     buffer-position store ] 'buffer-store-current' :
-[ "-n"     buffer-position fetch ] 'buffer-fetch-current' :
-[ "v-"     buffer-position store buffer-advance ] 'buffer-store' :
-[ "-n"     buffer-position fetch buffer-advance ] 'buffer-fetch' :
-[ "v-"     buffer-retreat buffer-position store ] 'buffer-store-retreat' :
-[ "-n"     buffer-retreat buffer-position fetch ] 'buffer-fetch-retreat' :
-[ "p-"     !CurrentBuffer 0 !BufferOffset ] 'set-buffer' :
-[ "...n-"  [ buffer-store ] times ] 'buffer-store-items' :
-[ "-"      request set-buffer ] 'new-buffer' :
-[ "p-"     @CurrentBuffer [ @BufferOffset [ invoke ] dip !BufferOffset ] dip !CurrentBuffer ] 'preserve-buffer' :
-[ "s-"     request [ swap : ] sip set-buffer ] 'named-buffer' :
-
 
 "Programatic Creation of Quotes"
 [ "vv-p"  swap request [ 0 store ] sip [ 1 store ] sip \
