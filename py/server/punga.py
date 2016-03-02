@@ -1,26 +1,28 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-# Parable, Copyright (c) 2012 - 2015  Charles Childers
-#
-# This is *Punga*, a browser based interface layer for Parable.
-# 
-# Punga is a CGI script that presents a simple form based editor. When the user
-# submits the form, Parable processes the code, and the refereshed page has the
-# original code and execution results.
-#
-# Setup:
-#
-# Copy punga.py, parable.py, stdlib.p to your *cgi-bin* location.
-# Configure your server to allow running punga.py
-#
-# Notes:
-#
-# * This uses Bootstrap CSS (loaded from a CDN) to simplify layout
-#
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+# Punga: a browser based interface to the Parable Language
+# (c) 2012 - 2016, Charles Childers
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
-import cgi, cgitb, signal, sys
+import cgi, cgitb, json, signal, sys
 import parable
 
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+def bootstrap(str):
+    j = json.loads(str)
+    parable.dictionary_names = j['symbols']
+    parable.dictionary_slices = j['symbol_map']
+    parable.errors = j['errors']
+    parable.stack = j['stack_values']
+    parable.types = j['stack_types']
+    parable.memory_values = j['memory_contents']
+    parable.memory_types = j['memory_types']
+    parable.memory_map = j['memory_map']
+    parable.memory_size = j['memory_sizes']
+
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 def stack_item(i, text):
     """return a HTML row for stack item *i* (which is represented by *text*)"""
@@ -65,7 +67,7 @@ def dump_stack():
                 sys.stdout.write(stack_item(i, "malformed flag"))
         elif type == parable.TYPE_BYTECODE:
             sys.stdout.write(stack_item(i, "`" + str(tos)))
-        elif type == parable.TYPE_COMMENT:
+        elif type == parable.TYPE_REMARK:
             s = "\"" + parable.slice_to_string(tos) + "\""
             s = s + "<br>Store at: " + str(tos)
             sys.stdout.write(stack_item(i, s))
@@ -79,6 +81,7 @@ def dump_stack():
         i += 1
     sys.stdout.write("</table>")
 
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 def dump_errors():
     if parable.errors:
@@ -87,23 +90,42 @@ def dump_errors():
             sys.stdout.write("<tt>" + error + "</tt><br>")
         sys.stdout.write("</div>")
 
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 def dump_dict():
     """display named items"""
     l = ''
+    i = 0
     for w in parable.dictionary_names:
-        l = l + w + ' '
+        wx = '<pre>' + w.replace('<', '&lt;').replace('>', '&gt;') + '</pre>'
+
+        slice = parable.dictionary_slices[i]
+        cell, type = parable.fetch(slice, 0)
+        size = parable.memory_size[slice]
+        if type == parable.TYPE_REMARK:
+            comment = parable.slice_to_string(cell)
+            l = l + '<tr><td>' + wx
+            cell, type = parable.fetch(slice, size)
+            if type == parable.TYPE_REMARK:
+                l = l + '<br>' + parable.slice_to_string(cell)
+            l = l + '</td>'
+            l = l + '<td width="25%"><pre>' + comment + '</pre></td></tr>\n'
+        else:
+            l = l + '<tr><td>' + wx + '</td></tr>\n'
+        i = i + 1
     sys.stdout.write(l)
     sys.stdout.write("\n")
 
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 def setup_environment():
-    cgitb.enable()
+#    cgitb.enable()
     signal.alarm(60)
     parable.prepare_slices()
     parable.prepare_dictionary()
-    parable.parse_bootstrap(open('stdlib.p').readlines())
+    bootstrap(open('parable.snapshot', 'r').read())
 
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 if __name__ == '__main__':
     setup_environment()
@@ -125,10 +147,10 @@ if __name__ == '__main__':
         <div class="container">
             <div class="row"><div class="span12">&nbsp;</div></div>
             <div class="row">
-                <div class="span6">
+                <div class="span4">
                     <form name='editor' id='editor' action='punga.py' method='post'>
     """)
-    sys.stdout.write("<textarea rows='12' class='span6' name='code' ")
+    sys.stdout.write("<textarea rows='12' class='span4' name='code' ")
     sys.stdout.write("placeholder='enter your code here'>")
     sys.stdout.write(message)
     sys.stdout.write("</textarea>")
@@ -136,7 +158,7 @@ if __name__ == '__main__':
                         <a onClick='document.forms["editor"].submit()' class='btn'>Evaluate</a>
                     </form>
                 </div>
-                <div class="span6">
+                <div class="span4" style="max-height: 600px; min-height: 300px; overflow: scroll">
     """)
 
     message = message.replace("\\\r\n", " ")
@@ -152,14 +174,25 @@ if __name__ == '__main__':
     print("""
                     &nbsp;
                 </div>
+                <div class="span4" style="max-height: 600px; min-height: 300px; overflow: scroll">
+                    <table class='table table-bordered'>
+    """)
+
+    dump_dict()
+
+    print("""
+                    </table>
+                </div>
             </div>
             <div class="row"><div class="span12">&nbsp;</div></div>
-            <div class="row"><div class="span12">
+<!--            <div class="row"><div class="span12">
                 <a href="http://forthworks.com/parable">Parable</a><br>
                 &copy; 2012 - 2015, <a href="http://forthworks.com">Charles Childers</a>
             </div>
+-->
         </div>
     </div>
     </body>
     </html>
     """)
+
