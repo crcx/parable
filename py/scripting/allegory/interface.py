@@ -106,7 +106,10 @@ def dump_stack():
     while i < len(stack):
         tos = stack[i]
         type = types[i]
-        sys.stdout.write("\t" + str(i))
+        if i == len(stack) - 1:
+            sys.stdout.write("TOS\t" + str(i))
+        else:
+            sys.stdout.write("\t" + str(i))
         if type == TYPE_NUMBER:
             display_item('\t' + '#', tos)
         elif type == TYPE_BYTECODE:
