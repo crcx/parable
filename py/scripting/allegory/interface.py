@@ -351,11 +351,11 @@ def evaluate(s):
 def get_input():
     done = False
     s = ''
-    s = input("\ninput> ")
+    s = input("\nok\n")
     while not done:
         if s.endswith(' \\'):
             s = s[:-2].strip() + ' '
-            s = s + input("       ")
+            s = s + input()
         else:
             done = True
     return s
