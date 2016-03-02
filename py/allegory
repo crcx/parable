@@ -2047,7 +2047,7 @@ def opcodes(slice, offset, opcode):
             report('A20: ' + name + ' not found')
     elif opcode == 9006:
         revert()
-        parse_bootstrap(stdlib)
+        bootstrap(stdlib)
         parse_bootstrap(extensions)
     return offset
 
