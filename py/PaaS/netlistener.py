@@ -4,8 +4,6 @@
 
 
 import PaaS
-
-import readline
 import sys
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
@@ -15,6 +13,10 @@ try:
     input = getattr(__builtin__, 'raw_input')
 except (ImportError, AttributeError):
     pass
+
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+parable = 0
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
@@ -61,14 +63,6 @@ def get_input():
     return s
 
 
-def completer(text, state):
-    options = [x for x in parable.dictionary_names if x.startswith(text)]
-    try:
-        return options[state]
-    except IndexError:
-        return None
-
-
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 
@@ -93,9 +87,6 @@ if __name__ == '__main__':
     print('words\tdisplay all named items')
     print('bye\texit netlistener')
     sep()
-
-    readline.set_completer(completer)
-    readline.parse_and_bind("tab: complete")
 
     parable = PaaS.getpso()
 
