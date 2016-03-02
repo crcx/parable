@@ -137,28 +137,28 @@ if __name__ == '__main__':
         <!DOCTYPE html>
         <head>
             <title>parable language</title>
-            <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
+            <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
             <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet">
             <style>i { font-size: 200%; }</style>
             <meta charset=UTF-8>
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
         </head>
         <body>
-        <div class="container">
-            <div class="row"><div class="span12">&nbsp;</div></div>
+        <div class="container-fluid" style="height: 100vh; overflow: hidden">
+            <div class="row"><div class="col-sm-12">&nbsp;</div></div>
             <div class="row">
-                <div class="span4">
+                <div class="col-sm-4"><div class="form-group row">
                     <form name='editor' id='editor' action='punga.py' method='post'>
     """)
-    sys.stdout.write("<textarea rows='12' class='span4' name='code' ")
+    sys.stdout.write("<textarea rows='24' style='height: 90vh' class='col-sm-4 form-control' name='code' ")
     sys.stdout.write("placeholder='enter your code here'>")
     sys.stdout.write(message)
     sys.stdout.write("</textarea>")
     print("""
-                        <a onClick='document.forms["editor"].submit()' class='btn'>Evaluate</a>
-                    </form>
+                        <a onClick='document.forms["editor"].submit()' class='form-control btn btn-default'>Evaluate</a>
+                    </form></div>
                 </div>
-                <div class="span4" style="max-height: 600px; min-height: 300px; overflow: scroll">
+                <div class="col-sm-4" style="max-height: 100vh; min-height: 100vh; overflow: scroll">
     """)
 
     message = message.replace("\\\r\n", " ")
@@ -174,7 +174,7 @@ if __name__ == '__main__':
     print("""
                     &nbsp;
                 </div>
-                <div class="span4" style="max-height: 600px; min-height: 300px; overflow: scroll">
+                <div class="col-sm-4" style="max-height: 100vh; min-height: 100vh; overflow: scroll">
                     <table class='table table-bordered'>
     """)
 
@@ -184,8 +184,8 @@ if __name__ == '__main__':
                     </table>
                 </div>
             </div>
-            <div class="row"><div class="span12">&nbsp;</div></div>
-<!--            <div class="row"><div class="span12">
+            <div class="row"><div class="col-sm-12">&nbsp;</div></div>
+<!--            <div class="row"><div class="col-sm-12">
                 <a href="http://forthworks.com/parable">Parable</a><br>
                 &copy; 2012 - 2015, <a href="http://forthworks.com">Charles Childers</a>
             </div>
