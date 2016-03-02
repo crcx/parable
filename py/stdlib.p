@@ -253,8 +253,8 @@
 
 "Arrays and Operations on Quotations"
 [ "q-v"  0 fetch "Return the first item in a slice" ] 'head' :
-[ "q-q"  1 over length? subslice ] 'body' :
-[ "p-v"  dup length? 1 - fetch "Return the second through last items in a slice" "Return the last item in a slice" ] 'tail' :
+[ "q-q"  1 over length? subslice "Return the second through last items in a slice" ] 'body' :
+[ "p-v"  dup length? 1 - fetch "Return the last item in a slice" ] 'tail' :
 
 [ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset' ] ::
 [ "q-" \
