@@ -4,7 +4,7 @@
 [ "v-vn"   `2  "Return the type constant for a value" ] 'type?' :
 [ "nn-n"   `3  "Add two numbers or concatenate two strings, remarks, or slices" ] '+' :
 [ "nn-n"   `4  "Subtract n2 from n1" ] '-' :
-[ "nn-n"   `5. "Multiply two numbers" ] '*' :
+[ "nn-n"   `5  "Multiply two numbers" ] '*' :
 [ "nn-n"   `6  "Divide n1 by n2" ] '/' :
 [ "nn-n"   `7  "Divide n1 by n2, returning the remainder" ] 'rem' :
 [ "n-n"    `8  "Return the smallest integer less than or equal to the starting value" ] 'floor' :
