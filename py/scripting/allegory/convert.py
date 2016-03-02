@@ -1,4 +1,4 @@
-print "#!/usr/bin/env python"
+print "#!/usr/bin/env python3"
 print "# Copyright (c)2012-2016, Charles Childers"
 
 def condense_lines(code):
