@@ -85,7 +85,7 @@ def dump_stack():
 
 def dump_errors():
     if parable.errors:
-        sys.stdout.write("<div class='alert alert-error'>")
+        sys.stdout.write("<div class='alert alert-warning'>")
         for error in parable.errors:
             sys.stdout.write("<tt>" + error + "</tt><br>")
         sys.stdout.write("</div>")
@@ -137,20 +137,19 @@ if __name__ == '__main__':
         <!DOCTYPE html>
         <head>
             <title>parable language</title>
-            <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/readable/bootstrap.min.css" rel="stylesheet">
             <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet">
-            <style>i { font-size: 200%; }</style>
+            <style>div { overflow-y: scroll; -webkit-overflow-scrolling: touch; } i { font-size: 200%; } textarea { font-family:Monaco,Consolas,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace; }</style>
             <meta charset=UTF-8>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
         </head>
         <body>
         <div class="container-fluid" style="height: 100vh; overflow: hidden">
-            <div class="row"><div class="col-sm-12">&nbsp;</div></div>
             <div class="row">
-                <div class="col-sm-4"><div class="form-group row">
+                <div class="col-sm-3"><div class="form-group row">
                     <form name='editor' id='editor' action='punga.py' method='post'>
     """)
-    sys.stdout.write("<textarea rows='24' style='height: 90vh' class='col-sm-4 form-control' name='code' ")
+    sys.stdout.write("<textarea rows='24' style='height: 85vh' class='col-sm-3 form-control' name='code'")
     sys.stdout.write("placeholder='enter your code here'>")
     sys.stdout.write(message)
     sys.stdout.write("</textarea>")
@@ -158,7 +157,7 @@ if __name__ == '__main__':
                         <a onClick='document.forms["editor"].submit()' class='form-control btn btn-default'>Evaluate</a>
                     </form></div>
                 </div>
-                <div class="col-sm-4" style="max-height: 100vh; min-height: 100vh; overflow: scroll">
+                <div class="col-sm-4" style="max-height: 85vh; min-height: 85vh; overflow: scroll">
     """)
 
     message = message.replace("\\\r\n", " ")
@@ -174,7 +173,7 @@ if __name__ == '__main__':
     print("""
                     &nbsp;
                 </div>
-                <div class="col-sm-4" style="max-height: 100vh; min-height: 100vh; overflow: scroll">
+                <div class="col-sm-5" style="max-height: 85vh; min-height: 85vh; overflow: scroll">
                     <table class='table table-bordered'>
     """)
 
@@ -184,15 +183,8 @@ if __name__ == '__main__':
                     </table>
                 </div>
             </div>
-            <div class="row"><div class="col-sm-12">&nbsp;</div></div>
-<!--            <div class="row"><div class="col-sm-12">
-                <a href="http://forthworks.com/parable">Parable</a><br>
-                &copy; 2012 - 2015, <a href="http://forthworks.com">Charles Childers</a>
-            </div>
--->
         </div>
     </div>
     </body>
     </html>
     """)
-
