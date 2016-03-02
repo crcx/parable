@@ -113,28 +113,28 @@ def dump_stack():
         else:
             sys.stdout.write("     " + str(i).rjust(8, ' '))
         if type == TYPE_NUMBER:
-            display_item('\t' + '#', tos)
+            display_item('   ' + '#', tos)
         elif type == TYPE_BYTECODE:
-            display_item('\t' + '`', tos)
+            display_item('   ' + '`', tos)
         elif type == TYPE_CHARACTER:
-            display_item('\t' + '$', chr(tos))
+            display_item('   ' + '$', chr(tos))
         elif type == TYPE_STRING:
-            display_item('\t' + '\'', slice_to_string(tos) + '\'')
+            display_item('   ' + '\'', slice_to_string(tos) + '\'')
         elif type == TYPE_POINTER:
-            display_item('\t' + '&', tos)
+            display_item('   ' + '&', tos)
         elif type == TYPE_REMARK:
-            display_item('\t' + '"', slice_to_string(tos) + '"')
+            display_item('   ' + '"', slice_to_string(tos) + '"')
         elif type == TYPE_FLAG:
             if tos == -1:
-                display_item('\t' + "", "true")
+                display_item('   ' + "", "true")
             elif tos == 0:
-                display_item('\t' + "", "false")
+                display_item('   ' + "", "false")
             else:
-                display_item('\t' + "", "malformed flag")
+                display_item('   ' + "", "malformed flag")
         elif type == TYPE_FUNCTION_CALL:
-            display_item('\tCALL to ' + '&', tos)
+            display_item('   CALL to ' + '&', tos)
         else:
-            display_item('\t' + "", "unmatched type on the stack")
+            display_item('   ' + "", "unmatched type on the stack")
         sys.stdout.write("\n")
         i += 1
 
