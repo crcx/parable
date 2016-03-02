@@ -1852,13 +1852,15 @@ def display_item(prefix, value):
 def dump_stack():
     """display the stack"""
     i = 0
+    if len(stack) > 100:
+        i = len(stack) - 100
     while i < len(stack):
         tos = stack[i]
         type = types[i]
         if i == len(stack) - 1:
-            sys.stdout.write("TOS\t" + str(i))
+            sys.stdout.write("TOS  " + str(i).rjust(8, ' '))
         else:
-            sys.stdout.write("\t" + str(i))
+            sys.stdout.write("     " + str(i).rjust(8, ' '))
         if type == TYPE_NUMBER:
             display_item('\t' + '#', tos)
         elif type == TYPE_BYTECODE:
