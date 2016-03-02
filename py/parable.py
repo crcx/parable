@@ -1708,5 +1708,5 @@ def parse_bootstrap(f):
 def prepare_dictionary():
     """setup the initial dictionary"""
     s = request_slice()
-    compile('"ps-" `52', s)
+    compile('"ps-" `52 "Attach a name to a pointer"', s)
     add_definition(':', s)
