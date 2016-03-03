@@ -318,12 +318,6 @@
 [ "s-s" reverse trim-left reverse :s "Remove trailing whitespace from a string" ] 'trim-right' :
 [ "s-s" trim-right trim-left "Remove leading and trailing whitespace from a string" ] 'trim' :
 
-"Text Output Buffer"
-'TOB' var
-[ "v-"   &TOB push "Append a value to the TOB" ] 'to-tob' :
-[ "-..." &TOB get<final-offset> [ &TOB pop ] times "Push each item in the TOB to the stack" ] 'show-tob' :
-[ "-"    0 &TOB set<final-offset> "Remove all items in the TOB" ] 'clear-tob' :
-
 
 "Scope"
 [ 'Public'  'Private' ] ::
