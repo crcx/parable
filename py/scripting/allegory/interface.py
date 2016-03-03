@@ -242,7 +242,7 @@ def opcodes(slice, offset, opcode):
         files[slot] = 0
     elif opcode == 203:
         slot = int(stack_pop())
-        stack_push(ord(files[slot].read(1)), TYPE_NUMBER)
+        stack_push(ord(files[slot].read(1)), TYPE_CHARACTER)
     elif opcode == 204:
         slot = int(stack_pop())
         files[slot].write(chr(int(stack_pop())))

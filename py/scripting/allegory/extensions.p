@@ -1,24 +1,25 @@
 [ "-"   `2000 "Turn on reporting of redefinitions" ] '+warnings' :
 [ "-"   `2001 "Turn off reporting of redefinitions" ] '-warnings' :
-[ "-"   `9000 "Display the stack" ] '.s' :
-[ "-"   `9001 "Exit Allegory" ] 'bye' :
-[ "-"   `9002 "Display a list of all named functions" ] 'words' :
-[ "s-"  `9003 "Evaluate the contents of a file as Parable source" ] 'include' :
-[ "s-"  `9004 "Save the current session to a snapshot file" ] 'save-snapshot' :
-[ "s-"  `9005 "Replace the current session with the one stored in the specified snapshot file" ] 'reload-snapshot' :
+
+[ "-"    `9000 "Display the stack" ] '.s' :
+[ "-"    `9001 "Exit Allegory" ] 'bye' :
+[ "-"    `9002 "Display a list of all named functions" ] 'words' :
+[ "s-"   `9003 "Evaluate the contents of a file as Parable source" ] 'include' :
+[ "s-"   `9004 "Save the current session to a snapshot file" ] 'save-snapshot' :
+[ "s-"   `9005 "Replace the current session with the one stored in the specified snapshot file" ] 'reload-snapshot' :
 [ "...-" `9006 "Soft restart from the basic snapshot and Allegory extensions" ] 'restart' :
 
 
 "File Operations"
-[ "string:name string:mode - number:file-id"  `201 "Open a file. Valid modes include R, W, and A" ] 'open-file' :
-[ "number:file-id -"  `202 "Close an open file" ] 'close-file' :
-[ "number:file-id - character"  `203 :c "Read a character from a file" ] 'read-file' :
-[ "character number:file-id -"  `204 "Write a character to a file" ] 'write-file' :
-[ "number:file-id - number:position"  `205 "Return the current value of the index pointer into the file" ] 'file-position' :
-[ "number:offset number:file-id -"  `206 "Move the index pointer into a file to a new position" ] 'file-seek' :
-[ "number:file-id - number:length"  `207 "Return the size of an open file" ] 'file-size' :
-[ "string:name -"  `208 "Delete a file" ] 'delete-file' :
-[ "string:name - flag"  `209 "True if the file exists, otherwise false" ] 'file-exists?' :
+[ "string:name string:mode - number:file-id"  `201  "Open a file. Valid modes include R, W, and A" ] 'open-file' :
+[ "number:file-id -"                          `202  "Close an open file" ] 'close-file' :
+[ "number:file-id - character"                `203  "Read a character from a file" ] 'read-file' :
+[ "character number:file-id -"                `204  "Write a character to a file" ] 'write-file' :
+[ "number:file-id - number:position"          `205  "Return the current value of the index pointer into the file" ] 'file-position' :
+[ "number:offset number:file-id -"            `206  "Move the index pointer into a file to a new position" ] 'file-seek' :
+[ "number:file-id - number:length"            `207  "Return the size of an open file" ] 'file-size' :
+[ "string:name -"                             `208  "Delete a file" ] 'delete-file' :
+[ "string:name - flag"                        `209  "True if the file exists, otherwise false" ] 'file-exists?' :
 
 [ 'slurp-file' ] {
   [ 'FID' 'S' ] ::
@@ -36,6 +37,8 @@
     "Read a file into a new slice" \
   ] 'slurp-file' :
 }
+[ 'open-file' 'close-file' 'read-file' 'write-file' 'file-position' 'file-seek' \
+  'file-size' 'delete-file' 'file-exists?' 'slurp-file' ] 'Files~' vocab
 
 
 "Command Line Arguments and System Integration"
@@ -58,7 +61,7 @@
 "Terminal I/O"
 [ "v-"  `6000    "Display a value to the screen" ] 'display' :
 [ #10 :c display "Display a newline on the screen" ] 'tty.cr' :
-
+[ 'display'  'tty.cr' ] 'ConsoleIO~' vocab
 
 [ "-n" `300 "Return a Unix timestamp" ] 'time' :
 [ "p-n" time [ invoke ] dip time swap - "Invoke a function and return the running time" ] 'invoke<time>' :
