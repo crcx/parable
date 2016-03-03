@@ -5,11 +5,14 @@ import base64
 import bz2
 import json
 import parable
+import os
 
 if __name__ == '__main__':
     parable.prepare_slices()
     parable.prepare_dictionary()
     parable.parse_bootstrap(open('stdlib.p').readlines())
+    if os.path.exists('extensions.p'):
+        parable.parse_bootstrap(open('extensions.p').readlines())
 
     j = json.dumps({"symbols": parable.dictionary_names, \
                     "symbol_map": parable.dictionary_slices, \
