@@ -6,7 +6,7 @@
 [ "s-"  `9003 "Evaluate the contents of a file as Parable source" ] 'include' :
 [ "s-"  `9004 "Save the current session to a snapshot file" ] 'save-snapshot' :
 [ "s-"  `9005 "Replace the current session with the one stored in the specified snapshot file" ] 'reload-snapshot' :
-[ "...-" `9006 "Soft restart from the basic snapshot and Allegory extensions"] 'restart' :
+[ "...-" `9006 "Soft restart from the basic snapshot and Allegory extensions" ] 'restart' :
 
 
 "File Operations"
@@ -50,14 +50,14 @@
 ] 'sys.run' :
 
 
-[ "- number"  `4000 ] 'arg-count' :
-[ "number - string"  `4001 ] 'get-arg' :
+[ "- number"  `4000 "Deprecated" ] 'arg-count' :
+[ "number - string"  `4001 "Deprecated" ] 'get-arg' :
 [ "s-s"  `5000 ] 'value-for-key' :
-[ "s-s"  `5001 ] 'get-environment-value' :
+[ "s-s"  `5001 "Return the value of an environment variable" ] 'get-environment-value' :
 
 "Terminal I/O"
-[ "v-"  `6000 ] 'display' :
-[ #10 :c display ] 'tty.cr' :
+[ "v-"  `6000    "Display a value to the screen" ] 'display' :
+[ #10 :c display "Display a newline on the screen" ] 'tty.cr' :
 
 
 [ "-n" `300 "Return a Unix timestamp" ] 'time' :
