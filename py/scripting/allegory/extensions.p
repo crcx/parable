@@ -10,15 +10,15 @@
 
 
 "File Operations"
-[ "string:name string:mode - number:file-id"  `201 ] 'open-file' :
-[ "number:file-id -"  `202 ] 'close-file' :
-[ "number:file-id - character"  `203 :c ] 'read-file' :
-[ "character number:file-id -"  `204 ] 'write-file' :
-[ "number:file-id - number:position"  `205 ] 'file-position' :
-[ "number:offset number:file-id -"  `206 ] 'file-seek' :
-[ "number:file-id - number:length"  `207 ] 'file-size' :
-[ "string:name -"  `208 ] 'delete-file' :
-[ "string:name - flag"  `209 ] 'file-exists?' :
+[ "string:name string:mode - number:file-id"  `201 "Open a file. Valid modes include R, W, and A" ] 'open-file' :
+[ "number:file-id -"  `202 "Close an open file" ] 'close-file' :
+[ "number:file-id - character"  `203 :c "Read a character from a file" ] 'read-file' :
+[ "character number:file-id -"  `204 "Write a character to a file" ] 'write-file' :
+[ "number:file-id - number:position"  `205 "Return the current value of the index pointer into the file" ] 'file-position' :
+[ "number:offset number:file-id -"  `206 "Move the index pointer into a file to a new position" ] 'file-seek' :
+[ "number:file-id - number:length"  `207 "Return the size of an open file" ] 'file-size' :
+[ "string:name -"  `208 "Delete a file" ] 'delete-file' :
+[ "string:name - flag"  `209 "True if the file exists, otherwise false" ] 'file-exists?' :
 
 [ 'slurp-file' ] {
   [ 'FID' 'S' ] ::
@@ -33,6 +33,7 @@
     ] \
     [ drop '' duplicate-slice :s 'Unable to to locate file' abort<with-error> ] \
     if \
+    "Read a file into a new slice" \
   ] 'slurp-file' :
 }
 
