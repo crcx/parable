@@ -492,34 +492,12 @@
 
 "?"
 [ '?' ] {
-  [ 'Probability' ] ::
-  [ "f-"   [ &Probability increment ] if-true ] 'check' :
-  [ "s-s"  head uppercase? check ] 'initial' :
-  [ "s-s"  1 fetch lowercase? check ] 'second' :
-  [ "s-s"  lookup-function head remark? not check drop ] 'no-comment?' :
-  [ "s-f" \
-    0 !Probability \
-    dup length? \
-    1 eq? [ &initial &no-comment? bi @Probability 2 eq? ] \
-          [ &initial &second &no-comment? tri @Probability 3 eq? ] if \
-    "Given a function name, try to determine if it is a variable." \
-  ] 'var?' :
-
-
-  [ "p-?"  &head &tail bi [ remark? &drop if-false ] bi@ ] 'describe-func' :
-  [ "s-s"  drop 'Variable' &:r bi@ ] 'describe-var' :
+  [ "p-?" &head &tail bi [ remark? [ drop ] if-false ] bi@ ] 'desc' :
 
   [ "s-s | s-ss" \
     dup function-exists? \
-    [ dup var? \
-      [ describe-var ] \
-      [ lookup-function \
-        [ head ] [ tail ] bi \
-        [ remark? [ drop ] if-false ] bi@ \
-      ] if \
-    ] \
-    [ 'function "' swap + '" not found' + report-error ] \
-    if \
+    [ lookup-function desc ] \
+    [ 'function "' swap + '" not found' + report-error ] if \
     "Lookup the stack comment and description (if existing) for a named item" \
   ] '?' :
 }
