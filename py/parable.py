@@ -89,7 +89,7 @@ BC_SUBTRACT = 4
 BC_MULTIPLY = 5
 BC_DIVIDE = 6
 BC_REMAINDER = 7
-BC_FLOOR = 8
+# BC_FLOOR = 8
 BC_POW = 9
 # BC_LOG = 10  ## REMOVE
 # BC_LOG10 = 11  ## REMOVE
@@ -252,11 +252,11 @@ def bytecode_remainder(opcode, offset, more):
         abort_run(opcode, offset)
 
 
-def bytecode_floor(opcode, offset, more):
-    if precheck([TYPE_NUMBER]):
-        stack_push(math.floor(float(stack_pop())), TYPE_NUMBER)
-    else:
-        abort_run(opcode, offset)
+#def bytecode_floor(opcode, offset, more):
+#    if precheck([TYPE_NUMBER]):
+#        stack_push(math.floor(float(stack_pop())), TYPE_NUMBER)
+#    else:
+#        abort_run(opcode, offset)
 
 
 def bytecode_pow(opcode, offset, more):
@@ -888,7 +888,6 @@ bytecodes = {
     BC_MULTIPLY:       bytecode_multiply,
     BC_DIVIDE:         bytecode_divide,
     BC_REMAINDER:      bytecode_remainder,
-    BC_FLOOR:          bytecode_floor,
     BC_POW:            bytecode_pow,
     BC_LOGN:           bytecode_logn,
     BC_BITWISE_SHIFT:  bytecode_bitwise_shift,

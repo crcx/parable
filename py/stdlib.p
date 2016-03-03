@@ -7,7 +7,6 @@
 [ "nn-n"   `5  "Multiply two numbers" ] '*' :
 [ "nn-n"   `6  "Divide n1 by n2" ] '/' :
 [ "nn-n"   `7  "Divide n1 by n2, returning the remainder" ] 'rem' :
-[ "n-n"    `8  "Return the smallest integer less than or equal to the starting value" ] 'floor' :
 [ "nn-n"   `9  "Return n1 to the power n2" ] '^' :
 [ "nn-n"   `12 "Return the logarithim of a number in the specified base" ] 'log<n>' :
 [ "nn-n"   `13 "Perform a bitwise shift" ] 'shift' :
@@ -92,6 +91,9 @@
   swap : \
   "Attach a name to a slice" \
 ] '.' :
+
+[ "n-n"  [ 1 / ] [ 1 rem ] bi - "Return the smallest integer less than or equal to the starting value" ] 'floor' :
+[ "n-n"  floor 1 + "Return the smallest integer greater than or equal to the starting value" ] 'ceil' :
 
 "Symbolic names for data types"
 [ "-n"  100 "Type constant" ] 'NUMBER' :
@@ -315,7 +317,6 @@
 [ "s-s" :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while 1 - [ dup get<final-offset> 1 + ] dip swap subslice :s "Remove leading whitespace from a string" ] 'trim-left' :
 [ "s-s" reverse trim-left reverse :s "Remove trailing whitespace from a string" ] 'trim-right' :
 [ "s-s" trim-right trim-left "Remove leading and trailing whitespace from a string" ] 'trim' :
-
 
 "Text Output Buffer"
 'TOB' var
