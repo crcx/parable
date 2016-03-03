@@ -2,6 +2,8 @@
 
 # allegory interface layer begins here
 
+import base64
+import bz2
 import json
 import os
 import sys
@@ -63,7 +65,8 @@ def load_snapshot(filename):
     memory_map = j['memory_map']
     memory_size = j['memory_sizes']
 
-def bootstrap(str):
+
+def bootstrap(s):
     global dictionary_names, \
            dictionary_slices, \
            errors, \
@@ -74,7 +77,14 @@ def bootstrap(str):
            memory_map, \
            memory_size
 
-    j = json.loads(str)
+    raw = base64.b64decode(s)
+    u = bz2.decompress(raw)
+
+    try:
+        j = json.loads(u)
+    except:
+        j = json.loads(u.decode())
+
     dictionary_names = j['symbols']
     dictionary_slices = j['symbol_map']
     errors = j['errors']

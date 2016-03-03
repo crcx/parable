@@ -1,6 +1,8 @@
 # parable
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
+import base64
+import bz2
 import json
 import parable
 
@@ -19,5 +21,10 @@ if __name__ == '__main__':
                     "memory_map": parable.memory_map, \
                     "memory_sizes": parable.memory_size})
 
+    try:
+        c = bz2.compress(bytes(j, 'utf-8'))
+    except:
+        c = bz2.compress(j)
+
     with open('parable.snapshot', 'w') as file:
-        file.write(j)
+        file.write(str(base64.b64encode(c)))
