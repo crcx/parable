@@ -1826,7 +1826,11 @@ def bootstrap(s):
            memory_map, \
            memory_size
 
-    raw = base64.b64decode(s)
+    try:
+        raw = base64.b64decode(s)
+    except:
+        raw = base64.b64decode(bytes(s, 'utf-8'))
+
     u = bz2.decompress(raw)
 
     try:
