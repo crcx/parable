@@ -1239,7 +1239,8 @@ def remove_name(name):
     if in_dictionary(name) is not False:
         i = dictionary_names.index(name)
         del dictionary_names[i]
-        dictionary_hidden_slices.append(dictionary_slices[i])
+        if not dictionary_slices[i] in dictionary_hidden_slices:
+            dictionary_hidden_slices.append(dictionary_slices[i])
         del dictionary_slices[i]
 
 
