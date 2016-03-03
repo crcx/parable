@@ -1747,6 +1747,8 @@ extensions.append(""" [ "s-s"  `5001 ] 'get-environment-value' : """)
 extensions.append(""" "Terminal I/O" """)
 extensions.append(""" [ "v-"  `6000 ] 'display' : """)
 extensions.append(""" [ #10 :c display ] 'tty.cr' : """)
+extensions.append(""" [ "-n" `300 "Return a Unix timestamp" ] 'time' : """)
+extensions.append(""" [ "p-n" time [ invoke ] dip time swap - "Invoke a function and return the running time" ] 'invoke<time>' : """)
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 # allegory interface layer begins here
@@ -2030,6 +2032,9 @@ def opcodes(slice, offset, opcode):
         s = slice_to_string(stack_pop())
         n = call(s, shell = True)
         stack_push(n, TYPE_NUMBER)
+    elif opcode == 300:
+        import time
+        stack_push(time.time(), TYPE_NUMBER)
     elif opcode == 4000:
         stack_push(len(sys.argv) - 2, TYPE_NUMBER)
     elif opcode == 4001:

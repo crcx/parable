@@ -58,3 +58,6 @@
 [ "v-"  `6000 ] 'display' :
 [ #10 :c display ] 'tty.cr' :
 
+
+[ "-n" `300 "Return a Unix timestamp" ] 'time' :
+[ "p-n" time [ invoke ] dip time swap - "Invoke a function and return the running time" ] 'invoke<time>' :

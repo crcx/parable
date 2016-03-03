@@ -281,6 +281,9 @@ def opcodes(slice, offset, opcode):
         s = slice_to_string(stack_pop())
         n = call(s, shell = True)
         stack_push(n, TYPE_NUMBER)
+    elif opcode == 300:
+        import time
+        stack_push(time.time(), TYPE_NUMBER)
     elif opcode == 4000:
         stack_push(len(sys.argv) - 2, TYPE_NUMBER)
     elif opcode == 4001:
