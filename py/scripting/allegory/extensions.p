@@ -62,3 +62,6 @@
 
 [ "-n" `300 "Return a Unix timestamp" ] 'time' :
 [ "p-n" time [ invoke ] dip time swap - "Invoke a function and return the running time" ] 'invoke<time>' :
+
+
+[ "s-" dup function-exists? [ drop ] [ 'library/' swap + include ] if "Load a library" ] 'needs' :

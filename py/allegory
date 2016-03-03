@@ -1749,6 +1749,7 @@ extensions.append(""" [ "v-"  `6000    "Display a value to the screen" ] 'displa
 extensions.append(""" [ #10 :c display "Display a newline on the screen" ] 'tty.cr' : """)
 extensions.append(""" [ "-n" `300 "Return a Unix timestamp" ] 'time' : """)
 extensions.append(""" [ "p-n" time [ invoke ] dip time swap - "Invoke a function and return the running time" ] 'invoke<time>' : """)
+extensions.append(""" [ "s-" dup function-exists? [ drop ] [ 'library/' swap + include ] if "Load a library" ] 'needs' : """)
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 # allegory interface layer begins here
