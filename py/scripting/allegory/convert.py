@@ -28,12 +28,6 @@ for line in f:
 f = condense_lines(open('parable.snapshot').readlines())
 print 'stdlib = \"' + f[0].replace('"', '\\"') + '"'
 
-print "extensions = []"
-f = condense_lines(open('extensions.p').readlines())
-for line in f:
-    if len(line) > 0:
-        print 'extensions.append(""" ' + line.strip() + ' """)'
-
 f = open('interface.py').readlines()
 for line in f:
     print line.rstrip()

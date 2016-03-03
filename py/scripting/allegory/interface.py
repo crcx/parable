@@ -321,7 +321,6 @@ def opcodes(slice, offset, opcode):
     elif opcode == 9006:
         revert()
         bootstrap(stdlib)
-        parse_bootstrap(extensions)
     return offset
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
@@ -443,8 +442,6 @@ if __name__ == '__main__':
     prepare_slices()
     prepare_dictionary()
     bootstrap(stdlib)
-#    parse_bootstrap(stdlib)
-    parse_bootstrap(extensions)
 
     home = expanduser("~")
 
