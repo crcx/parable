@@ -68,3 +68,6 @@
 
 
 [ "s-" dup function-exists? [ drop ] [ 'library/' swap + include ] if "Load a library" ] 'needs' :
+
+
+[ &ConsoleIO~ &Files~ ] [ with ] for-each
