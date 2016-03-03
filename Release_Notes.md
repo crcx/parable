@@ -8,6 +8,15 @@
 * added type checking to the byte codes
 * fetch now allows for negative offsets (fetch with index starting at tail end of slice)
 * disabled some redundant byte codes
+
+  * BC_FLOOR
+  * BC_LOG
+  * BC_LOG10
+  * BC_FLOW_CALL
+  * BC_FUNCTION_EXISTS
+  * BC_FUNCTION_LOOKUP
+  * BC_FUNCTION_NAME
+
 * error report and abort on type or depth errors
 * internal cleanups and refactorings
 
@@ -23,12 +32,14 @@
   * find-function now written in Parable
   * lookup-function now written in Parable
   * lookup-name now written in Parable
+  * floor now written in Parable
   * log now written in Parable
   * log10 now written in Parable
   * all functions now have documentation strings embedded
 
 * Additions
 
+  * ceil
   * enquote
   * with
   * without
@@ -40,12 +51,34 @@
   * last-index?
   * slice-length?
   * all of the functions in the buffer- family
+  * TOB, to-tob, show-tob, clear-tob
 
 * Renamed
 
   * get-last-index renamed to get<final-offset>
   * set-last-index renamed to set<final-offset>
 
+### Library
+
+* Added a "library" directory to hold useful extensions
+* File names to match vocabulary names:
+
+  * TextOutputBuffer~
+  * Buffer~
+
+### Interfaces
+
+* Allegory
+
+  * now uses a precompiled snapshot of stdlib+extensions
+  * all functions now have docstrings
+  * added vocabularies for grouping functionality
+  * added "need" for loading from library/
+
+* Punga
+
+  * now uses a precompiled snapshot
+  * new, 3-pane fullscreen interface: editor, results, dictionary
 
 ----
 
