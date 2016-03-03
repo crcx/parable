@@ -1,12 +1,12 @@
-[ "-"   `2000 ] '+warnings' :
-[ "-"   `2001 ] '-warnings' :
-[ "-"   `9000 ] '.s' :
-[ "-"   `9001 ] 'bye' :
-[ "-"   `9002 ] 'words' :
-[ "s-"  `9003 ] 'include' :
-[ "s-"  `9004 ] 'save-snapshot' :
-[ "s-"  `9005 ] 'reload-snapshot' :
-[ "...-" `9006 ] 'restart' :
+[ "-"   `2000 "Turn on reporting of redefinitions" ] '+warnings' :
+[ "-"   `2001 "Turn off reporting of redefinitions" ] '-warnings' :
+[ "-"   `9000 "Display the stack" ] '.s' :
+[ "-"   `9001 "Exit Allegory" ] 'bye' :
+[ "-"   `9002 "Display a list of all named functions" ] 'words' :
+[ "s-"  `9003 "Evaluate the contents of a file as Parable source" ] 'include' :
+[ "s-"  `9004 "Save the current session to a snapshot file" ] 'save-snapshot' :
+[ "s-"  `9005 "Replace the current session with the one stored in the specified snapshot file" ] 'reload-snapshot' :
+[ "...-" `9006 "Soft restart from the basic snapshot and Allegory extensions"] 'restart' :
 
 
 "File Operations"
