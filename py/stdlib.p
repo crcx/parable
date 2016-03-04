@@ -92,9 +92,6 @@
   "Attach a name to a slice" \
 ] '.' :
 
-[ "n-n"  [ 1 / ] [ 1 rem ] bi - "Return the smallest integer less than or equal to the starting value" ] 'floor' :
-[ "n-n"  floor 1 + "Return the smallest integer greater than or equal to the starting value" ] 'ceil' :
-
 "Symbolic names for data types"
 [ "-n"  100 "Type constant" ] 'NUMBER' :
 [ "-n"  200 "Type constant" ] 'STRING' :
@@ -133,6 +130,9 @@
 [ "q-...n"   depth [ invoke ] dip depth swap - \
   "Execute a quotation, returning a value indicating th stack depth change as a result" \
 ] 'invoke<depth?>' :
+
+[ "n-n"  [ 1 / ] [ 1 rem ] bi - "Return the smallest integer less than or equal to the starting value" ] 'floor' :
+[ "n-n"  dup floor dup-pair eq? [ drop ] [ nip 1 + ] if "Return the smallest integer greater than or equal to the starting value" ] 'ceil' :
 
 
 "Slice Functions"
