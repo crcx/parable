@@ -9,13 +9,13 @@
 * fetch now allows for negative offsets (fetch with index starting at tail end of slice)
 * disabled some redundant byte codes
 
-  * BC_FLOOR
-  * BC_LOG
-  * BC_LOG10
-  * BC_FLOW_CALL
-  * BC_FUNCTION_EXISTS
-  * BC_FUNCTION_LOOKUP
-  * BC_FUNCTION_NAME
+  * BC\_FLOOR
+  * BC\_LOG
+  * BC\_LOG10
+  * BC\_FLOW\_CALL
+  * BC\_FUNCTION\_EXISTS
+  * BC\_FUNCTION\_LOOKUP
+  * BC\_FUNCTION\_NAME
 
 * error report and abort on type or depth errors
 * internal cleanups and refactorings
