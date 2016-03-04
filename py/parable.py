@@ -1419,7 +1419,7 @@ def scan_slice(s):
     i = get_last_index(s)
     while i >= 0:
         try:
-            t, v = fetch(s, i)
+            v, t = fetch(s, i)
             v = int(v)
         except:
             t = 0
