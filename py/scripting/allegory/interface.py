@@ -74,9 +74,9 @@ def bootstrap(s):
            dictionary_hidden_slices
 
     try:
-        raw = base64.b64decode(s)
-    except:
         raw = base64.b64decode(bytes(s, 'utf-8'))
+    except:
+        raw = base64.b64decode(s)
 
     u = bz2.decompress(raw)
 
@@ -382,6 +382,22 @@ def get_input():
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 def scripting():
+    snapshot = expanduser("~") + "/.parable/default.j"
+    if os.path.exists(snapshot):
+        load_snapshot(snapshot)
+    else:
+        bootstrap(stdlib)
+        home = expanduser("~")
+
+        try:
+            src = home + "/.parable/on_startup.p"
+            if os.path.exists(src):
+                load_file(src)
+            elif os.path.exists("on_startup.p"):
+                load_file("on_startup.p")
+        except:
+            pass
+
     source = sys.argv[1]
     if not os.path.exists(source):
         sys.exit('ERROR: source file "%s" was not found!' % source)
@@ -409,6 +425,25 @@ def interactive():
         print('Initialized using ' + snapshot)
         print('------------------------------------------------')
         load_snapshot(snapshot)
+    else:
+        print('Initialized using embedded snapshot')
+        bootstrap(stdlib)
+
+        home = expanduser("~")
+
+        try:
+            src = home + "/.parable/on_startup.p"
+            if os.path.exists(src):
+                print('Loading on_startup.p...')
+                load_file(src)
+            elif os.path.exists("on_startup.p"):
+                print('Loading on_startup.p...')
+                load_file("on_startup.p")
+        except:
+            pass
+
+        print('------------------------------------------------')
+
 
     while True:
         try:
@@ -438,18 +473,6 @@ if __name__ == '__main__':
 
     prepare_slices()
     prepare_dictionary()
-    bootstrap(stdlib)
-
-    home = expanduser("~")
-
-    try:
-        src = home + "/.parable/on_startup.p"
-        if os.path.exists(src):
-            load_file(src)
-        elif os.path.exists("on_startup.p"):
-            load_file("on_startup.p")
-    except:
-        pass
 
     if len(sys.argv) < 2:
         interactive()

@@ -14,7 +14,7 @@ if __name__ == '__main__':
     if os.path.exists('extensions.p'):
         parable.parse_bootstrap(open('extensions.p').readlines())
 
-    parable.collect_garbage()
+#    parable.collect_garbage()
 
     j = json.dumps({"symbols": parable.dictionary_names, \
                     "symbol_map": parable.dictionary_slices, \
