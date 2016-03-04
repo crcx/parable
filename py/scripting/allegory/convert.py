@@ -1,5 +1,5 @@
-print "#!/usr/bin/env python3"
-print "# Copyright (c)2012-2016, Charles Childers"
+print("#!/usr/bin/env python3")
+print("# Copyright (c)2012-2016, Charles Childers")
 
 def condense_lines(code):
     m = len(code)
@@ -23,11 +23,11 @@ def condense_lines(code):
 
 f = open('../../parable.py').readlines()
 for line in f:
-    print line.rstrip()
+    print(line.rstrip())
 
 f = condense_lines(open('parable.snapshot').readlines())
-print 'stdlib = \"' + f[0].replace('"', '\\"') + '"'
+print('stdlib = \"' + f[0].replace('"', '\\"') + '"')
 
 f = open('interface.py').readlines()
 for line in f:
-    print line.rstrip()
+    print(line.rstrip())
