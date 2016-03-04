@@ -20,16 +20,6 @@ except (ImportError, AttributeError):
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 def save_snapshot(filename):
-    global dictionary_names, \
-           dictionary_slices, \
-           errors, \
-           stack, \
-           types, \
-           memory_values, \
-           memory_types, \
-           memory_map, \
-           memory_size
-
     collect_garbage()
     j = json.dumps({"symbols": dictionary_names, \
                     "symbol_map": dictionary_slices, \
@@ -42,6 +32,7 @@ def save_snapshot(filename):
                     "memory_sizes": memory_size})
     with open(filename, 'w') as file:
         file.write(j)
+
 
 def load_snapshot(filename):
     global dictionary_names, \
