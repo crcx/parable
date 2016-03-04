@@ -329,7 +329,7 @@ def bytecode_bitwise_xor(opcode, offset, more):
 
 
 def bytecode_random(opcode, offset, more):
-    stack_push(random.SystemRandom.random(), TYPE_NUMBER)
+    stack_push(random.SystemRandom().random(), TYPE_NUMBER)
 
 
 def bytecode_sqrt(opcode, offset, more):
