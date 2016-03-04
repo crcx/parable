@@ -14,6 +14,8 @@ if __name__ == '__main__':
     if os.path.exists('extensions.p'):
         parable.parse_bootstrap(open('extensions.p').readlines())
 
+    parable.collect_garbage()
+
     j = json.dumps({"symbols": parable.dictionary_names, \
                     "symbol_map": parable.dictionary_slices, \
                     "errors": parable.errors, \
@@ -22,7 +24,8 @@ if __name__ == '__main__':
                     "memory_contents": parable.memory_values, \
                     "memory_types": parable.memory_types, \
                     "memory_map": parable.memory_map, \
-                    "memory_sizes": parable.memory_size})
+                    "memory_sizes": parable.memory_size, \
+                    "hidden_slices": parable.dictionary_hidden_slices, })
 
     try:
         c = bz2.compress(bytes(j, 'utf-8'))

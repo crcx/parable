@@ -29,7 +29,8 @@ def save_snapshot(filename):
                     "memory_contents": memory_values, \
                     "memory_types": memory_types, \
                     "memory_map": memory_map, \
-                    "memory_sizes": memory_size})
+                    "memory_sizes": memory_size, \
+                    "hidden_slices": dictionary_hidden_slices })
     with open(filename, 'w') as file:
         file.write(j)
 
@@ -43,7 +44,9 @@ def load_snapshot(filename):
            memory_values, \
            memory_types, \
            memory_map, \
-           memory_size
+           memory_size, \
+           dictionary_hidden_slices
+
 
     j = json.loads(open(filename, 'r').read())
     dictionary_names = j['symbols']
@@ -55,6 +58,7 @@ def load_snapshot(filename):
     memory_types = j['memory_types']
     memory_map = j['memory_map']
     memory_size = j['memory_sizes']
+    dictionary_hidden_slices = j['hidden_slices']
 
 
 def bootstrap(s):
@@ -66,7 +70,8 @@ def bootstrap(s):
            memory_values, \
            memory_types, \
            memory_map, \
-           memory_size
+           memory_size, \
+           dictionary_hidden_slices
 
     try:
         raw = base64.b64decode(s)
@@ -89,6 +94,7 @@ def bootstrap(s):
     memory_types = j['memory_types']
     memory_map = j['memory_map']
     memory_size = j['memory_sizes']
+    dictionary_hidden_slices = j['hidden_slices']
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
@@ -440,7 +446,7 @@ if __name__ == '__main__':
         src = home + "/.parable/on_startup.p"
         if os.path.exists(src):
             load_file(src)
-        elif os.path.exits("on_startup.p"):
+        elif os.path.exists("on_startup.p"):
             load_file("on_startup.p")
     except:
         pass
