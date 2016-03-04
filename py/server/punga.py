@@ -5,13 +5,24 @@
 # (c) 2012 - 2016, Charles Childers
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
-import cgi, cgitb, json, signal, sys
+import base64, bz2, cgi, cgitb, json, signal, sys
 import parable
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
-def bootstrap(str):
-    j = json.loads(str)
+def bootstrap(s):
+    try:
+        raw = base64.b64decode(bytes(s, 'utf-8'))
+    except:
+        raw = base64.b64decode(s)
+
+    u = bz2.decompress(raw)
+
+    try:
+        j = json.loads(u)
+    except:
+        j = json.loads(u.decode())
+
     parable.dictionary_names = j['symbols']
     parable.dictionary_slices = j['symbol_map']
     parable.errors = j['errors']
@@ -104,14 +115,15 @@ def dump_dict():
         size = parable.memory_size[slice]
         if type == parable.TYPE_REMARK:
             comment = parable.slice_to_string(cell)
-            l = l + '<tr><td>' + wx
+            l = l + '<tr>'
+            l = l + '<td width="10%">' + str(slice) + '</td>' + '<td>' + wx
             cell, type = parable.fetch(slice, size)
             if type == parable.TYPE_REMARK:
                 l = l + '<br>' + parable.slice_to_string(cell)
             l = l + '</td>'
-            l = l + '<td width="25%"><pre>' + comment + '</pre></td></tr>\n'
+            l = l + '<td width="20%"><pre>' + comment + '</pre></td></tr>\n'
         else:
-            l = l + '<tr><td>' + wx + '</td></tr>\n'
+            l = l + '<tr><td colspan="3">' + wx + '</td></tr>\n'
         i = i + 1
     sys.stdout.write(l)
     sys.stdout.write("\n")
@@ -142,6 +154,8 @@ if __name__ == '__main__':
             <style>div { overflow-y: scroll; -webkit-overflow-scrolling: touch; } i { font-size: 200%; } textarea { font-family:Monaco,Consolas,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace; }</style>
             <meta charset=UTF-8>
             <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+            <meta name=apple-mobile-web-app-capable content=yes>
+            <meta name=apple-mobile-web-app-status-bar-style content=black>
         </head>
         <body>
         <div class="container-fluid" style="height: 100vh; overflow: hidden">
