@@ -20,7 +20,6 @@ except (ImportError, AttributeError):
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 def save_snapshot(filename):
-    collect_garbage()
     j = json.dumps({"symbols": dictionary_names, \
                     "symbol_map": dictionary_slices, \
                     "errors": errors, \
@@ -31,9 +30,22 @@ def save_snapshot(filename):
                     "memory_map": memory_map, \
                     "memory_sizes": memory_size, \
                     "hidden_slices": dictionary_hidden_slices })
-    with open(filename, 'w') as file:
-        file.write(j)
 
+    orig = open(__file__).read().split('\n')
+
+    try:
+        c = bz2.compress(bytes(j, 'utf-8'))
+    except:
+        c = bz2.compress(j)
+
+
+    with open(filename, 'w') as file:
+        for line in orig:
+            if line.startswith("stdlib"):
+                file.write('stdlib="' + str(base64.b64encode(c)).replace("b'", "").replace("'", "") + '"')
+            else:
+                file.write(line)
+            file.write('\n')
 
 def load_snapshot(filename):
     global dictionary_names, \
@@ -382,22 +394,7 @@ def get_input():
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 def scripting():
-    snapshot = expanduser("~") + "/.parable/default.j"
-    if os.path.exists(snapshot):
-        load_snapshot(snapshot)
-    else:
-        bootstrap(stdlib)
-        home = expanduser("~")
-
-        try:
-            src = home + "/.parable/on_startup.p"
-            if os.path.exists(src):
-                load_file(src)
-            elif os.path.exists("on_startup.p"):
-                load_file("on_startup.p")
-        except:
-            pass
-
+    bootstrap(stdlib)
     source = sys.argv[1]
     if not os.path.exists(source):
         sys.exit('ERROR: source file "%s" was not found!' % source)
@@ -419,31 +416,7 @@ def interactive():
     print('bye      Exit Listener')
     print('words    Display a list of all named items')
     print('------------------------------------------------')
-
-    snapshot = expanduser("~") + "/.parable/default.j"
-    if os.path.exists(snapshot):
-        print('Initialized using ' + snapshot)
-        print('------------------------------------------------')
-        load_snapshot(snapshot)
-    else:
-        print('Initialized using embedded snapshot')
-        bootstrap(stdlib)
-
-        home = expanduser("~")
-
-        try:
-            src = home + "/.parable/on_startup.p"
-            if os.path.exists(src):
-                print('Loading on_startup.p...')
-                load_file(src)
-            elif os.path.exists("on_startup.p"):
-                print('Loading on_startup.p...')
-                load_file("on_startup.p")
-        except:
-            pass
-
-        print('------------------------------------------------')
-
+    bootstrap(stdlib)
 
     while True:
         try:

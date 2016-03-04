@@ -5,9 +5,8 @@
 [ "-"    `9001 "Exit Allegory" ] 'bye' :
 [ "-"    `9002 "Display a list of all named functions" ] 'words' :
 [ "s-"   `9003 "Evaluate the contents of a file as Parable source" ] 'include' :
-[ "s-"   `9004 "Save the current session to a snapshot file" ] 'save-snapshot' :
-[ "s-"   `9005 "Replace the current session with the one stored in the specified snapshot file" ] 'reload-snapshot' :
-[ "...-" `9006 "Soft restart from the basic snapshot and Allegory extensions" ] 'restart' :
+[ "s-"   `9004 "Save the current session to a new script" ] 'save-snapshot' :
+[ "...-" `9006 "Soft restart from the embedded snapshot" ] 'restart' :
 
 
 "File Operations"

@@ -1,4 +1,4 @@
-# parable
+#!/usr/bin/env python
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 import base64
@@ -6,6 +6,7 @@ import bz2
 import json
 import parable
 import os
+import sys
 
 if __name__ == '__main__':
     parable.prepare_slices()
@@ -13,6 +14,11 @@ if __name__ == '__main__':
     parable.parse_bootstrap(open('stdlib.p').readlines())
     if os.path.exists('extensions.p'):
         parable.parse_bootstrap(open('extensions.p').readlines())
+
+    if len(sys.argv) > 1:
+        for i in sys.argv:
+            if os.path.exists(i) and i != "./gen-snapshot.py":
+                parable.parse_bootstrap(open(i).readlines())
 
 #    parable.collect_garbage()
 
