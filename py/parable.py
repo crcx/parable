@@ -14,7 +14,7 @@ import sys
 # Memory Configuration
 #
 
-MAX_SLICES = 100000
+MAX_SLICES = 10
 
 #
 # Constants for data types
@@ -1273,7 +1273,7 @@ def request_slice(attempts=1):
     """request a new memory slice"""
     global memory_values, memory_types, memory_map, memory_size, MAX_SLICES
     i = 0
-    while i < MAX_SLICES:
+    while i < len(memory_map):
         if memory_map[i] == 0:
             memory_map[i] = 1
             memory_values[i] = [float('nan')]
@@ -1283,7 +1283,13 @@ def request_slice(attempts=1):
         else:
             i += 1
     if attempts == 1:
-        collect_garbage()
+        i = 0
+        while i < 10:
+            memory_map.append(0)
+            memory_values.append(0)
+            memory_types.append(0)
+            memory_size.append(0)
+            i = i + 1
         return request_slice(2)
     else:
         return -1
