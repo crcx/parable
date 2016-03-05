@@ -12,15 +12,13 @@ if __name__ == '__main__':
     parable.prepare_slices()
     parable.prepare_dictionary()
     parable.parse_bootstrap(open('stdlib.p').readlines())
-    if os.path.exists('extensions.p'):
-        parable.parse_bootstrap(open('extensions.p').readlines())
 
     if len(sys.argv) > 1:
         for i in sys.argv:
             if os.path.exists(i) and i != "./gen-snapshot.py":
                 parable.parse_bootstrap(open(i).readlines())
 
-#    parable.collect_garbage()
+    parable.collect_garbage()
 
     j = json.dumps({"symbols": parable.dictionary_names, \
                     "symbol_map": parable.dictionary_slices, \
@@ -39,4 +37,4 @@ if __name__ == '__main__':
         c = bz2.compress(j)
 
     with open('parable.snapshot', 'w') as file:
-        file.write(str(base64.b64encode(c)))
+        file.write(str(base64.b64encode(c)).replace("b'", "").replace("'", ""))
