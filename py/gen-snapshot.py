@@ -15,7 +15,7 @@ if __name__ == '__main__':
 
     if len(sys.argv) > 1:
         for i in sys.argv:
-            if os.path.exists(i) and i != "./gen-snapshot.py":
+            if os.path.exists(i) and i != "./gen-snapshot.py" and i != "gen-snapshot.py" :
                 parable.parse_bootstrap(open(i).readlines())
 
     parable.collect_garbage()
