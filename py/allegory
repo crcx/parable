@@ -16,7 +16,7 @@ import sys
 # Memory Configuration
 #
 
-MAX_SLICES = 10
+INITIAL_SLICES = 100
 
 #
 # Constants for data types
@@ -1273,13 +1273,13 @@ memory_size = []      # A simple structure for indicating the number of items
 
 def request_slice(attempts=1):
     """request a new memory slice"""
-    global memory_values, memory_types, memory_map, memory_size, MAX_SLICES
+    global memory_values, memory_types, memory_map, memory_size
     i = 0
     while i < len(memory_map):
         if memory_map[i] == 0:
             memory_map[i] = 1
-            memory_values[i] = [float('nan')]
-            memory_types[i] = [TYPE_NUMBER]
+            memory_values[i] = [0]
+            memory_types[i] = [0]
             memory_size[i] = 0
             return i
         else:
@@ -1299,13 +1299,18 @@ def request_slice(attempts=1):
 
 def release_slice(slice):
     """release a slice. the slice should not be used after this is done"""
-    global memory_map
-    memory_map[int(slice)] = 0
+    global memory_map, memory_size, memory_values, memory_types
+    slice = int(slice)
+    memory_map[slice] = 0
+    memory_size[slice] = 0
+    memory_values[slice] = 0
+    memory_types[slice] = 0
+
 
 
 def copy_slice(source, dest):
     """copy the contents of one slice to another"""
-    global memory_values, memory_map, memory_size
+    global memory_size
     i = 0
     l = memory_size[int(source)]
     while i <= l:
@@ -1317,11 +1322,11 @@ def copy_slice(source, dest):
 
 def prepare_slices():
     """prepare the initial set of slices for use"""
-    global memory_values, memory_types, memory_map, memory_size, MAX_SLICES
-    memory_map = [0 for x in range(MAX_SLICES)]
-    memory_values = [0 for x in range(MAX_SLICES)]
-    memory_types = [0 for x in range(MAX_SLICES)]
-    memory_size = [0 for x in range(MAX_SLICES)]
+    global memory_values, memory_types, memory_map, memory_size, INITIAL_SLICES
+    memory_map = [0 for x in range(INITIAL_SLICES)]
+    memory_values = [0 for x in range(INITIAL_SLICES)]
+    memory_types = [0 for x in range(INITIAL_SLICES)]
+    memory_size = [0 for x in range(INITIAL_SLICES)]
 
 
 def fetch(slice, offset):
@@ -1485,10 +1490,9 @@ def seek_all_references():
 
 def collect_garbage():
     """scan memory, and collect unused slices"""
-    global MAX_SLICES, memory_map
     i = 0
     refs = seek_all_references()
-    while i < MAX_SLICES:
+    while i < INITIAL_SLICES:
         if not i in refs and memory_map[i] == 1:
             release_slice(i)
         i = i + 1

@@ -19,6 +19,8 @@
 
 * error report and abort on type or depth errors
 * internal cleanups and refactorings
+* disabled automatic garbage collection
+* removed ceiling on number of slices (goodbye MAX\_SLICES)
 
 ### Standard Library
 
@@ -73,7 +75,9 @@
   * now uses a precompiled snapshot of stdlib+extensions
   * all functions now have docstrings
   * added vocabularies for grouping functionality
-  * added "need" for loading from library/
+  * added *need* for loading from library/
+  * removed *reload-snapshot*
+  * changed *save-snapshot* to generate a turnkey script
 
 * Punga
 
