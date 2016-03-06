@@ -427,6 +427,16 @@ def interactive():
     print('------------------------------------------------')
     bootstrap(stdlib)
 
+    home = expanduser("~")
+    try:
+        src = home + "/.parable/on_startup.p"
+        if os.path.exists(src):
+            load_file(src)
+        elif os.path.exits("on_startup.p"):
+            load_file("on_startup.p")
+    except:
+        pass
+
     while True:
         try:
             src = get_input()
