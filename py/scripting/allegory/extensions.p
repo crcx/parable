@@ -5,7 +5,7 @@
 [ "-"    `9001 "Exit Allegory" ] 'bye' :
 [ "-"    `9002 "Display a list of all named functions" ] 'words' :
 [ "s-"   `9003 "Evaluate the contents of a file as Parable source" ] 'include' :
-[ "s-"   `9004 "Save the current session to a new script" ] 'save-snapshot' :
+[ "s-"   `9004 "Save the current session to a new script" ] 'save-as' :
 [ "...-" `9006 "Soft restart from the embedded snapshot" ] 'restart' :
 
 
@@ -72,4 +72,9 @@
 [ &ConsoleIO~ &Files~ ] [ with ] for-each
 
 
-[ "-" "Entry point for standalone applications (via turnkey)" ] 'allegory-main' :
+[ "-" \
+  'allegory, (c)2013-2016 Charles Childers\n\n' display \
+  "Entry point for standalone applications (via turnkey)" \
+] 'allegory.on-start' :
+
+[ "-" "Exit point for standalone applications (via turnkey)" ] 'allegory.on-end' :

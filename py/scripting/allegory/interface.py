@@ -47,6 +47,11 @@ def save_snapshot(filename):
                 file.write(line)
             file.write('\n')
 
+    import stat
+    st = os.stat(filename)
+    os.chmod(filename, st.st_mode | stat.S_IEXEC)
+
+
 def load_snapshot(filename):
     global dictionary_names, \
            dictionary_slices, \
@@ -108,7 +113,7 @@ def bootstrap(s):
     memory_size = j['memory_sizes']
     dictionary_hidden_slices = j['hidden_slices']
 
-    xt = lookup_pointer('allegory-main')
+    xt = lookup_pointer('allegory.on-start')
     if xt != -1:
         interpret(xt, opcodes)
 
@@ -322,6 +327,9 @@ def opcodes(slice, offset, opcode):
         dump_stack()
     elif opcode == 9001:
         dump_stack()
+        xt = lookup_pointer('allegory.on-end')
+        if xt != -1:
+            interpret(xt, opcodes)
         exit()
     elif opcode == 9002:
         dump_dict()
@@ -409,6 +417,9 @@ def scripting():
         sys.exit('ERROR: source file "%s" was not found!' % source)
     load_file(source)
     dump_stack()
+    xt = lookup_pointer('allegory.on-end')
+    if xt != -1:
+        interpret(xt, opcodes)
 
 
 def interactive():
@@ -419,12 +430,6 @@ def interactive():
     except (ImportError, AttributeError):
         pass
 
-    print('allegory, (c)2013-2016 Charles Childers')
-    print('------------------------------------------------')
-    print('.s       Display Stack')
-    print('bye      Exit Listener')
-    print('words    Display a list of all named items')
-    print('------------------------------------------------')
     bootstrap(stdlib)
 
     home = expanduser("~")
