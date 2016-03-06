@@ -70,3 +70,6 @@
 
 
 [ &ConsoleIO~ &Files~ ] [ with ] for-each
+
+
+[ "-" "Entry point for standalone applications (via turnkey)" ] 'allegory-main' :

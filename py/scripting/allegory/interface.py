@@ -108,6 +108,10 @@ def bootstrap(s):
     memory_size = j['memory_sizes']
     dictionary_hidden_slices = j['hidden_slices']
 
+    xt = lookup_pointer('allegory-main')
+    if xt != -1:
+        interpret(xt, opcodes)
+
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 def completer(text, state):
@@ -251,7 +255,11 @@ def opcodes(slice, offset, opcode):
         files[slot] = 0
     elif opcode == 203:
         slot = int(stack_pop())
-        stack_push(ord(files[slot].read(1)), TYPE_CHARACTER)
+        try:
+            stack_push(ord(files[slot].read(1)), TYPE_CHARACTER)
+        except:
+            report('Non-ASCII characters detected, aborting file input')
+            abort_run(opcode, offset)
     elif opcode == 204:
         slot = int(stack_pop())
         files[slot].write(chr(int(stack_pop())))
@@ -313,6 +321,7 @@ def opcodes(slice, offset, opcode):
     elif opcode == 9000:
         dump_stack()
     elif opcode == 9001:
+        dump_stack()
         exit()
     elif opcode == 9002:
         dump_dict()
