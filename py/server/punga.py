@@ -123,7 +123,8 @@ def dump_dict():
             l = l + '</td>'
             l = l + '<td width="20%"><pre>' + comment + '</pre></td></tr>\n'
         else:
-            l = l + '<tr><td colspan="3">' + wx + '</td></tr>\n'
+            l = l + '<tr><td width-"10%">' + str(slice) + '</td>'
+            l = l + '<td colspan="3">' + wx + '</td></tr>\n'
         i = i + 1
     sys.stdout.write(l)
     sys.stdout.write("\n")
