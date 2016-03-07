@@ -505,7 +505,7 @@
   [ "-p" \
     request-empty !S \
     depth [ @S push ] times \
-    @S reverse dup !S invoke \
+    @S reverse dup !S &nop for-each \
     @S \
     "Return an array with the items currently on the stack" \
   ] 'stack-values' :
