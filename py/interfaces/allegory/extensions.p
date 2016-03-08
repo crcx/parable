@@ -1,3 +1,4 @@
+"Allegory Extensions to the Parable"
 [ "-"   `2000 "Turn on reporting of redefinitions" ] '+warnings' :
 [ "-"   `2001 "Turn off reporting of redefinitions" ] '-warnings' :
 
@@ -52,14 +53,17 @@
 ] 'sys.run' :
 
 
-[ "- number"  `4000 "Deprecated" ] 'arg-count' :
-[ "number - string"  `4001 "Deprecated" ] 'get-arg' :
+[ "- number"         sys.args 2 -            "Deprecated" ] 'arg-count' :
+[ "number - string"  sys.args swap 2 - fetch "Deprecated" ] 'get-arg' :
+
 [ "s-s"  `5000 ] 'value-for-key' :
 [ "s-s"  `5001 "Return the value of an environment variable" ] 'get-environment-value' :
 
+
 "Terminal I/O"
 [ "v-"  `6000    "Display a value to the screen" ] 'display' :
-[ #10 :c display "Display a newline on the screen" ] 'tty.cr' :
+[ '\n'   display "Display a newline on the screen" ] 'tty.cr' :
+[ '\t'   display "Display a newline on the screen" ] 'tty.tab' :
 [ 'display'  'tty.cr' ] 'ConsoleIO~' vocab
 
 [ "-n" `300 "Return a Unix timestamp" ] 'time' :
@@ -67,7 +71,6 @@
 
 
 [ "s-" dup function-exists? [ drop ] [ 'library/' swap + include ] if "Load a library" ] 'needs' :
-
 
 [ &ConsoleIO~ &Files~ ] [ with ] for-each
 
