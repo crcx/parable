@@ -1,0 +1,84 @@
+#!/usr/bin/env python
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+import base64
+import bz2
+import json
+import parable
+import os
+import sys
+
+
+def find_references(slice):
+    refs = parable.find_references(slice)
+    refs.append(slice)
+
+    print('Slice: ' + str(slice))
+    print('RAW:   ' + str(parable.memory_values[slice]))
+    print('REFS:  ' + str(refs))
+    refs.sort()
+    print('REFS:  ' + str(refs))
+    print('---------------------------------------------')
+    for ref in refs:
+        s = parable.pointer_to_name(ref)
+        if s != "":
+            print(str(ref) + ':\t' + s)
+    return refs
+
+
+def load_files():
+    if len(sys.argv) > 1:
+        try:
+            for i in sys.argv:
+                if os.path.exists(i) and i != "./prc" and i != "prc" :
+                    parable.parse_bootstrap(open(i).readlines())
+        except:
+            pass
+
+
+
+if __name__ == '__main__':
+    parable.prepare_slices()
+    parable.prepare_dictionary()
+    parable.parse_bootstrap(open('stdlib.p').readlines())
+
+    load_files()
+    slice = parable.lookup_pointer('main')
+    print(slice)
+    refs = find_references(slice)
+
+    i = 0
+    while i < len(parable.memory_map):
+        if not i in refs:
+            parable.release_slice(i)
+        i = i + 1
+
+    parable.collect_garbage()
+
+    parable.dictionary_names = ['main']
+    parable.dictionary_slices = [slice]
+
+    print(parable.memory_values)
+    print(parable.dictionary_names)
+    print(parable.dictionary_slices)
+
+    j = json.dumps({"symbols": parable.dictionary_names, \
+                    "symbol_map": parable.dictionary_slices, \
+                    "errors": parable.errors, \
+                    "stack_values": parable.stack, \
+                    "stack_types": parable.types, \
+                    "memory_contents": parable.memory_values, \
+                    "memory_types": parable.memory_types, \
+                    "memory_map": parable.memory_map, \
+                    "memory_sizes": parable.memory_size, \
+                    "hidden_slices": parable.dictionary_hidden_slices, })
+
+    try:
+        c = bz2.compress(bytes(j, 'utf-8'))
+    except:
+        c = bz2.compress(j)
+
+    snapshot = str(base64.b64encode(c)).replace("b'", "").replace("'", "")
+
+    with open('a.out', 'w') as file:
+        file.write(snapshot)
