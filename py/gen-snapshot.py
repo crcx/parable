@@ -10,17 +10,44 @@ import sys
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
+standalone = False
+target = "parable.snapshot"
+
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+def embed_parable():
+    with open('parable.py', 'r') as file:
+        p = file.read()
+    return p
+
+def parse_args():
+    global standalone, target
+    files = []
+    if len(sys.argv) > 1:
+        for i in sys.argv:
+            if i.startswith("python") or i.startswith("pypy"):
+                pass
+            elif i.startswith("--"):
+                if i.startswith("--output="):
+                    target = i[9:]
+                if i.startswith("--standalone"):
+                    standalone = True
+            else:
+                files.append(i)
+    return files
+
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
 def prepare():
     parable.prepare_slices()
     parable.prepare_dictionary()
     parable.parse_bootstrap(open('stdlib.p').readlines())
 
 
-def load_files():
-    if len(sys.argv) > 1:
-        for i in sys.argv:
-            if os.path.exists(i) and i != "./gen-snapshot.py" and i != "gen-snapshot.py" :
-                parable.parse_bootstrap(open(i).readlines())
+def load_files(files):
+    for i in files:
+        if os.path.exists(i) and i != "./gen-snapshot.py" and i != "gen-snapshot.py" :
+            parable.parse_bootstrap(open(i).readlines())
 
 
 def create_snapshot():
@@ -53,9 +80,14 @@ def encode_snapshot(c):
 
 if __name__ == '__main__':
     prepare()
-    load_files()
+    load_files(parse_args())
     j = create_snapshot()
     c = compress_snapshot(j)
     e = encode_snapshot(c)
-    with open('parable.snapshot', 'w') as file:
-        file.write(e)
+
+    with open(target, 'w') as file:
+        if standalone:
+            file.write(embed_parable() + "\n")
+            file.write('stdlib="' + e + '"\n')
+        else:
+            file.write(e)
