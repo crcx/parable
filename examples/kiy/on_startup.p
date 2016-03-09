@@ -1,6 +1,3 @@
-+ignore
-'on_startup.p' include
--ignore
 "hand tools"
 "2016 kiy"
 
@@ -13,7 +10,6 @@
 
 'cheat' [ "ss-" + slurp-file display ] .
 'txt'   [ "s-" '.txt' cheat ] .
-'todo'  [ "-" 'cat todo.txt' sys.run drop ] .
 
 [ 'marker'  'anew'  ] { "160224 crcx"
   [ 'needle' 'haystack' ] ::
@@ -79,12 +75,14 @@
 'B?'      [ "-n" vm.memory<sizes> #0 &+ reduce bytes "memory used in bytes" ] .
 'MB?'     [ "-n" B? #2 [ #1024 / ] times #10 [ * round ] sip / "memory used in MB" ] .
 
- 'slicize'    &stack-values .
-'-slicize'    [ "p-.." &nop for-each "slice to stack" ] .
-'roll'        [ "...-..." slicize &reset dip &head &body bi &push sip -slicize \
+ 'enslice'    &stack-values .
+'-enslice'    [ "p-.." &nop for-each "slice to stack" ] .
+ 'rot'        [ "Vvv-vvV" &swap dip swap ] .
+'-rot'        [ "vvV-Vvv" rot rot ] .
+'roll'        [ "...-..." enslice &reset dip &head &body bi &push sip -enslice \
                 "Roll the last item on the stack to the top" ] .
 'rolls'       [ "..n-.." &roll times ] .
-'pick'        [ "...n-..." &slicize dip swap [ 1+ rolls dup ] dip [ &reset dip ] dip swap &-slicize dip \
+'pick'        [ "...n-..." &enslice dip swap [ 1+ rolls dup ] dip [ &reset dip ] dip swap &-enslice dip \
                 "pick from stack n" ] .
 'nips'        [ "..v-" &nip  times ] .
  'drops'      [ "..n-" &drop times ] .
@@ -94,10 +92,12 @@
  'drop-to'    [ "..n-.." 1+ [ &roll times ] sip drops \
                 "drop from 0 to n of the stack" ] .
  'drop-all'   &reset .
+[ 'drop-pick' ] {
+      'mark-unknown' [ "pn-p" &dup dip #nan :u swap &swap dip store ] .
+      'erase-unknown' [ "p-p" dup pop unknown? &drop &swap if ] .
+  'drop-pick'  [ "..p or ..n - .." &enslice dip pointer? [ &mark-unknown for-each ] &mark-unknown if \
+                 reverse &reset dip len? &erase-unknown times drop ] . }
  'stack-values<n>' [ "..n-p" request-empty swap [ &push sip ] times reverse ] .
-+ignore
- 'snap'       [ "-" 'default.j' save-snapshot ] .
--ignore
 
  '0@'       [ "p-v" #0 fetch ] . "consider using @ prefix"
  '0!'       [ "vp-" #0 store ] . "consider using ! prefix"
@@ -113,7 +113,7 @@
 'dim?'      &get<final-offset> .
 'dim!'      &set<final-offset> .
 
-[ '-1@' '-1!' '-1_1+' '-1_1-' 'head-remark?' 'tail-remark?' 'vector?' 'vector' 'assert-vector' \
+[ '-1@' '-1!' '-1_1+' '-1_1-' 'head-remark?' 'tail-remark?' 'vector?' 'envector' 'assert-vector' \
   'vpush' 'vpop' 'vdrop' 'vreset' ] { 
 "a vector may be used as a constant function, an array, or a stack."
 "each vector must have one head remark and no tail remark."
@@ -129,18 +129,17 @@
   '-1_1+'     [ "p-" dup -1@ 1+ swap -1! ] .
   '-1_1-'     [ "p-" dup -1@ 1- swap -1! ] .
     'value-absent?' [ "p-pf" bottom? &1unk? &false if ] .
-  'head-remark?'  [ "p-pf" dup  0@ remark? ] . 
-  'tail-remark?'  [ "p-pf" dup -1@ remark? ] .
-    'remarks?'      [ "p-pf" head-remark? [ tail-remark? not ] dip and \
-                      "+head -tail  =>  true" ] .
+  'head-remark?'  [ "p-pf" dup  0@ remark? nip ] . 
+  'tail-remark?'  [ "p-pf" dup -1@ remark? nip ] .
+    'vector?'     [ "p-pf" head-remark? [ tail-remark? not ] dip and \
+                      "+head -tail  =>  true; actually, there are more conditions to fulfill" ] .
     'vector-stop'   [ "sp-" drop 'ERROR: vector \'{v}\' must have a head remark and no tail remark' \
                       interpolate stop ] .
-  'vector?'       &remarks? . "there are more conditions to fulfill"
   'assert-vector' [ "sp-" dup-pair . vector? [ 2 drops ] &vector-stop if ] .
-    'add-remark-to-head'    [ "ss-" [ :r enquote ] dip [ lookup-function + ] sip redefine ] .
-    'merge-remarks-to-head' [ "s-" lookup-function [ 0@ :s ' | ' + ] sip [ pop :s ] sip [ + :r ] dip 0! ] .
-  'vector'        [ "s-s" head-remark? [ '-?' add-remark-to-head ] if-false \
-                      tail-remark?    &merge-remarks-to-head   if-true "turn a function into a vector" ] .
+    'add-remark-to-head'    [ "sp-" [ :r enquote ] dip &+ sip ] .
+    'merge-remarks-to-head' [ "p-p" dup [ 0@ :s ' | ' + ] sip [ pop :s ] sip [ + :r ] dip 0! ] .
+  'envector'      [ "p-p" head-remark? [ '-?' add-remark-to-head ] if-false \
+                      tail-remark? &merge-remarks-to-head if-true "turn a function into a vector" ] .
   'vpop'          [ "p-v" bottom? &fetch.unk! &pop  if ] .
   'vdrop'         [ "p-" dup len? #2 - #1 max swap dim! len? #2 eq? &1unk! if-true ] .
   'vreset'        [ "p-" 1unk! #1 dim! ] .
@@ -191,7 +190,7 @@
 
     'addr'  [ "p-s" dup lookup-name dup '' eq? [ drop :n n>s ] &nip if ] .
     'n.do'  [ "sn-s" n>s     '#'  prepend + ] .
-    's.do'  [ "ss-s"                      + ] .
+    's.do'  [ "ss-s"         '\'' enclose + ] .
     'c.do'  [ "sc-s" :s      '$'  prepend + ] .
     'p.do'  [ "sp-s" :n addr '&'  prepend + ] .
     'f.do'  [ "sf-s" :f :s                + ] .
@@ -226,15 +225,16 @@
  '?'    [ "s-.." (?) .. ] .
 '??'    [ "s-.." lookup-function [] .. ] . 
 
+'clear' [ "-" 'clear'                    sys.run drop ] .
 'date'  [ "-" 'date \"+%Y-%m-%d %H:%M\"' sys.run drop ] .
 'ls'    [ "-" 'ls'                       sys.run drop ] .
-'pwd'   [ "-" 'pwd'                      sys.run drop ] .
 'ps'    [ "-" 'ps -al'                   sys.run drop ] .
-'clear' [ "-" 'clear'                    sys.run drop ] .
+'pwd'   [ "-" 'pwd'                      sys.run drop ] .
+'todo'  [ "-" 'cat todo.txt'             sys.run drop ] .
  
 +ignore
   'units.p' include "a collection of units for conversion"
 -ignore
 
-MB? gc MB? ..
-2drops
+'allegory.on-start' [ MB? gc MB? .. 2drops ] .
+'alle' save-as
