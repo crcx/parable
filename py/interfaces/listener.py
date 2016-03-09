@@ -4,6 +4,9 @@
 # Copyright (c) 2013, 2015  Charles Childers
 #
 
+import base64
+import bz2
+import json
 import readline
 import os
 import sys
@@ -17,8 +20,34 @@ except (ImportError, AttributeError):
     pass
 
 
+def init_from_snapshot(s):
+    try:
+        raw = base64.b64decode(bytes(s, 'utf-8'))
+    except:
+        raw = base64.b64decode(s)
+
+    u = bz2.decompress(raw)
+
+    try:
+        j = json.loads(u)
+    except:
+        j = json.loads(u.decode())
+
+    parable.dictionary_names = j['symbols']
+    parable.dictionary_slices = j['symbol_map']
+    parable.errors = j['errors']
+    parable.stack = j['stack_values']
+    parable.types = j['stack_types']
+    parable.memory_values = j['memory_contents']
+    parable.memory_types = j['memory_types']
+    parable.memory_map = j['memory_map']
+    parable.memory_size = j['memory_sizes']
+    parable.dictionary_hidden_slices = j['hidden_slices']
+
+
 def display_item(prefix, value):
     sys.stdout.write('\t' + prefix + str(value))
+
 
 def dump_stack():
     """display the stack"""
@@ -114,7 +143,10 @@ if __name__ == '__main__':
 
     parable.prepare_slices()
     parable.prepare_dictionary()
-    parable.parse_bootstrap(open('stdlib.p').readlines())
+    if os.path.exists('parable.snapshot'):
+        init_from_snapshot(open('parable.snapshot').read())
+    else:
+        parable.parse_bootstrap(open('stdlib.p').readlines())
 
     evaluate("[ \"-\"   `9000 ] '.s' :")
     evaluate("[ \"-\"   `9001 ] 'bye' :")
