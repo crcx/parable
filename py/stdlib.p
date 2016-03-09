@@ -46,7 +46,7 @@
 [ "v-"     `49 "Discard the top value on the stack" ] 'drop' :
 [ "vV-Vv"  `50 "Switch the positions of the top two items on the stack" ] 'swap' :
 [ "-n"     `51 "Return the number of items on the stack" ] 'depth' :
-[ "s-"     `55 "Remove the named item from the dictionary" ] 'hide-function' :
+[ "s-"     `55 "Remove the named item from the dictionary" ] 'hide-word' :
 [ "ss-n"   `57 "Search for substring (s2) in a source string (s1). Returns #nan if not found." ] 'find' :
 [ "pnn-p"  `58 "Return a new slice containing the contents of the original slice, starting from the specified offset and ending at (but not including) the ending offset." ] 'subslice' :
 [ "s-f"    `59 "If string can be converted to a number, return true, otherwise return false" ] 'numeric?' :
@@ -227,8 +227,8 @@
 
 
 "Misc"
-[ "p-"   invoke<depth?> [ hide-function ] times "Given an array of names, hide each named item" ] 'hide-functions' :
-[ "ps-"  dup hide-function : "Remove the old name for a function and assign it to a new one" ] 'redefine' :
+[ "p-"   invoke<depth?> [ hide-word ] times "Given an array of names, hide each named item" ] 'hide-words' :
+[ "ps-"  dup hide-word : "Remove the old name for a word and assign it to a new one" ] 'redefine' :
 [ "p-"   invoke<depth?> [ var ] times "Given a list of names, create a variable for each one" ] '::' :
 
 
@@ -301,17 +301,17 @@
   "Given a slice and a value, return the offset the value is located at, or #nan if not found" \
 ] 'index-of' :
 
-[ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset'  'localize' ] hide-functions
+[ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset'  'localize' ] hide-words
 
 
-[ "s-f"  vm.dict<names> swap contains? "Return true if the named function exists or false otherwise" ] 'function-exists?' :
+[ "s-f"  vm.dict<names> swap contains? "Return true if the named word exists or false otherwise" ] 'word-exists?' :
 
-[ "s-p"  vm.dict<names> swap index-of vm.dict<slices> swap fetch "Return a pointer to the named function if it exists, or #nan otherwise" ] 'lookup-function' :
+[ "s-p"  vm.dict<names> swap index-of vm.dict<slices> swap fetch "Return a pointer to the named word if it exists, or #nan otherwise" ] 'lookup-word' :
 
 [ "p-s"  :p vm.dict<slices> over contains? [ vm.dict<slices> swap index-of vm.dict<names> swap fetch ] [ drop '' ] if "If the pointer corresponds to a named item, return the name. Otherwise return an empty string." ] 'lookup-name' :
 
 
-[ "ss-"  swap dup function-exists? [ dup lookup-function swap hide-function swap : ] [ drop ] if "Change a name from s1 to s2" ] 'rename-function' :
+[ "ss-"  swap dup word-exists? [ dup lookup-name swap hide-word swap : ] [ drop ] if "Change a name from s1 to s2" ] 'rename-word' :
 
 "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
 [ "s-s" :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while 1 - [ dup get<final-offset> 1 + ] dip swap subslice :s "Remove leading whitespace from a string" ] 'trim-left' :
@@ -331,29 +331,29 @@
   @Private [ @Public swap contains? not ] filter \
   \
   "Hide the remaining names" \
-  [ hide-function ] for-each \
+  [ hide-word ] for-each \
   "End a lexically scoped region, removing any headers not specified in the provided array." \
 ] '}' :
-[ 'Public'  'Private' ] hide-functions
+[ 'Public'  'Private' ] hide-words
 
 "Vocabularies"
 [ 'with' 'without' 'vocab' '}vocab' '}}' ] {
   [ 'Vocabulary' ] ::
 
   [ "p-"  [ invoke : ] for-each "Add words in a vocabulary to the dictionary" ] 'with' :
-  [ "p-"  [ tail hide-function ] for-each "Remove words in a vocabulary from the dictionary" ] 'without' :
+  [ "p-"  [ tail hide-word ] for-each "Remove words in a vocabulary from the dictionary" ] 'without' :
 
   [ "ps-" \
     request-empty !Vocabulary \
     @Vocabulary swap : \
-    [ dup lookup-function swap cons @Vocabulary push ] for-each \
+    [ dup lookup-word swap cons @Vocabulary push ] for-each \
     @Vocabulary without \
     "Create a new vocabulary" \
   ] 'vocab' :
 
   [ "ps-" \
     over } vocab \
-    "Close a lexical scope and create a vocabulary with the exposed functions" \
+    "Close a lexical scope and create a vocabulary with the exposed words" \
   ] '}}' :
 }
 
@@ -395,7 +395,7 @@
 [ "s-n" 0 swap [ :c swap hash:sdbm<n> ] for-each "Hash a string using the SDBM algorithim" ] 'hash:sdbm' :
 [ "s-b" hash:djb2 "The preferred hash algorithim (defaults to DJB2)" ] 'chosen-hash' :
 [ "s-n" chosen-hash @Hash-Prime rem "Hash a string using chosen-hash and HashPrime" ] 'hash' :
-'hash:sdbm<n>' hide-function
+'hash:sdbm<n>' hide-word
 
 
 
@@ -490,9 +490,9 @@
   [ "p-?" &head &tail bi [ remark? [ drop ] if-false ] bi@ ] 'desc' :
 
   [ "s-s | s-ss" \
-    dup function-exists? \
-    [ lookup-function desc ] \
-    [ 'function "' swap + '" not found' + report-error ] if \
+    dup word-exists? \
+    [ lookup-word desc ] \
+    [ 'word "' swap + '" not found' + report-error ] if \
     "Lookup the stack comment and description (if existing) for a named item" \
   ] '?' :
 }

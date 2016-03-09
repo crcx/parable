@@ -4,7 +4,7 @@
 
 [ "-"    `9000 "Display the stack" ] '.s' :
 [ "-"    `9001 "Exit Allegory" ] 'bye' :
-[ "-"    `9002 "Display a list of all named functions" ] 'words' :
+[ "-"    `9002 "Display a list of all named words" ] 'words' :
 [ "s-"   `9003 "Evaluate the contents of a file as Parable source" ] 'include' :
 [ "s-"   `9004 "Save the current session to a new script" ] 'save-as' :
 [ "...-" `9006 "Soft restart from the embedded snapshot" ] 'restart' :
@@ -70,7 +70,7 @@
 [ "p-n" time [ invoke ] dip time swap - "Invoke a function and return the running time (in seconds)" ] 'invoke<time>' :
 
 
-[ "s-" dup function-exists? [ drop ] [ 'library/' swap + include ] if "Load a library" ] 'needs' :
+[ "s-" dup word-exists? [ drop ] [ 'library/' swap + include ] if "Load a library" ] 'needs' :
 
 [ &ConsoleIO~ &Files~ ] [ with ] for-each
 
