@@ -52,59 +52,61 @@ def dump_stack():
     i = 0
     s = ""
     depth = len(parable.stack)
-    sys.stdout.write("<table class='table table-bordered'>")
+    html = "<table>"
     while i < depth:
         tos = parable.stack[i]
         type = parable.types[i]
         if type == parable.TYPE_NUMBER:
-            sys.stdout.write(stack_item(i, "#" + str(tos)))
+            html = html + stack_item(i, "#" + str(tos))
         elif type == parable.TYPE_CHARACTER:
-            sys.stdout.write(stack_item(i, "$" + str(chr(tos))))
+            html = html + stack_item(i, "$" + str(chr(tos)))
         elif type == parable.TYPE_STRING:
             s = "'" + parable.slice_to_string(tos) + "'"
             s = s + "<br>Store at: " + str(tos)
-            sys.stdout.write(stack_item(i, s))
+            html = html + stack_item(i, s)
         elif type == parable.TYPE_POINTER:
             s = "&amp;" + str(tos)
             if parable.pointer_to_name(tos) != "":
                 s = s + "<br>Pointer to: " + parable.pointer_to_name(tos)
-            sys.stdout.write(stack_item(i, s))
+            html = html + stack_item(i, s)
         elif type == parable.TYPE_FLAG:
             if tos == -1:
-                sys.stdout.write(stack_item(i, "true"))
+                html = html + stack_item(i, "true")
             elif tos == 0:
-                sys.stdout.write(stack_item(i, "false"))
+                html = html + stack_item(i, "false")
             else:
-                sys.stdout.write(stack_item(i, "malformed flag"))
+                html = html + stack_item(i, "malformed flag")
         elif type == parable.TYPE_BYTECODE:
-            sys.stdout.write(stack_item(i, "`" + str(tos)))
+            html = html + stack_item(i, "`" + str(tos))
         elif type == parable.TYPE_REMARK:
             s = "\"" + parable.slice_to_string(tos) + "\""
             s = s + "<br>Store at: " + str(tos)
-            sys.stdout.write(stack_item(i, s))
+            html = html + stack_item(i, s)
         elif type == parable.TYPE_FUNCTION_CALL:
             s = "Call: " + str(tos)
             if parable.pointer_to_name(tos) != "":
                 s = s + "<br>Pointer to: " + parable.pointer_to_name(tos)
-            sys.stdout.write(stack_item(i, s))
+            html = html + stack_item(i, s)
         else:
-            sys.stdout.write(stack_item(i, "unmatched type on stack!"))
+            html = html + stack_item(i, "unmatched type on stack!")
         i += 1
-    sys.stdout.write("</table>")
+    html = html + "</table>"
+    return html
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 def dump_errors():
+    html = ""
     if parable.errors:
-        sys.stdout.write("<div class='alert alert-warning'>")
         for error in parable.errors:
-            sys.stdout.write("<tt>" + error + "</tt><br>")
-        sys.stdout.write("</div>")
+            html = html + "<tt>" + error + "</tt><br>"
+    return html
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 def dump_dict():
     """display named items"""
+    html = "<table>"
     l = ''
     i = 0
     for w in parable.dictionary_names:
@@ -126,8 +128,9 @@ def dump_dict():
             l = l + '<tr><td width-"10%">' + str(slice) + '</td>'
             l = l + '<td colspan="3">' + wx + '</td></tr>\n'
         i = i + 1
-    sys.stdout.write(l)
-    sys.stdout.write("\n")
+    html = html + l
+    html = html + "</table>"
+    return html
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
@@ -143,63 +146,22 @@ def setup_environment():
 if __name__ == '__main__':
     setup_environment()
     form = cgi.FieldStorage()
-    message = form.getvalue("code", "")
-    sys.stdout.write("Content-type: text/html\n\n")
-
-    print("""
-        <!DOCTYPE html>
-        <head>
-            <title>parable language</title>
-            <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/readable/bootstrap.min.css" rel="stylesheet">
-            <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet">
-            <style>div { overflow-y: scroll; -webkit-overflow-scrolling: touch; } i { font-size: 200%; } textarea { font-family:Monaco,Consolas,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace; }</style>
-            <meta charset=UTF-8>
-            <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-            <meta name=apple-mobile-web-app-capable content=yes>
-            <meta name=apple-mobile-web-app-status-bar-style content=black>
-        </head>
-        <body>
-        <div class="container-fluid" style="height: 100vh; overflow: hidden">
-            <div class="row">
-                <div class="col-sm-3"><div class="form-group row">
-                    <form name='editor' id='editor' action='punga.py' method='post'>
-    """)
-    sys.stdout.write("<textarea rows='24' style='height: 85vh' class='col-sm-3 form-control' name='code'")
-    sys.stdout.write("placeholder='enter your code here'>")
-    sys.stdout.write(message)
-    sys.stdout.write("</textarea>")
-    print("""
-                        <a onClick='document.forms["editor"].submit()' class='form-control btn btn-default'>Evaluate</a>
-                    </form></div>
-                </div>
-                <div class="col-sm-4" style="max-height: 85vh; min-height: 85vh; overflow: scroll">
-    """)
-
-    message = message.replace("\\\r\n", " ")
+    code = form.getvalue("code", "")
+    message = code.replace("\\\r\n", " ")
     message = message.replace("\\\n", " ")
     f = parable.condense_lines(message.split("\n"))
     for line in f:
         if len(line) > 1:
             s = parable.compile(line, parable.request_slice())
             parable.interpret(s)
-    dump_errors()
-    dump_stack()
 
-    print("""
-                    &nbsp;
-                </div>
-                <div class="col-sm-5" style="max-height: 85vh; min-height: 85vh; overflow: scroll">
-                    <table class='table table-bordered'>
-    """)
+    sys.stdout.write("Content-type: text/html\n\n")
+    with open('template.html') as file:
+        template = file.read()
 
-    dump_dict()
+    stack = dump_stack()
+    errors = dump_errors()
+    dict = dump_dict()
 
-    print("""
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-    </body>
-    </html>
-    """)
+    template = template.replace('{{code}}', code).replace('{{stack}}',stack).replace('{{errors}}',errors).replace('{{dict}}', dict)
+    print(template)
