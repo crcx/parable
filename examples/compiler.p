@@ -32,12 +32,12 @@
 [ "-"  cleaned-token :n :b c, ] 'compile-bytecode' :
 [ "-"  $' gather-string c, ] 'compile-string' :
 [ "-"  $" gather-string c, ] 'compile-remark' :
-[ "s-p"  dup function-exists? [ lookup-function ] [ :n :p ] if ] 'resolve-pointer' :
+[ "s-p"  dup word-exists? [ lookup-word ] [ :n :p ] if ] 'resolve-pointer' :
 [ "-" \
   current-token body :s resolve-pointer c, ] 'compile-pointer' :
 [ "-" \
-  current-token dup function-exists? \
-  [ lookup-function :x c, ] \
+  current-token dup word-exists? \
+  [ lookup-word :x c, ] \
   [ dup numeric? \
     [ :n c, ] \
     [ 'ERROR: WORD NOT FOUND' report-error ] \
