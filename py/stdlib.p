@@ -310,8 +310,7 @@
 
 [ "p-s"  :p vm.dict<slices> over contains? [ vm.dict<slices> swap index-of vm.dict<names> swap fetch ] [ drop '' ] if "If the pointer corresponds to a named item, return the name. Otherwise return an empty string." ] 'lookup-name' :
 
-
-[ "ss-"  swap dup word-exists? [ dup lookup-name swap hide-word swap : ] [ drop ] if "Change a name from s1 to s2" ] 'rename-word' :
+[ "ss-"  swap dup word-exists? [ dup lookup-word swap hide-word swap : ] [ drop ] if "Change a name from s1 to s2" ] 'rename-word' :
 
 "Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
 [ "s-s" :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while 1 - [ dup get<final-offset> 1 + ] dip swap subslice :s "Remove leading whitespace from a string" ] 'trim-left' :
