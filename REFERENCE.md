@@ -1,1525 +1,1233 @@
 ## :
 
-    pointer string -
+    ps-
 
-Primitive. Attach a name to a pointer.
-
-## .
-
-    string pointer -
-
-Attach a name to a pointer.
+Attach a name to a pointer
 
 ## nop
 
     -
 
-Does nothing.
-
-## :b
-
-    value - bytecode
-
-Convert value on stack to a bytecode.
-
-Notes:
-
-* Currently the value is assumed to be a *number*.
-
-## :n
-
-    value - number
-
-Convert value on stack to a number.
-
-Notes:
-
-* If the conversion fails, #nan will be returned.
-
-## :s
-
-    value - string
-
-Convert value on stack to a string.
-
-Notes:
-
-* Currently strings should consist of ASCII characters. Unicode is not guaranteed to work.
-
-## :c
-
-    value - character
-
-Convert value on stack to a character.
-
-Notes:
-
-* Currently the value should be a number corresponding to an ASCII character code.
-* If you pass a string, this will return the first character in the string.
-
-## :p
-
-    value - pointer
-
-Convert value on stack to a pointer.
-
-## :f
-
-    value - flag
-
-Convert value on stack to a flag.
-
-## :x
-
-    value - function-call
-
-Convert value on stack to a function call.
-
-## :u
-
-    value - unknown-value
-
-Convert a value to an **UNKNOWN**/undefined type.
+Does nothing
 
 ## set-type
 
-    value number:type - value
+    vt-v
 
-Primitive. Set the value to a specific type. This will invoke the appropriate conversions for known types or set the internal type identifier otherwise.
+Convert a value to the specified type
 
 ## type?
 
-    value - value number:type
+    v-vn
 
-Primitive. Given a value, return the value and its corresponding type.
+Return the type constant for a value
 
 ## +
 
-    value value - value
+    nn-n
 
-Primitive.
-
-For numbers, add them and return the results.
-
-For strings and slices, append the second to the first one and return the new slice.
+Add two numbers or concatenate two strings, remarks, or slices
 
 ## -
 
-    number number - number
+    nn-n
 
-Primitive. Subtract the second number from the first one, returning the result.
+Subtract n2 from n1
 
 ## *
 
-    number number - number
+    nn-n
 
-Primitive. Multiply two numbers and return the result.
+Multiply two numbers
 
 ## /
 
-    number number - number
+    nn-n
 
-Primitive. Divide the first number by the second returning the result.
+Divide n1 by n2
 
 ## rem
 
-    number number - number
+    nn-n
 
-Primitive. Divide the first number by the second returning the remainder.
-
-## floor
-
-    number - number
-
-Primitive. Return the largest integer value less than or equal to the specified number.
+Divide n1 by n2, returning the remainder
 
 ## ^
 
-    number number - number
+    nn-n
 
-Primitive. Return the first value raised to the power of the second number.
-
-## log
-
-    number - number
-
-Primitive. Return the natural logarithm of the number (to base *e*).
-
-## log10
-
-    number - number
-
-Primitive. Return the natural logarithm of the number (to base *10*).
+Return n1 to the power n2
 
 ## log<n>
 
-    number number - number
+    nn-n
 
-Primitive. Return the natural logarithm of the number to a specified base (this is calculated as [log(first) / log(second)]).
+Return the logarithim of a number in the specified base
 
 ## shift
 
-    number number - number
+    nn-n
 
-Primitive. Perform a bit wise shift of the first number the specified number of bits (in the second number). Use a negative value for the second to shift left. A positive value will shift right.
+Perform a bitwise shift
 
 ## and
 
-    number number - number
+    nn-n
 
-Primitive. Perform a bitwise AND operation on the two values and return the result.
+Bitwise AND operation
 
 ## or
 
-    number number - number
+    nn-n
 
-Primitive. Perform a bitwise OR operation on the two values and return the result.
+Bitwise OR operation
 
 ## xor
 
-    number number - number
+    nn-n
 
-Primitive. Perform a bitwise XOR operation on the two values and return the result.
+Bitwise XOR operation
 
 ## random
 
-    - number
+    -n
 
-Primitive. Return a random number.
+Return a random number
 
 ## sqrt
 
-    number - number
+    n-n
 
-Primitive. Return the square root of a number.
+Obtain the square root of a number
 
 ## round
 
-    number - number
+    n-n
 
-Primitive. Round a number.
+Round a number to the nearest integer value
 
 ## lt?
 
-    number:a number:b - flag
+    nn-f
 
-Primitive. Compare two numbers. Returns **true** if the first number (a) is less than the second (b) or **false** otherwise.
+True if n1 < n2 or false otherwise
 
 ## gt?
 
-    number:a number:b - flag
+    nn-f
 
-Primitive. Compare two numbers. Returns **true** if the first number (a) is greater than the second (b) or **false** otherwise.
+True if n1 > n2 or false otherwise
 
 ## lteq?
 
-    number:a number:b - flag
+    nn-f
 
-Primitive. Compare two numbers. Returns **true** if the first number (a) is less than or equal to the second (b) or **false** otherwise.
+True if n1 <= n2 or false otherwise
 
 ## gteq?
 
-    number:a number:b - flag
+    nn-f
 
-Primitive. Compare two numbers. Returns **true** if the first number (a) is greater than or equal to the second (b) or **false** otherwise.
+True if n1 >= n2 or false otherwise
 
 ## eq?
 
-    value value - flag
+    vv-f
 
-Primitive. Compare two values for equality, returns a Boolean flag.
+True if n1 == n2 or false otherwise
 
 ## -eq?
 
-    value value - flag
+    vv-f
 
-Primitive. Compare two values for inequality, returns a Boolean flag.
+True if n1 != n2 or false otherwise
 
 ## if
 
-    flag quote:true quote:false -
+    fpp-
 
-Primitive. Given a flag, execute the first quote if the flag is **true** or the second if the flag is **false**.
+If flag is true, invoke p1; otherwise invoke p2
 
 ## while
 
-    quote -
+    p-
 
-Takes a quote which returns a flag. If the flag is **true**, execute the quote again. Repeat until the quote returns **false**.
+Invoke p (which should return a flag) until the returned flag is false
 
 ## until
 
-    quote -
+    p-
 
-Takes a quote which returns a flag. If the flag is **false**, execute the quote again. Repeat until the quote returns **true**.
+Invoke p (which should return a flag) until the returned flag is true
 
 ## times
 
-    number quote -
+    np-
 
-Primitive. Execute the specified quotation the specified number of times.
+Invoke slice p the specified number of times
 
 ## invoke
 
-    quote -
+    p-
 
-Primitive. Execute the specified quotation.
+Run the code in slice p
 
 ## dip
 
-    value quote - value
+    vp-v
 
-Primitive. Remove value from the stack and execute the quotation. When execution completes restore the Variable.
+Remove value and invoke the quote. Restore value when execution completes.
 
 ## sip
 
-    value quote - value
+    vp-v
 
-Primitive. Execute the quotation. When execution completes, restore a copy of the value to the stack.
+Invoke the quote. After execution complets, restore a copy of the value to the stack
 
 ## bi
 
-    value pointer pointer - ?
+    vpp-?
 
-Primitive. Apply each quotation to a copy of the Variable.
+Apply each quote to a copy of the value
 
 ## tri
 
-    value pointer pointer pointer - ?
+    vppp-?
 
-Primitive. Apply each quotation to a copy of the Variable.
+Apply each quote to a copy of the value
 
 ## abort
 
     -
 
-Primitive. Abort current execution cycle.
+Abort the current execution cycle
 
 ## copy
 
-    pointer:source pointer:dest -
+    pp-
 
-Primitive. Copy the content of the first slice to the second one.
+Copy the contents of the first slice to the second one
 
 ## fetch
 
-    pointer number:offset - value
+    pn-v
 
-Primitive. Fetch a value stored in a slice.
+Fetch a value stored at the specified offset within the specified slice
 
 ## store
 
-    value pointer number:offset -
+    vpn-
 
-Primitive. Store a value into a slice.
+Store a value into the specified offset within the specified slice
 
 ## request
 
-    - pointer
+    -p
 
-Primitive. Request a new memory slice. Returns a pointer to it.
-
-Notes:
-
-* The slice will have an initial cell stored in offset 0 with a *number* type and a value of 0. If you need a fully empty slice you will need to use **request-empty**.
+Request a new slice and return a pointer to it
 
 ## release
 
-    pointer -
+    p-
 
-Primitive. Tell Parable that a slice is no longer in use.
+Release a previously allocated slice
 
 ## collect-garbage
 
     -
 
-Primitive. Search memory for unused slices and recover them.
+Tell Parable that this is a good time to scan memory for unused slices and reclaim them
 
-## get-last-index
+## get<final-offset>
 
-    pointer - number
+    p-n
 
-Primitive. Return the last offset in a specified slice.
+Return the last offset in a slice
 
-## set-last-index
+## set<final-offset>
 
-    number pointer -
+    np-
 
-Primitive. Set the last index in a slice to the specified offset.
+Set the last index in a slice (can be used to shrink or grow a slice)
 
 ## store<type>
 
-    number pointer offset -
+    tpn-
 
-Primitive. Set the stored type for the value at offset within the specified slice to the specified type.
-
-Notes:
-
-* This is not limited to the built-in types.
+Set the stored type for the value at offset with the slice to the specified type.
 
 ## fetch<type>
 
-    pointer offset - number
+    pn-n
 
-Primitive. Get the stored type for the value at offset within the specified slice.
+Get the stored type for a value within a slice.
 
 ## dup
 
-    value - value value
+    v-vv
 
-Primitive. Duplicate the top value on the stack. If the value is a string, makes a new copy of the string.
+Duplicate the top value on the stack
 
 ## drop
 
-    value -
+    v-
 
-Primitive. Remove the top value from the stack.
+Discard the top value on the stack
 
 ## swap
 
-    value:a value:b - value:b value:a
+    vV-Vv
 
-Primitive. Switch the positions of the top two items on the stack.
+Switch the positions of the top two items on the stack
 
 ## depth
 
-    - number
+    -n
 
-Primitive. Return the number of items on the stack.
+Return the number of items on the stack
 
-## function-exists?
+## hide-word
 
-    string - flag
+    s-
 
-Primitive. Return **true** if the named function exists or **false** otherwise.
-
-## lookup-function
-
-    string - pointer
-
-Primitive. Return a pointer to the function if the function exists or a pointer to -1 (an invalid slice) if it does not.
-
-## hide-function
-
-    string -
-
-Primitive. Remove the named function from the dictionary. This removes the name, but not the definition: existing references to it will continue to work.
-
-## lookup-name
-
-    pointer - string
-
-Primitive. Return the name for a function stored at the specified slice.
-
-Note: this returns the first (canonical) name in the dictionary that corresponds to a slice. It will not return aliases.
+Remove the named item from the dictionary
 
 ## find
 
-    string:haystack string:needle - number
+    ss-n
 
-Primitive. Search for the substring *needle* in the *haystack*. Returns an offset of -1 if no match is found.
+Search for substring (s2) in a source string (s1). Returns #nan if not found.
 
 ## subslice
 
-    pointer number:start number:end - pointer
+    pnn-p
 
-Primitive. Return a new slice containing the contents of the original slice, starting from the specified offset and ending at (but not including) the ending offset.
+Return a new slice containing the contents of the original slice, starting from the specified offset and ending at (but not including) the ending offset.
 
 ## numeric?
 
-    string - flag
+    s-f
 
-Primitive. If string can be converted to a number using **:n** return **true**. Otherwise return **false**.
+If string can be converted to a number, return true, otherwise return false
 
 ## reverse
 
-    pointer - pointer
+    p-p
 
-Primitive. Reverse the order of items stored in a slice.
-
-E.g., given a slice:
-
-    [ 1 2 3 ]
-
-This will modify the slice to be:
-
-    [ 3 2 1 ]
-
-This function modifies contents of the original slice.
-
-## over
-
-    value:a value:b - value:a value:b value:a
-
-Put a copy of value a over value b.
-
-## tuck
-
-    value:a value:b - value:b value:a value:b
-
-Put a copy of value b under value a.
-
-## nip
-
-    value:a value:b - value:b
-
-Remove the second value on the stack.
-
-## reset
-
-    ... -
-
-Remove all values from the stack.
+Reverse the order of items in a slice. This modifies the original slice.
 
 ## to-lowercase
 
-    value - value
+    v-v
 
-Primitive. Given a string or character, return the lowercase equivalent.
+Convert a string or character to lowercase
 
 ## to-uppercase
 
-    value - value
+    v-v
 
-Primitive. Given a string or character, return the uppercase equivalent.
+Convert a string or character to uppercase
 
 ## report-error
 
-    string -
+    s-
 
-Primitive. Send a string to the Parable error log.
+Add a string to the error log
 
 ## vm.dict<names>
 
-    - pointer
+    -p
 
-Primitive. Return an array of strings corresponding to names in the dictionary.
+Return an array of strings corresponding to names in the dictionary
 
 ## vm.dict<slices>
 
-    - pointer
+    -p
 
-Primitive. Return an array of pointers corresponding to the named items in the dictionary.
+Return an array of slices corresponding to the named items in the dictionary
 
 ## sin
 
-    number - number
+    n-n
 
-Primitive. Return the sine of a number.
+Return the sine of a number
 
 ## cos
 
-    number - number
+    n-n
 
-Primitive. Return the cosine of a number.
+Return the cosine of a number
 
 ## tan
 
-    number - number
+    n-n
 
-Primitive. Return the tangent of a number.
+Return the tangent of a number
 
 ## asin
 
-    number - number
+    n-n
 
-Primitive. Return the arc sine of a number.
+Return the arc sine of a number
 
 ## acos
 
-    number - number
+    n-n
 
-Primitive. Return the arc cosine of a number.
+Return the arc cosine of a number
 
 ## atan
 
-    number - number
+    n-n
 
-Primitive. Return the arc tangent of a number.
+Return the arc tangent of a number
 
 ## atan2
 
-    number - number
+    n-n
 
-Primitive.
+Return the arc tangent of a number
 
 ## vm.memory<map>
 
-    - pointer
+    -p
 
-Primitive. Return an array indicating which slices are allocated and which are free. Each index corresponds to a slice. If the stored value is 0, the slice is free. If 1, the slice is allocated.
+Return an array indicating which slices are allocated and which are free. Each index corresponds to a slice. If the stored value is 0, the slice is free. If 1, the slice is allocated.
 
 ## vm.memory<sizes>
 
-    - pointer
+    -p
 
-Primitive. Return an array indicating the size of each slice (in cells). Each index corresponds to a slice; the stored value is the length of the slice.
+Return an array indicating the size of each slice (in cells). Each index corresponds to a slice; the stored value is the length of the slice.
 
 ## vm.memory<allocated>
 
-    - pointer
+    -p
 
-Primitive. Return an array of slice numbers which are currently marked as allocated.
+Return an array of slice numbers which are currently marked as allocated.
+
+## over
+
+    vV-vVv
+
+Put a copy of the second item on top of the stack
+
+## tuck
+
+    vV-VvV
+
+Put a copy of the top item below the second item
+
+## nip
+
+    vV-V
+
+Remove the item below the top item on the stack
+
+## reset
+
+    ...-
+
+Remove all items from the stack
+
+## .
+
+    sp-
+
+Attach a name to a slice
 
 ## NUMBER
 
-    - number
+    -n
 
-Constant. Type for numbers.
+Type constant
 
 ## STRING
 
-    - number
+    -n
 
-Constant. Type for strings.
+Type constant
 
 ## CHARACTER
 
-    - number
+    -n
 
-Constant. Type for characters.
+Type constant
 
 ## POINTER
 
-    - number
+    -n
 
-Constant. Type for pointers.
+Type constant
 
 ## FLAG
 
-    - number
+    -n
 
-Constant. Type for Boolean flag.
+Type constant
 
 ## BYTECODE
 
-    - number
+    -n
 
-Constant. Type for bytecodes.
+Type constant
 
 ## REMARK
 
-    - number
+    -n
 
-Constant. Type for comments / embedded remarks.
+Type constant
 
 ## FUNCALL
 
-    - number
+    -n
 
-Constant. Type for function calls.
+Type constant
 
 ## UNKNOWN
 
-Constant. Type for standard unknown/undefined value.
+    -n
+
+Type constant
+
+## :b
+
+    v-b
+
+Convert value to a BYTECODE
+
+## :n
+
+    v-n
+
+Convert value to a NUMBER
+
+## :s
+
+    v-s
+
+Convert value to a STRING
+
+## :c
+
+    v-c
+
+Convert value to a CHARACTER
+
+## :p
+
+    v-p
+
+Convert value to a POINTER
+
+## :f
+
+    v-f
+
+Convert value to a FLAG
+
+## :x
+
+    v-f
+
+Convert value to a FUNCALL
 
 ## :r
 
-    string - comment
+    v-c
 
-Convert a string to a comment / remark.
+Convert value to a REMARK
+
+## :u
+
+    v-v
+
+Convert value to a UNKNOWN
 
 ## number?
 
-    value - value flag
+    v-vf
 
-Return **true** if the value is a **NUMBER** or **false** otherwise.
+Return true if value is a NUMBER or false otherwise
 
 ## string?
 
-    value - value flag
+    v-vf
 
-Return **true** if the value is a **STRING** or **false** otherwise.
+Return true if value is a STRING or false otherwise
 
 ## character?
 
-    value - value flag
+    v-vf
 
-Return **true** if the value is a **CHARACTER** or **false** otherwise.
+Return true if value is a CHARACTER or false otherwise
 
 ## pointer?
 
-    value - value flag
+    v-vf
 
-Return **true** if the value is a **POINTER** or **false** otherwise.
+Return true if value is a POINTER or false otherwise
 
 ## flag?
 
-    value - value flag
+    v-vf
 
-Return **true** if the value is a **FLAG** or **false** otherwise.
+Return true if value is a FLAG or false otherwise
 
 ## bytecode?
 
-    value - value flag
+    v-vf
 
-Return **true** if the value is a **BYTECODE** or **false** otherwise.
+Return true if value is a BYTECODE or false otherwise
 
 ## remark?
 
-    value - value flag
+    v-vf
 
-Return **true** if the value is a **REMARK** or **false** otherwise.
+Return true if value is a REMARK or false otherwise
 
 ## funcall?
 
-    value - value flag
+    v-vf
 
-Return **true** if the value is a **FUNCALL** or **false** otherwise.
+Return true if value is a FUNCALL or false otherwise
 
 ## unknown?
 
-    value - value flag
+    v-vf
 
-Return **true** if the value is **UNKNOWN** or **false** otherwise.
+Return true if value is UNKNOWN or false otherwise
 
 ## dup-pair
 
-    value:a value:v - value:a value:b value:a value:b
+    vV-vVvV
 
-Duplicate the top two values on the stack.
+Duplicate the top two items on the stack
 
 ## drop-pair
 
-    value value -
+    vv-
 
-Remove the top two values from the stack.
+Discard the top two items on the stack
 
 ## drop-multiple
 
-    ? number -
+    ?n-
 
-Remove an arbitrary number of values from the stack.
+Discard an arbitrary number of items from the stack
 
 ## invoke<depth?>
 
-    quote - ... number
+    q-...n
 
-Execute a quotation, returning a value indicating the stack depth change resulting from the execution.
+Execute a quotation, returning a value indicating th stack depth change as a result
 
-## last-index?
+## floor
 
-    pointer - pointer number
+    n-n
 
-Return the last offset in a slice. This does not consume the pointer.
+Return the smallest integer less than or equal to the starting value
 
-## slice-length?
+## ceil
 
-    pointer - pointer number
+    n-n
 
-Return the length of a slice. This does not consume the pointer.
+Return the smallest integer greater than or equal to the starting value
 
 ## adjust-slice-length
 
-    number pointer -
+    np-
 
-Given a number, adjust the length of the specified slice by the requested amount. Use a negative value to shrink or positive to grow the slice.
+Given a number, adjust the length of the specified slice by the requested amount.
 
 ## duplicate-slice
 
-    pointer - pointer
+    p-p
 
-Make a copy of a slice, returning a pointer to the copy.
+Make a copy of a slice, returning a pointer to the copy
 
 ## length?
 
-    pointer - number
+    p-n
 
-Return the length of a slice.
-
-## var
-
-    string -
-
-Create a named variable. This will have an **UNKNOWN** type initially.
+Return the length of a slice
 
 ## var!
 
-    value string -
+    vs-
 
-Create a named variable with an initial Variable.
+Create a variable with an initial value
+
+## var
+
+    s-
+
+Create a variable
 
 ## off
 
-    pointer -
+    p-
 
-Set a variable to 0.
+Set a variable to a value of 0
 
 ## on
 
-    pointer -
+    p-
 
-Set a variable to -1
+Set a variable to a value of -1
 
 ## increment
 
-    pointer -
+    p-
 
-Increment the stored value in a variable by 1.
+Increment a variables value by 1
 
 ## decrement
 
-    pointer -
+    p-
 
-Decrement the stored value in a variable by 1.
+Increment a variables value by 1
 
 ## zero-out
 
-    pointer -
+    p-
 
-Erase all values in a slice.
+Erase all values in a slice
 
 ## preserve
 
-    pointer quote -
+    pp-
 
 Backup the contents of a slice and remove the pointer from the stack. Execute the quotation. Then restore the contents of the specified slice to their original state.
 
 ## max
 
-    number number - number
+    nn-n
 
-Return the larger of two numbers.
+Return the greater of two values
 
 ## min
 
-    number number - number
+    nn-n
 
-Return the smaller of two numbers.
+Return the smaller of two values
 
 ## abs
 
-    number - number
+    n-n
 
-Return the absolute value of a number.
+Return the absolute value of a number
 
 ## bi*
 
-    value:a value:b pointer:a pointer:b - ?
+    vvpp-?
 
-Execute pointer:a against value:a and pointer:b against value:b.
+Invoke p1 against v1 and p2 against v2
 
 ## tri*
 
-    value:a value:b value:c pointer:a pointer:b pointer:c - ?
+    vvvppp-?
 
-Execute pointer:a against value:a, pointer:b against value:b, and pointer:c against value:c.
+Invoke p1 against v1, p2 against v2, and p3 against v3
 
 ## bi@
 
-    value value pointer - ?
+    vvp-?
 
-Execute pointer against each Variable.
+Invoke p1 against v1 and again against v2
 
 ## tri@
 
-    value value value pointer - ?
+    vvvp-?
 
-Execute pointer against each Variable.
+Invoke p1 against v1, then v2, then v3
 
 ## abort<with-error>
 
-    string -
+    s-
 
-Report an error and invoke **abort**.
+Push a string to the error log and abort execution
 
 ## true
 
-    - flag
+    -f
 
-Return a true flag.
+Return a true flag
 
 ## false
 
-    - flag
+    -f
 
-Return a false flag.
+Return a false flag
 
 ## not
 
-    flag - flag
+    f-f
 
-Invert the state of a flag.
+Invert a flag
 
 ## if-true
 
-    flag quote -
+    fp-
 
-Execute the quotation if the flag is true.
+Invoke quote if flag is true
 
 ## if-false
 
-    flag quote -
+    fp-
 
-Execute the quotation if the flag is false.
+Invoke quote if flag is false
 
 ## nan?
 
-    number - flag
+    v-f
 
-Return **true** if number is not valid (#nan) or **false** otherwise.
+Return true if number is #nan or false otherwise
 
 ## zero?
 
-    number - flag
+    v-f
 
-If the value is zero, return **true** otherwise return **false**.
+Return true if number is #0 or false otherwise
 
 ## true?
 
-    value - flag
+    v-f
 
-Return **true** if value corresponds to a true flag, or **false** otherwise.
+Return true if flag is true or false otherwise
 
 ## false?
 
-    value - flag
+    v-f
 
-Return **true** if value corresponds to a false flag, or **false** otherwise.
+Return true if flag is false or false otherwise
 
 ## even?
 
-    number - flag
+    n-f
 
-Return **true** if the number is even or **false** otherwise.
+Return true if number is even or false otherwise
 
 ## odd?
 
-    number - flag
+    n-f
 
-Return **true** if the number is odd or **false** otherwise.
+Return true if number is odd or false otherwise
 
 ## negative?
 
-    number - flag
+    n-f
 
-Return **true** if the number is negative or **false** otherwise.
+Return true if number is less than zero or false otherwise
 
 ## positive?
 
-    number - flag
+    n-f
 
-Return **true** if the number is positive or **false** otherwise.
+Return true if number is greater than or equal to zero or false otherwise
 
 ## between?
 
-    number:check number:lower number:upper - flag
+    nnn-f
 
-Return **true** if the number to check is within the bounds specified or **false** otherwise. The check is inclusive of the bounds.
+Return true if the number (n1) is betwen n2 and n3, inclusive or false otherwise
 
 ## types-match?
 
-    value value - value value flag
+    vv-vvf
 
-Return **true** if the types of the two values match or **false** otherwise.
+Return true if the type of both values is the same, or false otherwise
 
 ## expand-range
 
-    number number - ...
+    nn-...
 
-Given two values, expand the range. 
-
-Example:
-
-    10 90 expand-range
-    10 1 expand-range
+Given two values, expand the range
 
 ## sum-range
 
-    ... number - number
+    ...n-n
 
-Add an arbitrary number of values. The range will include the limits.
+Given a series of values and a count, sum the values
 
-Example:
+## hide-words
 
-   1 2 3 4 5
-   5 sum-range
+    p-
 
-## hide-functions
-
-    quote -
-
-Given an array of strings, hide the function each names.
-
-Example:
-
-    [ 'a'  'e'  'i'  'o'  'u' ] hide-function
-
-## rename-function
-
-    string:old string:new -
-
-Remove the old name for a function and assign a new one.
-
-Example:
-
-    'foo' var
-    'foo'  'bar' rename
+Given an array of names, hide each named item
 
 ## redefine
 
-    pointer string -
+    ps-
 
-Remove the old header referred to by the string and define a new
-function with the name pointing to the new pointer.
-
-Example:
-
-    [ "n-n" 10 * ] 'scale' :
-    [ "-n"  5 scale ] 'b' :
-    [ "n-n" 20 * ] 'scale' redefine
-    [ "-n"  5 scale ] 'c' :
-    b c
+Remove the old name for a word and assign it to a new one
 
 ## ::
 
-    quote -
+    p-
 
-Given an array of strings, create a new named value for each item.
-
-    "Creates new variables named a, b, and c:"
-    [ 'a'  'b'  'c' ] ::
+Given a list of names, create a variable for each one
 
 ## string-contains?
 
-    value string - flag
+    vs-f
 
-Return **true** if the specified character is found in the string or **false** otherwise.
+Return true if the value is found in the specified string, or false otherwise
 
 ## digit?
 
-    value - flag
+    v-f
 
-Return **true** if the value is a numeric digit or **false** otherwise.
+Return true if value is a decimal digit, or false otherwise
 
 ## symbol?
 
-    value - flag
+    v-f
 
-Return **true** if the value is an ASCII symbol or **false** otherwise.
+Return true if value is an ASCII symbol, or false otherwise
 
 ## letter?
 
-    value - flag
+    v-f
 
-Return **true** if the value is an ASCII letter or **false** otherwise.
+Return true if value is an ASCII letter, or false otherwise
 
 ## alphanumeric?
 
-    value - flag
+    v-f
 
-Return **true** if the value is an ASCII letter or number or **false** otherwise.
+Return true if value is a ASCII letter or digit, or false otherwise
 
 ## consonant?
 
-    value - flag
+    v-f
 
-Return **true** if the value is an ASCII consonant or **false** otherwise.
+Return true if value is a consonant, or false otherwise
 
 ## vowel?
 
-    value - flag
+    v-f
 
-Return **true** if the value is an ASCII vowel or **false** otherwise.
+Return true if value is a vowel, or false otherwise
 
 ## lowercase?
 
-    value - flag
+    v-f
 
-Return **true** if the value is lowercase or **false** otherwise.
+Return true if value is a lowercase string or ASCII character, or false otherwise
 
 ## uppercase?
 
-    value - flag
+    v-f
 
-Return **true** if the value is uppercase or **false** otherwise.
+Return true if value is an uppercase string or ASCII character, or false otherwise
 
 ## build-string
 
-    quote - string
+    p-s
 
 Execute a quotation, constructing a string from the values it returns.
 
-Example:
-
-    [ 'Hello' 32 :c 'World!' ] build-string
-
-See also: **interpolate**
-
-## trim-left
-
-    string - string
-
-Remove leading whitespace from a string.
-
-## trim-right
-
-    string - string
-
-Remove trailing whitespace from a string.
-
-## trim
-
-    string - string
-
-Remove both leading and trailing whitespace from a string.
-
-## CurrentBuffer
-
-    N/A - Variable
-
-Variable. Holds a pointer to the current buffer.
-
-## BufferOffset
-
-    N/A - Variable
-
-Variable. Holds the current location in the buffer for reading/writing.
-
-## buffer-position
-
-    - pointer number
-
-Return the current buffer slice and location.
-
-## buffer-advance
-
-    -
-
-Increment the buffer location index by 1.
-
-## buffer-retreat
-
-    -
-
-Decrement the buffer location index by 1.
-
-## buffer-store-current
-
-    value -
-
-Store the value into the current location in the buffer. Does not alter the location.
-
-## buffer-fetch-current
-
-    - value
-
-Fetch a value from the current location in the buffer. Does not alter the location.
-
-## buffer-store
-
-    value -
-
-Store the value into the current location in the buffer and increment the location.
-
-## buffer-fetch
-
-    - value
-
-Return the current value in the buffer and increment the location.
-
-## buffer-store-retreat
-
-    value -
-
-Store the value into the current location in the buffer and decrement the location.
-
-## buffer-fetch-retreat
-
-    - value
-
-Return the current value in the buffer and decrement the location.
-
-## set-buffer
-
-    pointer -
-
-Set the current buffer to the specified slice and set the current location to 0.
-
-## buffer-store-items
-
-    ... number -
-
-Store an arbitrary number of items into the current buffer.
-
-## new-buffer
-
-    -
-
-Create a new buffer and set it as the current one.
-
-## preserve-buffer
-
-    pointer -
-
-Executes the specified quote while saving the current buffer and location. Restores the buffer and location after execution of the quote completes.
-
-## named-buffer
-
-    string -
-
-Create a new buffer with the specified name. Also assigns the buffer as the current one.
-
 ## cons
 
-    value value - pointer
+    vv-p
 
-Bind two values into a new slice.
-
-Example:
-
-    $a $b cons :s
+Bind two values into a new slice
 
 ## curry
 
-    value quote - quote
+    vp-p
 
-Bind a value and a quote, returning a new quote which will execute the original quote on the stored Variable.
-
-Example:
-
-    "Use this to create a counting function"
-    [ "s-q" request [ [ first ] [ increment ] bi ] curry ] 'counter' :
-
-    counter 'c' :
-    5 [ c ] times
+Bind a value and a quote, returning a new quote which executes the specified one against the provided value
 
 ## enquote
 
-    pointer - pointer
+    p-p
 
-Wrap a function call into a new quote. These are essentially the same:
-
-    [ dup ]
-
-    &dup enquote
+Wrap a pointer into a new quote, converting the pointer into a FUNCALL
 
 ## head
 
-    pointer - value
+    q-v
 
-Return the first value in a slice.
-
-Example:
-
-    [ 1 2 3 4 5 ] head
+Return the first item in a slice
 
 ## body
 
-    pointer - pointer
+    q-q
 
-Given a slice, construct a new slice with all but the first element and return a pointer to this.
-
-Example:
-
-    'Eggs Are Tasty' body :s
+Return the second through last items in a slice
 
 ## tail
 
-    pointer - value
+    p-v
 
-Given a slice, return the last value in it.
-
-Example:
-
-    'hello world!' tail
+Return the last item in a slice
 
 ## push
 
-    value pointer -
+    vp-
 
 Append a value to the specified slice. This modifies the original slice.
 
-Tip: If you are trying to append characters to a string, this is much faster than using **+** for concatenation.
-
 ## pop
 
-    pointer - value
+    p-v
 
-Remove and return the last value from a slice. This modifies the original slice.
+Remove the last value from the specified slice. This modifies the original slice.
 
 ## request-empty
 
-    - pointer
+    -p
 
-Return a new slice. Unlike **request** the returned slice will be fully empty.
-
-Note: **request** allocates an initial cell in the first slot; this does not.
+Request a slice with no stored values
 
 ## reduce
 
-    pointer value pointer - value
+    pnp-n
 
-**reduce** takes a slice, a starting value, and a quote. It executes the quote once for each item in the slice, passing the item and the value to the quote. The quote should consume both and return a new Variable.
-
-Example:
-
-    "Sum even numbers in an array"
-    [ 1 2 3 4 5 6 7 8 9 10 ] [ even? ] filter 0 [ + ] reduce
+Takes a slice, a starting value, and a quote. It executes the quote once for each item in the slice, passing the item and the value to the quote. The quote should consume both and return a new value.
 
 ## for-each
 
-    pointer pointer - ?
+    pp-?
 
-**for-each** takes a slice and a quotation. It then executes the quote once for each item in the slice, passing the individual items to the quote.
+Takes a slice and a quotation. It then executes the quote once for each item in the slice, passing the individual items to the quote.
 
 ## contains?
 
-    pointer value - flag
+    pv-f
 
-Given a slice and a value, return **true** if the value is found in the slice, or **false** otherwise.
+Given a slice and a value, return true if the value is found in the slice, or false otherwise.
 
 ## filter
 
-    pointer pointer - pointer
+    pq-p
 
-Given a slice and a quotation, this will pass each value to the quotation (executing it once per item in the slice). The quotation should return a Boolean flag. If the flag is **true**, copy the value to a new slice. Otherwise discard it.
-
-Example:
-
-    'The quick brown fox jumped over the lazy dogs'
-    [ vowel? ] filter :s
+Given a slice and a quotation, this will pass each value to the quotation (executing it once per item in the slice). The quotation should return a Boolean flag. If the flag is true, copy the value to a new slice. Otherwise discard it.
 
 ## map
 
-    pointer pointer - pointer
+    pq-
 
 Given a pointer to an array and a quotation, execute the quotation once for each item in the array. Construct a new array from the value returned by the quotation and return a pointer to it.
 
-Example:
-
-    "Multiply all values in the array by 10"
-    [ 1 2 3 4 ] [ 10 * ] map
-
 ## capture-results
 
-    quote - pointer
+    p-p
 
-Execute the code in the provided quotation, constructing a new slice with the returned values.
-
-Exercise some caution using this: you may need to manually append values if the stack depth changes in unexpected ways during execution of the source quotation.
-
-Example:
-
-    [ $a $z [ :n ] bi@ expand-range ] capture-results reverse :s
-
-Tip: the results will be appended in the order they are encountered on the stack. So the last result will be the first one in quote. Use **reverse** to alter the order if necessary.
+Invoke a quote and capture the results into a new array
 
 ## index-of
 
-    pointer value - number
+    pv-n
 
-Given a slice and a value, return the offset that the value is located at. If the value is not found, returns an offset of -1.
+Given a slice and a value, return the offset the value is located at, or #nan if not found
 
-Example:
+## word-exists?
 
-    [ 1 2 3 4 5 ]  9 index-of
-    [ 1 2 3 4 5 ]  3 index-of
+    s-f
 
-## TOB
+Return true if the named word exists or false otherwise
 
-    N/A - Variable
+## lookup-word
 
-Variable. This is an array that contains values intended for later display.
+    s-p
 
-## to-tob
+Return a pointer to the named word if it exists, or #nan otherwise
 
-    value -
+## lookup-name
 
-Append a value to the *text output buffer*.
+    p-s
 
-## show-tob
+If the pointer corresponds to a named item, return the name. Otherwise return an empty string.
 
-    - ...
+## rename-word
 
-Push the values in the *text output buffer* to the stack.
+    ss-
 
-## clear-tob
+Change a name from s1 to s2
 
-    -
+## trim-left
 
-Remove all entries from the *text output buffer*.
+    s-s
 
-## Internals
+Remove leading whitespace from a string
 
-    - value
+## trim-right
 
-Variable. Holds a list of function names to create or remove. This is used by **{** and **}**.
+    s-s
+
+Remove trailing whitespace from a string
+
+## trim
+
+    s-s
+
+Remove leading and trailing whitespace from a string
 
 ## {
 
     -
 
-Begin a lexically scoped region.
+Begin a lexically scoped area
 
 ## }
 
-    pointer -
+    p-
 
-End a lexically scoped area. Removes any headers created after **{** that are not listed in the array at pointer.
+End a lexically scoped region, removing any headers not specified in the provided array.
 
-Example:
+## with
 
-    {
-        [ 'a' 'b' ] ::
-        [ ... do something with a and b ... ] 'c' :
+    p-
 
-        [ 'c' ]
-    }
+Add words in a vocabulary to the dictionary
 
-    "a and b are no longer in the dictionary at this point"
+## without
+
+    p-
+
+Remove words in a vocabulary from the dictionary
+
+## vocab
+
+    ps-
+
+Create a new vocabulary
+
+## }}
+
+    ps-
+
+Close a lexical scope and create a vocabulary with the exposed words
 
 ## invoke<preserving>
 
-    pointer:values pointer:code -
+    qq-
 
-Executes the *code* quotation, preserving and restoring the contents of the variables specified.
-
-Example:
-
-    100 'A' var!
-    [ A ]  [ 200 !A  @A dup * ] invoke<preserving>
-    @A
+Executes the code quotation, preserving and restoring the contents of the variables specified.
 
 ## zip
 
-    pointer:source1 pointer:source2 pointer:code - pointer:results
+    ppp-p
 
-For each item in source1, push the item and the corresponding item from source2 to the stack. Execute the specified code. Push results into a new array, repeating until all items are exhausted. Returns the new array.
+For each item in source1, push the item and the corresponding item from source2 to the stack. Execute the specified code. Push results into a new array, repeating until all items are exhausted. Returns the new array. This expects the code to return a single value as a result. It also assumes that both sources are the same size (or at least that the second does not contain less than the first
 
-This expects the code to return a single value as a result. It also assumes that both sources are the same size (or at least that the second does not contain less than the first).
+    ## Hash-Prime
 
-Example:
-
-    [ 1 2 3 ]  [ 4 5 6 ]  [ + ] zip
-
-This would return a new array identical to:
-
-    [ 5 7 9 ]
-
-## HashPrime
-
-    - value
-
-Variable. Holds the prime number used to salt the raw hash. This is used by **hash**.
+Variable
 
 ## hash:xor
 
-    string - number
+    s-n
 
-Hash a string using the XOR algorithm.
+Hash a string using the XOR algorithim
 
 ## hash:djb2
 
-    string - number
+    s-n
 
-Hash a string using the DJB2 algorithm.
+Hash a string using the DJB2 algorithim
 
 ## hash:sdbm
 
-    string - number
+    s-n
 
-Hash a string using the SDBM algorithm.
+Hash a string using the SDBM algorithim
 
 ## chosen-hash
 
-    string - number
+    s-b
 
-A function that calls the preferred hash algorithm. This should be redefined as desired.
+The preferred hash algorithim (defaults to DJB2)
 
 ## hash
 
-    string - number
+    s-n
 
-Hash a string (using **chosen-hash**) and **HashPrime**.
+Hash a string using chosen-hash and HashPrime
 
 ## when
 
-    quote -
+    q-
 
 Takes a pointer to a set of quotations. Each quote in the set should consist of two other quotes: one that returns a flag, and one to be executed if the condition returns true. Executes each until one returns true, then exits.
 
-Example:
-
-    [ \
-      [ [ dup even? ] [ 'number is even!' ] ] \
-      [ [ dup odd? ] [ 'number is odd!' ] ] \
-      [ [ true ] [ 'hmm, this is a strange number!' ] ] \
-    ] when
-
 ## split
 
-    string value - pointer
+    ss-p
 
-Given a string, split it into pieces wherever the value (a character or string) is found and construct an array from these pieces. Return the array.
-
-Example:
-
-    'hello brave new world'
-    ' ' split
+Given a string and a delimiter, split the string into an array
 
 ## join
 
-    pointer value - string
+    pv-s
 
-Given an array and a value, convert the values in the array to strings and construct a new string, concatenating the pieces together with the specified value (a string or a character) between them.
-
-Example:
-
-    [ 'this' 'is' 'a' 'series' 'of' 'values' ]
-    '---' join
+Given an array of values and a string, convert each value to a string and merge, using the provided string between them
 
 ## clean-string
 
-    string - string
+    s-s
 
-Remove all non basic ASCII characters from a string. This will filter out anything less than 32 and greater than 128 and should be used if you find yourself with strings that have control characters or other problematic values.
+Remove any non-printable characters from a string
 
 ## replace
 
-    string:source string:seek string:replace - string
+    sss-s
 
-Replace all instances of *string:seek* in *string:source* with *string:replace*.
-
-Example:
-
-    'Apples are horrible.'
-    'horrible'  'tasty' replace
+Replace all instances of s2 in s1 with s3
 
 ## interpolate
 
-    pointer string - string
+    ps-s
 
-Takes an array and a string. Replaces instances of {v} in the string with values from the array.
-
-Example:
-
-    [ 1 2 3 ] '{v} + {v} = {v}' interpolate
-
-Note: if the array has fewer values than the number of replace points this will replace the remaining points with an empty string.
-
-See also: **build-string**
+Given an array of values and a string with insertion points, construct a new string, copying the values into the insertion points.
 
 ## interpolate<cycling>
 
-    pointer string - string
+    qs-s
 
-Takes an array and a string. Replaces instances of {v} in the string with values from the array.
-
-Example:
-
-    [ 1 2 3 ] '{v} + {v} = {v}' interpolate<cycling>
-
-Note: if the array has fewer values than the number of replace points this will cycle through the data until all replace points are exhausted.
+Given an array of values and a string with insertion points, construct a new string, copying the values into the insertion points. If the array of values is less than the number of insertion points, cycle through them again.
 
 ## ?
 
-    string - string | string - string string
+    s-s | s-ss
 
-Given a function name, return the stack comment for it as a string. If a closing comment exists (as the last item in the function), return this as well.
+Lookup the stack comment and description (if existing) for a named item
 
 ## stack-values
 
-    - pointer
+    -p
 
-Returns a pointer to an array with copies of all values on the stack.
+Return an array with the items currently on the stack
+
+## vm.dict<names-like>
+
+    s-p
+
+Return an array of names in the dictionary that match a given substring.
+
+## E
+
+    -n
+
+Mathmatical constant for Euler's Number
+
+## PI
+
+    -n
+
+Mathmatical constant for PI
+
+## log
+
+    n-n
+
+Return the base E logarithim of a number
+
+## log10
+
+    n-n
+
+Return the base 10 logarithim of a number
