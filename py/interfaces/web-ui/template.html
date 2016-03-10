@@ -67,6 +67,26 @@
         margin: 0px;
         height: 100vh;
       }
+
+      @media only screen and (min-device-width : 768px) and (max-device-width : 1024px)
+      {
+        .left, .right {
+          height: 90vh;
+        }
+        textarea {
+          height: 80vh;
+        }
+      }
+
+      @media only screen and (min-device-width : 375px) and (max-device-width : 667px) and (orientation : landscape)
+      {
+        .left, .right {
+          height: 85vh;
+        }
+        textarea {
+          height: 70vh;
+        }
+      }
     </style>
     <script>
       function toggle(e) {
@@ -87,7 +107,7 @@
   <body>
     <div class='left'>
       <form name='editor' id='editor' action='punga.py' method='post'>
-        <textarea rows='24' style='height: 80vh; width: 95%' name='code' placeholder='enter your code here'>{{code}}</textarea>
+        <textarea rows='24' style='width: 95%' name='code' placeholder='enter your code here'>{{code}}</textarea>
         <br><hr>
         <a onClick='document.forms["editor"].submit()' style='border: 1px solid black; padding: 5px; float: right'>Evaluate</a>
       </form>
