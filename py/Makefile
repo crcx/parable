@@ -1,9 +1,10 @@
+PY = pypy3
 DISTDIR = parable-201603
 
 default: clean all
 
 all:
-	python gen-snapshot.py
+	$(PY) gen-snapshot.py
 	cd interfaces && make
 
 clean:
