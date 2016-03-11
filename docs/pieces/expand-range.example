@@ -1,3 +1,2 @@
-10 90 expand-range
-10 1 expand-range
+[ $a $z [ :n ] bi@ expand-range ] capture-results reverse :s
 

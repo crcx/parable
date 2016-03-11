@@ -1,0 +1,9 @@
+{
+    [ 'a' 'b' ] ::
+    [ ... do something with a and b ... ] 'c' :
+
+    [ 'c' ]
+}
+
+"a and b are no longer in the dictionary at this point"
+

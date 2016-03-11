@@ -847,8 +847,7 @@ Given two values, expand the range
 Example:
 
 ````
-10 90 expand-range
-10 1 expand-range
+[ $a $z [ :n ] bi@ expand-range ] capture-results reverse :s
 
 ````
 ## sum-range
@@ -1065,6 +1064,13 @@ Request a slice with no stored values
 
 Takes a slice, a starting value, and a quote. It executes the quote once for each item in the slice, passing the item and the value to the quote. The quote should consume both and return a new value.
 
+Example:
+
+````
+"Sum even numbers in an array"
+[ 1 2 3 4 5 6 7 8 9 10 ] [ even? ] filter 0 [ + ] reduce
+
+````
 ## for-each
 
     pp-?
@@ -1083,12 +1089,26 @@ Given a slice and a value, return true if the value is found in the slice, or fa
 
 Given a slice and a quotation, this will pass each value to the quotation (executing it once per item in the slice). The quotation should return a Boolean flag. If the flag is true, copy the value to a new slice. Otherwise discard it.
 
+Example:
+
+````
+'The quick brown fox jumped over the lazy dogs'
+[ vowel? ] filter :s
+
+````
 ## map
 
     pq-
 
 Given a pointer to an array and a quotation, execute the quotation once for each item in the array. Construct a new array from the value returned by the quotation and return a pointer to it.
 
+Example:
+
+````
+"Multiply all values in the array by 10"
+[ 1 2 3 4 ] [ 10 * ] map
+
+````
 ## capture-results
 
     p-p
@@ -1101,6 +1121,13 @@ Invoke a quote and capture the results into a new array
 
 Given a slice and a value, return the offset the value is located at, or #nan if not found
 
+Example:
+
+````
+[ 1 2 3 4 5 ]  9 index-of
+[ 1 2 3 4 5 ]  3 index-of
+
+````
 ## word-exists?
 
     s-f
@@ -1162,6 +1189,19 @@ Begin a lexically scoped area
 
 End a lexically scoped region, removing any headers not specified in the provided array.
 
+Example:
+
+````
+{
+    [ 'a' 'b' ] ::
+    [ ... do something with a and b ... ] 'c' :
+
+    [ 'c' ]
+}
+
+"a and b are no longer in the dictionary at this point"
+
+````
 ## with
 
     p-
@@ -1192,12 +1232,30 @@ Close a lexical scope and create a vocabulary with the exposed words
 
 Executes the code quotation, preserving and restoring the contents of the variables specified.
 
+Example:
+
+````
+100 'A' var!
+[ A ]  [ 200 !A  @A dup * ] invoke<preserving>
+@A
+
+````
 ## zip
 
     ppp-p
 
 For each item in source1, push the item and the corresponding item from source2 to the stack. Execute the specified code. Push results into a new array, repeating until all items are exhausted. Returns the new array. This expects the code to return a single value as a result. It also assumes that both sources are the same size (or at least that the second does not contain less than the first
 
+Example:
+
+````
+[ 1 2 3 ]  [ 4 5 6 ]  [ + ] zip
+
+"This would return a new array identical to:"
+
+[ 5 7 9 ]
+
+````
     ## Hash-Prime
 
 Variable
@@ -1238,18 +1296,42 @@ Hash a string using chosen-hash and HashPrime
 
 Takes a pointer to a set of quotations. Each quote in the set should consist of two other quotes: one that returns a flag, and one to be executed if the condition returns true. Executes each until one returns true, then exits.
 
+Example:
+
+````
+[ \
+  [ [ dup even? ] [ 'number is even!' ] ] \
+  [ [ dup odd? ] [ 'number is odd!' ] ] \
+  [ [ true ] [ 'hmm, this is a strange number!' ] ] \
+] when
+
+````
 ## split
 
     ss-p
 
 Given a string and a delimiter, split the string into an array
 
+Example:
+
+````
+'hello brave new world'
+' ' split
+
+````
 ## join
 
     pv-s
 
 Given an array of values and a string, convert each value to a string and merge, using the provided string between them
 
+Example:
+
+````
+[ 'this' 'is' 'a' 'series' 'of' 'values' ]
+'---' join
+
+````
 ## clean-string
 
     s-s
@@ -1262,18 +1344,37 @@ Remove any non-printable characters from a string
 
 Replace all instances of s2 in s1 with s3
 
+Example:
+
+````
+'Apples are horrible.'
+'horrible'  'tasty' replace
+
+````
 ## interpolate
 
     ps-s
 
 Given an array of values and a string with insertion points, construct a new string, copying the values into the insertion points.
 
+Example:
+
+````
+[ 1 2 3 ] '{v} + {v} = {v}' interpolate
+
+````
 ## interpolate<cycling>
 
     qs-s
 
 Given an array of values and a string with insertion points, construct a new string, copying the values into the insertion points. If the array of values is less than the number of insertion points, cycle through them again.
 
+Example:
+
+````
+[ 1 2 3 ] '{v} + {v} = {v}' interpolate<cycling>
+
+````
 ## ?
 
     s-s | s-ss

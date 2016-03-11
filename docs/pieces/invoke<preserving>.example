@@ -1,0 +1,4 @@
+100 'A' var!
+[ A ]  [ 200 !A  @A dup * ] invoke<preserving>
+@A
+

@@ -1,0 +1,6 @@
+[ \
+  [ [ dup even? ] [ 'number is even!' ] ] \
+  [ [ dup odd? ] [ 'number is odd!' ] ] \
+  [ [ true ] [ 'hmm, this is a strange number!' ] ] \
+] when
+
