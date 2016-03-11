@@ -844,30 +844,67 @@ Return true if the type of both values is the same, or false otherwise
 
 Given two values, expand the range
 
+Example:
+
+````
+10 90 expand-range
+10 1 expand-range
+
+````
 ## sum-range
 
     ...n-n
 
 Given a series of values and a count, sum the values
 
+Example:
+
+````
+1 2 3 4 5
+5 sum-range
+
+````
 ## hide-words
 
     p-
 
 Given an array of names, hide each named item
 
+Example:
+
+````
+[ 'a'  'e'  'i'  'o'  'u' ] hide-words
+
+````
 ## redefine
 
     ps-
 
 Remove the old name for a word and assign it to a new one
 
+Example:
+
+````
+[ "n-n" 10 * ] 'scale' :
+[ "-n"  5 scale ] 'b' :
+[ "n-n" 20 * ] 'scale' redefine
+[ "-n"  5 scale ] 'c' :
+b c
+
+````
 ## ::
 
     p-
 
 Given a list of names, create a variable for each one
 
+Example:
+
+````
+"Creates new variables named a, b, and c:"
+[ 'a'  'b'  'c' ] ::
+
+````
 ## string-contains?
 
     vs-f
@@ -928,18 +965,40 @@ Return true if value is an uppercase string or ASCII character, or false otherwi
 
 Execute a quotation, constructing a string from the values it returns.
 
+Example:
+
+````
+[ 'Hello' 32 :c 'World!' ] build-string
+
+````
 ## cons
 
     vv-p
 
 Bind two values into a new slice
 
+Example:
+
+````
+$a $b cons :s
+
+````
 ## curry
 
     vp-p
 
 Bind a value and a quote, returning a new quote which executes the specified one against the provided value
 
+Example:
+
+````
+"Use this to create a counting function"
+[ "s-q" request [ [ head ] [ increment ] bi ] curry ] 'counter' :
+
+counter 'c' :
+5 [ c ] times
+
+````
 ## enquote
 
     p-p
@@ -952,18 +1011,36 @@ Wrap a pointer into a new quote, converting the pointer into a FUNCALL
 
 Return the first item in a slice
 
+Example:
+
+````
+[ 1 2 3 4 5 ] head
+
+````
 ## body
 
     q-q
 
 Return the second through last items in a slice
 
+Example:
+
+````
+'Eggs Are Tasty' body :s
+
+````
 ## tail
 
     p-v
 
 Return the last item in a slice
 
+Example:
+
+````
+'hello world!' tail
+
+````
 ## push
 
     vp-
@@ -1048,6 +1125,13 @@ If the pointer corresponds to a named item, return the name. Otherwise return an
 
 Change a name from s1 to s2
 
+Example:
+
+````
+'foo' var
+'foo'  'bar' rename-word
+
+````
 ## trim-left
 
     s-s
