@@ -1,0 +1,37 @@
+[ "-n" 000 "Constant for special character" ] 'ASCII.NUL' :
+[ "-n" 001 "Constant for special character" ] 'ASCII.SOH' :
+[ "-n" 002 "Constant for special character" ] 'ASCII.STX' :
+[ "-n" 003 "Constant for special character" ] 'ASCII.ETX' :
+[ "-n" 004 "Constant for special character" ] 'ASCII.EOT' :
+[ "-n" 005 "Constant for special character" ] 'ASCII.ENQ' :
+[ "-n" 006 "Constant for special character" ] 'ASCII.ACK' :
+[ "-n" 007 "Constant for special character" ] 'ASCII.BEL' :
+[ "-n" 008 "Constant for special character" ] 'ASCII.BS' :
+[ "-n" 009 "Constant for special character" ] 'ASCII.TAB' :
+[ "-n" 010 "Constant for special character" ] 'ASCII.LF' :
+[ "-n" 011 "Constant for special character" ] 'ASCII.VT' :
+[ "-n" 012 "Constant for special character" ] 'ASCII.FF' :
+[ "-n" 013 "Constant for special character" ] 'ASCII.CR' :
+[ "-n" 014 "Constant for special character" ] 'ASCII.SO' :
+[ "-n" 015 "Constant for special character" ] 'ASCII.SI' :
+[ "-n" 016 "Constant for special character" ] 'ASCII.DLE' :
+[ "-n" 017 "Constant for special character" ] 'ASCII.DC1' :
+[ "-n" 018 "Constant for special character" ] 'ASCII.DC2' :
+[ "-n" 019 "Constant for special character" ] 'ASCII.DC3' :
+[ "-n" 020 "Constant for special character" ] 'ASCII.DC4' :
+[ "-n" 021 "Constant for special character" ] 'ASCII.NAK' :
+[ "-n" 022 "Constant for special character" ] 'ASCII.SYN' :
+[ "-n" 023 "Constant for special character" ] 'ASCII.ETB' :
+[ "-n" 024 "Constant for special character" ] 'ASCII.CAN' :
+[ "-n" 025 "Constant for special character" ] 'ASCII.EM' :
+[ "-n" 026 "Constant for special character" ] 'ASCII.SUB' :
+[ "-n" 027 "Constant for special character" ] 'ASCII.ESC' :
+[ "-n" 028 "Constant for special character" ] 'ASCII.FS' :
+[ "-n" 029 "Constant for special character" ] 'ASCII.SS' :
+[ "-n" 030 "Constant for special character" ] 'ASCII.RS' :
+[ "-n" 031 "Constant for special character" ] 'ASCII.US' :
+[ "-n" 032 "Constant for special character" ] 'ASCII.SPACE' :
+
+
+'ASCII' vm.dict<names-like> 'ASCII~' vocab
+
