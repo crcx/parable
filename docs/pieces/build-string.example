@@ -1,0 +1,2 @@
+[ 'Hello' 32 :c 'World!' ] build-string
+

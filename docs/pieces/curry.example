@@ -1,0 +1,6 @@
+"Use this to create a counting function"
+[ "s-q" request [ [ head ] [ increment ] bi ] curry ] 'counter' :
+
+counter 'c' :
+5 [ c ] times
+

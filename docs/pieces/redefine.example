@@ -1,0 +1,6 @@
+[ "n-n" 10 * ] 'scale' :
+[ "-n"  5 scale ] 'b' :
+[ "n-n" 20 * ] 'scale' redefine
+[ "-n"  5 scale ] 'c' :
+b c
+
