@@ -1315,3 +1315,4 @@ Return the base E logarithim of a number
     n-n
 
 Return the base 10 logarithim of a number
+
