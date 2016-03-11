@@ -109,7 +109,9 @@
       <form name='editor' id='editor' action='punga.py' method='post'>
         <textarea rows='24' style='width: 95%' name='code' placeholder='enter your code here'>{{code}}</textarea>
         <br><hr>
+        <a onClick='location.href="/punga"' style='border: 1px solid black; padding: 5px; float: left'>Reset Environment</a>
         <a onClick='document.forms["editor"].submit()' style='border: 1px solid black; padding: 5px; float: right'>Evaluate</a>
+        <input type="hidden" name="snapshot" value="{{snapshot}}">
       </form>
     </div>
     <div class='right'>

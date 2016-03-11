@@ -10,6 +10,33 @@ import parable
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
+def create_snapshot():
+    parable.collect_garbage()
+    j = json.dumps({"symbols": parable.dictionary_names, \
+                    "symbol_map": parable.dictionary_slices, \
+                    "errors": parable.errors, \
+                    "stack_values": parable.stack, \
+                    "stack_types": parable.types, \
+                    "memory_contents": parable.memory_values, \
+                    "memory_types": parable.memory_types, \
+                    "memory_map": parable.memory_map, \
+                    "memory_sizes": parable.memory_size, \
+                    "hidden_slices": parable.dictionary_hidden_slices, })
+    return j
+
+def compress_snapshot(j):
+    try:
+        c = bz2.compress(bytes(j, 'utf-8'))
+    except:
+        c = bz2.compress(j)
+    return c
+
+
+def encode_snapshot(c):
+    return str(base64.b64encode(c)).replace("b'", "").replace("'", "")
+
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
 def bootstrap(s):
     try:
         raw = base64.b64decode(bytes(s, 'utf-8'))
@@ -134,18 +161,27 @@ def dump_dict():
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
+form = 0
+snapshot = ""
+
 def setup_environment():
-#    cgitb.enable()
+    global form, snapshot
+    cgitb.enable()
     signal.alarm(60)
+    form = cgi.FieldStorage()
     parable.prepare_slices()
     parable.prepare_dictionary()
-    bootstrap(open('parable.snapshot', 'r').read())
+    snapshot = form.getvalue("snapshot", "{{snapshot}}")
+    if snapshot == "{{snapshot}}":
+        snapshot = open('parable.snapshot', 'r').read()
+    bootstrap(snapshot)
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 if __name__ == '__main__':
+    sys.stdout.write("Content-type: text/html\n\n")
+
     setup_environment()
-    form = cgi.FieldStorage()
     code = form.getvalue("code", "")
     message = code.replace("\\\r\n", " ")
     message = message.replace("\\\n", " ")
@@ -155,7 +191,6 @@ if __name__ == '__main__':
             s = parable.compile(line, parable.request_slice())
             parable.interpret(s)
 
-    sys.stdout.write("Content-type: text/html\n\n")
     with open('template.html') as file:
         template = file.read()
 
@@ -163,5 +198,11 @@ if __name__ == '__main__':
     errors = dump_errors()
     dict = dump_dict()
 
-    template = template.replace('{{code}}', code).replace('{{stack}}',stack).replace('{{errors}}',errors).replace('{{dict}}', dict)
+    template = template.replace('{{code}}', code)
+    template = template.replace('{{stack}}', stack)
+    template = template.replace('{{errors}}', errors)
+    template = template.replace('{{dict}}', dict)
+
+    shot = encode_snapshot(compress_snapshot(create_snapshot()))
+    template = template.replace('{{snapshot}}', shot)
     print(template)
