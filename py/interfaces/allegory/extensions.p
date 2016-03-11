@@ -1,4 +1,3 @@
-"Allegory Extensions to the Parable"
 [ "-"   `2000 "Turn on reporting of redefinitions" ] '+warnings' :
 [ "-"   `2001 "Turn off reporting of redefinitions" ] '-warnings' :
 
@@ -37,8 +36,6 @@
     "Read a file into a new slice" \
   ] 'slurp-file' :
 }
-[ 'open-file' 'close-file' 'read-file' 'write-file' 'file-position' 'file-seek' \
-  'file-size' 'delete-file' 'file-exists?' 'slurp-file' ] 'Files~' vocab
 
 
 "Command Line Arguments and System Integration"
@@ -64,16 +61,11 @@
 [ "v-"  `6000    "Display a value to the screen" ] 'display' :
 [ '\n'   display "Display a newline on the screen" ] 'tty.cr' :
 [ '\t'   display "Display a newline on the screen" ] 'tty.tab' :
-[ 'display'  'tty.cr' ] 'ConsoleIO~' vocab
 
 [ "-n" `300 "Return a Unix timestamp" ] 'time' :
 [ "p-n" time [ invoke ] dip time swap - "Invoke a function and return the running time (in seconds)" ] 'invoke<time>' :
 
-
 [ "s-" dup word-exists? [ drop ] [ 'library/' swap + include ] if "Load a library" ] 'needs' :
-
-[ &ConsoleIO~ &Files~ ] [ with ] for-each
-
 
 [ "-" \
   'allegory, (c)2013-2016 Charles Childers\n\n' display \
@@ -81,3 +73,18 @@
 ] 'allegory.on-start' :
 
 [ "-" "Exit point for standalone applications (via turnkey)" ] 'allegory.on-end' :
+
+
+[ 'open-file' 'close-file' 'read-file' 'write-file' 'file-position' 'file-seek' \
+  'file-size' 'delete-file' 'file-exists?' 'slurp-file' ] 'Files~' vocab
+
+[ 'display'  'tty.cr' 'tty.tab' ] 'ConsoleIO~' vocab
+
+[ '+warnings' '-warnings' '.s' 'bye' 'words' 'include' 'save-as' \
+  'restart' 'Files~' 'sys.args' 'sys.run' 'arg-count' 'get-arg' \
+  'value-for-key' 'get-environment-value' 'ConsoleIO~' 'time' \
+  'invoke<time>' 'needs' 'allegory.on-start' 'allegory.on-end' \
+] 'Allegory~' vocab
+
+&Allegory~ with
+[ &ConsoleIO~ &Files~ ] [ with ] for-each
