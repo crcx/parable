@@ -339,7 +339,7 @@
 [ 'with' 'without' 'vocab' '}vocab' '}}' ] {
   [ 'Vocabulary' ] ::
 
-  [ "p-"  [ invoke : ] for-each "Add words in a vocabulary to the dictionary" ] 'with' :
+  [ "p-"  [ invoke redefine ] for-each "Add words in a vocabulary to the dictionary" ] 'with' :
   [ "p-"  [ tail hide-word ] for-each "Remove words in a vocabulary from the dictionary" ] 'without' :
 
   [ "ps-" \
