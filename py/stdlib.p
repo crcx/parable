@@ -146,7 +146,7 @@
 
 "Simple variables are just named slices, with functions to access the first element. They're useful for holding single values."
 
-[ "vs-"  [ request [ 0 store ] sip [ 'Variable' :r swap 1 store ] sip ] dip : \
+[ "vs-"  [ request [ 0 store ] sip ] dip : \
   "Create a variable with an initial value" \
 ] 'var!' :
 
@@ -526,3 +526,5 @@
 [ "-n"   3.14159265359 "Mathmatical constant for PI" ] 'PI' :
 [ "n-n"  E log<n> "Return the base E logarithim of a number" ] 'log' :
 [ "n-n"  10 log<n> "Return the base 10 logarithim of a number" ] 'log10' :
+
+[ "p-p"  [ remark? not nip ] filter "Return a copy of the slice with embedded comments removed" ] 'strip-remarks' :

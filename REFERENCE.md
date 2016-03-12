@@ -1256,9 +1256,9 @@ Example:
 [ 5 7 9 ]
 
 ````
-## Hash-Prime
+    ## Hash-Prime
 
-    Variable
+Variable
 
 ## hash:xor
 
@@ -1416,4 +1416,10 @@ Return the base E logarithim of a number
     n-n
 
 Return the base 10 logarithim of a number
+
+## strip-remarks
+
+    p-p
+
+Return a copy of the slice with embedded comments removed
 
