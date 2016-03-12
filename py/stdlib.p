@@ -7,65 +7,65 @@
 [ "nn-n"   `5  "Multiply two numbers" ] '*' :
 [ "nn-n"   `6  "Divide n1 by n2" ] '/' :
 [ "nn-n"   `7  "Divide n1 by n2, returning the remainder" ] 'rem' :
-[ "nn-n"   `9  "Return n1 to the power n2" ] '^' :
-[ "nn-n"   `12 "Return the logarithim of a number in the specified base" ] 'log<n>' :
-[ "nn-n"   `13 "Perform a bitwise shift" ] 'shift' :
-[ "nn-n"   `14 "Bitwise AND operation" ] 'and' :
-[ "nn-n"   `15 "Bitwise OR operation" ] 'or' :
-[ "nn-n"   `16 "Bitwise XOR operation" ] 'xor' :
-[ "-n"     `17 "Return a random number" ] 'random' :
-[ "n-n"    `18 "Obtain the square root of a number" ] 'sqrt' :
-[ "n-n"    `19 "Round a number to the nearest integer value" ] 'round' :
-[ "nn-f"   `20 "True if n1 < n2 or false otherwise" ] 'lt?' :
-[ "nn-f"   `21 "True if n1 > n2 or false otherwise" ] 'gt?' :
-[ "nn-f"   `22 "True if n1 <= n2 or false otherwise" ] 'lteq?' :
-[ "nn-f"   `23 "True if n1 >= n2 or false otherwise" ] 'gteq?' :
-[ "vv-f"   `24 "True if n1 == n2 or false otherwise" ] 'eq?' :
-[ "vv-f"   `25 "True if n1 != n2 or false otherwise" ] '-eq?' :
-[ "fpp-"   `26 "If flag is true, invoke p1; otherwise invoke p2" ] 'if' :
-[ "p-"     `27 "Invoke p (which should return a flag) until the returned flag is false" ] 'while' :
-[ "p-"     `28 "Invoke p (which should return a flag) until the returned flag is true" ] 'until' :
-[ "np-"    `29 "Invoke slice p the specified number of times" ] 'times' :
-[ "p-"     `31 "Run the code in slice p" ] 'invoke' :
-[ "vp-v"   `32 "Remove value and invoke the quote. Restore value when execution completes." ] 'dip' :
-[ "vp-v"   `33 "Invoke the quote. After execution complets, restore a copy of the value to the stack" ] 'sip' :
-[ "vpp-?"  `34 "Apply each quote to a copy of the value" ] 'bi' :
-[ "vppp-?" `35 "Apply each quote to a copy of the value" ] 'tri' :
-[ "-"      `36 "Abort the current execution cycle" ] 'abort' :
-[ "pp-"    `38 "Copy the contents of the first slice to the second one" ] 'copy' :
-[ "pn-v"   `39 "Fetch a value stored at the specified offset within the specified slice" ] 'fetch' :
-[ "vpn-"   `40 "Store a value into the specified offset within the specified slice" ] 'store' :
-[ "-p"     `41 "Request a new slice and return a pointer to it" ] 'request' :
-[ "p-"     `42 "Release a previously allocated slice" ] 'release' :
-[ "-"      `43 "Tell Parable that this is a good time to scan memory for unused slices and reclaim them" ] 'collect-garbage' :
-[ "p-n"    `44 "Return the last offset in a slice" ] 'get<final-offset>' :
-[ "np-"    `45 "Set the last index in a slice (can be used to shrink or grow a slice)" ] 'set<final-offset>' :
-[ "tpn-"   `46 "Set the stored type for the value at offset with the slice to the specified type." ] 'store<type>' :
-[ "pn-n"   `47 "Get the stored type for a value within a slice." ] 'fetch<type>' :
-[ "v-vv"   `48 "Duplicate the top value on the stack" ] 'dup' :
-[ "v-"     `49 "Discard the top value on the stack" ] 'drop' :
-[ "vV-Vv"  `50 "Switch the positions of the top two items on the stack" ] 'swap' :
-[ "-n"     `51 "Return the number of items on the stack" ] 'depth' :
-[ "s-"     `55 "Remove the named item from the dictionary" ] 'hide-word' :
-[ "ss-n"   `57 "Search for substring (s2) in a source string (s1). Returns #nan if not found." ] 'find' :
-[ "pnn-p"  `58 "Return a new slice containing the contents of the original slice, starting from the specified offset and ending at (but not including) the ending offset." ] 'subslice' :
-[ "s-f"    `59 "If string can be converted to a number, return true, otherwise return false" ] 'numeric?' :
-[ "p-p"    `60 "Reverse the order of items in a slice. This modifies the original slice." ] 'reverse' :
-[ "v-v"    `61 "Convert a string or character to lowercase" ] 'to-lowercase' :
-[ "v-v"    `62 "Convert a string or character to uppercase" ] 'to-uppercase' :
-[ "s-"     `63 "Add a string to the error log" ] 'report-error' :
-[ "-p"     `64 "Return an array of strings corresponding to names in the dictionary" ] 'vm.dict<names>' :
-[ "-p"     `65 "Return an array of slices corresponding to the named items in the dictionary" ] 'vm.dict<slices>' :
-[ "n-n"    `66 "Return the sine of a number" ] 'sin' :
-[ "n-n"    `67 "Return the cosine of a number" ] 'cos' :
-[ "n-n"    `68 "Return the tangent of a number" ] 'tan' :
-[ "n-n"    `69 "Return the arc sine of a number" ] 'asin' :
-[ "n-n"    `70 "Return the arc cosine of a number" ] 'acos' :
-[ "n-n"    `71 "Return the arc tangent of a number" ] 'atan' :
-[ "n-n"    `72 "Return the arc tangent of a number" ] 'atan2' :
-[ "-p"     `73 "Return an array indicating which slices are allocated and which are free. Each index corresponds to a slice. If the stored value is 0, the slice is free. If 1, the slice is allocated." ] 'vm.memory<map>' :
-[ "-p"     `74 "Return an array indicating the size of each slice (in cells). Each index corresponds to a slice; the stored value is the length of the slice." ] 'vm.memory<sizes>' :
-[ "-p"     `75 "Return an array of slice numbers which are currently marked as allocated." ] 'vm.memory<allocated>' :
+[ "nn-n"   `8  "Return n1 to the power n2" ] '^' :
+[ "nn-n"   `9 "Return the logarithim of a number in the specified base" ] 'log<n>' :
+[ "nn-n"   `10 "Perform a bitwise shift" ] 'shift' :
+[ "nn-n"   `11 "Bitwise AND operation" ] 'and' :
+[ "nn-n"   `12 "Bitwise OR operation" ] 'or' :
+[ "nn-n"   `13 "Bitwise XOR operation" ] 'xor' :
+[ "-n"     `14 "Return a random number" ] 'random' :
+[ "n-n"    `15 "Obtain the square root of a number" ] 'sqrt' :
+[ "n-n"    `16 "Round a number to the nearest integer value" ] 'round' :
+[ "nn-f"   `17 "True if n1 < n2 or false otherwise" ] 'lt?' :
+[ "nn-f"   `18 "True if n1 > n2 or false otherwise" ] 'gt?' :
+[ "nn-f"   `19 "True if n1 <= n2 or false otherwise" ] 'lteq?' :
+[ "nn-f"   `20 "True if n1 >= n2 or false otherwise" ] 'gteq?' :
+[ "vv-f"   `21 "True if n1 == n2 or false otherwise" ] 'eq?' :
+[ "vv-f"   `22 "True if n1 != n2 or false otherwise" ] '-eq?' :
+[ "fpp-"   `23 "If flag is true, invoke p1; otherwise invoke p2" ] 'if' :
+[ "p-"     `24 "Invoke p (which should return a flag) until the returned flag is false" ] 'while' :
+[ "p-"     `25 "Invoke p (which should return a flag) until the returned flag is true" ] 'until' :
+[ "np-"    `26 "Invoke slice p the specified number of times" ] 'times' :
+[ "p-"     `27 "Run the code in slice p" ] 'invoke' :
+[ "vp-v"   `28 "Remove value and invoke the quote. Restore value when execution completes." ] 'dip' :
+[ "vp-v"   `29 "Invoke the quote. After execution complets, restore a copy of the value to the stack" ] 'sip' :
+[ "vpp-?"  `30 "Apply each quote to a copy of the value" ] 'bi' :
+[ "vppp-?" `31 "Apply each quote to a copy of the value" ] 'tri' :
+[ "-"      `32 "Abort the current execution cycle" ] 'abort' :
+[ "pp-"    `34 "Copy the contents of the first slice to the second one" ] 'copy' :
+[ "pn-v"   `35 "Fetch a value stored at the specified offset within the specified slice" ] 'fetch' :
+[ "vpn-"   `36 "Store a value into the specified offset within the specified slice" ] 'store' :
+[ "-p"     `37 "Request a new slice and return a pointer to it" ] 'request' :
+[ "p-"     `38 "Release a previously allocated slice" ] 'release' :
+[ "-"      `39 "Tell Parable that this is a good time to scan memory for unused slices and reclaim them" ] 'collect-garbage' :
+[ "p-n"    `40 "Return the last offset in a slice" ] 'get<final-offset>' :
+[ "np-"    `41 "Set the last index in a slice (can be used to shrink or grow a slice)" ] 'set<final-offset>' :
+[ "tpn-"   `42 "Set the stored type for the value at offset with the slice to the specified type." ] 'store<type>' :
+[ "pn-n"   `43 "Get the stored type for a value within a slice." ] 'fetch<type>' :
+[ "v-vv"   `44 "Duplicate the top value on the stack" ] 'dup' :
+[ "v-"     `45 "Discard the top value on the stack" ] 'drop' :
+[ "vV-Vv"  `46 "Switch the positions of the top two items on the stack" ] 'swap' :
+[ "-n"     `47 "Return the number of items on the stack" ] 'depth' :
+[ "s-"     `49 "Remove the named item from the dictionary" ] 'hide-word' :
+[ "ss-n"   `50 "Search for substring (s2) in a source string (s1). Returns #nan if not found." ] 'find' :
+[ "pnn-p"  `51 "Return a new slice containing the contents of the original slice, starting from the specified offset and ending at (but not including) the ending offset." ] 'subslice' :
+[ "s-f"    `52 "If string can be converted to a number, return true, otherwise return false" ] 'numeric?' :
+[ "p-p"    `53 "Reverse the order of items in a slice. This modifies the original slice." ] 'reverse' :
+[ "v-v"    `55 "Convert a string or character to lowercase" ] 'to-lowercase' :
+[ "v-v"    `55 "Convert a string or character to uppercase" ] 'to-uppercase' :
+[ "s-"     `56 "Add a string to the error log" ] 'report-error' :
+[ "-p"     `57 "Return an array of strings corresponding to names in the dictionary" ] 'vm.dict<names>' :
+[ "-p"     `58 "Return an array of slices corresponding to the named items in the dictionary" ] 'vm.dict<slices>' :
+[ "n-n"    `59 "Return the sine of a number" ] 'sin' :
+[ "n-n"    `60 "Return the cosine of a number" ] 'cos' :
+[ "n-n"    `61 "Return the tangent of a number" ] 'tan' :
+[ "n-n"    `62 "Return the arc sine of a number" ] 'asin' :
+[ "n-n"    `63 "Return the arc cosine of a number" ] 'acos' :
+[ "n-n"    `64 "Return the arc tangent of a number" ] 'atan' :
+[ "n-n"    `65 "Return the arc tangent of a number" ] 'atan2' :
+[ "-p"     `66 "Return an array indicating which slices are allocated and which are free. Each index corresponds to a slice. If the stored value is 0, the slice is free. If 1, the slice is allocated." ] 'vm.memory<map>' :
+[ "-p"     `67 "Return an array indicating the size of each slice (in cells). Each index corresponds to a slice; the stored value is the length of the slice." ] 'vm.memory<sizes>' :
+[ "-p"     `68 "Return an array of slice numbers which are currently marked as allocated." ] 'vm.memory<allocated>' :
 
 [ "vV-vVv" \
   [ dup ] dip swap \
