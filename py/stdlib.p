@@ -393,7 +393,7 @@
 [ :n over -6 shift + over -16 shift + swap - ] 'hash:sdbm<n>' :
 [ "s-n" 0 swap [ :c swap hash:sdbm<n> ] for-each "Hash a string using the SDBM algorithim" ] 'hash:sdbm' :
 [ "s-b" hash:djb2 "The preferred hash algorithim (defaults to DJB2)" ] 'chosen-hash' :
-[ "s-n" chosen-hash @Hash-Prime rem "Hash a string using chosen-hash and HashPrime" ] 'hash' :
+[ "s-n" chosen-hash @Hash-Prime rem "Hash a string using chosen-hash and Hash-Prime" ] 'hash' :
 'hash:sdbm<n>' hide-word
 
 

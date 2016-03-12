@@ -1256,9 +1256,9 @@ Example:
 [ 5 7 9 ]
 
 ````
-    ## Hash-Prime
+## Hash-Prime
 
-Variable
+    Variable
 
 ## hash:xor
 
@@ -1288,7 +1288,7 @@ The preferred hash algorithim (defaults to DJB2)
 
     s-n
 
-Hash a string using chosen-hash and HashPrime
+Hash a string using chosen-hash and Hash-Prime
 
 ## when
 
