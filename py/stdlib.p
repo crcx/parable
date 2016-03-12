@@ -146,7 +146,7 @@
 
 "Simple variables are just named slices, with functions to access the first element. They're useful for holding single values."
 
-[ "vs-"  [ request [ 0 store ] sip ] dip : \
+[ "vs-"  [ request [ 0 store ] sip [ 'Variable' :r swap 1 store ] sip ] dip : \
   "Create a variable with an initial value" \
 ] 'var!' :
 
