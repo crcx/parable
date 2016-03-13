@@ -11,7 +11,7 @@ clean:
 	rm -rf *.pyc __pycache__ *~ parable-dist.tar.gz
 
 update:
-	cp server/punga.py ~/www/api.forthworks.com/apologue
+#	cp server/punga.py ~/www/api.forthworks.com/apologue
 	cp parable.py stdlib.p ~/www/api.forthworks.com/apologue/2
 #	cp parable.py ~/www/api.forthworks.com/apologue/1.8
 #	cp server/apologue-1.8 ~/www/api.forthworks.com/apologue/1.8/0

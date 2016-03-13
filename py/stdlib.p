@@ -51,7 +51,7 @@
 [ "pnn-p"  `51 "Return a new slice containing the contents of the original slice, starting from the specified offset and ending at (but not including) the ending offset." ] 'subslice' :
 [ "s-f"    `52 "If string can be converted to a number, return true, otherwise return false" ] 'numeric?' :
 [ "p-p"    `53 "Reverse the order of items in a slice. This modifies the original slice." ] 'reverse' :
-[ "v-v"    `55 "Convert a string or character to lowercase" ] 'to-lowercase' :
+[ "v-v"    `54 "Convert a string or character to lowercase" ] 'to-lowercase' :
 [ "v-v"    `55 "Convert a string or character to uppercase" ] 'to-uppercase' :
 [ "s-"     `56 "Add a string to the error log" ] 'report-error' :
 [ "-p"     `57 "Return an array of strings corresponding to names in the dictionary" ] 'vm.dict<names>' :
