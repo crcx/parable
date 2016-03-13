@@ -1918,7 +1918,7 @@ def display_value():
             sys.stdout.write("false")
         else:
             sys.stdout.write("malformed flag")
-    elif types[i] == TYPE_COMMENT:
+    elif types[i] == TYPE_REMARK:
         sys.stdout.write(slice_to_string(stack[i]))
     elif types[i] == TYPE_BYTECODE:
         sys.stdout.write('`' + str(stack[i]))
