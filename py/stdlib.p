@@ -146,19 +146,19 @@
 
 "Simple variables are just named slices, with functions to access the first element. They're useful for holding single values."
 
-[ "vs-"  [ request [ 0 store ] sip ] dip : \
+[ "vs-"  [ request [ '-v' :r swap 0 store ] sip [ 1 store ] sip ] dip : \
   "Create a variable with an initial value" \
 ] 'var!' :
 
 [ "s-"   0 :u swap var! "Create a variable" ] 'var' :
-[ "p-"   0 swap 0 store "Set a variable to a value of 0" ] 'off' :
-[ "p-"   -1 swap 0 store "Set a variable to a value of -1" ] 'on' :
+[ "p-"   0 swap 1 store "Set a variable to a value of 0" ] 'off' :
+[ "p-"   -1 swap 1 store "Set a variable to a value of -1" ] 'on' :
 
-[ "p-"   [ 0 fetch 1 + ] sip 0 store \
+[ "p-"   [ 1 fetch 1 + ] sip 1 store \
   "Increment a variables value by 1" \
 ] 'increment' :
 
-[ "p-"   [ 0 fetch 1 - ] sip 0 store \
+[ "p-"   [ 1 fetch 1 - ] sip 1 store \
   "Increment a variables value by 1" \
 ] 'decrement' :
 
@@ -365,7 +365,7 @@
         swap duplicate-slice !List \
         [ @List [ head ] for-each ] capture-results reverse !Prior \
         invoke \
-        @Prior length? [ @Prior pop @List pop 0 store ] times \
+        @Prior length? [ @Prior pop @List pop 1 store ] times \
       ] dip !List \
     ] dip !Prior \
     "Executes the code quotation, preserving and restoring the contents of the variables specified." \
@@ -389,7 +389,7 @@
 "Hashing functions"
 389 'Hash-Prime' var!
 [ "s-n" 0 swap [ :n xor ] for-each "Hash a string using the XOR algorithim" ] 'hash:xor' :
-[ "s-n" 5381 swap [ over -5 shift + + ] for-each "Hash a string using the DJB2 algorithim" ] 'hash:djb2' :
+[ "s-n" 5381 swap [ :n over -5 shift + + ] for-each "Hash a string using the DJB2 algorithim" ] 'hash:djb2' :
 [ :n over -6 shift + over -16 shift + swap - ] 'hash:sdbm<n>' :
 [ "s-n" 0 swap [ :c swap hash:sdbm<n> ] for-each "Hash a string using the SDBM algorithim" ] 'hash:sdbm' :
 [ "s-b" hash:djb2 "The preferred hash algorithim (defaults to DJB2)" ] 'chosen-hash' :

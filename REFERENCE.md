@@ -1256,9 +1256,9 @@ Example:
 [ 5 7 9 ]
 
 ````
-    ## Hash-Prime
+## Hash-Prime
 
-Variable
+    -v
 
 ## hash:xor
 

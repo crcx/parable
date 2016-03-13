@@ -1655,11 +1655,11 @@ def compile(str, slice):
             offset = compile_bytecode(current, slice, offset)
         elif prefix == "@":
             offset = compile_pointer(current, slice, offset)
-            offset = compile_number(0, slice, offset)
+            offset = compile_number(1, slice, offset)
             offset = compile_bytecode(BC_MEM_FETCH, slice, offset)
         elif prefix == "!":
             offset = compile_pointer(current, slice, offset)
-            offset = compile_number(0, slice, offset)
+            offset = compile_number(1, slice, offset)
             offset = compile_bytecode(BC_MEM_STORE, slice, offset)
         elif current == "[":
             nest.append(slice)
