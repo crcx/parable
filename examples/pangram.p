@@ -1,8 +1,9 @@
 'Scratch' var
+
 [ "s-f" \
-  request-empty :s !Scratch \
-  to-lowercase \
-  [ dup letter? [ dup :n $a :n - @Scratch swap store ] [ drop ] if ] for-each \
+  request :s !Scratch 25 @Scratch :p set<final-offset> \
+  to-lowercase [ letter? ] filter \
+  [ @Scratch :p over :n $a :n - store ] for-each \
   'abcdefghijklmnopqrstuvwxyz' @Scratch eq? \
 ] 'pangram?' :
 
@@ -10,4 +11,3 @@
 'a' pangram?
 'is this or this or this zzz' pangram?
 'the quick brown fox jumped over the lazy dogs' pangram?
-

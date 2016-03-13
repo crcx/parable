@@ -5,8 +5,8 @@
 "quite agree with the whole 'we should all kill ourselves' idea, figured out"
 "the perfect way to avoid death: be the last man standing."
 
-[ 40 ] 'Soldiers' :
-[  3 ] 'Victim' :
+[ "-n" 40 ] 'Soldiers' :
+[ "-n"  3 ] 'Victim' :
 
 [ ] '(josephus)' :
 [ "r i"   swap @Victim + over rem swap #1 + dup @Soldiers gt? [ (josephus) ] if-false ] '(josephus)' :

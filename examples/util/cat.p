@@ -1,5 +1,5 @@
 #!/usr/bin/env allegory
 
-arg-count #0 -eq?
-  [ #0 arg-count [ dup get-arg slurp-file display tty.cr #1 + ] times drop ]
+sys.args length? 1 -eq?
+  [ sys.args reverse dup pop drop [ slurp-file display tty.cr ] for-each ]
   [ './cat.p filename(s)' display tty.cr ] if
