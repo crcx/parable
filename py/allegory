@@ -474,7 +474,7 @@ def bytecode_flow_times(opcode, offset, more):
 
 
 def bytecode_flow_call(opcode, offset, more):
-    if precheck([TYPE_POINTER]):
+    if precheck([TYPE_POINTER]) or precheck([TYPE_FUNCTION_CALL]):
         a = stack_pop()
         interpret(a, more)
     else:
