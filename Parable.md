@@ -37,15 +37,17 @@ The basic process is:
 The second part of this is where the work gets done. An example implementation of this in Parable would be:
 
     [ "s-..." \
-      [ [ [ current-prefix $# eq? ]  [ compile-number ] ] \
-        [ [ current-prefix $$ eq? ]  [ compile-character ] ] \
-        [ [ current-prefix $& eq? ]  [ compile-pointer ] ] \
-        [ [ current-prefix $' eq? ]  [ compile-string ] ] \
-        [ [ current-prefix $" eq? ]  [ compile-comment ] ] \
-        [ [ current-token numeric? ] [ current-token :n *Slice push ] ] \
-        [ [ current-token '[' eq? ]  [ handle-[ ] ] \
-        [ [ current-token ']' eq? ]  [ handle-] ] ] \
-        [ [ true ]                   [ compile-funcall ] ] \
+      [ [ [ current-prefix $# eq?  ]  [ compile-number    ] ] \
+        [ [ current-prefix $$ eq?  ]  [ compile-character ] ] \
+        [ [ current-prefix $& eq?  ]  [ compile-pointer   ] ] \
+        [ [ current-prefix $' eq?  ]  [ compile-string    ] ] \
+        [ [ current-prefix $" eq?  ]  [ compile-comment   ] ] \
+        [ [ current-prefix $@ eq?  ]  [ compile-fetch     ] ] \
+        [ [ current-prefix $! eq?  ]  [ compile-store     ] ] \
+        [ [ current-token numeric? ]  [ current-token :n *Slice push ] ] \
+        [ [ current-token '[' eq?  ]  [ handle-[          ] ] \
+        [ [ current-token ']' eq?  ]  [ handle-]          ] ] \
+        [ [ true ]                    [ compile-funcall   ] ] \
       ] when ] 'compile-token' :
 
 Basically the parser will look at each prefix and invoke a handling function for the specific type.
@@ -88,17 +90,17 @@ Other interfaces (such as *Apologue* for iOS) exist as well but are developed an
 
 The Parable compiler is a fairly simple construction. It takes a single line of source, breaks it into whitespace delimited tokens, and then iterates over the tokens, compiling them into a new slice as instructed by the *prefixes* each token optionally has.
 
-The compiler recognizes the following prefixes: # $ & ` " '
+The compiler recognizes the following prefixes: **# $ & ` " ' @ !**
 
-Numbers are *floating point*, and canonically have a # prefix. E.g.,
+Numbers are *floating point*, and canonically have a **#** prefix. E.g.,
 
     #1
     #NaN
     #-121.1124
 
-To aid in simplicity and readability, the # prefix is considered optional: Parable will attempt to recognize numbers without the prefix, but this is not guaranteed to work in all cases. 
+To aid in simplicity and readability, the **#** prefix is considered optional: Parable will attempt to recognize numbers without the prefix, but this is not guaranteed to work in all cases. 
 
-The next prefix, $, is used to mark the token as a *character*. Currently this compiles the character immediately following the prefix into the quotation. 
+The next prefix, **$**, is used to mark the token as a *character*. Currently this compiles the character immediately following the prefix into the quotation. 
 
     $a
     $1
@@ -106,29 +108,37 @@ The next prefix, $, is used to mark the token as a *character*. Currently this c
 
 *Currently the only reliably recognized characters are ASCII. Extended Unicode character values may not work.*
 
-The & prefix is used to mark the token as a pointer to a slice. The following value can be either a name or a slice number.
+The **&** prefix is used to mark the token as a pointer to a slice. The following value can be either a name or a slice number.
 
     &invoke
     &capture-results
     &12345
 
-Strings start and end with a single quotation character ('). They contain *character* data, and can contain spaces. The compiler will concatenate tokens together until encountering one ending in '.
+Strings start and end with a single quotation character (**'**). They contain *character* data, and can contain spaces. The compiler will concatenate tokens together until encountering one ending in '.
 
     'hello world'
     '1234567890'
 
-Comments start and end with double quotes ("). They contain *character* data, and can contain spaces. Like strings, the compiler will concatenate tokens until encountering one ending in ".
+Comments start and end with double quotes (**"**). They contain *character* data, and can contain spaces. Like strings, the compiler will concatenate tokens until encountering one ending in ".
 
     "this does something"
     "string -- number"
 
-Bytecodes are prefixes by  a backtick. The remainder of the token should contain a number corresponding to the desired bytecode.
+Bytecodes are prefixes by a backtick. The remainder of the token should contain a number corresponding to the desired bytecode.
 
     `100
 
 Anything not recognized as a type is assumed to be a function call. Tokens without a prefix are looked up in the dictionary, and if found, mapped to their corresponding slice and a function call is compiled. If the token is not mapped to a valid name, an error is logged and compilation continues.
 
-Two special cases exist: [ and ]. When the compiler encounters a [ it begins compiling a new quotation, and when a ] is encountered a pointer to this new quote is compiled into the previous one.
+The **@** and **!** prefixes are used to easily store into or update a variable.
+
+E.g. you can do:
+
+    @foo 1 + !foo
+
+To obtain the value in foo, increase it by 1, and then store back into foo.
+
+Two special cases exist: **[** and **]**. When the compiler encounters a **[** it begins compiling a new quotation, and when a **]** is encountered a pointer to this new quote is compiled into the previous one.
 
 # Memory Model
 
@@ -263,10 +273,10 @@ Each string is stored in a separate slice. String length is the same as the corr
 
 Notes:
 
-* Make sure to use use single quotes (') for strings. Double quotes are used for comments.
+* Make sure to use use single quotes (**'**) for strings. Double quotes are used for comments.
 * All restrictions on characters apply to strings (and comments)
 
-Escape sequences can be used in strings. These start with a \ and are followed by a single character.
+Escape sequences can be used in strings. These start with a **\** and are followed by a single character.
 
     \<space>       Embed a space in a string
     \n             Embed a newline in a string
@@ -349,8 +359,6 @@ The need to reference the offsets obscures the intent. Variables simplify this t
     100 !a
     @a 1 + !a
 
-The **@** prefix replaces the **0 fetch** and the **!** prefix replaces **0 store**. It's a small, but useful improvement. 
-
 # Arrays
 
 All slices are effectively usable as arrays. The length is stored by the VM as the size of the slice, with the values stored sequentially in the slice. This is simplistic, but easy to understand and makes working with them at low level easy.
@@ -374,7 +382,7 @@ You can use the standard **fetch** and **store** functions to access array eleme
 
 All of this is good, but the array combinators are what make arrays truly useful. There are currently six of interest: **filter**, **map**,  **reduce**, **for-each**, **contains?**, and **index-of**.
 
-**Filter** takes an array and a quote which filters values, and returns a new array that contains values that match the filter. So to find all vowels in a string, we could do:
+**filter** takes an array and a quote which filters values, and returns a new array that contains values that match the filter. So to find all vowels in a string, we could do:
 
     'this is a string of sorts'
     [ vowel? ] filter :s
@@ -384,16 +392,16 @@ Or, to return values greater than 20:
     [ 10 20 30 4 40 5 50 60 8 98 ]
     [ 20 lt? ] filter
 
-**Filter** executes the quotation passed once for each item in the array. It passes each item on the stack to the quotation, and then checks the value returned. If **true**, it appends the stored value into a new quote, otherwise it ignores it. The quotation you pass to **filter** should consume the value passed to it and return a valid flag.
+**filter** executes the quotation passed once for each item in the array. It passes each item on the stack to the quotation, and then checks the value returned. If **true**, it appends the stored value into a new quote, otherwise it ignores it. The quotation you pass to **filter** should consume the value passed to it and return a valid flag.
 
-**Map** applies a quote to each value in an array. We could square all values in an array like:
+**map** applies a quote to each value in an array. We could square all values in an array like:
 
     [ 1 2 3 4 5 6 7 8 9 ]
     [ dup * ] map
 
 The quotation should return a single value; this will replace the original value in the array.
 
-**Reduce** takes an array, a value, and a quote. It's useful for doing something with each value in an array. Some examples:
+**reduce** takes an array, a value, and a quote. It's useful for doing something with each value in an array. Some examples:
 
     "add all values in an array"
     [ 1 2 3 4 5 6 7 8 ] 
@@ -407,18 +415,18 @@ The quotation should return a single value; this will replace the original value
     'this is a string of text' :p
     0 [ vowel? [ 1 + ] if-true ] reduce
 
-**For-each** takes an array and a quote which is applied to each item in the array.
+**for-each** takes an array and a quote which is applied to each item in the array.
 
     'Count' var
     'this is a string of sorts'
     [ vowel? [ @Count 1 + !Count ] if-true ] for-each
     @Count
 
-**For-each** executes the quotation passed once for each item in the array. It passes each item on the stack to the quotation.
+**for-each** executes the quotation passed once for each item in the array. It passes each item on the stack to the quotation.
 
-**Contains?** takes an array and a value. It returns **true** if the array contains the value, or **false** otherwise.
+**contains?** takes an array and a value. It returns **true** if the array contains the value, or **false** otherwise.
 
-**Index-of** takes an array and a value. If the value is in the array, it returns the offset. Otherwise it returns an offset of -1.
+**index-of** takes an array and a value. If the value is in the array, it returns the offset. Otherwise it returns an offset of -1.
 
 # Appendix: Terms
 
@@ -476,7 +484,7 @@ If the token maps to a name in the dictionary, this will store a pointer to the 
 
 ### Nested Quotations
 
-A new slice is allocated, and compilation switches to this slice. When the ending ] is encountered, switch back to the previous slice and compile a pointer into the original slice. The pointer has a *TYPE_POINTER* assigned.
+A new slice is allocated, and compilation switches to this slice. When the ending **]** is encountered, switch back to the previous slice and compile a pointer into the original slice. The pointer has a *TYPE_POINTER* assigned.
 
 A special case exists if the quotation is empty (a **[ ]** pair). In this case a return instruction is compiled into the otherwise empty quote and then the pointer is compiled.
 
