@@ -187,7 +187,7 @@ if __name__ == '__main__':
     message = message.replace("\\\n", " ")
     f = parable.condense_lines(message.split("\n"))
     for line in f:
-        if len(line) > 1:
+        if len(line) > 0:
             s = parable.compile(line, parable.request_slice())
             parable.interpret(s)
 
