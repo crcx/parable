@@ -7,7 +7,7 @@
 * now using a dispatch table for the byte codes
 * added type checking to the byte codes
 * fetch now allows for negative offsets (fetch with index starting at tail end of slice)
-* disabled some redundant byte codes
+* removed some redundant byte codes
 
   * BC\_FLOOR
   * BC\_LOG
@@ -21,6 +21,9 @@
 * internal cleanups and refactorings
 * disabled automatic garbage collection
 * removed ceiling on number of slices (goodbye MAX\_SLICES)
+* garbage collector now actually releases memory on release
+* random was crashing; fixed
+* fixed a bug in division handling
 
 ### Standard Library
 
@@ -28,6 +31,7 @@
 
   * index-of now returns #nan when no matching item is in the slice
   * index-of no longer crashes on slices with mixed types
+  * stack-values now restores comments properly
 
 * Improvements
 
@@ -38,11 +42,13 @@
   * log now written in Parable
   * log10 now written in Parable
   * all functions now have documentation strings embedded
+  * variables now have a mandatory stack comment
 
 * Additions
 
   * ceil
   * enquote
+  * strip-remarks
   * with
   * without
   * vocab
@@ -57,16 +63,27 @@
 
 * Renamed
 
+  * lookup-function renamed to lookup-word
+  * function-exists? renamed to word-exists?
+  * hide-function renamed to hide-word
+  * hide-functions renamed to hide-words
+  * rename-function renamed to rename-word
   * get-last-index renamed to get<final-offset>
   * set-last-index renamed to set<final-offset>
 
 ### Library
 
 * Added a "library" directory to hold useful extensions
-* File names to match vocabulary names:
+* Files named to match vocabulary names:
+* New vocabularies:
 
-  * TextOutputBuffer~
+  * ASCII~
   * Buffer~
+  * Compiler~
+  * Infix~
+  * Marker~
+  * Table~
+  * TextOutputBuffer~
 
 ### Interfaces
 
@@ -82,7 +99,8 @@
 * Punga
 
   * now uses a precompiled snapshot
-  * new, 3-pane fullscreen interface: editor, results, dictionary
+  * new, 2-pane fullscreen interface: editor, results/errors/dictionary
+  * results/memory persist across runs (until manually reset or tab closed)
 
 ----
 
