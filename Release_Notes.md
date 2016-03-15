@@ -70,6 +70,7 @@
   * rename-function renamed to rename-word
   * get-last-index renamed to get<final-offset>
   * set-last-index renamed to set<final-offset>
+  * drop-multiple is now drop<n>
 
 ### Library
 

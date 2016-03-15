@@ -126,7 +126,7 @@
 "Stack Flow"
 [ "vV-vVvV"  over over   "Duplicate the top two items on the stack" ] 'dup-pair' :
 [ "vv-"      drop drop   "Discard the top two items on the stack" ] 'drop-pair' :
-[ "?n-"      [ drop ] times   "Discard an arbitrary number of items from the stack" ] 'drop-multiple' :
+[ "?n-"      [ drop ] times   "Discard an arbitrary number of items from the stack" ] 'drop<n>' :
 [ "q-...n"   depth [ invoke ] dip depth swap - \
   "Execute a quotation, returning a value indicating th stack depth change as a result" \
 ] 'invoke<depth?>' :

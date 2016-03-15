@@ -610,7 +610,7 @@ Duplicate the top two items on the stack
 
 Discard the top two items on the stack
 
-## drop-multiple
+## drop<n>
 
     ?n-
 
@@ -1226,6 +1226,15 @@ Create a new vocabulary
 
 Close a lexical scope and create a vocabulary with the exposed words
 
+Example:
+
+````
+[ 'a' 'c' ] 'EiEiO~' {
+  [ "-n" 100 ] 'a' :
+  [ "-n" 200 ] 'b' :
+  [ "-n" a b + ] 'c' :
+}}
+````
 ## invoke<preserving>
 
     qq-
