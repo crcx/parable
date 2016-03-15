@@ -5,11 +5,11 @@
 
 "A table is setup like:"
 
-"[ [  1  2  3  4  5 ] \"
-"  [ $a $b $c $d $e ] \"
-"  [ $f $g $h $i $j ] \"
-"  [ $k $l $m $n $o ] \"
-"] 'T' :               "
+"[ [  1  2  3  4  5 ] \ "
+"  [ $a $b $c $d $e ] \ "
+"  [ $f $g $h $i $j ] \ "
+"  [ $k $l $m $n $o ] \ "
+"] 'T' :                "
 
 "Given a string containing tab separated or comma separated values, this can"
 "construct a table from the string."
@@ -39,3 +39,6 @@
 
 [ "pnn-"  [ fetch ] dip fetch "Fetch from a table." ] 'table.fetch<row,col>' :
 [ "vpnn-" [ fetch ] dip store "Store into a table." ] 'table.store<row,col>' :
+
+[ 'table.fetch<row,col>' 'table.store<row,col>' 'table.from<tsv>' \
+  'table.from<csv>' ] 'Table~' vocab
