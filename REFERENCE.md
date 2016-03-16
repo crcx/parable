@@ -850,6 +850,7 @@ Example:
 [ $a $z [ :n ] bi@ expand-range ] capture-results reverse :s
 
 ````
+
 ## sum-range
 
     ...n-n
@@ -863,6 +864,7 @@ Example:
 5 sum-range
 
 ````
+
 ## hide-words
 
     p-
@@ -875,6 +877,7 @@ Example:
 [ 'a'  'e'  'i'  'o'  'u' ] hide-words
 
 ````
+
 ## redefine
 
     ps-
@@ -891,6 +894,7 @@ Example:
 b c
 
 ````
+
 ## ::
 
     p-
@@ -904,6 +908,7 @@ Example:
 [ 'a'  'b'  'c' ] ::
 
 ````
+
 ## string-contains?
 
     vs-f
@@ -970,6 +975,7 @@ Example:
 [ 'Hello' 32 :c 'World!' ] build-string
 
 ````
+
 ## cons
 
     vv-p
@@ -982,6 +988,7 @@ Example:
 $a $b cons :s
 
 ````
+
 ## curry
 
     vp-p
@@ -998,6 +1005,7 @@ counter 'c' :
 5 [ c ] times
 
 ````
+
 ## enquote
 
     p-p
@@ -1016,6 +1024,7 @@ Example:
 [ 1 2 3 4 5 ] head
 
 ````
+
 ## body
 
     q-q
@@ -1028,6 +1037,7 @@ Example:
 'Eggs Are Tasty' body :s
 
 ````
+
 ## tail
 
     p-v
@@ -1040,6 +1050,7 @@ Example:
 'hello world!' tail
 
 ````
+
 ## push
 
     vp-
@@ -1071,6 +1082,7 @@ Example:
 [ 1 2 3 4 5 6 7 8 9 10 ] [ even? ] filter 0 [ + ] reduce
 
 ````
+
 ## for-each
 
     pp-?
@@ -1096,6 +1108,7 @@ Example:
 [ vowel? ] filter :s
 
 ````
+
 ## map
 
     pq-
@@ -1109,6 +1122,7 @@ Example:
 [ 1 2 3 4 ] [ 10 * ] map
 
 ````
+
 ## capture-results
 
     p-p
@@ -1128,6 +1142,7 @@ Example:
 [ 1 2 3 4 5 ]  3 index-of
 
 ````
+
 ## word-exists?
 
     s-f
@@ -1159,6 +1174,7 @@ Example:
 'foo'  'bar' rename-word
 
 ````
+
 ## trim-left
 
     s-s
@@ -1202,6 +1218,7 @@ Example:
 "a and b are no longer in the dictionary at this point"
 
 ````
+
 ## with
 
     p-
@@ -1235,6 +1252,7 @@ Example:
   [ "-n" a b + ] 'c' :
 }}
 ````
+
 ## invoke<preserving>
 
     qq-
@@ -1249,6 +1267,7 @@ Example:
 @A
 
 ````
+
 ## zip
 
     ppp-p
@@ -1265,6 +1284,7 @@ Example:
 [ 5 7 9 ]
 
 ````
+
 ## Hash-Prime
 
     -v
@@ -1315,6 +1335,7 @@ Example:
 ] when
 
 ````
+
 ## split
 
     ss-p
@@ -1328,6 +1349,7 @@ Example:
 ' ' split
 
 ````
+
 ## join
 
     pv-s
@@ -1341,6 +1363,7 @@ Example:
 '---' join
 
 ````
+
 ## clean-string
 
     s-s
@@ -1360,6 +1383,7 @@ Example:
 'horrible'  'tasty' replace
 
 ````
+
 ## interpolate
 
     ps-s
@@ -1372,6 +1396,7 @@ Example:
 [ 1 2 3 ] '{v} + {v} = {v}' interpolate
 
 ````
+
 ## interpolate<cycling>
 
     qs-s
@@ -1384,6 +1409,7 @@ Example:
 [ 1 2 3 ] '{v} + {v} = {v}' interpolate<cycling>
 
 ````
+
 ## ?
 
     s-s | s-ss
