@@ -472,7 +472,7 @@ The parser concatenates tokens until it encounters one ending in a single quote.
 
 ### Comments
 
-The parser concatenates tokens until it encounters one ending in a double quote. It then stores the character codes into a new slice and stores a pointer to this slice into the current one. When done, it sets the type to *TYPE_COMMENT*.
+The parser concatenates tokens until it encounters one ending in a double quote. It then stores the character codes into a new slice and stores a pointer to this slice into the current one. When done, it sets the type to *TYPE_REMARK*.
 
 ### Pointers
 
