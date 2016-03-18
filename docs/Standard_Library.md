@@ -62,7 +62,7 @@ Return n1 to the power n2
 
     nn-n
 
-Return the logarithim of a number in the specified base
+Return the logarithm of a number in the specified base
 
 ## shift
 
@@ -1529,13 +1529,13 @@ Mathmatical constant for PI
 
     n-n
 
-Return the base E logarithim of a number
+Return the base E logarithm of a number
 
 ## log10
 
     n-n
 
-Return the base 10 logarithim of a number
+Return the base 10 logarithm of a number
 
 ## strip-remarks
 

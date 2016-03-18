@@ -8,7 +8,7 @@
 [ "nn-n"   `6  "Divide n1 by n2" ] '/' :
 [ "nn-n"   `7  "Divide n1 by n2, returning the remainder" ] 'rem' :
 [ "nn-n"   `8  "Return n1 to the power n2" ] '^' :
-[ "nn-n"   `9 "Return the logarithim of a number in the specified base" ] 'log<n>' :
+[ "nn-n"   `9 "Return the logarithm of a number in the specified base" ] 'log<n>' :
 [ "nn-n"   `10 "Perform a bitwise shift" ] 'shift' :
 [ "nn-n"   `11 "Bitwise AND operation" ] 'and' :
 [ "nn-n"   `12 "Bitwise OR operation" ] 'or' :
@@ -532,7 +532,7 @@
 
 [ "-n"   2.71828182846 "Mathmatical constant for Euler's Number" ] 'E' :
 [ "-n"   3.14159265359 "Mathmatical constant for PI" ] 'PI' :
-[ "n-n"  E log<n> "Return the base E logarithim of a number" ] 'log' :
-[ "n-n"  10 log<n> "Return the base 10 logarithim of a number" ] 'log10' :
+[ "n-n"  E log<n> "Return the base E logarithm of a number" ] 'log' :
+[ "n-n"  10 log<n> "Return the base 10 logarithm of a number" ] 'log10' :
 
 [ "p-p"  [ remark? not nip ] filter "Return a copy of the slice with embedded comments removed" ] 'strip-remarks' :
