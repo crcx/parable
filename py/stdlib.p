@@ -276,11 +276,11 @@
 
 [ "-p"     request [ pop drop ] sip "Request a slice with no stored values" ] 'request-empty' :
 
-[ "pnp-n"  [ !XT over length? [ over pop @XT invoke ] times nip ] localize \
+[ "pnp-n"  [ !XT [ duplicate-slice ] dip over length? [ over pop @XT invoke ] times nip ] localize \
   "Takes a slice, a starting value, and a quote. It executes the quote once for each item in the slice, passing the item and the value to the quote. The quote should consume both and return a new value." \
 ] 'reduce' :
 
-[ "pp-?"   [ !XT !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke &Offset increment ] times ] localize \
+[ "pp-?"   [ !XT duplicate-slice !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke &Offset increment ] times ] localize \
   "Takes a slice and a quotation. It then executes the quote once for each item in the slice, passing the individual items to the quote." \
 ] 'for-each' :
 
