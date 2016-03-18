@@ -280,7 +280,7 @@
   "Takes a slice, a starting value, and a quote. It executes the quote once for each item in the slice, passing the item and the value to the quote. The quote should consume both and return a new value." \
 ] 'reduce' :
 
-[ "pp-?"   [ !XT !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke @Offset 1 + !Offset ] times ] localize \
+[ "pp-?"   [ !XT !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke &Offset increment ] times ] localize \
   "Takes a slice and a quotation. It then executes the quote once for each item in the slice, passing the individual items to the quote." \
 ] 'for-each' :
 
@@ -288,11 +288,11 @@
   "Given a slice and a value, return true if the value is found in the slice, or false otherwise." \
  ] 'contains?' :
 
-[ "pq-p"   [ !XT !Source request-empty !Target 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke [ @Source @Offset fetch @Target push ] if-true @Offset 1 + !Offset ] times @Target ] localize \
+[ "pq-p"   [ !XT !Source request-empty !Target 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke [ @Source @Offset fetch @Target push ] if-true &Offset increment ] times @Target ] localize \
   "Given a slice and a quotation, this will pass each value to the quotation (executing it once per item in the slice). The quotation should return a Boolean flag. If the flag is true, copy the value to a new slice. Otherwise discard it." \
 ] 'filter' :
 
-[ "pq-"    [ !XT duplicate-slice !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke @Source @Offset store @Offset 1 + !Offset ] times @Source ] localize \
+[ "pq-"    [ !XT duplicate-slice !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke @Source @Offset store &Offset increment ] times @Source ] localize \
   "Given a pointer to an array and a quotation, execute the quotation once for each item in the array. Construct a new array from the value returned by the quotation and return a pointer to it." \
 ] 'map' :
 
@@ -303,7 +303,7 @@
 [ "pv-n" \
   [ dup-pair !Value !Source \
     contains? \
-    [ 0 !Offset #nan !Found @Source length? [ @Source @Offset fetch @Value types-match? [ eq? [ @Offset !Found ] if-true ] [ drop-pair ] if @Offset 1 + !Offset ] times @Found ] \
+    [ 0 !Offset #nan !Found @Source length? [ @Source @Offset fetch @Value types-match? [ eq? [ @Offset !Found ] if-true ] [ drop-pair ] if &Offset increment ] times @Found ] \
     [ #nan ] if \
   ] localize \
   "Given a slice and a value, return the offset the value is located at, or #nan if not found" \
@@ -414,7 +414,7 @@
     [ !Tests false !Done 0 !Offset \
       [ @Tests @Offset fetch head invoke \
         [ true !Done @Tests @Offset fetch 1 fetch invoke ] if-true \
-        @Offset 1 + !Offset @Done \
+        &Offset increment @Done \
       ] until \
     ] invoke<preserving> \
     "Takes a pointer to a set of quotations. Each quote in the set should consist of two other quotes: one that returns a flag, and one to be executed if the condition returns true. Executes each until one returns true, then exits." \
