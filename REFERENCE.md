@@ -58,7 +58,7 @@ Divide n1 by n2, returning the remainder
 
 Return n1 to the power n2
 
-## log<n>
+## log&lt;n&gt;
 
     nn-n
 
@@ -253,25 +253,25 @@ Release a previously allocated slice
 
 Tell Parable that this is a good time to scan memory for unused slices and reclaim them
 
-## get<final-offset>
+## get&lt;final-offset&gt;
 
     p-n
 
 Return the last offset in a slice
 
-## set<final-offset>
+## set&lt;final-offset&gt;
 
     np-
 
 Set the last index in a slice (can be used to shrink or grow a slice)
 
-## store<type>
+## store&lt;type&gt;
 
     tpn-
 
 Set the stored type for the value at offset with the slice to the specified type.
 
-## fetch<type>
+## fetch&lt;type&gt;
 
     pn-n
 
@@ -349,13 +349,13 @@ Convert a string or character to uppercase
 
 Add a string to the error log
 
-## vm.dict<names>
+## vm.dict&lt;names&gt;
 
     -p
 
 Return an array of strings corresponding to names in the dictionary
 
-## vm.dict<slices>
+## vm.dict&lt;slices&gt;
 
     -p
 
@@ -403,19 +403,19 @@ Return the arc tangent of a number
 
 Return the arc tangent of a number
 
-## vm.memory<map>
+## vm.memory&lt;map&gt;
 
     -p
 
 Return an array indicating which slices are allocated and which are free. Each index corresponds to a slice. If the stored value is 0, the slice is free. If 1, the slice is allocated.
 
-## vm.memory<sizes>
+## vm.memory&lt;sizes&gt;
 
     -p
 
 Return an array indicating the size of each slice (in cells). Each index corresponds to a slice; the stored value is the length of the slice.
 
-## vm.memory<allocated>
+## vm.memory&lt;allocated&gt;
 
     -p
 
@@ -625,13 +625,13 @@ Duplicate the top two items on the stack
 
 Discard the top two items on the stack
 
-## drop<n>
+## drop&lt;n&gt;
 
     ?n-
 
 Discard an arbitrary number of items from the stack
 
-## invoke<depth?>
+## invoke&lt;depth?&gt;
 
     q-...n
 
@@ -788,7 +788,7 @@ Example:
 [ 10 * ] tri@
 ````
 
-## abort<with-error>
+## abort&lt;with-error&gt;
 
     s-
 
@@ -1299,7 +1299,7 @@ Example:
 }}
 ````
 
-## invoke<preserving>
+## invoke&lt;preserving&gt;
 
     qq-
 
@@ -1443,7 +1443,7 @@ Example:
 
 ````
 
-## interpolate<cycling>
+## interpolate&lt;cycling&gt;
 
     qs-s
 
@@ -1468,7 +1468,7 @@ Lookup the stack comment and description (if existing) for a named item
 
 Return an array with the items currently on the stack
 
-## vm.dict<names-like>
+## vm.dict&lt;names-like&gt;
 
     s-p
 

@@ -2,7 +2,7 @@
 "Requires: allegory"
 [ ]
 {
-  [ "s-s"  '## ' swap + ] 'header' :
+  [ "s-s"  '<' '&lt;' replace '>' '&gt;' replace '## ' swap + ] 'header' :
   [ "s-s"  :s '\ \ \ \ ' swap + ] 'stack' :
   [ "-"    depth 3 eq? [ [ stack ] dip ] [ stack ] if ] 'format' :
   [ "s-..." [ header ] sip ? format ] 'get-strings' :
