@@ -154,11 +154,19 @@
 [ "p-"   0 swap 1 store "Set a variable to a value of 0" ] 'off' :
 [ "p-"   -1 swap 1 store "Set a variable to a value of -1" ] 'on' :
 
-[ "p-"   [ 1 fetch 1 + ] sip 1 store \
+[ "np-"  swap over 1 fetch + swap 1 store \
+  "Increment a variable by the specified amount" \
+] 'increment<by>' :
+
+[ "p-"   1 swap increment<by> \
   "Increment a variables value by 1" \
 ] 'increment' :
 
-[ "p-"   [ 1 fetch 1 - ] sip 1 store \
+[ "np-"  swap over 1 fetch swap - swap 1 store \
+  "Decrement a variable by the specified amount" \
+] 'decrement<by>' :
+
+[ "p-"   1 swap decrement<by> \
   "Increment a variables value by 1" \
 ] 'decrement' :
 

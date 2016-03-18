@@ -704,11 +704,23 @@ Set a variable to a value of 0
 
 Set a variable to a value of -1
 
+## increment&lt;by&gt;
+
+    np-
+
+Increment a variable by the specified amount
+
 ## increment
 
     p-
 
 Increment a variables value by 1
+
+## decrement&lt;by&gt;
+
+    np-
+
+Decrement a variable by the specified amount
 
 ## decrement
 
