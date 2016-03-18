@@ -190,11 +190,26 @@ Invoke the quote. After execution complets, restore a copy of the value to the s
 
 Apply each quote to a copy of the value
 
+Example:
+
+````
+100 [ 10 / ]
+    [ 20 - ] bi
+````
+
 ## tri
 
     vppp-?
 
 Apply each quote to a copy of the value
+
+Example:
+
+````
+100 [ 10 / ]
+    [ 20 * ]
+    [ 30 - ] tri
+````
 
 ## abort
 
@@ -724,11 +739,28 @@ Return the absolute value of a number
 
 Invoke p1 against v1 and p2 against v2
 
+Example:
+
+````
+100 200
+[ 10 / ]
+[ 20 - ] bi*
+````
+
 ## tri*
 
     vvvppp-?
 
 Invoke p1 against v1, p2 against v2, and p3 against v3
+
+Example:
+
+````
+100 200 300
+[ 10 / ]
+[ 20 - ]
+[ 50 + ] tri*
+````
 
 ## bi@
 
@@ -736,11 +768,25 @@ Invoke p1 against v1, p2 against v2, and p3 against v3
 
 Invoke p1 against v1 and again against v2
 
+Example:
+
+````
+1 2
+[ 10 * ] bi@
+````
+
 ## tri@
 
     vvvp-?
 
 Invoke p1 against v1, then v2, then v3
+
+Example:
+
+````
+1 2 3
+[ 10 * ] tri@
+````
 
 ## abort<with-error>
 
