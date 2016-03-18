@@ -12,4 +12,4 @@ turnkeys: parable
 	$(PY) py/allegory tools/gen_wordlist_turnkey.p
 
 documents: turnkeys
-	$(PY) generate-reference.py >REFERENCE.md
+	$(PY) generate-reference.py >docs/Standard_Library.md
