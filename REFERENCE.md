@@ -673,11 +673,24 @@ Return the length of a slice
 
 Create a variable with an initial value
 
+Example:
+
+````
+100  'Foo' var!
+'Hello World'  'Bar' var!
+````
+
 ## var
 
     s-
 
 Create a variable
+
+Example:
+
+````
+'Foo' var
+````
 
 ## off
 
@@ -1175,6 +1188,13 @@ Example:
 
 Invoke a quote and capture the results into a new array
 
+Example:
+
+````
+[ 1 100 expand-range ] capture-results
+
+````
+
 ## index-of
 
     pv-n
@@ -1282,6 +1302,13 @@ Remove words in a vocabulary from the dictionary
     ps-
 
 Create a new vocabulary
+
+Example:
+
+````
+[ '+'  '*'  '-'  '/'  'rem'  'ceil'  'floor' ]
+'Math~' vocab
+````
 
 ## }}
 
