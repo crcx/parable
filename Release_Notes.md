@@ -21,9 +21,15 @@
 * internal cleanups and refactorings
 * disabled automatic garbage collection
 * removed ceiling on number of slices (goodbye MAX\_SLICES)
-* garbage collector now actually releases memory on release
-* random was crashing; fixed
-* fixed a bug in division handling
+* bug fixes
+
+  * garbage collector now actually releases memory on release
+  * random was crashing; fixed
+  * fixed a bug in division handling
+
+* prefix change:
+
+  * @ and ! now fetch/store from offset 1, not offset 0
 
 ### Standard Library
 
@@ -52,7 +58,7 @@
   * with
   * without
   * vocab
-  * {{
+  * }}
 
 * Removals
 
@@ -83,6 +89,7 @@
   * Compiler~
   * Infix~
   * Marker~
+  * Stack~
   * Table~
   * TextOutputBuffer~
 
@@ -102,6 +109,10 @@
   * now uses a precompiled snapshot
   * new, 2-pane fullscreen interface: editor, results/errors/dictionary
   * results/memory persist across runs (until manually reset or tab closed)
+
+### Documentation
+
+* Function Reference is now extracted from the docstrings
 
 ----
 
