@@ -2,9 +2,7 @@
 
 collect-garbage
 
-[ 'Image'  'I'  'O' ] variables
-[ 'Data'   'Address' ] variables
-[ 'Ports'  'Input'  'Output' ] variables
+[ 'Image'  'I'  'O'  'Data'  'Address'  'Ports'  'Input'  'Output' ] ::
 
 [ "-" \
   0 !I \
@@ -14,76 +12,76 @@ collect-garbage
   [ 1 0 0 0 0 0 0 0 0 0 0 0 0 ] !Ports \
   request-empty :s !Output \
   request-empty :s !Input \
-] 'ngaro.initialize' define
+] 'ngaro.initialize' :
 
 
-[ "-" @I 1 + !I ] 'I+' define
-[ "-n" @Image @I fetch ] 'Image@' define
-[ "n-" @Image @I store ] 'Image!' define
+[ "-" @I 1 + !I ] 'I+' :
+[ "-n" @Image @I fetch ] 'Image@' :
+[ "n-" @Image @I store ] 'Image!' :
 
-[ "-n" @Data pop ] 'D>' define
-[ "n-" @Data push ] '>D' define
-[ "-n" @Address pop ] 'A>' define
-[ "n-" @Address push ] '>A' define
+[ "-n" @Data pop :n ] 'D>' :
+[ "n-" :n @Data push ] '>D' :
+[ "-n" @Address pop ] 'A>' :
+[ "n-" @Address push ] '>A' :
 
 "I/O Simulation"
 [ "-" \
-  @Input first :n >D @Input rest !Input \
-  0 @Ports 1 store ] 'io-console-input' define
+  @Input head :n >D @Input body !Input \
+  0 @Ports 1 store ] 'io-console-input' :
 
 [ "-" \
-  @Output D> :c :s + !Output \
-  0 @Ports 2 store ] 'io-console-output' define
+  @Output :p :s D> :c :s + !Output \
+  0 @Ports 2 store ] 'io-console-output' :
 
 [ "-" \
-  0 @Ports 5 store ] 'io-capabilities' define
+  0 @Ports 5 store ] 'io-capabilities' :
 
 [ "-" \
   @Ports 0 fetch 1 -eq? \
   [ \
-    [ [ [ @Ports 1 fetch 1 eq? ]   [ io-console-input ] ] \
-      [ [ @Ports 2 fetch 1 eq? ]   [ io-console-output ] ] \
-      [ [ @Ports 5 fetch 0 -eq? ]  [ io-capabilities ] ] \
+    [ [ [ @Ports 1 fetch 1  eq? ]  [ io-console-input  ] ] \
+      [ [ @Ports 2 fetch 1  eq? ]  [ io-console-output ] ] \
+      [ [ @Ports 5 fetch 0 -eq? ]  [ io-capabilities   ] ] \
     ] when \
   ] if-true \
-] 'simulate-io' define
+] 'simulate-io' :
 
 "Implement the instructions"
-[ "-" ] 'I.nop' define
-[ "-"  I+ Image@ >D ] 'I.lit' define
-[ "-"  D> dup >D >D ] 'I.dup' define
-[ "-"  D> drop ] 'I.drop' define
-[ "-"  D> D> swap >D >D ] 'I.swap' define
-[ "-"  D> >A ] 'I.push' define
-[ "-"  A> >D ] 'I.pop' define
+[ "-" ] 'I.nop' :
+[ "-"  I+ Image@ >D ] 'I.lit' :
+[ "-"  D> dup >D >D ] 'I.dup' :
+[ "-"  D> drop ] 'I.drop' :
+[ "-"  D> D> swap >D >D ] 'I.swap' :
+[ "-"  D> >A ] 'I.push' :
+[ "-"  A> >D ] 'I.pop' :
 [ "-" \
   I+ \
   D> 1 - dup >D zero? not \
-  [ "-"  Image@ 1 - !I ] [ I.drop ] if ] 'I.loop' define
-[ "-"  I+ Image@ 1 - !I ] 'I.jump' define
-[ "-"  A> !I ] 'I.return' define
-[ "-"  D> D> lt? [ I.jump ] [ I+ ] if ] 'I.lt_jump' define
-[ "-"  D> D> gt? [ I.jump ] [ I+ ] if ] 'I.gt_jump' define
-[ "-"  D> D> -eq? [ I.jump ] [ I+ ] if ] 'I.ne_jump' define
-[ "-"  D> D> eq? [ I.jump ] [ I+ ] if ] 'I.eq_jump' define
-[ "-"  @Image D> fetch >D ] 'I.fetch' define
-[ "-"  D> D> swap @Image swap store ] 'I.store' define
-[ "-"  D> D> + >D ] 'I.+' define
-[ "-"  D> D> - >D ] 'I.-' define
-[ "-"  D> D> * >D ] 'I.*' define
-[ "-"  D> D> dup-pair rem floor [ / floor ] dip >D >D ] 'I./rem' define
-[ "-"  D> D> and >D ] 'I.and' define
-[ "-"  D> D> or >D ] 'I.or' define
-[ "-"  D> D> xor >D ] 'I.xor' define
-[ "-"  D> D> -1 * shift >D ] 'I.shl' define
-[ "-"  D> D> shift >D ] 'I.shr' define
-[ "-"  I.dup D> zero? [ I.drop I.return ] if-true ] 'I.0;' define
-[ "-"  0 @Ports D> dup-pair fetch >D store ] 'I.in' define
-[ "-"  D> D> swap @Ports swap store ] 'I.out' define
-[ "-"  simulate-io ] 'I.wait' define
-[ "-"  D> 1 + >D ] 'I.1+' define
-[ "-"  D> 1 - >D ] 'I.1-' define
-[ "-"  @I >A Image@ 1 - !I ] 'I.call' define
+  [ "-"  Image@ 1 - !I ] [ I.drop ] if ] 'I.loop' :
+[ "-"  I+ Image@ 1 - !I ] 'I.jump' :
+[ "-"  A> !I ] 'I.return' :
+[ "-"  D> D> lt? [ I.jump ] [ I+ ] if ] 'I.lt_jump' :
+[ "-"  D> D> gt? [ I.jump ] [ I+ ] if ] 'I.gt_jump' :
+[ "-"  D> D> -eq? [ I.jump ] [ I+ ] if ] 'I.ne_jump' :
+[ "-"  D> D> eq? [ I.jump ] [ I+ ] if ] 'I.eq_jump' :
+[ "-"  @Image D> fetch >D ] 'I.fetch' :
+[ "-"  D> D> swap @Image swap store ] 'I.store' :
+[ "-"  D> D> + >D ] 'I.+' :
+[ "-"  D> D> - >D ] 'I.-' :
+[ "-"  D> D> * >D ] 'I.*' :
+[ "-"  D> D> dup-pair rem floor [ / floor ] dip >D >D ] 'I./rem' :
+[ "-"  D> D> and >D ] 'I.and' :
+[ "-"  D> D> or >D ] 'I.or' :
+[ "-"  D> D> xor >D ] 'I.xor' :
+[ "-"  D> D> -1 * shift >D ] 'I.shl' :
+[ "-"  D> D> shift >D ] 'I.shr' :
+[ "-"  I.dup D> zero? [ I.drop I.return ] if-true ] 'I.0;' :
+[ "-"  0 @Ports D> dup-pair fetch >D store ] 'I.in' :
+[ "-"  D> D> swap @Ports swap store ] 'I.out' :
+[ "-"  simulate-io ] 'I.wait' :
+[ "-"  D> 1 + >D ] 'I.1+' :
+[ "-"  D> 1 - >D ] 'I.1-' :
+[ "-"  @I >A Image@ 1 - !I ] 'I.call' :
 
 "Instruction dispatch"
 "We could also use a lookup table for this, which would probably be faster"
@@ -122,13 +120,13 @@ collect-garbage
     [ [ @O 30 eq? ] [ I.wait       ] ] \
     [ [ true      ] [ I.call       ] ] \
   ] when \
-] 'process-bytecode' define
+] 'process-bytecode' :
 
 "Top level implementation: loop over each instruction until at the end of"
 "the slice."
 [ "p-" \
   !Image \
-  [ process-bytecode I+ @I @Image length? lt? ] while ] 'ngaro' define
+  [ process-bytecode I+ @I @Image length? lt? ] while ] 'ngaro' :
 
 "------------------------------------------------------------------------------"
 
@@ -136,11 +134,11 @@ collect-garbage
 "Like the assembler part of the Retro metacompiler, this is kept very minimal,"
 "though a few helper functions exist."
 
-'Target' variable
+'Target' var
 
-[ "n-"  :n @Target push ] 'v,' define
-[ "ns-" [ [ v, ] curry ] dip define ] 'vmi' define
-[ "s-"  @Target length? swap define ] 'label' define
+[ "n-"  :n @Target push ] 'v,' :
+[ "ns-" [ [ v, ] curry ] dip : ] 'vmi' :
+[ "s-"  @Target length? :p . ] 'label' :
 
 0 '.nop' vmi
 1 '.lit' vmi
@@ -175,9 +173,9 @@ collect-garbage
 30 '.wait' vmi
 
 [ "-" \
-  request-empty !Target .jump 32 [ 31 v, ] times ] 'begin-assembly' define
-[ "s-" [ @Target ] dip define ] 'save-assembly' define
-[ "-"  @Target length? @Target 1 store ] ':main' define
+  request-empty !Target .jump 32 [ 31 v, ] times ] 'begin-assembly' :
+[ "s-" @Target . ] 'save-assembly' :
+[ "-"  @Target length? @Target 1 store ] ':main' :
 
 
 "Some test images"
@@ -194,11 +192,14 @@ begin-assembly
 
 
 begin-assembly
+:main
   .lit 1 v,
   .lit 2 v,
   .+
   .lit 3 v,
   .*
+  .lit 3 v,
+  .1+
 'Ngaro:nine' save-assembly
 
 
@@ -240,8 +241,10 @@ begin-assembly
 
 'Ngaro:display' save-assembly
 
-
 ngaro.initialize
+
+"0 &Ngaro:display [ over [ cons '{v}: {v}' interpolate display tty.cr ] dip 1 + ] for-each"
+
 &Ngaro:nine ngaro
-"@Data invoke"
-"@Output"
+@Data invoke
+@Output
