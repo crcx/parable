@@ -2,8 +2,9 @@
 "Requires: allegory"
 [ ]
 {
-  [ "s-s"  '<' '&lt;' replace '>' '&gt;' replace '## ' swap + ] 'header' :
-  [ "s-s"  :s '\ \ \ \ ' swap + ] 'stack' :
+  [ "s-s"  '<' '&lt;' replace '>' '&gt;' replace ] 'encode' :
+  [ "s-s"  '## ' swap + encode ] 'header' :
+  [ "s-s"  :s '\ \ \ \ ' swap + encode ] 'stack' :
   [ "-"    depth 3 eq? [ [ stack ] dip ] [ stack ] if ] 'format' :
   [ "s-..." [ header ] sip ? format ] 'get-strings' :
 
