@@ -6,7 +6,7 @@ This was done to make the core more adaptable to devices that don't implement a 
 
 ## Prerequsites
 
-* Python 2
+* Python 2 or 3
 * parable.py
 * stdlib.p
 
@@ -68,7 +68,7 @@ To display a stack dump is more difficult as you need to account for the various
                     sys.stdout.write(stack_item(i, "malformed flag"))
             elif type == parable.TYPE_BYTECODE:
                 sys.stdout.write(stack_item(i, "`" + str(tos)))
-            elif type == parable.TYPE_COMMENT:
+            elif type == parable.TYPE_REMARK:
                 s = "\"" + parable.slice_to_string(tos) + "\""
             elif type == parable.TYPE_FUNCTION_CALL:
                 s = "Call: " + str(tos)
