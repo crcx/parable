@@ -1523,8 +1523,8 @@ def collect_garbage():
 #
 # These correspond to the following bytecode sequences:
 #
-#   &<pointer> #0 fetch
-#   &<pointer> #0 store
+#   &<pointer> #1 fetch
+#   &<pointer> #1 store
 #
 # The compiler handle two implicit pieces of functionality: [ and ]. These
 # are used to begin and end quotations.
@@ -1711,5 +1711,5 @@ def parse_bootstrap(f):
 def prepare_dictionary():
     """setup the initial dictionary"""
     s = request_slice()
-    compile('"ps-" `48 "Attach a name to a pointer"', s)
+    compile('"ps-" `{0} "Attach a name to a pointer"'.format(BC_QUOTE_NAME), s)
     add_definition(':', s)
