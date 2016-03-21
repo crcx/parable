@@ -10,6 +10,8 @@
   [ "-s"  @Tokens @Offset fetch ] 'current-token' :
   [ "-"   @Offset 1 + !Offset ] 'next-token' :
 
+  [ "-vf"  current-token lookup-word dup nan? not ] 'var?' :
+
   "Token Handler"
   [ "-f"  @Offset @End lt? ] 'more?' :
   [ "s-..." \
@@ -19,7 +21,7 @@
       [ [ current-token '*' eq?  ] [ &*   @Operators push ] ] \
       [ [ current-token '/' eq?  ] [ &/   @Operators push ] ] \
       [ [ current-token '%' eq?  ] [ &rem @Operators push ] ] \
-      [ [ true                   ] [ '...Unknown...' ] ] \
+      [ [ true                   ] [ var? [ 1 fetch @Numbers push ] [ drop '...Unknown...' abort<with-error> ] if ] ] \
     ] when ] 'process-token' :
 
   "And finally, the top level compiler loop"
