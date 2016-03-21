@@ -909,7 +909,7 @@ Return true if the number (n1) is betwen n2 and n3, inclusive or false otherwise
 
 Return true if the type of both values is the same, or false otherwise
 
-## expand-range
+## range
 
     nn-...
 
@@ -919,20 +919,6 @@ Example:
 
 ````
 [ $a $z [ :n ] bi@ expand-range ] capture-results reverse :s
-
-````
-
-## sum-range
-
-    ...n-n
-
-Given a series of values and a count, sum the values
-
-Example:
-
-````
-1 2 3 4 5
-5 sum-range
 
 ````
 

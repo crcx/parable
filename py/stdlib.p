@@ -230,8 +230,7 @@
     [ [ [ dup 1 - ] dip dup-pair eq? ] until ] if \
   drop \
   "Given two values, expand the range" \
-] 'expand-range' :
-[ "...n-n"  1 - [ + ] times "Given a series of values and a count, sum the values" ] 'sum-range' :
+] 'range' :
 
 
 "Misc"
