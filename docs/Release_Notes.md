@@ -53,8 +53,11 @@
 * Additions
 
   * ceil
+  * decrement<by>
   * enquote
+  * increment<by>
   * strip-remarks
+  * times<with-index>
   * with
   * without
   * vocab
@@ -64,6 +67,7 @@
 
   * last-index?
   * slice-length?
+  * sum-range
   * all of the functions in the buffer- family
   * TOB, to-tob, show-tob, clear-tob
 
@@ -77,6 +81,7 @@
   * get-last-index renamed to get<final-offset>
   * set-last-index renamed to set<final-offset>
   * drop-multiple is now drop<n>
+  * expand-range is now range
 
 ### Library
 
