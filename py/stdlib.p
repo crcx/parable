@@ -535,3 +535,12 @@
 [ "n-n"  10 log<n> "Return the base 10 logarithm of a number" ] 'log10' :
 
 [ "p-p"  [ remark? not nip ] filter "Return a copy of the slice with embedded comments removed" ] 'strip-remarks' :
+
+[ 'times<with-index>' ] {
+  '_' var
+  [ "qq-" \
+    [ &_ ] \
+    [ [ !_ [ @_ invoke range ] capture-results reverse ] dip for-each ] invoke<preserving> \
+    "Construct a range from the values in q1, then execute q2 as a for-each against them" \
+  ] 'times<with-index>' :
+}

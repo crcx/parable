@@ -1,0 +1,2 @@
+[ 1 10 ]
+[ 0 cons 'This is cycle {v}' interpolate<cycling> ] times<with-index>

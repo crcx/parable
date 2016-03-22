@@ -1529,3 +1529,16 @@ Return the base 10 logarithm of a number
 
 Return a copy of the slice with embedded comments removed
 
+## times&lt;with-index&gt;
+
+    qq-
+
+Construct a range from the values in q1, then execute q2 as a for-each against them
+
+Example:
+
+````
+[ 1 10 ]
+[ 0 cons 'This is cycle {v}' interpolate<cycling> ] times<with-index>
+````
+
