@@ -21,6 +21,8 @@
       [ [ current-token '*' eq?  ] [ &*   @Operators push ] ] \
       [ [ current-token '/' eq?  ] [ &/   @Operators push ] ] \
       [ [ current-token '%' eq?  ] [ &rem @Operators push ] ] \
+      [ [ current-token '(' eq?  ] [ 'Parenthesis are not supported' abort<with-error> ] ] \
+      [ [ current-token ')' eq?  ] [ 'Parenthesis are not supported' abort<with-error> ] ] \
       [ [ true                   ] [ var? [ 1 fetch @Numbers push ] [ drop '...Unknown...' abort<with-error> ] if ] ] \
     ] when ] 'process-token' :
 
