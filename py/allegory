@@ -2083,11 +2083,29 @@ def allegory_evaluate(src):
         ignore_depth = 0
 
 
+def extract_from_markdown(name):
+    v = []
+    with open(name) as f:
+        v = f.readlines()
+    s = []
+    fence = False
+    for l in v:
+        if l.startswith('    '): s.append(l[4:])
+        elif fence == True and l != '````\n':
+            s.append(l)
+        elif l == '````\n' and fence == True:
+            fence = False
+        elif l == '````\n' and fence == False:
+            fence = True
+    return s
+
+
 def load_file(name):
     global should_abort
     should_abort = False
     if os.path.exists(name):
-        lines = condense_lines(open(name).readlines())
+        if name.endswith('.md'): lines = condense_lines(extract_from_markdown(name))
+        else: lines = condense_lines(open(name).readlines())
         for l in lines:
             try:
                 if l != "#!/usr/bin/env allegory" and should_abort == False:
