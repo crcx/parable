@@ -2169,14 +2169,14 @@ def interactive():
     bootstrap(stdlib)
 
     home = expanduser("~")
-    try:
-        src = home + "/.parable/on_startup.p"
-        if os.path.exists(src):
-            load_file(src)
-        elif os.path.exits("on_startup.p"):
-            load_file("on_startup.p")
-    except:
-        pass
+    if os.path.exists(home + "/.parable.on_startup.p"):
+        load_file(home + "/.parable/on_startup.p")
+    elif os.path.exists("on_startup.p"):
+        load_file("on_startup.p")
+    elif os.path.exists(home + "/.parable/on_startup.md"):
+        load_file(home + "/.parable/on_startup.md")
+    elif os.path.exists("on_startup.md"):
+        load_file("on_startup.md")
 
     while True:
         try:
