@@ -343,7 +343,7 @@
 [ 'Public'  'Private' ] hide-words
 
 "Vocabularies"
-[ 'with' 'without' 'vocab' '}vocab' '}}' ] {
+[ 'with' 'without' 'vocab' '}vocab' '}}' 'vocab.add-word' ] {
   [ 'Vocabulary' ] ::
 
   [ "p-"  [ invoke redefine ] for-each "Add words in a vocabulary to the dictionary" ] 'with' :
@@ -361,6 +361,11 @@
     over } vocab \
     "Close a lexical scope and create a vocabulary with the exposed words" \
   ] '}}' :
+
+  [ "sp-" \
+    over word-exists? [ [ dup lookup-word over hide-word swap cons ] dip push ] [ drop-pair ] if \
+    "Add a word to an existing vocabulary" \
+  ] 'vocab.add-word' :
 }
 
 

@@ -73,20 +73,20 @@
 
 * Renamed
 
-  * lookup-function renamed to lookup-word
-  * function-exists? renamed to word-exists?
-  * hide-function renamed to hide-word
-  * hide-functions renamed to hide-words
-  * rename-function renamed to rename-word
-  * get-last-index renamed to get<final-offset>
-  * set-last-index renamed to set<final-offset>
+  * lookup-function is now lookup-word
+  * function-exists? is now word-exists?
+  * hide-function is now hide-word
+  * hide-functions is now hide-words
+  * rename-function is now rename-word
+  * get-last-index is now get<final-offset>
+  * set-last-index is now set<final-offset>
   * drop-multiple is now drop<n>
   * expand-range is now range
 
 ### Library
 
 * Added a "library" directory to hold useful extensions
-* Files named to match vocabulary names:
+* Files named to match vocabulary names
 * New vocabularies:
 
   * ASCII~
@@ -105,9 +105,10 @@
   * now uses a precompiled snapshot of stdlib+extensions
   * all functions now have docstrings
   * added vocabularies for grouping functionality
-  * added *need* for loading from library/
+  * added *need* and *needs&lt;now&gt;* for loading from library/
   * removed *reload-snapshot*
   * changed *save-snapshot* to generate a turnkey script
+  * support for running code in Markdown file
 
 * Punga
 
@@ -117,10 +118,11 @@
 
 ### Documentation
 
-* Function Reference is now extracted from the docstrings
+* Allegory based tool for creating the reference file in Markdown
+* Reference file extracted from the dictionary, with embedded stack comments and docstrings
+* Examples included (stored as separate files matching the name of the word)
 
 ----
-
 
 ## Parable 2016.02
 

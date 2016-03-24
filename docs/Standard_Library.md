@@ -1324,6 +1324,12 @@ Example:
 }}
 ````
 
+## vocab.add-word
+
+    sp-
+
+Add a word to an existing vocabulary
+
 ## invoke&lt;preserving&gt;
 
     qq-
@@ -1541,4 +1547,14 @@ Example:
 [ 1 10 ]
 [ 0 cons 'This is cycle {v}' interpolate<cycling> ] times<with-index>
 ````
+
+## LibraryPath
+
+    -v
+
+## needs&lt;now&gt;
+
+    s-
+
+Load a library and expose the vocabulary immediately
 
