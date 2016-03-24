@@ -352,7 +352,7 @@
   [ "ps-" \
     request-empty !Vocabulary \
     @Vocabulary swap : \
-    [ dup lookup-word swap cons @Vocabulary push ] for-each \
+    [ dup word-exists? [ dup lookup-word swap cons @Vocabulary push ] [ drop ] if ] for-each \
     @Vocabulary without \
     "Create a new vocabulary" \
   ] 'vocab' :
