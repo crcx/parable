@@ -50,11 +50,7 @@ def load_snapshot(data):
 
 
 def getpso(form):
-    parable.prepare_slices()
-    parable.prepare_dictionary()
-    parable.parse_bootstrap(open('stdlib.p').readlines())
-    parable.collect_garbage()
-    pso = save_snapshot().decode()
+    pso = open('parable.snapshot', 'r').read()
     return pso
 
 
