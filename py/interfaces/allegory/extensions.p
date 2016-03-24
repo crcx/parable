@@ -65,7 +65,9 @@
 [ "-n" `300 "Return a Unix timestamp" ] 'time' :
 [ "p-n" time [ invoke ] dip time swap - "Invoke a function and return the running time (in seconds)" ] 'invoke<time>' :
 
-[ "s-" dup word-exists? [ drop ] [ 'library/' swap + include ] if "Load a library" ] 'needs' :
+'library/' 'LibraryPath' var!
+[ "s-" dup word-exists? [ drop ] [ @LibraryPath swap + include ] if "Load a library" ] 'needs' :
+[ "s-" [ needs ] [ lookup-word with ] bi "Load a library and expose the vocabulary immediately" ] 'needs<now>' :
 
 [ "-" \
   'allegory, (c)2013-2016 Charles Childers\n\n' display \
