@@ -66,7 +66,23 @@
 [ "p-n" time [ invoke ] dip time swap - "Invoke a function and return the running time (in seconds)" ] 'invoke<time>' :
 
 'library/' 'LibraryPath' var!
-[ "s-" dup word-exists? [ drop ] [ @LibraryPath swap + include ] if "Load a library" ] 'needs' :
+[ 'needs' ] {
+  [ "s-sf" dup file-exists? ] 'present?' :
+  [ "s-s"  @LibraryPath swap + ] '+path' :
+  [ "s-" \
+    dup word-exists? \
+    [ drop ] \
+    [ +path present? \
+      [ include ] \
+      [ '.md' + present? \
+        [ include ] \
+        [ drop ] if \
+      ] if \
+    ] if \
+    "Load a library" \
+  ] 'needs' :
+}
+
 [ "s-" [ needs ] [ lookup-word with ] bi "Load a library and expose the vocabulary immediately" ] 'needs<now>' :
 
 [ "-" \
