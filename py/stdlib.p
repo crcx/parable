@@ -297,7 +297,9 @@
 
 [ "p-p"    [ request !Target invoke<depth?> 0 max [ @Target push ] times @Target 1 over length? subslice :p ] localize \
   "Invoke a quote and capture the results into a new array" \
-] 'capture-results' :
+] 'capture-results<in-stack-order>' :
+
+[ "p-p"    capture-results<in-stack-order> reverse "Invoke a quote and capture the results into a new array" ] 'capture-results' :
 
 [ "pv-n" \
   [ dup-pair !Value !Source \
