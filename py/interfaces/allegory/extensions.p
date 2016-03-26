@@ -91,15 +91,15 @@
 
   [ "-" \
     @V pop \
-    [ [ [ bytecode?  ] [ $` display display                  ] ] \
-      [ [ remark?    ] [ $" display display $" display       ] ] \
-      [ [ string?    ] [ $' display display $' display       ] ] \
-      [ [ number?    ] [ $# display display                  ] ] \
-      [ [ character? ] [ $$ display display                  ] ] \
-      [ [ pointer?   ] [ $& display display                  ] ] \
-      [ [ flag?      ] [ display                             ] ] \
-      [ [ funcall?   ] [ 'CALL ' display $& display display  ] ] \
-      [ [ true       ] [ 'Unknown type: ' display :n display ] ] \
+    [ [ [ bytecode?  ] [ "$` display" display                  ] ] \
+      [ [ remark?    ] [ $" display display $" display         ] ] \
+      [ [ string?    ] [ $' display display $' display         ] ] \
+      [ [ number?    ] [ $# display display                    ] ] \
+      [ [ character? ] [ $$ display display                    ] ] \
+      [ [ pointer?   ] [ "$& display" display                  ] ] \
+      [ [ flag?      ] [ display                               ] ] \
+      [ [ funcall?   ] [ "'CALL ' display $& display" display  ] ] \
+      [ [ true       ] [ 'Unknown type: ' display :n display   ] ] \
     ] when tty.cr \
   ] 'display-cell' :
 
