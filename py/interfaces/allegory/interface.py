@@ -128,50 +128,6 @@ def completer(text, state):
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
-def display_item(prefix, value):
-    sys.stdout.write(prefix + str(value))
-
-
-def dump_stack():
-    """display the stack"""
-    i = 0
-    if len(stack) > 100:
-        i = len(stack) - 100
-    while i < len(stack):
-        tos = stack[i]
-        type = types[i]
-        if i == len(stack) - 1:
-            sys.stdout.write("TOS  " + str(i).rjust(8, ' '))
-        else:
-            sys.stdout.write("     " + str(i).rjust(8, ' '))
-        if type == TYPE_NUMBER:
-            display_item('   ' + '#', tos)
-        elif type == TYPE_BYTECODE:
-            display_item('   ' + '`', tos)
-        elif type == TYPE_CHARACTER:
-            display_item('   ' + '$', chr(tos))
-        elif type == TYPE_STRING:
-            display_item('   ' + '\'', slice_to_string(tos) + '\'')
-        elif type == TYPE_POINTER:
-            display_item('   ' + '&', tos)
-        elif type == TYPE_REMARK:
-            display_item('   ' + '"', slice_to_string(tos) + '"')
-        elif type == TYPE_FLAG:
-            if tos == -1:
-                display_item('   ' + "", "true")
-            elif tos == 0:
-                display_item('   ' + "", "false")
-            else:
-                display_item('   ' + "", "malformed flag")
-        elif type == TYPE_FUNCTION_CALL:
-            display_item('   CALL to ' + '&', tos)
-        else:
-            display_item('   ' + "", "unmatched type on the stack")
-        sys.stdout.write("\n")
-        i += 1
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-
 def dump_dict():
     """display named items"""
     l = ''
@@ -323,10 +279,7 @@ def opcodes(slice, offset, opcode):
         display_value()
         stack_pop()
         sys.stdout.flush()
-    elif opcode == 9000:
-        dump_stack()
     elif opcode == 9001:
-        dump_stack()
         xt = lookup_pointer('allegory.on-end')
         if xt != -1:
             interpret(xt, opcodes)
@@ -434,7 +387,6 @@ def scripting():
     if not os.path.exists(source):
         sys.exit('ERROR: source file "%s" was not found!' % source)
     load_file(source)
-    dump_stack()
     xt = lookup_pointer('allegory.on-end')
     if xt != -1:
         interpret(xt, opcodes)

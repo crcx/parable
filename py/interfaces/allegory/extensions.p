@@ -1,7 +1,6 @@
 [ "-"   `2000 "Turn on reporting of redefinitions" ] '+warnings' :
 [ "-"   `2001 "Turn off reporting of redefinitions" ] '-warnings' :
 
-[ "-"    `9000 "Display the stack" ] '.s' :
 [ "-"    `9001 "Exit Allegory" ] 'bye' :
 [ "-"    `9002 "Display a list of all named words" ] 'words' :
 [ "s-"   `9003 "Evaluate the contents of a file as Parable source" ] 'include' :
@@ -85,12 +84,41 @@
 
 [ "s-" [ needs ] [ lookup-word with ] bi "Load a library and expose the vocabulary immediately" ] 'needs<now>' :
 
+[ '.s' ] {
+  [ 'I' 'V' ] ::
+
+  [ "-" @I zero? [ 'TOS\ \ \ ' ] [ '\ \ \ \ \ \ ' ] if display ] 'indicate' :
+
+  [ "-" \
+    @V pop \
+    [ [ [ bytecode?  ] [ $` display display                  ] ] \
+      [ [ remark?    ] [ $" display display $" display       ] ] \
+      [ [ string?    ] [ $' display display $' display       ] ] \
+      [ [ number?    ] [ $# display display                  ] ] \
+      [ [ character? ] [ $$ display display                  ] ] \
+      [ [ pointer?   ] [ $& display display                  ] ] \
+      [ [ flag?      ] [ display                             ] ] \
+      [ [ funcall?   ] [ 'CALL ' display $& display display  ] ] \
+      [ [ true       ] [ 'Unknown type: ' display :n display ] ] \
+    ] when tty.cr \
+  ] 'display-cell' :
+
+  [ "-" @I display tty.tab ] 'display-offset' :
+
+  [ "-" \
+    depth 1 - !I \
+    stack-values reverse !V \
+    depth [ indicate display-offset display-cell &I decrement ] times \
+    "Display the items on the stack" \
+  ] '.s' :
+}
+
 [ "-" \
   'allegory, (c)2013-2016 Charles Childers\n\n' display \
   "Entry point for standalone applications (via turnkey)" \
 ] 'allegory.on-start' :
 
-[ "-" "Exit point for standalone applications (via turnkey)" ] 'allegory.on-end' :
+[ "-" .s "Exit point for standalone applications (via turnkey)" ] 'allegory.on-end' :
 
 
 [ 'open-file' 'close-file' 'read-file' 'write-file' 'file-position' 'file-seek' \
