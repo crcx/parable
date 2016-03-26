@@ -1,7 +1,5 @@
 ## Parable 2016.03
 
-**Work in Progress - This is subject to change**
-
 ### Virtual Machine
 
 * now using a dispatch table for the byte codes
@@ -104,17 +102,21 @@
 
   * now uses a precompiled snapshot of stdlib+extensions
   * all functions now have docstrings
-  * added vocabularies for grouping functionality
-  * added *need* and *needs&lt;now&gt;* for loading from library/
-  * removed *reload-snapshot*
-  * changed *save-snapshot* to generate a turnkey script
+  * added *need* and *needs&lt;now&gt;* for loading from *LibraryPath*
+  * removed *reload-snapshot* and *save-snapshot*
+  * added *save-as* to generate a turnkey script
   * support for running code in Markdown file
+  * stack display now in parable code, not python
 
 * Punga
 
   * now uses a precompiled snapshot
   * new, 2-pane fullscreen interface: editor, results/errors/dictionary
   * results/memory persist across runs (until manually reset or tab closed)
+
+* PaaS
+
+  * use a precompiled snapshot of stdlib
 
 ### Documentation
 
