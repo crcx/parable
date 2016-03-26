@@ -1180,6 +1180,12 @@ Example:
 
 ````
 
+## capture-results&lt;in-stack-order&gt;
+
+    p-p
+
+Invoke a quote and capture the results into a new array
+
 ## capture-results
 
     p-p
