@@ -161,7 +161,7 @@ def display_value():
     elif types[i] == TYPE_BYTECODE:
         sys.stdout.write('`' + str(stack[i]))
     elif types[i] == TYPE_FUNCTION_CALL:
-        sys.stdout.write('CALL: ' + str(stack[i]))
+        sys.stdout.write('CALL: &' + str(stack[i]))
     else:
        sys.stdout.write("unknown type")
 
