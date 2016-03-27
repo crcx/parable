@@ -1505,6 +1505,12 @@ Lookup the stack comment and description (if existing) for a named item
 
 Return an array with the items currently on the stack
 
+## rso
+
+    ...-...
+
+Reverse the order of all items on the stack
+
 ## vm.dict&lt;names-like&gt;
 
     s-p

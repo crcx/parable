@@ -512,7 +512,7 @@
 
 
 "unsorted"
-[ 'stack-values' ] {
+[ 'stack-values' 'rso' ] {
   'S' var
 
   [ "-p" \
@@ -522,6 +522,11 @@
     @S \
     "Return an array with the items currently on the stack" \
   ] 'stack-values' :
+
+  [ "...-..." \
+    stack-values reverse [ reset ] dip &nop for-each \
+    "Reverse the order of all items on the stack" \
+  ] 'rso' :
 }
 
 

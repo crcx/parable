@@ -54,6 +54,7 @@
   * decrement<by>
   * enquote
   * increment<by>
+  * rso
   * strip-remarks
   * times<with-index>
   * with
