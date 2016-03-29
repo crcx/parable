@@ -1730,14 +1730,6 @@ from os.path import expanduser
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
-try:
-    import __builtin__
-    input = getattr(__builtin__, 'raw_input')
-except (ImportError, AttributeError):
-    pass
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-
 def save_snapshot(filename):
     j = json.dumps({"symbols": dictionary_names, \
                     "symbol_map": dictionary_slices, \
@@ -1751,12 +1743,7 @@ def save_snapshot(filename):
                     "hidden_slices": dictionary_hidden_slices })
 
     orig = open(__file__).read().split('\n')
-
-    try:
-        c = bz2.compress(bytes(j, 'utf-8'))
-    except:
-        c = bz2.compress(j)
-
+    c = bz2.compress(bytes(j, 'utf-8'))
 
     with open(filename, 'w') as file:
         for line in orig:
@@ -1809,17 +1796,9 @@ def bootstrap(s):
            memory_size, \
            dictionary_hidden_slices
 
-    try:
-        raw = base64.b64decode(bytes(s, 'utf-8'))
-    except:
-        raw = base64.b64decode(s)
-
+    raw = base64.b64decode(bytes(s, 'utf-8'))
     u = bz2.decompress(raw)
-
-    try:
-        j = json.loads(u)
-    except:
-        j = json.loads(u.decode())
+    j = json.loads(u.decode())
 
     dictionary_names = j['symbols']
     dictionary_slices = j['symbol_map']

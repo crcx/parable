@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 import base64
@@ -25,7 +25,7 @@ def parse_args():
     files = []
     if len(sys.argv) > 1:
         for i in sys.argv:
-            if i.startswith("python") or i.startswith("pypy"):
+            if i.startswith("python3") or i.startswith("pypy3"):
                 pass
             elif i.startswith("--"):
                 if i.startswith("--output="):

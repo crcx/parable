@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Listener: a basic UI for Parable
 # Copyright (c) 2013, 2015  Charles Childers
