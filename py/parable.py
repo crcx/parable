@@ -713,10 +713,11 @@ def bytecode_slice_reverse(opcode, offset, more):
     if precheck([TYPE_POINTER]) or \
        precheck([TYPE_STRING]) or \
        precheck([TYPE_REMARK]):
-        a = stack_pop()
-        memory_values[int(a)] = memory_values[int(a)][::-1]
-        memory_types[int(a)] = memory_types[int(a)][::-1]
-        stack_push(a, TYPE_POINTER)
+        a, t = stack_pop(type = True)
+        a = int(a)
+        memory_values[a] = memory_values[a][::-1]
+        memory_types[a] = memory_types[a][::-1]
+        stack_push(a, t)
     else:
         abort_run(opcode, offset)
 
