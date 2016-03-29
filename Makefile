@@ -13,3 +13,5 @@ turnkeys: parable
 
 documents: turnkeys
 	$(PY) generate-reference.py >docs/Standard_Library.md
+	cd docs && make
+

@@ -1,0 +1,110 @@
+<h1>
+<a id="user-content-implementing-parable-the-interface-layer" class="anchor" href="#implementing-parable-the-interface-layer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Implementing Parable: The Interface Layer</h1>
+
+<p>Parable consists of two parts: the core language and a user interface layer. By itself, the core language isn't very useful. It has no facilities for input or output, focusing instead on implementing the parser, compiler, byte code interpreter, and standard library of functions. All I/O operations are left up to the interface layer to implement.</p>
+
+<p>This was done to make the core more adaptable to devices that don't implement a traditional terminal environment. It's quite easy to embed Parable into a larger application, and to create an environment incorporating new capabilities for interacting with the world.</p>
+
+<h2>
+<a id="user-content-prerequsites" class="anchor" href="#prerequsites" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Prerequsites</h2>
+
+<ul>
+<li>Python 2 or 3</li>
+<li>parable.py</li>
+<li>stdlib.p</li>
+</ul>
+
+<p><em>The Parable code can be converted to work with Python 3 using *</em>2to3*<em>. The example code below will likely need adjustments in this case.</em></p>
+
+<h2>
+<a id="user-content-initialization" class="anchor" href="#initialization" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Initialization</h2>
+
+<p>The minimal skeleton to initialize the Parable environment is:</p>
+
+<pre><code>import parable
+
+if __name__ == '__main__':
+    parable.prepare_slices()
+    parable.prepare_dictionary()
+    parable.parse_bootstrap(open('stdlib.p').readlines())
+</code></pre>
+
+<p>While optional, it's also useful to collect garbage after loading the standard library:</p>
+
+<pre><code>    parable.collect_garbage()
+</code></pre>
+
+<h2>
+<a id="user-content-processing-code" class="anchor" href="#processing-code" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Processing Code</h2>
+
+<p>To process code:</p>
+
+<pre><code>parable.interpret(parable.compile("code", request_slice()))
+</code></pre>
+
+<h2>
+<a id="user-content-displaying-the-stack" class="anchor" href="#displaying-the-stack" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Displaying the Stack</h2>
+
+<p>To display a stack dump is more difficult as you need to account for the various data types. An example:</p>
+
+<pre><code>def stack_item(i, s):
+    return str(i) + ':' + str(s)
+
+def dump_stack():
+    """display the stack"""
+    i = 0
+    s = ""
+    depth = len(parable.stack)
+    while i &lt; depth:
+        tos = parable.stack[i]
+        type = parable.types[i]
+        if type == parable.TYPE_NUMBER:
+            sys.stdout.write(stack_item(i, "#" + str(tos)))
+        elif type == parable.TYPE_CHARACTER:
+            sys.stdout.write(stack_item(i, "$" + unicode(unichr(tos)).encode('utf-8')))
+        elif type == parable.TYPE_STRING:
+            s = "'" + parable.slice_to_string(tos) + "'"
+        elif type == parable.TYPE_POINTER:
+            s = "&amp;" + str(tos)
+            if parable.pointer_to_name(tos) != "":
+                s = s + "\nPointer to: " + parable.pointer_to_name(tos)
+            sys.stdout.write(stack_item(i, s))
+        elif type == parable.TYPE_FLAG:
+            if tos == -1:
+                sys.stdout.write(stack_item(i, "true"))
+            elif tos == 0:
+                sys.stdout.write(stack_item(i, "false"))
+            else:
+                sys.stdout.write(stack_item(i, "malformed flag"))
+        elif type == parable.TYPE_BYTECODE:
+            sys.stdout.write(stack_item(i, "`" + str(tos)))
+        elif type == parable.TYPE_REMARK:
+            s = "\"" + parable.slice_to_string(tos) + "\""
+        elif type == parable.TYPE_FUNCTION_CALL:
+            s = "Call: " + str(tos)
+            sys.stdout.write(stack_item(i, s))
+        else:
+            sys.stdout.write(stack_item(i, "unmatched type on stack!"))
+        i += 1
+        sys.stdout.write('\n')
+</code></pre>
+
+<h2>
+<a id="user-content-extending-the-vm" class="anchor" href="#extending-the-vm" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Extending the VM</h2>
+
+<p>Parable provides hooks for the interface layer to add extensions to the byte codes. To make use of this, implement an opcode handler, and pass it to interpret() along with the slice.</p>
+
+<pre><code>interpret(slice, [function providing new byte codes])
+</code></pre>
+
+<p>A sample opcode processor:</p>
+
+<pre><code>def opcodes(slice, offset, opcode):
+    if opcode == 2000:
+        # do something here
+    else:
+        return offset
+</code></pre>
+
+<p>If you extend the byte codes your interface code should also bind them to names.</p>
+

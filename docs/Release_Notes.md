@@ -11,3 +11,5 @@
 ### Documentation
 
 * added *tools/gfm.py* (git flavored markdown to html)
+* added *docs/Makefile* to generate HTML from Markdown using *tools/gfm.py*
+
