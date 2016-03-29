@@ -114,7 +114,7 @@ BC_FLOW_SIP = 29
 BC_FLOW_BI = 30
 BC_FLOW_TRI = 31
 BC_FLOW_ABORT = 32
-BC_FLOW_RETURN = 33
+# BC_FLOW_RETURN = 33
 BC_MEM_COPY = 34
 BC_MEM_FETCH = 35
 BC_MEM_STORE = 36
@@ -659,7 +659,7 @@ def bytecode_stack_swap(opcode, offset, more):
 
 
 def bytecode_stack_depth(opcode, offset, more):
-    stack_push(len(stack), TYPE_NUMBER)
+    stack_push(stack_depth(), TYPE_NUMBER)
 
 
 def bytecode_quote_name(opcode, offset, more):
@@ -1008,18 +1008,18 @@ def abort_run(opcode, offset):
 
 def precheck(req):
     flag = True
-    if len(stack) < len(req):
+    if stack_depth() < len(req):
         flag = False
-    i = len(stack) - 1
+    i = stack_depth() - 1
     if flag:
         for t in reversed(req):
             if t == TYPE_ANY_PTR:
-                if types[i] != TYPE_POINTER and \
-                   types[i] != TYPE_STRING and \
-                   types[i] != TYPE_REMARK and \
-                   types[i] != TYPE_FUNCTION_CALL:
+                if stack_type_for(i) != TYPE_POINTER and \
+                   stack_type_for(i) != TYPE_STRING and \
+                   stack_type_for(i) != TYPE_REMARK and \
+                   stack_type_for(i) != TYPE_FUNCTION_CALL:
                     flag = False
-            elif t != types[i] and t != TYPE_ANY:
+            elif t != stack_type_for(i) and t != TYPE_ANY:
                 flag = False
             i = i - 1
     return flag
@@ -1029,8 +1029,6 @@ def precheck(req):
 #
 # - pushing values to the stack (based on stored type)
 # - invoking the handler for each byte code
-# - the BC_FLOW_RETURN instruction (which jumps to the end of the slice,
-#   halting execution).
 # - sets / clears the **current_slice** variable
 
 def interpret(slice, more=None):
@@ -1052,8 +1050,6 @@ def interpret(slice, more=None):
         else:
             if opcode in bytecodes:
                 bytecodes[opcode](opcode, offset, more)
-            elif opcode == BC_FLOW_RETURN:
-                offset = size
             if more is not None:
                 offset = more(slice, offset, opcode)
         offset += 1
@@ -1069,6 +1065,14 @@ def interpret(slice, more=None):
 
 stack = []    # holds the data items
 types = []    # holds the types for data items
+
+
+def stack_depth():
+    return len(stack)
+
+
+def stack_type_for(d):
+    return types[d]
 
 
 def stack_clear():
@@ -1103,7 +1107,7 @@ def stack_pop(type = False):
 
 def tos():
     """return a pointer to the top element in the stack"""
-    return len(stack) - 1
+    return stack_depth() - 1
 
 
 def stack_type():
@@ -1686,7 +1690,7 @@ def compile(str, slice):
             else:
                 old = slice
                 if offset == 0:
-                    store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
+                    store(BC_NOP, slice, offset, TYPE_BYTECODE)
                 offset = nest.pop()
                 slice = nest.pop()
                 store(old, slice, offset, TYPE_POINTER)
@@ -1698,7 +1702,7 @@ def compile(str, slice):
                 offset = compile_function_call(current, slice, offset)
         i += 1
         if offset == 0:
-            store(BC_FLOW_RETURN, slice, offset, TYPE_BYTECODE)
+            store(BC_NOP, slice, offset, TYPE_BYTECODE)
     if len(nest) != 0:
         report('E03: Compile Error - quotations not balanced')
     return slice
