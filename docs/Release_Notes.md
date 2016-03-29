@@ -6,3 +6,8 @@
 * **+** now supports new forms: cs-s, sc-s, and cc-s
 
 ### Standard Library
+
+
+### Documentation
+
+* added *tools/gfm.py* (git flavored markdown to html)
