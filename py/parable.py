@@ -1075,6 +1075,10 @@ def stack_type_for(d):
     return types[d]
 
 
+def stack_value_for(d):
+    return stack[d]
+
+
 def stack_clear():
     """remove all values from the stack"""
     global stack, types
@@ -1294,7 +1298,7 @@ def request_slice(attempts=1):
             i += 1
     if attempts == 1:
         i = 0
-        while i < 10:
+        while i < 3:
             memory_map.append(0)
             memory_values.append(0)
             memory_types.append(0)
@@ -1483,8 +1487,8 @@ def seek_all_references():
     # Strings, comments, pointers, function calls on the stack
     i = tos()
     while i >= 0:
-        if is_pointer(types[i]):
-            sources.append(stack[i])
+        if is_pointer(stack_type_for(i)):
+            sources.append(stack_value_for(i))
         i = i - 1
 
     refs = sources
