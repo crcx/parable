@@ -184,6 +184,18 @@ def bytecode_add(opcode, offset, more):
         a = slice_to_string(stack_pop())
         b = slice_to_string(stack_pop())
         stack_push(string_to_slice(b + a), TYPE_STRING)
+    elif precheck([TYPE_CHARACTER, TYPE_CHARACTER]):
+        a = chr(int(stack_pop()))
+        b = chr(int(stack_pop()))
+        stack_push(string_to_slice(b + a), TYPE_STRING)
+    elif precheck([TYPE_CHARACTER, TYPE_STRING]):
+        a = slice_to_string(stack_pop())
+        b = chr(int(stack_pop()))
+        stack_push(string_to_slice(b + a), TYPE_STRING)
+    elif precheck([TYPE_STRING, TYPE_CHARACTER]):
+        a = chr(int(stack_pop()))
+        b = slice_to_string(stack_pop())
+        stack_push(string_to_slice(b + a), TYPE_STRING)
     elif precheck([TYPE_REMARK, TYPE_REMARK]):
         a = slice_to_string(stack_pop())
         b = slice_to_string(stack_pop())
