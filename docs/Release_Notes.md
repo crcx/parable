@@ -5,11 +5,14 @@
 * **reverse** now preserves the pointer type (pointer, stack, remark)
 * **+** now supports new forms: cs-s, sc-s, and cc-s
 * the stack is now implemented as a single array of tuples (value, type)
+* remove BC_ROUND
+* remove BC\_FLOW\_RETURN
 
 ### Standard Library
 
 * add vocab{
 * add }vocab
+* round now written in parable
 
 ### Documentation
 

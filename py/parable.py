@@ -97,7 +97,7 @@ BC_BITWISE_OR = 12
 BC_BITWISE_XOR = 13
 BC_RANDOM = 14
 BC_SQRT = 15
-BC_ROUND = 16
+# BC_ROUND = 16
 BC_COMPARE_LT = 17
 BC_COMPARE_GT = 18
 BC_COMPARE_LTEQ = 19
@@ -344,11 +344,11 @@ def bytecode_sqrt(opcode, offset, more):
         abort_run(opcode, offset)
 
 
-def bytecode_round(opcode, offset, more):
-    if precheck([TYPE_NUMBER]):
-        stack_push(round(stack_pop()), TYPE_NUMBER)
-    else:
-        abort_run(opcode, offset)
+#def bytecode_round(opcode, offset, more):
+#    if precheck([TYPE_NUMBER]):
+#        stack_push(round(stack_pop()), TYPE_NUMBER)
+#    else:
+#        abort_run(opcode, offset)
 
 
 def bytecode_compare_lt(opcode, offset, more):
@@ -902,7 +902,7 @@ bytecodes = {
     BC_BITWISE_XOR:    bytecode_bitwise_xor,
     BC_RANDOM:         bytecode_random,
     BC_SQRT:           bytecode_sqrt,
-    BC_ROUND:          bytecode_round,
+#    BC_ROUND:          bytecode_round,
     BC_COMPARE_LT:     bytecode_compare_lt,
     BC_COMPARE_GT:     bytecode_compare_gt,
     BC_COMPARE_LTEQ:   bytecode_compare_lteq,

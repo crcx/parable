@@ -15,7 +15,6 @@
 [ "nn-n"   `13 "Bitwise XOR operation" ] 'xor' :
 [ "-n"     `14 "Return a random number" ] 'random' :
 [ "n-n"    `15 "Obtain the square root of a number" ] 'sqrt' :
-[ "n-n"    `16 "Round a number to the nearest integer value" ] 'round' :
 [ "nn-f"   `17 "True if n1 < n2 or false otherwise" ] 'lt?' :
 [ "nn-f"   `18 "True if n1 > n2 or false otherwise" ] 'gt?' :
 [ "nn-f"   `19 "True if n1 <= n2 or false otherwise" ] 'lteq?' :
@@ -133,6 +132,7 @@
 
 [ "n-n"  [ 1 / ] [ 1 rem ] bi - "Return the smallest integer less than or equal to the starting value" ] 'floor' :
 [ "n-n"  dup floor dup-pair eq? [ drop ] [ nip 1 + ] if "Return the smallest integer greater than or equal to the starting value" ] 'ceil' :
+[ "n-n"  0.5 + floor "Round a number to the nearest integer value" ] 'round' :
 
 
 "Slice Functions"
