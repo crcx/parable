@@ -97,59 +97,57 @@ BC_BITWISE_OR = 12
 BC_BITWISE_XOR = 13
 BC_RANDOM = 14
 BC_SQRT = 15
-# BC_ROUND = 16
-BC_COMPARE_LT = 17
-BC_COMPARE_GT = 18
-BC_COMPARE_LTEQ = 19
-BC_COMPARE_GTEQ = 20
-BC_COMPARE_EQ = 21
-BC_COMPARE_NEQ = 22
-BC_FLOW_IF = 23
-BC_FLOW_WHILE = 24
-BC_FLOW_UNTIL = 25
-BC_FLOW_TIMES = 26
-BC_FLOW_CALL = 27
-BC_FLOW_DIP = 28
-BC_FLOW_SIP = 29
-BC_FLOW_BI = 30
-BC_FLOW_TRI = 31
-BC_FLOW_ABORT = 32
-# BC_FLOW_RETURN = 33
-BC_MEM_COPY = 34
-BC_MEM_FETCH = 35
-BC_MEM_STORE = 36
-BC_MEM_REQUEST = 37
-BC_MEM_RELEASE = 38
-BC_MEM_COLLECT = 39
-BC_MEM_GET_LAST = 40
-BC_MEM_SET_LAST = 41
-BC_MEM_SET_TYPE = 42
-BC_MEM_GET_TYPE = 43
-BC_STACK_DUP = 44
-BC_STACK_DROP = 45
-BC_STACK_SWAP = 46
-BC_STACK_DEPTH = 47
-BC_QUOTE_NAME = 48
-BC_FUNCTION_HIDE = 49
-BC_STRING_SEEK = 50
-BC_SLICE_SUBSLICE = 51
-BC_STRING_NUMERIC = 52
-BC_SLICE_REVERSE = 53
-BC_TO_LOWER = 54
-BC_TO_UPPER = 55
-BC_REPORT = 56
-BC_VM_NAMES = 57
-BC_VM_SLICES = 58
-BC_TRIG_SIN = 59
-BC_TRIG_COS = 60
-BC_TRIG_TAN = 61
-BC_TRIG_ASIN = 62
-BC_TRIG_ACOS = 63
-BC_TRIG_ATAN = 64
-BC_TRIG_ATAN2 = 65
-BC_VM_MEM_MAP = 66
-BC_VM_MEM_SIZES = 67
-BC_VM_MEM_ALLOC = 68
+BC_COMPARE_LT = 16
+BC_COMPARE_GT = 17
+BC_COMPARE_LTEQ = 18
+BC_COMPARE_GTEQ = 19
+BC_COMPARE_EQ = 20
+BC_COMPARE_NEQ = 21
+BC_FLOW_IF = 22
+BC_FLOW_WHILE = 23
+BC_FLOW_UNTIL = 24
+BC_FLOW_TIMES = 25
+BC_FLOW_CALL = 26
+BC_FLOW_DIP = 27
+BC_FLOW_SIP = 28
+BC_FLOW_BI = 29
+BC_FLOW_TRI = 30
+BC_FLOW_ABORT = 31
+BC_MEM_COPY = 32
+BC_MEM_FETCH = 33
+BC_MEM_STORE = 34
+BC_MEM_REQUEST = 35
+BC_MEM_RELEASE = 36
+BC_MEM_COLLECT = 37
+BC_MEM_GET_LAST = 38
+BC_MEM_SET_LAST = 39
+BC_MEM_SET_TYPE = 40
+BC_MEM_GET_TYPE = 41
+BC_STACK_DUP = 42
+BC_STACK_DROP = 43
+BC_STACK_SWAP = 44
+BC_STACK_DEPTH = 45
+BC_QUOTE_NAME = 46
+BC_FUNCTION_HIDE = 47
+BC_STRING_SEEK = 48
+BC_SLICE_SUBSLICE = 49
+BC_STRING_NUMERIC = 50
+BC_SLICE_REVERSE = 51
+BC_TO_LOWER = 52
+BC_TO_UPPER = 53
+BC_REPORT = 54
+BC_VM_NAMES = 55
+BC_VM_SLICES = 56
+BC_TRIG_SIN = 57
+BC_TRIG_COS = 58
+BC_TRIG_TAN = 59
+BC_TRIG_ASIN = 60
+BC_TRIG_ACOS = 61
+BC_TRIG_ATAN = 62
+BC_TRIG_ATAN2 = 63
+BC_VM_MEM_MAP = 64
+BC_VM_MEM_SIZES = 65
+BC_VM_MEM_ALLOC = 66
 
 
 # Implement the byte code functions
@@ -257,13 +255,6 @@ def bytecode_remainder(opcode, offset, more):
         abort_run(opcode, offset)
 
 
-#def bytecode_floor(opcode, offset, more):
-#    if precheck([TYPE_NUMBER]):
-#        stack_push(math.floor(float(stack_pop())), TYPE_NUMBER)
-#    else:
-#        abort_run(opcode, offset)
-
-
 def bytecode_pow(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -342,13 +333,6 @@ def bytecode_sqrt(opcode, offset, more):
         stack_push(math.sqrt(stack_pop()), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
-
-
-#def bytecode_round(opcode, offset, more):
-#    if precheck([TYPE_NUMBER]):
-#        stack_push(round(stack_pop()), TYPE_NUMBER)
-#    else:
-#        abort_run(opcode, offset)
 
 
 def bytecode_compare_lt(opcode, offset, more):
@@ -902,7 +886,6 @@ bytecodes = {
     BC_BITWISE_XOR:    bytecode_bitwise_xor,
     BC_RANDOM:         bytecode_random,
     BC_SQRT:           bytecode_sqrt,
-#    BC_ROUND:          bytecode_round,
     BC_COMPARE_LT:     bytecode_compare_lt,
     BC_COMPARE_GT:     bytecode_compare_gt,
     BC_COMPARE_LTEQ:   bytecode_compare_lteq,
