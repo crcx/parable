@@ -1079,13 +1079,19 @@ def stack_drop():
     stack.pop()
 
 
-def stack_pop(type = False):
+def stack_pop(type = False, fifo = False):
     """remove and return a value from the stack"""
     global stack
-    if type:
-        return stack.pop()
+    if fifo:
+        if type:
+            return stack.pop(0)
+        else:
+            return stack.pop(0)[0]
     else:
-        return stack.pop()[0]
+        if type:
+            return stack.pop()
+        else:
+            return stack.pop()[0]
 
 
 def tos():
