@@ -44,6 +44,7 @@ Useful shortcuts from kiy's on_startup.md
    '>=?'      [ "nN-nf" over     lteq? ] .
   'len?'      [ "p-pn"  dup    length? ] .
 }vocab
+````
 
 ### Legal
 
