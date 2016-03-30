@@ -100,12 +100,6 @@ Return a random number
 
 Obtain the square root of a number
 
-## round
-
-    n-n
-
-Round a number to the nearest integer value
-
 ## lt?
 
     nn-f
@@ -649,6 +643,12 @@ Return the smallest integer less than or equal to the starting value
 
 Return the smallest integer greater than or equal to the starting value
 
+## round
+
+    n-n
+
+Round a number to the nearest integer value
+
 ## adjust-slice-length
 
     np-
@@ -1119,6 +1119,12 @@ Append a value to the specified slice. This modifies the original slice.
     p-v
 
 Remove the last value from the specified slice. This modifies the original slice.
+
+## cycle
+
+    p-p
+
+Move the head of the slice to the tail
 
 ## request-empty
 

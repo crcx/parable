@@ -10,6 +10,7 @@
 
 ### Standard Library
 
+* add cycle
 * add vocab{
 * add }vocab
 * round now written in parable

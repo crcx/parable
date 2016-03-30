@@ -273,6 +273,8 @@
 
 [ "p-v"    :p [ dup get<final-offset> fetch ] sip dup length? 2 - swap set<final-offset> "Remove the last value from the specified slice. This modifies the original slice." ] 'pop' :
 
+[ "p-p"    [ head ] [ body ] bi [ push ] sip "Move the head of the slice to the tail" ] 'cycle' :
+
 [ "-p"     request [ pop drop ] sip "Request a slice with no stored values" ] 'request-empty' :
 
 [ "pnp-n"  [ !XT [ duplicate-slice ] dip over length? [ over pop @XT invoke ] times nip ] localize \
