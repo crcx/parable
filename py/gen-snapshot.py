@@ -52,8 +52,7 @@ def load_files(files):
 
 def create_snapshot():
     parable.collect_garbage()
-    j = json.dumps({"symbols": parable.dictionary_names, \
-                    "symbol_map": parable.dictionary_slices, \
+    j = json.dumps({"symbols": parable.dictionary, \
                     "errors": parable.errors, \
                     "stack_values": parable.stack, \
                     "memory_contents": parable.memory_values, \

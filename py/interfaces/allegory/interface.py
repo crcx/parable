@@ -12,8 +12,7 @@ from os.path import expanduser
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 def save_snapshot(filename):
-    j = json.dumps({"symbols": dictionary_names, \
-                    "symbol_map": dictionary_slices, \
+    j = json.dumps({"symbols": dictionary, \
                     "errors": errors, \
                     "stack_values": stack, \
                     "memory_contents": memory_values, \
@@ -39,8 +38,7 @@ def save_snapshot(filename):
 
 
 def load_snapshot(filename):
-    global dictionary_names, \
-           dictionary_slices, \
+    global dictionary, \
            errors, \
            stack, \
            memory_values, \
@@ -51,8 +49,7 @@ def load_snapshot(filename):
 
 
     j = json.loads(open(filename, 'r').read())
-    dictionary_names = j['symbols']
-    dictionary_slices = j['symbol_map']
+    dictionary = j['symbols']
     errors = j['errors']
     stack = j['stack_values']
     memory_values = j['memory_contents']
@@ -63,8 +60,7 @@ def load_snapshot(filename):
 
 
 def bootstrap(s):
-    global dictionary_names, \
-           dictionary_slices, \
+    global dictionary, \
            errors, \
            stack, \
            memory_values, \
@@ -77,8 +73,7 @@ def bootstrap(s):
     u = bz2.decompress(raw)
     j = json.loads(u.decode())
 
-    dictionary_names = j['symbols']
-    dictionary_slices = j['symbol_map']
+    dictionary = j['symbols']
     errors = j['errors']
     stack = j['stack_values']
     memory_values = j['memory_contents']
@@ -94,7 +89,7 @@ def bootstrap(s):
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 def completer(text, state):
-    options = [x for x in dictionary_names if x.startswith(text)]
+    options = [x for x in dictionary_names() if x.startswith(text)]
     try:
         return options[state]
     except IndexError:
@@ -105,7 +100,7 @@ def completer(text, state):
 def dump_dict():
     """display named items"""
     l = ''
-    for w in dictionary_names:
+    for w in dictionary_names():
         l = l + w + ' '
     sys.stdout.write(l)
     sys.stdout.write("\n")
@@ -144,12 +139,11 @@ def display_value():
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 def revert():
-    global memory_values, memory_map, memory_types, dictionary_slices, dictionary_names
+    global memory_values, memory_map, memory_types, dictionary
     memory_values = []
     memory_map = []
     memory_types = []
-    dictionary_slices = []
-    dictionary_names = []
+    dictionary = []
     prepare_slices()
     prepare_dictionary()
     stack_clear()

@@ -1,4 +1,4 @@
-# parable
+	# parable
 # Copyright (c) 2012-2016, Charles Childers
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 # coding: utf-8
@@ -780,7 +780,7 @@ def bytecode_report(opcode, offset, more):
 def bytecode_vm_names(opcode, offset, more):
     s = request_slice()
     i = 0
-    for word in dictionary_names:
+    for word in dictionary_names():
         value = string_to_slice(word)
         store(value, s, i, TYPE_STRING)
         i = i + 1
@@ -790,7 +790,7 @@ def bytecode_vm_names(opcode, offset, more):
 def bytecode_vm_slices(opcode, offset, more):
     s = request_slice()
     i = 0
-    for ptr in dictionary_slices:
+    for ptr in dictionary_slices():
         store(ptr, s, i, TYPE_POINTER)
         i = i + 1
     stack_push(s, TYPE_POINTER)
@@ -1214,53 +1214,81 @@ def stack_change_type(desired):
 # of two arrays: one for the names and a second one for the pointers.
 
 dictionary_warnings = False     # Used to trigger a warning if a name is redefined
-dictionary_names = []           # Holds the names for each slice
-dictionary_slices = []          # Holds the slice for each name
 dictionary_hidden_slices = []   # Holds a list of slices that previously had names
+dictionary = []
+
+def dictionary_names():
+    r = []
+    for w in dictionary:
+        r.append(w[0])
+    return r
+
+
+def dictionary_slices():
+    r = []
+    for w in dictionary:
+        r.append(w[1])
+    return r
 
 
 def in_dictionary(s):
-    return s in dictionary_names
+    for w in dictionary_names():
+        if w == s:
+            return True
+    return False
+
+
+def dict_entry(name):
+    for i in dictionary:
+        if i[0] == name:
+            return i[1]
+    return -1
+
+
+def dict_index(name):
+    n = 0
+    for i in dictionary:
+        if i[0] == name:
+            return n
+        n = n + 1
+    return -1
 
 
 def lookup_pointer(name):
     if in_dictionary(name) is False:
         return -1
     else:
-        return dictionary_slices[dictionary_names.index(name)]
+        return dict_entry(name)
 
 
 def add_definition(name, slice):
-    global dictionary_names, dictionary_slices
+    global dictionary
     if in_dictionary(name) is False:
-        dictionary_names.append(name)
-        dictionary_slices.append(slice)
+        dictionary.append((name, slice))
     else:
         if dictionary_warnings:
             report('W10: ' + name + ' redefined')
-        target = dictionary_slices[dictionary_names.index(name)]
+        target = lookup_pointer(name)
         copy_slice(slice, target)
-    return dictionary_names.index(name)
 
 
 def remove_name(name):
-    global dictionary_names, dictionary_slices, dictionary_hidden_slices
+    global dictionary, dictionary_hidden_slices
     if in_dictionary(name) is not False:
-        i = dictionary_names.index(name)
-        del dictionary_names[i]
-        if not dictionary_slices[i] in dictionary_hidden_slices:
-            dictionary_hidden_slices.append(dictionary_slices[i])
-        del dictionary_slices[i]
+        i = dict_index(name)
+        if not dictionary[i][1] in dictionary_hidden_slices:
+            dictionary_hidden_slices.append(dictionary[i][1])
+        del dictionary[i]
 
 
 def pointer_to_name(ptr):
     """given a parable pointer, return the corresponding name, or"""
     """an empty string"""
-    global dictionary_names, dictionary_slices
-    s = ""
-    if ptr in dictionary_slices:
-        s = dictionary_names[dictionary_slices.index(ptr)]
-    return s
+    for i in dictionary:
+        if i[1] == ptr:
+            return i[0]
+    return ''
+
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1463,11 +1491,11 @@ def find_references(s):
 
 def seek_all_references():
     """return a list of all references in all named slices and stack items"""
-    global dictionary_slices, stack, types, current_slice
+    global dictionary, stack, types, current_slice
     sources = []
 
     # Named items
-    for s in dictionary_slices:
+    for s in dictionary_slices():
         if not s in sources:
             sources.append(s)
 
