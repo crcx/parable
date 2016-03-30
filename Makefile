@@ -1,4 +1,4 @@
-PY = pypy3
+include Makefile.config
 default: parable turnkeys documents clean
 
 clean:

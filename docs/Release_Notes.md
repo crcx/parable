@@ -16,3 +16,8 @@
 * added *tools/gfm.py* (git flavored markdown to html)
 * added *docs/Makefile* to generate HTML from Markdown using *tools/gfm.py*
 
+### Build
+
+* Use a single top-level Makefile.config
+* Makefiles are no longer hard coded to update my personal environment
+

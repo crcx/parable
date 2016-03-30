@@ -1,7 +1,9 @@
+include ../Makefile.config
+
 all: $(patsubst %.md, %.html, $(wildcard *.md))
 
 %.html: %.md Makefile
-	../tools/gfm.py $< >$@
+	$(PYALT) ../tools/gfm.py $< >$@
 	mv $@ html
 
 clean:
