@@ -1336,6 +1336,18 @@ Example:
 
 Add a word to an existing vocabulary
 
+## vocab{
+
+    -
+
+Start a vocabulary block
+
+## }vocab
+
+    s-
+
+End a vocabulary block
+
 ## invoke&lt;preserving&gt;
 
     qq-

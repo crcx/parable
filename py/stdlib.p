@@ -370,6 +370,13 @@
   ] 'vocab.add-word' :
 }
 
+[ 'vocab{'  '}vocab' ] {
+  [ 'o' ] ::
+
+  [ "-"  vm.dict<names> length? !o "Start a vocabulary block" ] 'vocab{' :
+  [ "s-" vm.dict<names> @o over length? subslice swap vocab "End a vocabulary block" ] '}vocab' :
+}
+
 
 [ 'invoke<preserving>' ] {
   [ 'Prior'  'List' ] ::
