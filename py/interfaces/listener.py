@@ -37,7 +37,6 @@ def init_from_snapshot(s):
     parable.dictionary_slices = j['symbol_map']
     parable.errors = j['errors']
     parable.stack = j['stack_values']
-    parable.types = j['stack_types']
     parable.memory_values = j['memory_contents']
     parable.memory_types = j['memory_types']
     parable.memory_map = j['memory_map']
@@ -53,8 +52,8 @@ def dump_stack():
     """display the stack"""
     i = 0
     while i < len(parable.stack):
-        tos = parable.stack[i]
-        type = parable.types[i]
+        tos = parable.stack_value_for(i)
+        type = parable.stack_type_for(i)
         sys.stdout.write("\t" + str(i))
         if type == parable.TYPE_NUMBER:
             display_item('#', tos)

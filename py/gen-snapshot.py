@@ -56,7 +56,6 @@ def create_snapshot():
                     "symbol_map": parable.dictionary_slices, \
                     "errors": parable.errors, \
                     "stack_values": parable.stack, \
-                    "stack_types": parable.types, \
                     "memory_contents": parable.memory_values, \
                     "memory_types": parable.memory_types, \
                     "memory_map": parable.memory_map, \

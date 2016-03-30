@@ -16,7 +16,6 @@ def save_snapshot(filename):
                     "symbol_map": dictionary_slices, \
                     "errors": errors, \
                     "stack_values": stack, \
-                    "stack_types": types, \
                     "memory_contents": memory_values, \
                     "memory_types": memory_types, \
                     "memory_map": memory_map, \
@@ -44,7 +43,6 @@ def load_snapshot(filename):
            dictionary_slices, \
            errors, \
            stack, \
-           types, \
            memory_values, \
            memory_types, \
            memory_map, \
@@ -57,7 +55,6 @@ def load_snapshot(filename):
     dictionary_slices = j['symbol_map']
     errors = j['errors']
     stack = j['stack_values']
-    types = j['stack_types']
     memory_values = j['memory_contents']
     memory_types = j['memory_types']
     memory_map = j['memory_map']
@@ -70,7 +67,6 @@ def bootstrap(s):
            dictionary_slices, \
            errors, \
            stack, \
-           types, \
            memory_values, \
            memory_types, \
            memory_map, \
@@ -85,7 +81,6 @@ def bootstrap(s):
     dictionary_slices = j['symbol_map']
     errors = j['errors']
     stack = j['stack_values']
-    types = j['stack_types']
     memory_values = j['memory_contents']
     memory_types = j['memory_types']
     memory_map = j['memory_map']
@@ -118,29 +113,31 @@ def dump_dict():
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 def display_value():
-    global stack, types
+    global stack
     i = len(stack) - 1
-    if types[i] == TYPE_NUMBER:
-        sys.stdout.write(str(stack[i]))
-    elif types[i] == TYPE_CHARACTER:
-        sys.stdout.write(str(chr(stack[i])))
-    elif types[i] == TYPE_STRING:
-        sys.stdout.write(slice_to_string(stack[i]))
-    elif types[i] == TYPE_POINTER:
-        sys.stdout.write('&' + str(stack[i]))
-    elif types[i] == TYPE_FLAG:
-        if stack[i] == -1:
+    t = stack_type_for(i)
+    v = stack_value_for(i)
+    if t == TYPE_NUMBER:
+        sys.stdout.write(str(v))
+    elif t == TYPE_CHARACTER:
+        sys.stdout.write(str(chr(v)))
+    elif t == TYPE_STRING:
+        sys.stdout.write(slice_to_string(v))
+    elif t == TYPE_POINTER:
+        sys.stdout.write('&' + str(v))
+    elif t == TYPE_FLAG:
+        if v == -1:
             sys.stdout.write("true")
-        elif stack[i] == 0:
+        elif v == 0:
             sys.stdout.write("false")
         else:
             sys.stdout.write("malformed flag")
-    elif types[i] == TYPE_REMARK:
-        sys.stdout.write(slice_to_string(stack[i]))
-    elif types[i] == TYPE_BYTECODE:
-        sys.stdout.write('`' + str(stack[i]))
-    elif types[i] == TYPE_FUNCTION_CALL:
-        sys.stdout.write('CALL: &' + str(stack[i]))
+    elif t == TYPE_REMARK:
+        sys.stdout.write(slice_to_string(v))
+    elif t == TYPE_BYTECODE:
+        sys.stdout.write('`' + str(v))
+    elif t == TYPE_FUNCTION_CALL:
+        sys.stdout.write('CALL: &' + str(v))
     else:
        sys.stdout.write("unknown type")
 

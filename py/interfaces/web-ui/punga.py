@@ -16,7 +16,6 @@ def create_snapshot():
                     "symbol_map": parable.dictionary_slices, \
                     "errors": parable.errors, \
                     "stack_values": parable.stack, \
-                    "stack_types": parable.types, \
                     "memory_contents": parable.memory_values, \
                     "memory_types": parable.memory_types, \
                     "memory_map": parable.memory_map, \
@@ -54,7 +53,6 @@ def bootstrap(s):
     parable.dictionary_slices = j['symbol_map']
     parable.errors = j['errors']
     parable.stack = j['stack_values']
-    parable.types = j['stack_types']
     parable.memory_values = j['memory_contents']
     parable.memory_types = j['memory_types']
     parable.memory_map = j['memory_map']
@@ -81,8 +79,8 @@ def dump_stack():
     depth = len(parable.stack)
     html = "<table>"
     while i < depth:
-        tos = parable.stack[i]
-        type = parable.types[i]
+        tos = parable.stack_value_for(i)
+        type = parable.stack_type_for(i)
         if type == parable.TYPE_NUMBER:
             html = html + stack_item(i, "#" + str(tos))
         elif type == parable.TYPE_CHARACTER:

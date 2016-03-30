@@ -1063,8 +1063,7 @@ def interpret(slice, more=None):
 # last-in, first-out (LIFO) model. But it does track types as well as the raw
 # values.
 
-stack = []    # holds the data items
-types = []    # holds the types for data items
+stack = []
 
 
 def stack_depth():
@@ -1072,41 +1071,38 @@ def stack_depth():
 
 
 def stack_type_for(d):
-    return types[d]
+    return stack[d][1]
 
 
 def stack_value_for(d):
-    return stack[d]
+    return stack[d][0]
 
 
 def stack_clear():
     """remove all values from the stack"""
-    global stack, types
+    global stack
     stack = []
-    types = []
 
 
 def stack_push(value, type):
     """push a value to the stack"""
-    global stack, types
-    stack.append(value)
-    types.append(type)
+    global stack
+    stack.append((value, type))
 
 
 def stack_drop():
     """remove a value from the stack"""
-    global stack, types
-    stack_pop()
+    global stack
+    stack.pop()
 
 
 def stack_pop(type = False):
     """remove and return a value from the stack"""
-    global stack, types
+    global stack
     if type:
-        return stack.pop(), types.pop()
-    else:
-        types.pop()
         return stack.pop()
+    else:
+        return stack.pop()[0]
 
 
 def tos():
@@ -1116,7 +1112,7 @@ def tos():
 
 def stack_type():
     """return the type identifier for the top item on the stack"""
-    return types[tos()]
+    return stack_type_for(tos())
 
 
 def stack_swap():
@@ -1142,22 +1138,22 @@ def stack_dup():
 
 def stack_change_type(desired):
     """convert the type of an item on the stack to a different type"""
-    global types, stack
+    global stack
     original = stack_type()
     if desired == TYPE_BYTECODE:
         if original == TYPE_NUMBER:
-            types.pop()
-            types.append(TYPE_BYTECODE)
+            a = stack_pop()
+            stack_push(a, TYPE_BYTECODE)
     elif desired == TYPE_NUMBER:
         if original == TYPE_STRING:
-            if is_number(slice_to_string(stack[tos()])):
-                stack_push(float(slice_to_string(stack_pop())), TYPE_NUMBER)
+            a = stack_pop()
+            if is_number(slice_to_string(a)):
+                stack_push(float(slice_to_string(a)), TYPE_NUMBER)
             else:
-                stack_pop()
                 stack_push(float('nan'), TYPE_NUMBER)
         else:
-            types.pop()
-            types.append(TYPE_NUMBER)
+            a = stack_pop()
+            stack_push(a, TYPE_NUMBER)
     elif desired == TYPE_STRING:
         if original == TYPE_NUMBER:
             stack_push(string_to_slice(str(stack_pop())), TYPE_STRING)
@@ -1176,8 +1172,8 @@ def stack_change_type(desired):
             else:
                 stack_push(string_to_slice('malformed flag'), TYPE_STRING)
         elif original == TYPE_POINTER or original == TYPE_REMARK:
-            types.pop()
-            types.append(TYPE_STRING)
+            a = stack_pop()
+            stack_push(a, TYPE_STRING)
         else:
             return 0
     elif desired == TYPE_CHARACTER:
@@ -1188,8 +1184,8 @@ def stack_change_type(desired):
             s = stack_pop()
             stack_push(int(s), TYPE_CHARACTER)
     elif desired == TYPE_POINTER:
-        types.pop()
-        types.append(TYPE_POINTER)
+        a = stack_pop()
+        stack_push(a, TYPE_POINTER)
     elif desired == TYPE_FLAG:
         if original == TYPE_STRING:
             s = slice_to_string(stack_pop())

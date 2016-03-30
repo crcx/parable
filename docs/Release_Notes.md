@@ -4,6 +4,7 @@
 
 * **reverse** now preserves the pointer type (pointer, stack, remark)
 * **+** now supports new forms: cs-s, sc-s, and cc-s
+* the stack is now implemented as a single array of tuples (value, type)
 
 ### Standard Library
 
