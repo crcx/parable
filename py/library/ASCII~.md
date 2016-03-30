@@ -1,3 +1,12 @@
+## ASCII~
+
+### Overview
+
+This vocabulary provides a set of constants for special ASCII characters. (The printable characters are easily handled via the **$** prefix.)
+
+### Code
+
+````
 'ASCII~' vocab{
   [ "-n" 000 "Constant for special character" ] 'NUL' :
   [ "-n" 001 "Constant for special character" ] 'SOH' :
@@ -33,3 +42,9 @@
   [ "-n" 031 "Constant for special character" ] 'US' :
   [ "-n" 032 "Constant for special character" ] 'SPACE' :
 }vocab
+````
+
+### Legal
+
+Copyright (c) 2016, Charles Childers
+
