@@ -12,8 +12,7 @@ import parable
 
 def create_snapshot():
     parable.collect_garbage()
-    j = json.dumps({"symbols": parable.dictionary_names, \
-                    "symbol_map": parable.dictionary_slices, \
+    j = json.dumps({"symbols": parable.dictionary, \
                     "errors": parable.errors, \
                     "stack_values": parable.stack, \
                     "memory_contents": parable.memory_values, \
@@ -49,8 +48,7 @@ def bootstrap(s):
     except:
         j = json.loads(u.decode())
 
-    parable.dictionary_names = j['symbols']
-    parable.dictionary_slices = j['symbol_map']
+    parable.dictionary = j['symbols']
     parable.errors = j['errors']
     parable.stack = j['stack_values']
     parable.memory_values = j['memory_contents']
@@ -134,10 +132,10 @@ def dump_dict():
     html = "<table>"
     l = ''
     i = 0
-    for w in parable.dictionary_names:
+    for w in parable.dictionary_names():
         wx = '<pre>' + w.replace('<', '&lt;').replace('>', '&gt;') + '</pre>'
 
-        slice = parable.dictionary_slices[i]
+        slice = parable.dictionary_slices()[i]
         cell, type = parable.fetch(slice, 0)
         size = parable.memory_size[slice]
         if type == parable.TYPE_REMARK:
