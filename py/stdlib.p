@@ -317,7 +317,12 @@
 
 [ "s-f"  vm.dict<names> swap contains? "Return true if the named word exists or false otherwise" ] 'word-exists?' :
 
-[ "s-p"  vm.dict<names> swap index-of vm.dict<slices> swap fetch "Return a pointer to the named word if it exists, or #nan otherwise" ] 'lookup-word' :
+[ "s-p" \
+  dup word-exists? \
+  [ vm.dict<names> swap index-of vm.dict<slices> swap fetch ] \
+  [ drop #nan ] if \
+  "Return a pointer to the named word if it exists, or #nan otherwise" \
+] 'lookup-word' :
 
 [ "p-s"  :p vm.dict<slices> over contains? [ vm.dict<slices> swap index-of vm.dict<names> swap fetch ] [ drop '' ] if "If the pointer corresponds to a named item, return the name. Otherwise return an empty string." ] 'lookup-name' :
 
