@@ -4,57 +4,47 @@
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 import requests
+import json
 
 def make_request(d):
-    url = 'http://api.forthworks.com/apologue/2/0'
+    url = 'http://api.forthworks.com/PaaS/2016.04'
     return requests.post(url, data=d).text
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 
-def getpso():
-    payload = { 'req': 'getpso' }
+def obtain():
+    payload = { 'req': 'obtain' }
     return make_request(payload)
 
 
 def evaluate(pso, source):
-    payload = { 'req': 'evaluate', 'source': source, 'pso': pso }
+    payload = { 'req': 'evaluate', 'source': source, 'snapshot': pso }
     return make_request(payload)
 
 
 def dictionary(pso):
-    payload = { 'req': 'dictionary', 'pso': pso }
+    payload = { 'req': 'dictionary', 'snapshot': pso }
     r = make_request(payload)
-    return eval(r)
+    return json.loads(r)
 
 
 def stack(pso):
-    payload = { 'req': 'stack', 'pso': pso }
+    payload = { 'req': 'stack', 'snapshot': pso }
     r = make_request(payload)
-    return eval(r)
+    return json.loads(r)
 
 
 def errors(pso):
-    payload = { 'req': 'errors', 'pso': pso }
+    payload = { 'req': 'errors', 'snapshot': pso }
     r = make_request(payload)
-    return eval(r)
-
-
-def clear_errors(pso):
-    payload = { 'req': 'clear_errors', 'pso': pso }
-    return make_request(payload)
-
-
-def dictionary_names(pso):
-    payload = { 'req': 'dictionary_names', 'pso': pso }
-    r = make_request(payload)
-    return eval(r)
+    return json.loads(r)
 
 
 def slice_contents(pso, slice):
-    payload = { 'req': 'get_slice', 's': slice, 'pso': pso }
+    payload = { 'req': 'slice', 'which': slice, 'snapshot': pso }
     r = make_request(payload)
-    return eval(r)
+    return json.loads(r)
 
 
 def slice_to_string(pso, slice):
@@ -63,15 +53,3 @@ def slice_to_string(pso, slice):
     for c in res:
         s.append(chr(c))
     return ''.join(s)
-
-
-def stack_values(pso):
-    payload = { 'req': 'stack_values', 'pso': pso }
-    r = make_request(payload)
-    return eval(r)
-
-
-def stack_types(pso):
-    payload = { 'req': 'stack_types', 'pso': pso }
-    r = make_request(payload)
-    return eval(r)

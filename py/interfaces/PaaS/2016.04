@@ -19,10 +19,8 @@ def extract(pso, key):
 
 
 def save_snapshot():
-    j = json.dumps({"symbols": parable.dictionary_names,
-                    "symbol_map": parable.dictionary_slices,
+    j = json.dumps({"symbols": parable.dictionary,
                     "stack_values": parable.stack,
-                    "stack_types": parable.types,
                     "errors": parable.errors,
                     "memory_contents": parable.memory_values,
                     "memory_types": parable.memory_types,
@@ -35,10 +33,8 @@ def save_snapshot():
 def load_snapshot(data):
     raw = base64.b64decode(data)
     j = json.loads(bz2.decompress(raw).decode())
-    parable.dictionary_names = j['symbols']
-    parable.dictionary_slices = j['symbol_map']
+    parable.dictionary = j['symbols']
     parable.stack = j['stack_values']
-    parable.types = j['stack_types']
     parable.memory_values = j['memory_contents']
     parable.memory_types = j['memory_types']
     parable.memory_map = j['memory_map']
@@ -49,15 +45,15 @@ def load_snapshot(data):
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 
-def getpso(form):
-    pso = open('parable.snapshot', 'r').read()
+def obtain(form):
+    pso = open('snapshots/2016.04', 'r').read()
     return pso
 
 
 def evaluate(form):
-    pso = form.getvalue("pso")
+    pso = form.getvalue("snapshot", obtain(form))
     load_snapshot(pso)
-    parable.errors = []
+    parable.clear_errors()
     source = form.getvalue("source")
     process_input(source)
     pso = save_snapshot().decode()
@@ -65,66 +61,36 @@ def evaluate(form):
 
 
 def dictionary(form):
-    pso = form.getvalue("pso")
+    pso = form.getvalue("snapshot")
     load_snapshot(pso)
-    j = json.dumps({"names": parable.dictionary_names,
-                    "pointers": parable.dictionary_slices,
+    j = json.dumps({"names": parable.dictionary_names(),
+                    "pointers": parable.dictionary_slices(),
                   })
     return j
 
 
 def stack(form):
-    pso = form.getvalue("pso")
+    pso = form.getvalue("snapshot")
     load_snapshot(pso)
-    j = json.dumps({"values": parable.stack,
-                    "types": parable.types,
+    j = json.dumps({"values": parable.stack_values(),
+                    "types": parable.stack_types(),
+                    "parsed": parable.parsed_stack(),
                   })
     return j
 
 
-def dictionary_names(form):
-    pso = form.getvalue("pso")
+def slice(form):
+    pso = form.getvalue("snapshot")
     load_snapshot(pso)
-    return extract(pso, 'symbols')
-
-
-def dictionary_map(form):
-    pso = form.getvalue("pso")
-    load_snapshot(pso)
-    return extract(pso, 'symbol_map')
-
-
-def stack_values(form):
-    pso = form.getvalue("pso")
-    load_snapshot(pso)
-    return extract(pso, 'stack_values')
-
-
-def stack_types(form):
-    pso = form.getvalue("pso")
-    load_snapshot(pso)
-    return extract(pso, 'stack_types')
-
-
-def get_slice(form):
-    pso = form.getvalue("pso")
-    load_snapshot(pso)
-    s = int(form.getvalue("s"))
+    s = int(form.getvalue("which"))
     memory = extract(pso, 'memory_contents')
     return memory[s]
 
 
 def errors(form):
-    pso = form.getvalue("pso")
+    pso = form.getvalue("snapshot")
     load_snapshot(pso)
     return extract(pso, 'errors')
-
-
-def clear_errors(form):
-    pso = form.getvalue("pso")
-    load_snapshot(pso)
-    parable.clear_errors()
-    return save_snapshot().decode()
 
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
@@ -164,40 +130,30 @@ if __name__ == '__main__':
     req = form.getvalue("req")
     res = ""
 
-    if req == "getpso":
-        res = getpso(form)
+    if req == "obtain":
+        print("Content-Type: text/plain")
+        res = obtain(form)
 
     if req == "evaluate":
+        print("Content-Type: text/plain")
         res = evaluate(form)
 
     if req == "dictionary":
+        print("Content-Type: text/json")
         res = dictionary(form)
 
     if req == "stack":
+        print("Content-Type: text/json")
         res = stack(form)
 
-    if req == "dictionary_names":
-        res = dictionary_names(form)
-
-    if req == "dictionary_map":
-        res = dictionary_names(map)
-
-    if req == "stack_values":
-        res = stack_values(form)
-
-    if req == "stack_types":
-        res = stack_types(form)
-
     if req == "errors":
+        print("Content-Type: text/json")
         res = errors(form)
 
-    if req == "clear_errors":
-        res = clear_errors(form)
+    if req == "slice":
+        print("Content-Type: text/json")
+        res = slice(form)
 
-    if req == "get_slice":
-        res = get_slice(form)
-
-    print("Content-Type: text/plain")
     print("")
     print(res)
 

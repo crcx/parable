@@ -2,46 +2,10 @@
 # netlistener - listener using PaaS backend
 # (c) 2016, charles childers
 
-
 import PaaS
 import sys
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-
-parable = 0
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-
-
-def stack(pso):
-    s = PaaS.stack(pso)
-    v = s['values']
-    t = s['types']
-    a = []
-    x = 0
-    while x < len(v):
-        if t[x] == 100:
-            a.append('#' + str(v[x]))
-        if t[x] == 200:
-            a.append('\'' + PaaS.slice_to_string(pso, v[x]) + '\'')
-        if t[x] == 300:
-            a.append('$' + chr(v[x]))
-        if t[x] == 400:
-            a.append('&' + str(v[x]))
-        if t[x] == 500:
-            a.append('FLAG: ' + str(v[x]))
-        if t[x] == 600:
-            a.append('`' + str(v[x]))
-        if t[x] == 700:
-            a.append('"' + PaaS.slice_to_string(pso, v[x]) + '"')
-        if t[x] == 800:
-            a.append('CALL: ' + str(v[x]))
-        x += 1
-    return a
-
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-
 
 def get_input():
     done = 0
@@ -54,9 +18,7 @@ def get_input():
             done = 1
     return s
 
-
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-
 
 def sep():
     for i in range(1, 40):
@@ -67,9 +29,7 @@ def sep():
 def prompt():
     sys.stdout.write('input> ')
 
-
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-
 
 if __name__ == '__main__':
     print("")
@@ -80,7 +40,7 @@ if __name__ == '__main__':
     print('bye\texit netlistener')
     sep()
 
-    parable = PaaS.getpso()
+    parable = PaaS.obtain()
 
     while True:
         prompt()
@@ -94,12 +54,11 @@ if __name__ == '__main__':
 
         if len(src) >= 1:
             if src == ".s":
-                for i in stack(parable):
+                for i in PaaS.stack(parable)['parsed']:
                     sys.stdout.write(i + '  ')
                 sys.stdout.write("\n")
             elif src == "words":
-                dictionary = PaaS.dictionary(parable)
-                for w in dictionary['names']:
+                for w in PaaS.dictionary(parable)['names']:
                     sys.stdout.write(w + ' ')
                 sys.stdout.write("\n")
             elif src == "bye":
@@ -114,7 +73,5 @@ if __name__ == '__main__':
 
         for e in PaaS.errors(parable):
             print(e)
-
-        parable = PaaS.clear_errors(parable)
 
         sys.stdout.flush()
