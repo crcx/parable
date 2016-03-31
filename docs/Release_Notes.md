@@ -7,6 +7,9 @@
 * the stack is now implemented as a single array of tuples (value, type)
 * remove BC_ROUND
 * remove BC\_FLOW\_RETURN
+* added parsed_stack()
+* added stack_values()
+* added stack_types()
 
 ### Standard Library
 

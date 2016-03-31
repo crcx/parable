@@ -27,7 +27,7 @@ TYPE_POINTER = 400
 TYPE_FLAG = 500
 TYPE_BYTECODE = 600
 TYPE_REMARK = 700
-TYPE_FUNCTION_CALL = 800
+TYPE_FUNCALL = 800
 
 # For precheck(), we also allow matching agains two "generic" types:
 
@@ -468,7 +468,7 @@ def bytecode_flow_times(opcode, offset, more):
 
 
 def bytecode_flow_call(opcode, offset, more):
-    if precheck([TYPE_POINTER]) or precheck([TYPE_FUNCTION_CALL]):
+    if precheck([TYPE_POINTER]) or precheck([TYPE_FUNCALL]):
         a = stack_pop()
         interpret(a, more)
     else:
@@ -1000,7 +1000,7 @@ def precheck(req):
                 if stack_type_for(i) != TYPE_POINTER and \
                    stack_type_for(i) != TYPE_STRING and \
                    stack_type_for(i) != TYPE_REMARK and \
-                   stack_type_for(i) != TYPE_FUNCTION_CALL:
+                   stack_type_for(i) != TYPE_FUNCALL:
                     flag = False
             elif t != stack_type_for(i) and t != TYPE_ANY:
                 flag = False
@@ -1028,7 +1028,7 @@ def interpret(slice, more=None):
             stack_push(opcode, optype)
             if optype == TYPE_REMARK:
                 stack_pop()
-            if optype == TYPE_FUNCTION_CALL:
+            if optype == TYPE_FUNCALL:
                 interpret(stack_pop(), more)
         else:
             if opcode in bytecodes:
@@ -1047,6 +1047,57 @@ def interpret(slice, more=None):
 # values.
 
 stack = []
+
+
+def format_item(prefix, value):
+    return  prefix + str(value)
+
+def parsed_stack():
+    i = 0
+    r = []
+    while i < len(stack):
+        tos = stack_value_for(i)
+        type = stack_type_for(i)
+        if type == TYPE_NUMBER:
+            r.append(format_item('#', tos))
+        elif type == TYPE_BYTECODE:
+            r.append(format_item('`', tos))
+        elif type == TYPE_CHARACTER:
+            r.append(format_item('$', chr(tos)))
+        elif type == TYPE_STRING:
+            r.append(format_item('\'', slice_to_string(tos) + '\''))
+        elif type == TYPE_POINTER:
+            r.append(format_item('&', tos))
+        elif type == TYPE_FUNCALL:
+            r.append(format_item('CALL &', tos))
+        elif type == TYPE_REMARK:
+            r.append(format_item('"', slice_to_string(tos) + '"'))
+        elif type == TYPE_FLAG:
+            if tos == -1:
+                r.append(format_item("", "true"))
+            elif tos == 0:
+                r.append(format_item("", "false"))
+            else:
+                r.append(format_item("", "malformed flag"))
+        else:
+            r.append(format_item("", "unmatched type on the stack"))
+        sys.stdout.write("\n")
+        i += 1
+    return r
+
+
+def stack_values():
+    r = []
+    for w in stack:
+        r.append(w[0])
+    return r
+
+
+def stack_types():
+    r = []
+    for w in stack:
+        r.append(w[1])
+    return r
 
 
 def stack_depth():
@@ -1187,10 +1238,10 @@ def stack_change_type(desired):
         else:
             s = stack_pop()
             stack_push(s, TYPE_FLAG)
-    elif desired == TYPE_FUNCTION_CALL:
+    elif desired == TYPE_FUNCALL:
         if original == TYPE_NUMBER or original == TYPE_POINTER:
             a = stack_pop()
-            stack_push(a, TYPE_FUNCTION_CALL)
+            stack_push(a, TYPE_FUNCALL)
     else:
         a = stack_pop()
         stack_push(a, desired)
@@ -1439,7 +1490,7 @@ def is_pointer(type):
     if type == TYPE_POINTER or \
        type == TYPE_STRING or \
        type == TYPE_REMARK or \
-       type == TYPE_FUNCTION_CALL:
+       type == TYPE_FUNCALL:
         flag = True
     else:
         flag = False
@@ -1622,7 +1673,7 @@ def compile_bytecode(bytecode, slice, offset):
 
 def compile_function_call(name, slice, offset):
     if lookup_pointer(name) != -1:
-        store(lookup_pointer(name), slice, offset, TYPE_FUNCTION_CALL)
+        store(lookup_pointer(name), slice, offset, TYPE_FUNCALL)
         offset += 1
     else:
         if name != "":
