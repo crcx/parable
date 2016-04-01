@@ -17,6 +17,11 @@
 * add vocab{
 * add }vocab
 * round now written in parable
+* fix lookup-word
+
+### Interfaces
+
+* PaaS: revised API
 
 ### Documentation
 
@@ -28,3 +33,6 @@
 * Use a single top-level Makefile.config
 * Makefiles are no longer hard coded to update my personal environment
 
+### Tooling
+
+* Added *tools/gen-tags.py* to generate a ctags compatible *tags* file
