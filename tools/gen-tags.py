@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
 
+# gen-tags.py
+# Generate a ctags compatible tags file for Parable
+
+
 import fnmatch
 import os
 
 def tag_for_colon(l, f, i):
     t = l.split(' ')
+    print('  ' + t[-2:-1][0][1:-1])
     return t[-2:-1][0][1:-1] + '\t' + f + '\t' + str(i)
 
 def tag_for_dot(l, f, i):
      t = l.strip().split(' ')
+     print('  ' + t[0:1][0][1:-1])
      return t[0:1][0][1:-1] + '\t' + f + '\t' + str(i)
 
 def get_tags_for(pat):
@@ -18,6 +24,7 @@ def get_tags_for(pat):
         for filename in fnmatch.filter(filenames, pat):
             matches.append(os.path.join(root, filename))
     for f in matches:
+        print('Scanning ' + f + '...')
         s = open(f, 'r').readlines()
         i = 1
         for l in s:
@@ -28,8 +35,9 @@ def get_tags_for(pat):
 
 if __name__ == '__main__':
     with open('tags', 'w') as f:
-        f.write('!_TAG_FILE_FORMAT 1\n!_TAG_FILE_SORTED 1\n')
+#        f.write('!_TAG_FILE_FORMAT 1\n!_TAG_FILE_SORTED 1\n')
         tags = get_tags_for('*.p')
         tags = tags + get_tags_for('*.md')
         for l in sorted(tags):
             f.write(l + '\n')
+        print(str(len(tags)) + ' words found')
