@@ -318,6 +318,8 @@ def load_file(name):
                 if l != "#!/usr/bin/env allegory" and should_abort == False:
                     allegory_evaluate(l)
             except:
+                e = sys.exc_info()[0]
+                if e == SystemExit: exit()
                 pass
         for e in errors:
             sys.stdout.write('IN: ' + name + ', ' + e + '\n')

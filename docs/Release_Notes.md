@@ -22,6 +22,7 @@
 ### Interfaces
 
 * PaaS: revised API
+* Allegory: load on_startup.md from the parable side, not the python
 
 ### Documentation
 
