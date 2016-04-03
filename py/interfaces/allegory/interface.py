@@ -164,7 +164,9 @@ def opcodes(slice, offset, opcode):
         dictionary_warnings = True
     if opcode == 2001:
         dictionary_warnings = False
-    if opcode == 201:
+    if opcode == 200:
+        stack_push(string_to_slice(expanduser('~')), TYPE_STRING)
+    elif opcode == 201:
         slot = 0
         i = 1
         while i < (len(files) - 1):
@@ -253,7 +255,7 @@ def opcodes(slice, offset, opcode):
         xt = lookup_pointer('allegory.on-end')
         if xt != -1:
             interpret(xt, opcodes)
-        exit()
+        sys.exit('')
     elif opcode == 9002:
         dump_dict()
     elif opcode == 9003:
@@ -371,16 +373,6 @@ def interactive():
         pass
 
     bootstrap(stdlib)
-
-    home = expanduser("~")
-    if os.path.exists(home + "/.parable.on_startup.p"):
-        load_file(home + "/.parable/on_startup.p")
-    elif os.path.exists("on_startup.p"):
-        load_file("on_startup.p")
-    elif os.path.exists(home + "/.parable/on_startup.md"):
-        load_file(home + "/.parable/on_startup.md")
-    elif os.path.exists("on_startup.md"):
-        load_file("on_startup.md")
 
     while True:
         try:

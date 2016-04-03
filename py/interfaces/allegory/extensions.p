@@ -7,6 +7,7 @@
 [ "s-"   `9004 "Save the current session to a new script" ] 'save-as' :
 [ "...-" `9006 "Soft restart from the embedded snapshot" ] 'restart' :
 
+[ "-s"  `200 "Get user home directory" ] 'home-directory' :
 
 "File Operations"
 [ "string:name string:mode - number:file-id"  `201  "Open a file. Valid modes include R, W, and A" ] 'open-file' :
@@ -115,6 +116,9 @@
 
 [ "-" \
   'allegory, (c)2013-2016 Charles Childers\n\n' display \
+  'on_startup.md' dup file-exists? \
+  [ include ] \
+  [ drop home-directory '/.parable/on_startup.md' + dup file-exists? [ include ] [ drop ] if ] if \
   "Entry point for standalone applications (via turnkey)" \
 ] 'allegory.on-start' :
 
