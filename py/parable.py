@@ -1069,7 +1069,7 @@ def parsed_stack():
         elif type == TYPE_POINTER:
             r.append(format_item('&', tos))
         elif type == TYPE_FUNCALL:
-            r.append(format_item('CALL &', tos))
+            r.append(format_item('|', tos))
         elif type == TYPE_REMARK:
             r.append(format_item('"', slice_to_string(tos) + '"'))
         elif type == TYPE_FLAG:
@@ -1382,8 +1382,8 @@ def release_slice(slice):
     slice = int(slice)
     memory_map[slice] = 0
     memory_size[slice] = 0
-    memory_values[slice] = 0
-    memory_types[slice] = 0
+    memory_values[slice] = [0]
+    memory_types[slice] = [0]
 
 
 
@@ -1680,7 +1680,20 @@ def compile_function_call(name, slice, offset):
         offset += 1
     else:
         if name != "":
-            report('E03: Compile Error: Unable to map `' + name + '` to a pointer')
+           report('E03: Compile Error: Unable to map `' + name + '` to a pointer')
+    return offset
+
+
+def compile_function_call_prefixed(name, slice, offset):
+    if lookup_pointer(name) != -1:
+        store(lookup_pointer(name), slice, offset, TYPE_FUNCALL)
+        offset += 1
+    else:
+        if is_number(name):
+            store(int(name), slice, offset, TYPE_FUNCALL)
+            offset += 1
+        else:
+           report('E03: Compile Error: Unable to map `' + name + '` to a pointer')
     return offset
 
 
@@ -1710,7 +1723,7 @@ def parse_string(tokens, i, count, delimiter):
 def compile(str, slice):
     global should_abort
     should_abort = False
-    prefixes = { '`', '#', '$', '&', '\'', '"', '@', '!', }
+    prefixes = { '`', '#', '$', '&', '\'', '"', '@', '!', '|' }
     nest = []
     tokens = ' '.join(str.split()).split(' ')
     count = len(tokens)
@@ -1749,6 +1762,8 @@ def compile(str, slice):
             offset = compile_pointer(current, slice, offset)
             offset = compile_number(1, slice, offset)
             offset = compile_bytecode(BC_MEM_STORE, slice, offset)
+        elif prefix == "|":
+            offset = compile_function_call_prefixed(current, slice, offset)
         elif current == "[":
             nest.append(slice)
             nest.append(offset)

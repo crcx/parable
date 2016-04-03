@@ -12,6 +12,7 @@
 * added stack_types()
 * Re-enable automatic garbage collection on OOM
 * Allocate a larger array of slices when OOM
+* Add | prefix for function calls
 
 ### Standard Library
 

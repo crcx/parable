@@ -6,7 +6,7 @@
 
 "Helper functions for dealing with the current token."
 [ "-s"  @Tokens @Offset fetch ] 'current-token' :
-[ "-s"  current-token tail :s ] 'cleaned-token' :
+[ "-s"  current-token body :s ] 'cleaned-token' :
 [ "-c"  current-token head ] 'current-prefix' :
 [ "-"  @Offset 1 + !Offset ] 'next-token' :
 
@@ -36,6 +36,15 @@
 [ "-" \
   current-token body :s resolve-pointer c, ] 'compile-pointer' :
 [ "-" \
+  cleaned-token dup word-exists? \
+  [ lookup-word :x c, ] \
+  [ dup numeric? \
+    [ :n :p :x c, ] \
+    [ 'ERROR: WORD NOT FOUND' report-error ] \
+    if \
+  ] if \
+] 'compile-funcall-prefixed' :
+[ "-" \
   current-token dup word-exists? \
   [ lookup-word :x c, ] \
   [ dup numeric? \
@@ -63,6 +72,7 @@
     [ [ current-prefix $' eq? ] [ compile-string    ] ] \
     [ [ current-prefix $" eq? ] [ compile-remark    ] ] \
     [ [ current-prefix $` eq? ] [ compile-bytecode  ] ] \
+    [ [ current-prefix $| eq? ] [ compile-funcall-prefixed ] ] \
     [ [ current-token '[' eq? ] [ begin-quote       ] ] \
     [ [ current-token ']' eq? ] [ end-quote         ] ] \
     [ [ true                  ] [ compile-funcall   ] ] \
@@ -74,4 +84,9 @@
 '1 [ 2 ] dip 3 +' compile
 
     '\'Hello World!\' 2 3 *' compile invoke
+
+&+
+
+'4 5 |21' compile invoke
+'15 5 |+' compile invoke
 

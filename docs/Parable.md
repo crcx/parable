@@ -12,6 +12,7 @@ Parable code consists of whitespace delimited tokens. Each token can have a pref
     &         Pointer
     '         String
     "         Comment
+    |         Function Call
 
 Additionally two prefixes exist to simplify working with variables:
 
@@ -47,6 +48,7 @@ The second part of this is where the work gets done. An example implementation o
         [ [ current-token numeric? ]  [ current-token :n *Slice push ] ] \
         [ [ current-token '[' eq?  ]  [ handle-[          ] ] \
         [ [ current-token ']' eq?  ]  [ handle-]          ] ] \
+        [ [ current-token '|' eq?  ]  [ handle-|          ] ] \
         [ [ true ]                    [ compile-funcall   ] ] \
       ] when ] 'compile-token' :
 

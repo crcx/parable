@@ -131,7 +131,7 @@ def display_value():
         sys.stdout.write(slice_to_string(v))
     elif t == TYPE_BYTECODE:
         sys.stdout.write('`' + str(v))
-    elif t == TYPE_FUNCTION_CALL:
+    elif t == TYPE_FUNCALL:
         sys.stdout.write('CALL: &' + str(v))
     else:
        sys.stdout.write("unknown type")

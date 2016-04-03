@@ -5,7 +5,7 @@
   [ "s-"  ' ' split !Tokens 0 !Offset @Tokens length? !End ] 'tokenize' :
 
   [ "-s"  @Tokens @Offset fetch ] 'current-token' :
-  [ "-s"  current-token tail :s ] 'cleaned-token' :
+  [ "-s"  current-token body :s ] 'cleaned-token' :
   [ "-c"  current-token head ] 'current-prefix' :
   [ "-"  @Offset 1 + !Offset ] 'next-token' :
 
@@ -35,6 +35,14 @@
   [ "-"  compile-pointer 1 c, &fetch :x c, ] 'compile-fetch' :
   [ "-"  compile-pointer 1 c, &store :x c, ] 'compile-store' :
   [ "-" \
+    cleaned-token dup word-exists? \
+    [ lookup-word :x c, ] \
+    [ dup numeric? \
+      [ :n :p :x c, ] \
+      [ 'ERROR: WORD NOT FOUND' report-error ] if \
+    ] if \
+  ] 'compile-funcall-prefixed' :
+  [ "-" \
     current-token dup word-exists? \
     [ lookup-word :x c, ] \
     [ dup numeric? \
@@ -63,6 +71,7 @@
       [ [ current-prefix $` eq? ] [ compile-bytecode  ] ] \
       [ [ current-prefix $@ eq? ] [ compile-fetch     ] ] \
       [ [ current-prefix $! eq? ] [ compile-store     ] ] \
+      [ [ current-prefix $| eq? ] [ compile-funcall-prefixed ] ] \
       [ [ current-token '[' eq? ] [ begin-quote       ] ] \
       [ [ current-token ']' eq? ] [ end-quote         ] ] \
       [ [ true                  ] [ compile-funcall   ] ] \
