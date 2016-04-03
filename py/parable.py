@@ -533,7 +533,7 @@ def bytecode_flow_abort(opcode, offset, more):
 
 
 def bytecode_mem_copy(opcode, offset, more):
-    if precheck([TYPE_POINTER, TYPE_POINTER]):
+    if precheck([TYPE_ANY_PTR, TYPE_ANY_PTR]):
         a = stack_pop()
         b = stack_pop()
         copy_slice(b, a)
