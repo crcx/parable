@@ -1347,7 +1347,7 @@ memory_size = []      # A simple structure for indicating the number of items
                       # in each slice
 
 
-def request_slice(attempts=0):
+def request_slice():
     """request a new memory slice"""
     global memory_values, memory_types, memory_map, memory_size
     i = 0
@@ -1360,7 +1360,6 @@ def request_slice(attempts=0):
             return i
         else:
             i += 1
-#    print('OOM: GC & Increase')
     x = 0
     while x < 1250:
         memory_map.append(0)
@@ -1368,7 +1367,8 @@ def request_slice(attempts=0):
         memory_types.append([0])
         memory_size.append(0)
         x = x + 1
-    collect_garbage()
+#    if stack_depth() == 0:
+#        collect_garbage()
     memory_map[i] = 1
     memory_values[i] = [0]
     memory_types[i] = [0]
