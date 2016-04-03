@@ -10,6 +10,8 @@
 * added parsed_stack()
 * added stack_values()
 * added stack_types()
+* Re-enable automatic garbage collection on OOM
+* Allocate a larger array of slices when OOM
 
 ### Standard Library
 
