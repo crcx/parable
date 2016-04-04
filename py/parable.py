@@ -545,7 +545,7 @@ def bytecode_mem_fetch(opcode, offset, more):
     if precheck([TYPE_ANY_PTR, TYPE_NUMBER]):
         a = stack_pop()     # offset
         b = stack_pop()     # slice
-        if a == float('nan'):
+        if math.isnan(a) or math.isinf(a):
             abort_run(opcode, offset)
         else:
             v, t = fetch(b, a)
@@ -559,7 +559,7 @@ def bytecode_mem_store(opcode, offset, more):
         a = stack_pop()     # offset
         b = stack_pop()     # slice
         c, t = stack_pop(type = True)   # value
-        if a == float('nan'):
+        if math.isnan(a) or math.isinf(a):
             abort_run(opcode, offset)
         else:
             store(c, b, a, t)

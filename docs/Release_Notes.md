@@ -14,6 +14,7 @@
 * Re-enable automatic garbage collection on OOM
 * Allocate a larger array of slices when OOM
 * Add | prefix for function calls
+* fixed bugs in BC_MEM_FETCH and B_MEM_STORE
 
 ### Standard Library
 
