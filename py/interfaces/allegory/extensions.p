@@ -134,6 +134,7 @@
   'restart' 'Files~' 'sys.args' 'sys.run' 'arg-count' 'get-arg' \
   'value-for-key' 'get-environment-value' 'ConsoleIO~' 'time' \
   'invoke<time>' 'needs' 'allegory.on-start' 'allegory.on-end' \
+  'home-directory' 'LibraryPath' 'needs<now>' \
 ] 'Allegory~' vocab
 
 &Allegory~ with
