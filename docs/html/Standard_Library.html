@@ -1973,16 +1973,23 @@ counter 'c' :
 </code></pre>
 
 <h2>
-<a id="user-content-librarypath" class="anchor" href="#librarypath" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>LibraryPath</h2>
+<a id="user-content-bykey" class="anchor" href="#bykey" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>byKey:</h2>
 
-<pre><code>-v
+<pre><code>ps-pn
 </code></pre>
 
-<h2>
-<a id="user-content-needsnow" class="anchor" href="#needsnow" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>needs&lt;now&gt;</h2>
+<p>Return an offset for a key in a slice of key:value pairs</p>
 
-<pre><code>s-
+<p>Example:</p>
+
+<pre><code>[ [ 'a' 100 ] \
+  [ 'b' 200 ] \
+  [ 'c' 300 ] \
+  [ 'd' 400 ] ] 'KVT' :
+
+&amp;KVT 'c' byKey: fetch dup
+40 - &amp;KVT 'c' byKey: store
+&amp;KVT 'c' byKey: fetch
+
 </code></pre>
-
-<p>Load a library and expose the vocabulary immediately</p>
 

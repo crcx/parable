@@ -13,6 +13,7 @@ $         Character
 &amp;         Pointer
 '         String
 "         Comment
+|         Function Call
 </code></pre>
 
 <p>Additionally two prefixes exist to simplify working with variables:</p>
@@ -53,6 +54,7 @@ $         Character
     [ [ current-token numeric? ]  [ current-token :n *Slice push ] ] \
     [ [ current-token '[' eq?  ]  [ handle-[          ] ] \
     [ [ current-token ']' eq?  ]  [ handle-]          ] ] \
+    [ [ current-token '|' eq?  ]  [ handle-|          ] ] \
     [ [ true ]                    [ compile-funcall   ] ] \
   ] when ] 'compile-token' :
 </code></pre>

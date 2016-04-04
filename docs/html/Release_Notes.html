@@ -12,9 +12,14 @@
 <li>the stack is now implemented as a single array of tuples (value, type)</li>
 <li>remove BC_ROUND</li>
 <li>remove BC_FLOW_RETURN</li>
+<li>BC_MEM_COPY now works with any pointer types</li>
 <li>added parsed_stack()</li>
 <li>added stack_values()</li>
 <li>added stack_types()</li>
+<li>Re-enable automatic garbage collection on OOM</li>
+<li>Allocate a larger array of slices when OOM</li>
+<li>Add | prefix for function calls</li>
+<li>fixed bugs in BC_MEM_FETCH and B_MEM_STORE</li>
 </ul>
 
 <h3>
@@ -26,6 +31,7 @@
 <li>add }vocab</li>
 <li>round now written in parable</li>
 <li>fix lookup-word</li>
+<li>add byKey:</li>
 </ul>
 
 <h3>
@@ -33,6 +39,7 @@
 
 <ul>
 <li>PaaS: revised API</li>
+<li>Allegory: load on_startup.md from the parable side, not the python</li>
 </ul>
 
 <h3>
