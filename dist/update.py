@@ -15,8 +15,8 @@ def download(urls, dir):
         print(str(len(r.content)) + ' bytes')
 
 core = [
-         'https://raw.githubusercontent.com/crcx/parable/master/py/parable.py',
-         'https://raw.githubusercontent.com/crcx/parable/master/py/stdlib.p',
+         'https://raw.githubusercontent.com/crcx/parable/master/source/py/parable.py',
+         'https://raw.githubusercontent.com/crcx/parable/master/source/py/stdlib.p',
        ]
 
 allegory = [

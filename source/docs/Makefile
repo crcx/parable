@@ -4,7 +4,7 @@ all: $(patsubst %.md, %.html, $(wildcard *.md))
 
 %.html: %.md Makefile
 	$(PYALT) ../tools/gfm.py $< >$@
-	mv $@ html
+	mv $@ ../../docs
 
 clean:
 	rm -f *.html *~
