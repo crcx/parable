@@ -1,3 +1,10 @@
+## Buffer~
+
+### Overview
+
+### Code
+
+````
 [ 'CurrentBuffer'  'BufferOffset'  'buffer-position'  'buffer-advance' \
   'buffer-retreat' 'buffer-store-current'  'buffer-fetch-current' \
   'buffer-store'   'buffer-fetch'  'buffer-store-retreat' \
@@ -20,3 +27,4 @@
   [ "p-"     @CurrentBuffer [ @BufferOffset [ invoke ] dip !BufferOffset ] dip !CurrentBuffer ] 'preserve-buffer' :
   [ "s-"     request [ swap : ] sip set-buffer ] 'named-buffer' :
 }}
+````

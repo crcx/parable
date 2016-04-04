@@ -1,3 +1,10 @@
+## Table~
+
+### Overview
+
+### Code
+
+````
 "Tables~"
 "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
 "This is a vocabulary that provides some functions for working on simple tables"
@@ -42,3 +49,4 @@
 
 [ 'table.fetch<row,col>' 'table.store<row,col>' 'table.from<tsv>' \
   'table.from<csv>' ] 'Table~' vocab
+````

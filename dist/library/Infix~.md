@@ -1,3 +1,10 @@
+## Infix~
+
+### Overview
+
+### Code
+
+````
 "Infix to Postfix Evaluator"
 
 [ 'evaluate-infix' ] 'Infix~' {
@@ -40,3 +47,5 @@
     "Evaluate the code in the string as an infix expression. Tokens should be separated by whitespace." \
   ] 'evaluate-infix' :
 }}
+````
+
