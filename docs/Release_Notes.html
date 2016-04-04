@@ -1,0 +1,68 @@
+<h2>
+<a id="user-content-parable-201604" class="anchor" href="#parable-201604" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Parable 2016.04</h2>
+
+<h3>
+<a id="user-content-virtual-machine" class="anchor" href="#virtual-machine" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Virtual Machine</h3>
+
+<ul>
+<li>
+<strong>reverse</strong> now preserves the pointer type (pointer, stack, remark)</li>
+<li>
+<strong>+</strong> now supports new forms: cs-s, sc-s, and cc-s</li>
+<li>the stack is now implemented as a single array of tuples (value, type)</li>
+<li>remove BC_ROUND</li>
+<li>remove BC_FLOW_RETURN</li>
+<li>BC_MEM_COPY now works with any pointer types</li>
+<li>added parsed_stack()</li>
+<li>added stack_values()</li>
+<li>added stack_types()</li>
+<li>Re-enable automatic garbage collection on OOM</li>
+<li>Allocate a larger array of slices when OOM</li>
+<li>Add | prefix for function calls</li>
+<li>fixed bugs in BC_MEM_FETCH and B_MEM_STORE</li>
+</ul>
+
+<h3>
+<a id="user-content-standard-library" class="anchor" href="#standard-library" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Standard Library</h3>
+
+<ul>
+<li>add cycle</li>
+<li>add vocab{</li>
+<li>add }vocab</li>
+<li>round now written in parable</li>
+<li>fix lookup-word</li>
+<li>add byKey:</li>
+</ul>
+
+<h3>
+<a id="user-content-interfaces" class="anchor" href="#interfaces" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Interfaces</h3>
+
+<ul>
+<li>PaaS: revised API</li>
+<li>Allegory: load on_startup.md from the parable side, not the python</li>
+</ul>
+
+<h3>
+<a id="user-content-documentation" class="anchor" href="#documentation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Documentation</h3>
+
+<ul>
+<li>added <em>tools/gfm.py</em> (git flavored markdown to html)</li>
+<li>added <em>docs/Makefile</em> to generate HTML from Markdown using <em>tools/gfm.py</em>
+</li>
+</ul>
+
+<h3>
+<a id="user-content-build" class="anchor" href="#build" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Build</h3>
+
+<ul>
+<li>Use a single top-level Makefile.config</li>
+<li>Makefiles are no longer hard coded to update my personal environment</li>
+</ul>
+
+<h3>
+<a id="user-content-tooling" class="anchor" href="#tooling" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Tooling</h3>
+
+<ul>
+<li>Added <em>tools/gen-tags.py</em> to generate a ctags compatible <em>tags</em> file</li>
+</ul>
+
