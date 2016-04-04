@@ -14,7 +14,7 @@ import sys
 # Memory Configuration
 #
 
-INITIAL_SLICES = 250
+INITIAL_SLICES = 9250
 
 #
 # Constants for data types
@@ -1052,36 +1052,41 @@ stack = []
 def format_item(prefix, value):
     return  prefix + str(value)
 
+def parsed_item(i):
+    r = ""
+    tos = stack_value_for(i)
+    type = stack_type_for(i)
+    if type == TYPE_NUMBER:
+        r = format_item('#', tos)
+    elif type == TYPE_BYTECODE:
+        r = format_item('`', tos)
+    elif type == TYPE_CHARACTER:
+        r = format_item('$', chr(tos))
+    elif type == TYPE_STRING:
+        r = format_item('\'', slice_to_string(tos) + '\'')
+    elif type == TYPE_POINTER:
+        r = format_item('&', tos)
+    elif type == TYPE_FUNCALL:
+        r = format_item('|', tos)
+    elif type == TYPE_REMARK:
+        r = format_item('"', slice_to_string(tos) + '"')
+    elif type == TYPE_FLAG:
+        if tos == -1:
+            r = "true"
+        elif tos == 0:
+            r = "false"
+        else:
+            r = "malformed flag"
+    else:
+        r = "unmatched type on the stack"
+    return r
+
+
 def parsed_stack():
     i = 0
     r = []
     while i < len(stack):
-        tos = stack_value_for(i)
-        type = stack_type_for(i)
-        if type == TYPE_NUMBER:
-            r.append(format_item('#', tos))
-        elif type == TYPE_BYTECODE:
-            r.append(format_item('`', tos))
-        elif type == TYPE_CHARACTER:
-            r.append(format_item('$', chr(tos)))
-        elif type == TYPE_STRING:
-            r.append(format_item('\'', slice_to_string(tos) + '\''))
-        elif type == TYPE_POINTER:
-            r.append(format_item('&', tos))
-        elif type == TYPE_FUNCALL:
-            r.append(format_item('|', tos))
-        elif type == TYPE_REMARK:
-            r.append(format_item('"', slice_to_string(tos) + '"'))
-        elif type == TYPE_FLAG:
-            if tos == -1:
-                r.append(format_item("", "true"))
-            elif tos == 0:
-                r.append(format_item("", "false"))
-            else:
-                r.append(format_item("", "malformed flag"))
-        else:
-            r.append(format_item("", "unmatched type on the stack"))
-        sys.stdout.write("\n")
+        r.append(parsed_item(a))
         i += 1
     return r
 

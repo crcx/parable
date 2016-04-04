@@ -33,8 +33,7 @@ def init_from_snapshot(s):
     except:
         j = json.loads(u.decode())
 
-    parable.dictionary_names = j['symbols']
-    parable.dictionary_slices = j['symbol_map']
+    parable.dictionary = j['symbols']
     parable.errors = j['errors']
     parable.stack = j['stack_values']
     parable.memory_values = j['memory_contents']
@@ -44,44 +43,19 @@ def init_from_snapshot(s):
     parable.dictionary_hidden_slices = j['hidden_slices']
 
 
-def display_item(prefix, value):
-    sys.stdout.write('\t' + prefix + str(value))
-
-
 def dump_stack():
     """display the stack"""
     i = 0
     while i < len(parable.stack):
-        tos = parable.stack_value_for(i)
-        type = parable.stack_type_for(i)
         sys.stdout.write("\t" + str(i))
-        if type == parable.TYPE_NUMBER:
-            display_item('#', tos)
-        elif type == parable.TYPE_CHARACTER:
-            display_item('$', chr(tos))
-        elif type == parable.TYPE_STRING:
-            display_item('\'', parable.slice_to_string(tos) + '\'')
-        elif type == parable.TYPE_POINTER:
-            display_item('&', tos)
-        elif type == parable.TYPE_REMARK:
-            display_item('"', parable.slice_to_string(tos) + '"')
-        elif type == parable.TYPE_FLAG:
-            if tos == -1:
-                display_item("", "true")
-            elif tos == 0:
-                display_item("", "false")
-            else:
-                display_item("", "malformed flag")
-        else:
-            display_item("", "unmatched type on the stack")
-        sys.stdout.write("\n")
+        sys.stdout.write("\t" + parable.parsed_item(i) + "\n")
         i += 1
 
 
 def dump_dict():
     """display named items"""
     l = ''
-    for w in parable.dictionary_names:
+    for w in parable.dictionary_names():
         l = l + w + ' '
     sys.stdout.write(l)
     sys.stdout.write("\n")
