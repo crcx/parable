@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
-# Listener: a basic UI for Parable
-# Copyright (c) 2013, 2015  Charles Childers
-#
+# parable repl
+# Copyright (c) 2013-2016, Charles Childers
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+# coding: utf-8
+
 
 import base64
 import bz2
@@ -11,28 +13,11 @@ import readline
 import os
 import sys
 import parable
-from os.path import expanduser
-
-try:
-    import __builtin__
-    input = getattr(__builtin__, 'raw_input')
-except (ImportError, AttributeError):
-    pass
-
 
 def init_from_snapshot(s):
-    try:
-        raw = base64.b64decode(bytes(s, 'utf-8'))
-    except:
-        raw = base64.b64decode(s)
-
+    raw = base64.b64decode(bytes(s, 'utf-8'))
     u = bz2.decompress(raw)
-
-    try:
-        j = json.loads(u)
-    except:
-        j = json.loads(u.decode())
-
+    j = json.loads(u.decode())
     parable.dictionary = j['symbols']
     parable.errors = j['errors']
     parable.stack = j['stack_values']
@@ -97,7 +82,7 @@ def get_input():
 
 
 def completer(text, state):
-    options = [x for x in parable.dictionary_names if x.startswith(text)]
+    options = [x for x in parable.dictionary_names() if x.startswith(text)]
     try:
         return options[state]
     except IndexError:
@@ -125,13 +110,6 @@ if __name__ == '__main__':
     evaluate("[ \"-\"   `9001 ] 'bye' :")
     evaluate("[ \"-\"   `9002 ] 'words' :")
     evaluate("[ \"s-\"  `9003 ] 'include' :")
-
-    try:
-        home = expanduser("~")
-        src = home + "/.parable/on_startup.p"
-        parable.parse_bootstrap(open(src).readlines())
-    except:
-        pass
 
     while 1 == 1:
         try:
