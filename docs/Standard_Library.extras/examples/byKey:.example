@@ -1,0 +1,9 @@
+[ [ 'a' 100 ] \
+  [ 'b' 200 ] \
+  [ 'c' 300 ] \
+  [ 'd' 400 ] ] 'KVT' :
+
+&KVT 'c' byKey: fetch dup
+40 - &KVT 'c' byKey: store
+&KVT 'c' byKey: fetch
+

@@ -23,6 +23,7 @@
 * add }vocab
 * round now written in parable
 * fix lookup-word
+* add byKey:
 
 ### Interfaces
 

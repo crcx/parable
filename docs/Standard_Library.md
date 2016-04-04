@@ -1578,13 +1578,23 @@ Example:
 [ 0 cons 'This is cycle {v}' interpolate<cycling> ] times<with-index>
 ````
 
-## LibraryPath
+## byKey:
 
-    -v
+    ps-pn
 
-## needs&lt;now&gt;
+Return an offset for a key in a slice of key:value pairs
 
-    s-
+Example:
 
-Load a library and expose the vocabulary immediately
+````
+[ [ 'a' 100 ] \
+  [ 'b' 200 ] \
+  [ 'c' 300 ] \
+  [ 'd' 400 ] ] 'KVT' :
+
+&KVT 'c' byKey: fetch dup
+40 - &KVT 'c' byKey: store
+&KVT 'c' byKey: fetch
+
+````
 

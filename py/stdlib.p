@@ -570,3 +570,18 @@
     "Construct a range from the values in q1, then execute q2 as a for-each against them" \
   ] 'times<with-index>' :
 }
+
+[ 'byKey:' ] {
+  [ 'S' 'O' 'K' 'M' ] ::
+
+  [ "-f"  @S length? @O eq? ] 'done?' :
+  [ "-f"  @S @O fetch 0 fetch @K eq? ] 'match?' :
+
+  [ "ps-pn" \
+    !K !S 0 !O #nan !M \
+    [ match? [ @O !M ] if-true &O increment done? ] until \
+    @M nan? [ 'ERROR: No key found' abort<with-error> ] if-true \
+    @S @M fetch 1 \
+    "Return an offset for a key in a slice of key:value pairs" \
+  ] 'byKey:' :
+}
