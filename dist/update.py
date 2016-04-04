@@ -8,6 +8,7 @@ import sys
 
 urls = [
         'https://raw.githubusercontent.com/crcx/allegory/master/allegory',
+        'https://raw.githubusercontent.com/crcx/legend/master/legend.py',
         'https://raw.githubusercontent.com/crcx/parable/master/py/parable.py',
         'https://raw.githubusercontent.com/crcx/parable/master/py/stdlib.p',
        ]
