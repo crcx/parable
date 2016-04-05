@@ -20,7 +20,7 @@ def extract(pso, key):
 
 def save_snapshot():
     j = json.dumps({"symbols": parable.dictionary,
-                    "stack_values": parable.stack,
+                    "stack": parable.stack,
                     "errors": parable.errors,
                     "memory_contents": parable.memory_values,
                     "memory_types": parable.memory_types,
@@ -34,7 +34,7 @@ def load_snapshot(data):
     raw = base64.b64decode(data)
     j = json.loads(bz2.decompress(raw).decode())
     parable.dictionary = j['symbols']
-    parable.stack = j['stack_values']
+    parable.stack = j['stack']
     parable.memory_values = j['memory_contents']
     parable.memory_types = j['memory_types']
     parable.memory_map = j['memory_map']

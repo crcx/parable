@@ -14,7 +14,7 @@ def create_snapshot():
     parable.collect_garbage()
     j = json.dumps({"symbols": parable.dictionary, \
                     "errors": parable.errors, \
-                    "stack_values": parable.stack, \
+                    "stack": parable.stack, \
                     "memory_contents": parable.memory_values, \
                     "memory_types": parable.memory_types, \
                     "memory_map": parable.memory_map, \
@@ -50,7 +50,7 @@ def bootstrap(s):
 
     parable.dictionary = j['symbols']
     parable.errors = j['errors']
-    parable.stack = j['stack_values']
+    parable.stack = j['stack']
     parable.memory_values = j['memory_contents']
     parable.memory_types = j['memory_types']
     parable.memory_map = j['memory_map']
@@ -105,13 +105,13 @@ def dump_stack():
             s = "\"" + parable.slice_to_string(tos) + "\""
             s = s + "<br>Store at: " + str(tos)
             html = html + stack_item(i, s)
-        elif type == parable.TYPE_FUNCTION_CALL:
+        elif type == parable.TYPE_FUNCALL:
             s = "Call: " + str(tos)
             if parable.pointer_to_name(tos) != "":
                 s = s + "<br>Pointer to: " + parable.pointer_to_name(tos)
             html = html + stack_item(i, s)
         else:
-            html = html + stack_item(i, "unmatched type on stack!")
+            html = html + stack_item(i, "unmatched type on stack!<br>(" + str(tos) + "," + str(type) + ")")
         i += 1
     html = html + "</table>"
     return html

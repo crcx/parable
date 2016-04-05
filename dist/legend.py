@@ -160,7 +160,7 @@ def display_stack():
             write("\t\"" + parable.slice_to_string(tos) + "\"", COLOR_STACK_COMMENT)
             write("\n\t\tstored at: " + str(tos), 'normal')
             l += 1
-        elif type == parable.TYPE_FUNCTION_CALL:
+        elif type == parable.TYPE_FUNCALL:
             write("\tCALL: " + str(tos), COLOR_STACK_FUN_CALL)
         else:
             write("\tUNKNOWN\t" + str(tos) + "\t" + str(type), COLOR_ERROR)
