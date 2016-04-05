@@ -54,7 +54,7 @@ def create_snapshot():
     parable.collect_garbage()
     j = json.dumps({"symbols": parable.dictionary, \
                     "errors": parable.errors, \
-                    "stack_values": parable.stack, \
+                    "stack": parable.stack, \
                     "memory_contents": parable.memory_values, \
                     "memory_types": parable.memory_types, \
                     "memory_map": parable.memory_map, \

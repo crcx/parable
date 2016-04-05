@@ -62,7 +62,7 @@ def init_from_snapshot(s):
     j = json.loads(u.decode())                  # parse json
     parable.dictionary = j['symbols']
     parable.errors = j['errors']
-    parable.stack = j['stack_values']
+    parable.stack = j['stack']
     parable.memory_values = j['memory_contents']
     parable.memory_types = j['memory_types']
     parable.memory_map = j['memory_map']
