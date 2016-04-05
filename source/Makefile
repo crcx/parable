@@ -9,7 +9,7 @@ parable:
 	cd py && make
 
 turnkeys: parable
-	$(PY) py/allegory tools/gen_wordlist_turnkey.p
+	$(PY) ../dist/allegory tools/gen_wordlist_turnkey.p
 
 documents: turnkeys
 	$(PY) generate-reference.py >docs/Standard_Library.md
