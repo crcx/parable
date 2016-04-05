@@ -2081,7 +2081,7 @@ def opcodes(slice, offset, opcode):
         xt = lookup_pointer('allegory.on-end')
         if xt != -1:
             interpret(xt, opcodes)
-        sys.exit('')
+        exit()
     elif opcode == 9002:
         dump_dict()
     elif opcode == 9003:
