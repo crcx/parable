@@ -1,6 +1,0 @@
-To use these, you will need to copy parable.py and stdlib.p to the same
-directory as the CGI script.
-
-Make an HTTP POST to the script and get the results as JSON. See the individual
-files for more information on the fields they support.
-
