@@ -38,10 +38,15 @@ punga = [
          'https://raw.githubusercontent.com/crcx/punga/master/template.html',
         ]
 
+tools = [
+         'https://raw.githubusercontent.com/crcx/ptags/master/ptags.py',
+        ]
+
 print('Downloading')
 download(core, '.')
 download(allegory, '.')
 download(legend, '.')
 download(paas, 'PaaS')
 download(punga, 'Punga')
+download(tools, 'tools')
 print('Finished')
