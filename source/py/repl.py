@@ -85,7 +85,16 @@ def get_input():
             s = s[:-2].strip() + ' '
             s = s + input("       ")
         else:
-            done = True
+            braces = 0
+            tokens = s.strip().split(' ')
+            for t in tokens:
+                if t == '[': braces = braces + 1
+                if t == ']': braces = braces - 1
+            if braces == 0:
+                done = True
+            else:
+                s = s.strip() + ' '
+                s = s + input("       ")
     return s
 
 
