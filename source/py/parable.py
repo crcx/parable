@@ -47,6 +47,30 @@ def is_number(s):
         return False
 
 
+def tokenize(str):
+    prefixes = { '`', '#', '$', '&', '\'', '"', '@', '!', '|' }
+    tokens = ' '.join(str.strip().split()).split(' ')
+    cleaned = []
+    count = len(tokens)
+    i = 0
+    while i < count:
+        current = tokens[i]
+        prefix = tokens[i][:1]
+        if prefix in prefixes:
+            current = tokens[i][1:]
+        else:
+            current = tokens[i]
+        s = ""
+        if prefix == '"':
+            i, s = parse_string(tokens, i, count, '"')
+        elif prefix == "'":
+            i, s = parse_string(tokens, i, count, '\'')
+        if s != "": cleaned.append(s)
+        elif current != '': cleaned.append(current)
+        i = i + 1
+    return cleaned
+
+
 def condense_lines(code):
     """Take an array of code, join lines ending with a \, and return"""
     """the new array"""
@@ -59,8 +83,7 @@ def condense_lines(code):
             s = s + ' ' + code[i][:-2].strip()
         else:
             s = s + ' ' + code[i].strip()
-        tokens = s.split(' ')
-        for t in tokens:
+        for t in tokenize(s):
             if t == '[':
                 braces = braces + 1
             if t == ']':
