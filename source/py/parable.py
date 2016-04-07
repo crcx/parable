@@ -53,17 +53,20 @@ def condense_lines(code):
     s = ''
     r = []
     i = 0
-    c = 0
     while i < len(code):
+        braces = 0
         if code[i].endswith(' \\\n'):
             s = s + ' ' + code[i][:-2].strip()
-            c = 1
         else:
-            c = 0
-            s = s + ' ' + code[i]
-        if c == 0:
-            if s != '' and s != ' \n':
-                r.append(s.strip())
+            s = s + ' ' + code[i].strip()
+        tokens = s.split(' ')
+        for t in tokens:
+            if t == '[':
+                braces = braces + 1
+            if t == ']':
+                braces = braces - 1
+        if braces == 0:
+            r.append(s.strip())
             s = ''
         i = i + 1
     return r
