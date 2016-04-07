@@ -1767,6 +1767,9 @@ def compile(str, slice):
     nest = []
     tokens = tokenize(str)
     offset = 0
+    if tokens == []:
+        store(BC_NOP, slice, offset, TYPE_BYTECODE)
+        return slice
     for token in tokens:
         prefix = token[:1]
         if prefix in prefixes:
