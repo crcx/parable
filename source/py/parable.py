@@ -56,10 +56,6 @@ def tokenize(str):
     while i < count:
         current = tokens[i]
         prefix = tokens[i][:1]
-        if prefix in prefixes:
-            current = tokens[i][1:]
-        else:
-            current = tokens[i]
         s = ""
         if prefix == '"':
             i, s = parse_string(tokens, i, count, '"')
@@ -1756,26 +1752,18 @@ def compile(str, slice):
     should_abort = False
     prefixes = { '`', '#', '$', '&', '\'', '"', '@', '!', '|' }
     nest = []
-    tokens = ' '.join(str.split()).split(' ')
-    count = len(tokens)
-    i = 0
+    tokens = tokenize(str)
     offset = 0
-    current = ""
-    prefix = ""
-    while i < count:
-        current = tokens[i]
-        prefix = tokens[i][:1]
+    for token in tokens:
+        prefix = token[:1]
         if prefix in prefixes:
-            current = tokens[i][1:]
+            current = token[1:]
         else:
-            current = tokens[i]
-        s = ""
+            current = token
         if prefix == '"':
-            i, s = parse_string(tokens, i, count, '"')
-            offset = compile_comment(s[1:-1], slice, offset)
+            offset = compile_comment(current[:-1], slice, offset)
         elif prefix == "'":
-            i, s = parse_string(tokens, i, count, '\'')
-            offset = compile_string(s[1:-1], slice, offset)
+            offset = compile_string(current[:-1], slice, offset)
         elif prefix == "$":
             v = ord(current[0].encode('utf-8'))
             offset = compile_character(v, slice, offset)
@@ -1817,7 +1805,6 @@ def compile(str, slice):
                 offset = compile_number(current, slice, offset)
             else:
                 offset = compile_function_call(current, slice, offset)
-        i += 1
         if offset == 0:
             store(BC_NOP, slice, offset, TYPE_BYTECODE)
     if len(nest) != 0:
