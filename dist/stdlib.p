@@ -66,29 +66,29 @@
 [ "-p"     `65 "Return an array indicating the size of each slice (in cells). Each index corresponds to a slice; the stored value is the length of the slice." ] 'vm.memory<sizes>' :
 [ "-p"     `66 "Return an array of slice numbers which are currently marked as allocated." ] 'vm.memory<allocated>' :
 
-[ "vV-vVv" \
-  [ dup ] dip swap \
-  "Put a copy of the second item on top of the stack" \
+[ "vV-vVv"
+  [ dup ] dip swap
+  "Put a copy of the second item on top of the stack"
 ] 'over' :
 
-[ "vV-VvV" \
-  [ swap ] sip \
-  "Put a copy of the top item below the second item" \
+[ "vV-VvV"
+  [ swap ] sip
+  "Put a copy of the top item below the second item"
 ] 'tuck' :
 
-[ "vV-V" \
-  swap drop \
-  "Remove the item below the top item on the stack" \
+[ "vV-V"
+  swap drop
+  "Remove the item below the top item on the stack"
 ] 'nip' :
 
-[ "...-" \
-  depth [ drop ] times \
-  "Remove all items from the stack" \
+[ "...-"
+  depth [ drop ] times
+  "Remove all items from the stack"
 ] 'reset' :
 
-[ "sp-" \
-  swap : \
-  "Attach a name to a slice" \
+[ "sp-"
+  swap :
+  "Attach a name to a slice"
 ] '.' :
 
 "Symbolic names for data types"
@@ -126,8 +126,8 @@
 [ "vV-vVvV"  over over   "Duplicate the top two items on the stack" ] 'dup-pair' :
 [ "vv-"      drop drop   "Discard the top two items on the stack" ] 'drop-pair' :
 [ "?n-"      [ drop ] times   "Discard an arbitrary number of items from the stack" ] 'drop<n>' :
-[ "q-...n"   depth [ invoke ] dip depth swap - \
-  "Execute a quotation, returning a value indicating th stack depth change as a result" \
+[ "q-...n"   depth [ invoke ] dip depth swap -
+  "Execute a quotation, returning a value indicating th stack depth change as a result"
 ] 'invoke<depth?>' :
 
 [ "n-n"  [ 1 / ] [ 1 rem ] bi - "Return the smallest integer less than or equal to the starting value" ] 'floor' :
@@ -136,8 +136,8 @@
 
 
 "Slice Functions"
-[ "np-"   [ get<final-offset> + ] sip set<final-offset> \
-  "Given a number, adjust the length of the specified slice by the requested amount." \
+[ "np-"   [ get<final-offset> + ] sip set<final-offset>
+  "Given a number, adjust the length of the specified slice by the requested amount."
 ] 'adjust-slice-length' :
 
 [ "p-p"   request [ copy ] sip   "Make a copy of a slice, returning a pointer to the copy" ] 'duplicate-slice' :
@@ -146,34 +146,34 @@
 
 "Simple variables are just named slices, with functions to access the first element. They're useful for holding single values."
 
-[ "vs-"  [ request [ '-v' :r swap 0 store ] sip [ 1 store ] sip ] dip : \
-  "Create a variable with an initial value" \
+[ "vs-"  [ request [ '-v' :r swap 0 store ] sip [ 1 store ] sip ] dip :
+  "Create a variable with an initial value"
 ] 'var!' :
 
 [ "s-"   0 :u swap var! "Create a variable" ] 'var' :
 [ "p-"   0 swap 1 store "Set a variable to a value of 0" ] 'off' :
 [ "p-"   -1 swap 1 store "Set a variable to a value of -1" ] 'on' :
 
-[ "np-"  swap over 1 fetch + swap 1 store \
-  "Increment a variable by the specified amount" \
+[ "np-"  swap over 1 fetch + swap 1 store
+  "Increment a variable by the specified amount"
 ] 'increment<by>' :
 
-[ "p-"   1 swap increment<by> \
-  "Increment a variables value by 1" \
+[ "p-"   1 swap increment<by>
+  "Increment a variables value by 1"
 ] 'increment' :
 
-[ "np-"  swap over 1 fetch swap - swap 1 store \
-  "Decrement a variable by the specified amount" \
+[ "np-"  swap over 1 fetch swap - swap 1 store
+  "Decrement a variable by the specified amount"
 ] 'decrement<by>' :
 
-[ "p-"   1 swap decrement<by> \
-  "Increment a variables value by 1" \
+[ "p-"   1 swap decrement<by>
+  "Increment a variables value by 1"
 ] 'decrement' :
 
 [ "p-"   request swap copy "Erase all values in a slice" ] 'zero-out' :
 
-[ "pp-"  swap request dup-pair copy swap [ [ invoke ] dip ] dip copy \
-  "Backup the contents of a slice and remove the pointer from the stack. Execute the quotation. Then restore the contents of the specified slice to their original state." \
+[ "pp-"  swap request dup-pair copy swap [ [ invoke ] dip ] dip copy
+  "Backup the contents of a slice and remove the pointer from the stack. Execute the quotation. Then restore the contents of the specified slice to their original state."
 ] 'preserve' :
 
 
@@ -190,8 +190,8 @@
 "Spread combinators (bi*, tri*) apply multiple quotations to multiple values."
 [ "vvpp-?"   [ dip ] dip invoke "Invoke p1 against v1 and p2 against v2" ] 'bi*' :
 
-[ "vvvppp-?" [ [ swap [ dip ] dip ] dip dip ] dip invoke \
-  "Invoke p1 against v1, p2 against v2, and p3 against v3" \
+[ "vvvppp-?" [ [ swap [ dip ] dip ] dip dip ] dip invoke
+  "Invoke p1 against v1, p2 against v2, and p3 against v3"
 ] 'tri*' :
 
 
@@ -215,21 +215,21 @@
 [ "n-f"  2 rem zero? not "Return true if number is odd or false otherwise" ] 'odd?' :
 [ "n-f"  0 lt? "Return true if number is less than zero or false otherwise" ] 'negative?' :
 [ "n-f"  0 gteq? "Return true if number is greater than or equal to zero or false otherwise" ] 'positive?' :
-[ "nnn-f"  [ [ :n ] bi@ ] dip :n dup-pair gt? [ swap ] if-true [ over ] dip lteq? [ gteq? ] dip and :f \
-  "Return true if the number (n1) is betwen n2 and n3, inclusive or false otherwise" \
+[ "nnn-f"  [ [ :n ] bi@ ] dip :n dup-pair gt? [ swap ] if-true [ over ] dip lteq? [ gteq? ] dip and :f
+  "Return true if the number (n1) is betwen n2 and n3, inclusive or false otherwise"
 ] 'between?' :
-[ "vv-vvf"  [ type? ] dip type? swap [ eq? ] dip swap \
-  "Return true if the type of both values is the same, or false otherwise" \
+[ "vv-vvf"  [ type? ] dip type? swap [ eq? ] dip swap
+  "Return true if the type of both values is the same, or false otherwise"
 ] 'types-match?' :
 
 
 "numeric ranges"
-[ "nn-..." \
-  dup-pair lt? \
-    [ [ [ dup 1 + ] dip dup-pair eq? ] until ] \
-    [ [ [ dup 1 - ] dip dup-pair eq? ] until ] if \
-  drop \
-  "Given two values, expand the range" \
+[ "nn-..."
+  dup-pair lt?
+    [ [ [ dup 1 + ] dip dup-pair eq? ] until ]
+    [ [ [ dup 1 - ] dip dup-pair eq? ] until ] if
+  drop
+  "Given two values, expand the range"
 ] 'range' :
 
 
@@ -254,8 +254,8 @@
 
 
 "Programatic Creation of Quotes"
-[ "vv-p"  swap request [ 0 store ] sip [ 1 store ] sip \
-  "Bind two values into a new slice" \
+[ "vv-p"  swap request [ 0 store ] sip [ 1 store ] sip
+  "Bind two values into a new slice"
 ] 'cons' :
 [ "vp-p"  :x cons "Bind a value and a quote, returning a new quote which executes the specified one against the provided value" ] 'curry' :
 [ "p-p"   :x request [ 0 store ] sip "Wrap a pointer into a new quote, converting the pointer into a FUNCALL" ] 'enquote' :
@@ -266,7 +266,7 @@
 [ "p-v"  dup length? 1 - fetch "Return the last item in a slice" ] 'tail' :
 
 [ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset' ] ::
-[ "q-" \
+[ "q-"
   @Found [ @Value [ @XT [ @Source [ @Target [ @Offset [ invoke ] dip !Offset ] dip !Target ] dip !Source ] dip !XT ] dip !Value ] dip !Found ] 'localize' :
 
 [ "vp-"    :p dup length? store "Append a value to the specified slice. This modifies the original slice." ] 'push' :
@@ -277,39 +277,39 @@
 
 [ "-p"     request [ pop drop ] sip "Request a slice with no stored values" ] 'request-empty' :
 
-[ "pnp-n"  [ !XT [ duplicate-slice ] dip over length? [ over pop @XT invoke ] times nip ] localize \
-  "Takes a slice, a starting value, and a quote. It executes the quote once for each item in the slice, passing the item and the value to the quote. The quote should consume both and return a new value." \
+[ "pnp-n"  [ !XT [ duplicate-slice ] dip over length? [ over pop @XT invoke ] times nip ] localize
+  "Takes a slice, a starting value, and a quote. It executes the quote once for each item in the slice, passing the item and the value to the quote. The quote should consume both and return a new value."
 ] 'reduce' :
 
-[ "pp-?"   [ !XT duplicate-slice !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke &Offset increment ] times ] localize \
-  "Takes a slice and a quotation. It then executes the quote once for each item in the slice, passing the individual items to the quote." \
+[ "pp-?"   [ !XT duplicate-slice !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke &Offset increment ] times ] localize
+  "Takes a slice and a quotation. It then executes the quote once for each item in the slice, passing the individual items to the quote."
 ] 'for-each' :
 
-[ "pv-f"   false !Found !Value dup length? 0 swap [ dup-pair fetch @Value types-match? [ eq? @Found or :f !Found ] [ drop-pair ] if 1 + ] times drop-pair @Found \
-  "Given a slice and a value, return true if the value is found in the slice, or false otherwise." \
+[ "pv-f"   false !Found !Value dup length? 0 swap [ dup-pair fetch @Value types-match? [ eq? @Found or :f !Found ] [ drop-pair ] if 1 + ] times drop-pair @Found
+  "Given a slice and a value, return true if the value is found in the slice, or false otherwise."
  ] 'contains?' :
 
-[ "pq-p"   [ !XT !Source request-empty !Target 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke [ @Source @Offset fetch @Target push ] if-true &Offset increment ] times @Target ] localize \
-  "Given a slice and a quotation, this will pass each value to the quotation (executing it once per item in the slice). The quotation should return a Boolean flag. If the flag is true, copy the value to a new slice. Otherwise discard it." \
+[ "pq-p"   [ !XT !Source request-empty !Target 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke [ @Source @Offset fetch @Target push ] if-true &Offset increment ] times @Target ] localize
+  "Given a slice and a quotation, this will pass each value to the quotation (executing it once per item in the slice). The quotation should return a Boolean flag. If the flag is true, copy the value to a new slice. Otherwise discard it."
 ] 'filter' :
 
-[ "pq-"    [ !XT duplicate-slice !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke @Source @Offset store &Offset increment ] times @Source ] localize \
-  "Given a pointer to an array and a quotation, execute the quotation once for each item in the array. Construct a new array from the value returned by the quotation and return a pointer to it." \
+[ "pq-"    [ !XT duplicate-slice !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke @Source @Offset store &Offset increment ] times @Source ] localize
+  "Given a pointer to an array and a quotation, execute the quotation once for each item in the array. Construct a new array from the value returned by the quotation and return a pointer to it."
 ] 'map' :
 
-[ "p-p"    [ request !Target invoke<depth?> 0 max [ @Target push ] times @Target 1 over length? subslice :p ] localize \
-  "Invoke a quote and capture the results into a new array" \
+[ "p-p"    [ request !Target invoke<depth?> 0 max [ @Target push ] times @Target 1 over length? subslice :p ] localize
+  "Invoke a quote and capture the results into a new array"
 ] 'capture-results<in-stack-order>' :
 
 [ "p-p"    capture-results<in-stack-order> reverse "Invoke a quote and capture the results into a new array" ] 'capture-results' :
 
-[ "pv-n" \
-  [ dup-pair !Value !Source \
-    contains? \
-    [ 0 !Offset #nan !Found @Source length? [ @Source @Offset fetch @Value types-match? [ eq? [ @Offset !Found ] if-true ] [ drop-pair ] if &Offset increment ] times @Found ] \
-    [ #nan ] if \
-  ] localize \
-  "Given a slice and a value, return the offset the value is located at, or #nan if not found" \
+[ "pv-n"
+  [ dup-pair !Value !Source
+    contains?
+    [ 0 !Offset #nan !Found @Source length? [ @Source @Offset fetch @Value types-match? [ eq? [ @Offset !Found ] if-true ] [ drop-pair ] if &Offset increment ] times @Found ]
+    [ #nan ] if
+  ] localize
+  "Given a slice and a value, return the offset the value is located at, or #nan if not found"
 ] 'index-of' :
 
 [ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset'  'localize' ] hide-words
@@ -317,11 +317,11 @@
 
 [ "s-f"  vm.dict<names> swap contains? "Return true if the named word exists or false otherwise" ] 'word-exists?' :
 
-[ "s-p" \
-  dup word-exists? \
-  [ vm.dict<names> swap index-of vm.dict<slices> swap fetch ] \
-  [ drop #nan ] if \
-  "Return a pointer to the named word if it exists, or #nan otherwise" \
+[ "s-p"
+  dup word-exists?
+  [ vm.dict<names> swap index-of vm.dict<slices> swap fetch ]
+  [ drop #nan ] if
+  "Return a pointer to the named word if it exists, or #nan otherwise"
 ] 'lookup-word' :
 
 [ "p-s"  :p vm.dict<slices> over contains? [ vm.dict<slices> swap index-of vm.dict<names> swap fetch ] [ drop '' ] if "If the pointer corresponds to a named item, return the name. Otherwise return an empty string." ] 'lookup-name' :
@@ -337,17 +337,17 @@
 "Scope"
 [ 'Public'  'Private' ] ::
 [ "-" vm.dict<names> !Private "Begin a lexically scoped area" ] '{' :
-[ "p-" \
-  [ string? nip ] filter !Public \
-  "Extract names in scope" \
-  vm.dict<names> @Private length? over length? subslice !Private \
-  \
-  "Filter out the functions to keep" \
-  @Private [ @Public swap contains? not ] filter \
-  \
-  "Hide the remaining names" \
-  [ hide-word ] for-each \
-  "End a lexically scoped region, removing any headers not specified in the provided array." \
+[ "p-"
+  [ string? nip ] filter !Public
+  "Extract names in scope"
+  vm.dict<names> @Private length? over length? subslice !Private
+
+  "Filter out the functions to keep"
+  @Private [ @Public swap contains? not ] filter
+
+  "Hide the remaining names"
+  [ hide-word ] for-each
+  "End a lexically scoped region, removing any headers not specified in the provided array."
 ] '}' :
 [ 'Public'  'Private' ] hide-words
 
@@ -358,22 +358,22 @@
   [ "p-"  [ invoke redefine ] for-each "Add words in a vocabulary to the dictionary" ] 'with' :
   [ "p-"  [ tail hide-word ] for-each "Remove words in a vocabulary from the dictionary" ] 'without' :
 
-  [ "ps-" \
-    request-empty !Vocabulary \
-    @Vocabulary swap : \
-    [ dup word-exists? [ dup lookup-word swap cons @Vocabulary push ] [ drop ] if ] for-each \
-    @Vocabulary without \
-    "Create a new vocabulary" \
+  [ "ps-"
+    request-empty !Vocabulary
+    @Vocabulary swap :
+    [ dup word-exists? [ dup lookup-word swap cons @Vocabulary push ] [ drop ] if ] for-each
+    @Vocabulary without
+    "Create a new vocabulary"
   ] 'vocab' :
 
-  [ "ps-" \
-    over } vocab \
-    "Close a lexical scope and create a vocabulary with the exposed words" \
+  [ "ps-"
+    over } vocab
+    "Close a lexical scope and create a vocabulary with the exposed words"
   ] '}}' :
 
-  [ "sp-" \
-    over word-exists? [ [ dup lookup-word over hide-word swap cons ] dip push ] [ drop-pair ] if \
-    "Add a word to an existing vocabulary" \
+  [ "sp-"
+    over word-exists? [ [ dup lookup-word over hide-word swap cons ] dip push ] [ drop-pair ] if
+    "Add a word to an existing vocabulary"
   ] 'vocab.add-word' :
 }
 
@@ -387,29 +387,29 @@
 
 [ 'invoke<preserving>' ] {
   [ 'Prior'  'List' ] ::
-  [ "qq-" \
-    @Prior [ \
-      @List [ \
-        swap duplicate-slice !List \
-        [ @List [ head ] for-each ] capture-results reverse !Prior \
-        invoke \
-        @Prior length? [ @Prior pop @List pop 1 store ] times \
-      ] dip !List \
-    ] dip !Prior \
-    "Executes the code quotation, preserving and restoring the contents of the variables specified." \
+  [ "qq-"
+    @Prior [
+      @List [
+        swap duplicate-slice !List
+        [ @List [ head ] for-each ] capture-results reverse !Prior
+        invoke
+        @Prior length? [ @Prior pop @List pop 1 store ] times
+      ] dip !List
+    ] dip !Prior
+    "Executes the code quotation, preserving and restoring the contents of the variables specified."
   ] 'invoke<preserving>' :
 }
 
 [ 'zip' ] {
   [ 'A'  'B'  'X'  'C' ] ::
 
-  [ "ppp-p" \
-    [ A B X C ] \
-    [ !X !B !A request-empty !C \
-      @A length? [ @A head @B head @X invoke @C push @A body !A @B body !B ] times \
-      @C duplicate-slice \
-    ] invoke<preserving> \
-    "For each item in source1, push the item and the corresponding item from source2 to the stack. Execute the specified code. Push results into a new array, repeating until all items are exhausted. Returns the new array. This expects the code to return a single value as a result. It also assumes that both sources are the same size (or at least that the second does not contain less than the first" \
+  [ "ppp-p"
+    [ A B X C ]
+    [ !X !B !A request-empty !C
+      @A length? [ @A head @B head @X invoke @C push @A body !A @B body !B ] times
+      @C duplicate-slice
+    ] invoke<preserving>
+    "For each item in source1, push the item and the corresponding item from source2 to the stack. Execute the specified code. Push results into a new array, repeating until all items are exhausted. Returns the new array. This expects the code to return a single value as a result. It also assumes that both sources are the same size (or at least that the second does not contain less than the first"
   ] 'zip' :
 }
 
@@ -429,15 +429,15 @@
 [ 'when' ] {
   [ 'Offset'  'Tests'  'Done' ] ::
 
-  [ "q-" \
-    [ Offset Tests Done ] \
-    [ !Tests false !Done 0 !Offset \
-      [ @Tests @Offset fetch head invoke \
-        [ true !Done @Tests @Offset fetch 1 fetch invoke ] if-true \
-        &Offset increment @Done \
-      ] until \
-    ] invoke<preserving> \
-    "Takes a pointer to a set of quotations. Each quote in the set should consist of two other quotes: one that returns a flag, and one to be executed if the condition returns true. Executes each until one returns true, then exits." \
+  [ "q-"
+    [ Offset Tests Done ]
+    [ !Tests false !Done 0 !Offset
+      [ @Tests @Offset fetch head invoke
+        [ true !Done @Tests @Offset fetch 1 fetch invoke ] if-true
+        &Offset increment @Done
+      ] until
+    ] invoke<preserving>
+    "Takes a pointer to a set of quotations. Each quote in the set should consist of two other quotes: one that returns a flag, and one to be executed if the condition returns true. Executes each until one returns true, then exits."
   ] 'when' :
 }
 
@@ -447,27 +447,27 @@
   [ "n-"  [ @Source 0 ] dip subslice :s ] 'extract' :
   [ "n-"  @Source swap @Value length? + over length? subslice :s !Source ] 'next-piece' :
 
-  [ "ss-p" \
-    dup length? 0 eq? \
-    [ drop [ :s ] map ] \
-    [ :s !Value \
-      !Source \
-      request-empty !Target \
-      [ @Source @Value find dup \
-        -1 -eq? [ [ extract @Target push ] sip next-piece true ] \
-                [ drop @Source @Target push false ] if \
-      ] while \
-      @Target \
-    ] if \
-    "Given a string and a delimiter, split the string into an array" \
+  [ "ss-p"
+    dup length? 0 eq?
+    [ drop [ :s ] map ]
+    [ :s !Value
+      !Source
+      request-empty !Target
+      [ @Source @Value find dup
+        -1 -eq? [ [ extract @Target push ] sip next-piece true ]
+                [ drop @Source @Target push false ] if
+      ] while
+      @Target
+    ] if
+    "Given a string and a delimiter, split the string into an array"
   ] 'split' :
 
-  [ "pv-s" \
-    :s !Value \
-    reverse '' [ :s + @Value + ] reduce \
-    "This leaves the join value appended to the string. Remove it." \
-    0 over length? @Value length? - subslice :s \
-    "Given an array of values and a string, convert each value to a string and merge, using the provided string between them" \
+  [ "pv-s"
+    :s !Value
+    reverse '' [ :s + @Value + ] reduce
+    "This leaves the join value appended to the string. Remove it."
+    0 over length? @Value length? - subslice :s
+    "Given an array of values and a string, convert each value to a string and merge, using the provided string between them"
   ] 'join' :
 }
 
@@ -482,16 +482,16 @@
   [ "-"  @String @Source head @Data head pointer? [ invoke ] if-true :s + + !String ] '(accumulate)' :
   [ "-"  @Source body !Source  @Data body !Data ] '(next)' :
 
-  [ "ps-s" \
-    [ Data Source String ] \
-    [ '{v}' split !Source \
-      !Data \
-      request-empty :s !String \
-      @Data length? [ (accumulate) (next) ] times \
-      "Merge any remaining items" \
-      @String @Source '' join + clean-string \
-    ] invoke<preserving> \
-    "Given an array of values and a string with insertion points, construct a new string, copying the values into the insertion points." \
+  [ "ps-s"
+    [ Data Source String ]
+    [ '{v}' split !Source
+      !Data
+      request-empty :s !String
+      @Data length? [ (accumulate) (next) ] times
+      "Merge any remaining items"
+      @String @Source '' join + clean-string
+    ] invoke<preserving>
+    "Given an array of values and a string with insertion points, construct a new string, copying the values into the insertion points."
   ] 'interpolate' :
 }
 
@@ -499,15 +499,15 @@
 [ 'interpolate<cycling>' ] {
   [ 'D'  'S'  'L' ] ::
 
-  [ "qs-s" \
-    [ S D L ] \
-    [ !S  !D \
-      @S '{v}' split length? !L \
-      [ @D length? @L lt? dup [ @D duplicate-slice @D + !D ] if-true ] while \
-      [ @D length? @L lt? dup [ @D pop drop ] if-false ] until \
-      @D @S interpolate \
-    ] invoke<preserving> \
-    "Given an array of values and a string with insertion points, construct a new string, copying the values into the insertion points. If the array of values is less than the number of insertion points, cycle through them again." \
+  [ "qs-s"
+    [ S D L ]
+    [ !S  !D
+      @S '{v}' split length? !L
+      [ @D length? @L lt? dup [ @D duplicate-slice @D + !D ] if-true ] while
+      [ @D length? @L lt? dup [ @D pop drop ] if-false ] until
+      @D @S interpolate
+    ] invoke<preserving>
+    "Given an array of values and a string with insertion points, construct a new string, copying the values into the insertion points. If the array of values is less than the number of insertion points, cycle through them again."
   ] 'interpolate<cycling>' :
 }
 
@@ -516,11 +516,11 @@
 [ '?' ] {
   [ "p-?" &head &tail bi [ remark? [ drop ] if-false ] bi@ ] 'desc' :
 
-  [ "s-s | s-ss" \
-    dup word-exists? \
-    [ lookup-word desc ] \
-    [ 'word "' swap + '" not found' + report-error ] if \
-    "Lookup the stack comment and description (if existing) for a named item" \
+  [ "s-s | s-ss"
+    dup word-exists?
+    [ lookup-word desc ]
+    [ 'word "' swap + '" not found' + report-error ] if
+    "Lookup the stack comment and description (if existing) for a named item"
   ] '?' :
 }
 
@@ -529,17 +529,17 @@
 [ 'stack-values' 'rso' ] {
   'S' var
 
-  [ "-p" \
-    request-empty !S \
-    depth [ @S push ] times \
-    @S reverse dup !S &nop for-each \
-    @S \
-    "Return an array with the items currently on the stack" \
+  [ "-p"
+    request-empty !S
+    depth [ @S push ] times
+    @S reverse dup !S &nop for-each
+    @S
+    "Return an array with the items currently on the stack"
   ] 'stack-values' :
 
-  [ "...-..." \
-    stack-values reverse [ reset ] dip &nop for-each \
-    "Reverse the order of all items on the stack" \
+  [ "...-..."
+    stack-values reverse [ reset ] dip &nop for-each
+    "Reverse the order of all items on the stack"
   ] 'rso' :
 }
 
@@ -548,9 +548,9 @@
 [ 'vm.dict<names-like>' ] {
  'Pattern' var
  [ "s-f" @Pattern swap string-contains? ] 'matches' :
- [ "s-p" \
-   !Pattern vm.dict<names> &matches filter \
-   "Return an array of names in the dictionary that match a given substring." \
+ [ "s-p"
+   !Pattern vm.dict<names> &matches filter
+   "Return an array of names in the dictionary that match a given substring."
  ] 'vm.dict<names-like>' :
 }
 
@@ -564,10 +564,10 @@
 
 [ 'times<with-index>' ] {
   '_' var
-  [ "qq-" \
-    [ &_ ] \
-    [ [ !_ [ @_ invoke range ] capture-results reverse ] dip for-each ] invoke<preserving> \
-    "Construct a range from the values in q1, then execute q2 as a for-each against them" \
+  [ "qq-"
+    [ &_ ]
+    [ [ !_ [ @_ invoke range ] capture-results reverse ] dip for-each ] invoke<preserving>
+    "Construct a range from the values in q1, then execute q2 as a for-each against them"
   ] 'times<with-index>' :
 }
 
@@ -577,11 +577,11 @@
   [ "-f"  @S length? @O eq? ] 'done?' :
   [ "-f"  @S @O fetch 0 fetch @K eq? ] 'match?' :
 
-  [ "ps-pn" \
-    !K !S 0 !O #nan !M \
-    [ match? [ @O !M ] if-true &O increment done? ] until \
-    @M nan? [ 'ERROR: No key found' abort<with-error> ] if-true \
-    @S @M fetch 1 \
-    "Return an offset for a key in a slice of key:value pairs" \
+  [ "ps-pn"
+    !K !S 0 !O #nan !M
+    [ match? [ @O !M ] if-true &O increment done? ] until
+    @M nan? [ 'ERROR: No key found' abort<with-error> ] if-true
+    @S @M fetch 1
+    "Return an offset for a key in a slice of key:value pairs"
   ] 'byKey:' :
 }
