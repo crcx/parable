@@ -123,8 +123,8 @@ def display_stack():
     i = 0
     l = 1
     while i < len(parable.stack):
-        tos = parable.stack[i]
-        type = parable.types[i]
+        tos = parable.stack_value_for(i)
+        type = parable.stack_type_for(i)
 
         # display the stack item number
         if i == len(parable.stack) - 1:
@@ -161,7 +161,7 @@ def display_stack():
             write("\n\t\tstored at: " + str(tos), 'normal')
             l += 1
         elif type == parable.TYPE_FUNCALL:
-            write("\tCALL: " + str(tos), COLOR_STACK_FUN_CALL)
+            write("\t|" + str(tos), COLOR_STACK_FUN_CALL)
         else:
             write("\tUNKNOWN\t" + str(tos) + "\t" + str(type), COLOR_ERROR)
         sys.stdout.write("\n")
