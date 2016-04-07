@@ -15,6 +15,7 @@
 * Allocate a larger array of slices when OOM
 * Add | prefix for function calls
 * fixed bugs in BC_MEM_FETCH and B_MEM_STORE
+* line condenser no longer requires a \ to join lines
 
 ### Standard Library
 
