@@ -85,12 +85,7 @@ def get_input():
             s = s[:-2].strip() + ' '
             s = s + input("       ")
         else:
-            braces = 0
-            tokens = s.strip().split(' ')
-            for t in tokens:
-                if t == '[': braces = braces + 1
-                if t == ']': braces = braces - 1
-            if braces == 0:
+            if parable.is_balanced(parable.tokenize(s)):
                 done = True
             else:
                 s = s.strip() + ' '

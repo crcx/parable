@@ -49,7 +49,7 @@ def is_number(s):
 
 def is_balanced(tokens):
     braces = 0
-    for t in tokenize(s):
+    for t in tokens:
         if t == '[':
             braces = braces + 1
         if t == ']':
