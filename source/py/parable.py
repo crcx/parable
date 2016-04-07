@@ -47,6 +47,19 @@ def is_number(s):
         return False
 
 
+def is_balanced(tokens):
+    braces = 0
+    for t in tokenize(s):
+        if t == '[':
+            braces = braces + 1
+        if t == ']':
+            braces = braces - 1
+    if braces == 0:
+        return True
+    else:
+        return False
+
+
 def tokenize(str):
     prefixes = { '`', '#', '$', '&', '\'', '"', '@', '!', '|' }
     tokens = ' '.join(str.strip().split()).split(' ')
@@ -74,17 +87,11 @@ def condense_lines(code):
     r = []
     i = 0
     while i < len(code):
-        braces = 0
         if code[i].endswith(' \\\n'):
             s = s + ' ' + code[i][:-2].strip()
         else:
             s = s + ' ' + code[i].strip()
-        for t in tokenize(s):
-            if t == '[':
-                braces = braces + 1
-            if t == ']':
-                braces = braces - 1
-        if braces == 0:
+        if is_balanced(tokenize(s)):
             r.append(s.strip())
             s = ''
         i = i + 1
@@ -1618,6 +1625,10 @@ def collect_garbage():
 #   `   Bytecodes
 #   '   Strings
 #   "   Comments
+#   |   Function Calls
+#
+# To aid in readability, the compiler also allows for use of number and
+# functions calls without the prefixes.
 #
 # The bytecode forms are kept simple:
 #
@@ -1641,15 +1652,17 @@ def collect_garbage():
 #   &<pointer> #1 fetch
 #   &<pointer> #1 store
 #
-# The compiler handle two implicit pieces of functionality: [ and ]. These
-# are used to begin and end quotations.
+# The compiler handle two implicit pieces of functionality: [ and ].
+# These are used to begin and end quotations.
 #
-# Bytecodes get wrapped into named functions. At this point they are not
-# inlined. This hurts performance, but makes the implementation much simpler.
+# Bytecodes get wrapped into named functions. At this point they are
+# not inlined. This hurts performance, but makes the implementation
+# much simpler.
 #
-# The compile_ functions take a parameter, a slice, and the current offset
-# in that slice. They lay down the appropriate byte codes for the type of
-# item they are compiling. When done, they return the new offset.
+# The compile_ functions take a parameter, a slice, and the current
+# offset in that slice. They lay down the appropriate byte codes
+# for the type of item they are compiling. When done, they return
+# the new offset.
 
 
 def compile_string(string, slice, offset):
