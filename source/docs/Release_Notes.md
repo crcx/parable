@@ -16,6 +16,7 @@
 * Add | prefix for function calls
 * fixed bugs in BC_MEM_FETCH and B_MEM_STORE
 * line condenser no longer requires a \ to join lines
+* rewrote tokenizer
 
 ### Standard Library
 
@@ -25,6 +26,7 @@
 * round now written in parable
 * fix lookup-word
 * add byKey:
+* removed \ from multi-line definitions
 
 ### Interfaces
 
@@ -43,4 +45,4 @@
 
 ### Tooling
 
-* Added *tools/gen-tags.py* to generate a ctags compatible *tags* file
+* Added *tools/ptags.py* to generate a ctags compatible *tags* file
