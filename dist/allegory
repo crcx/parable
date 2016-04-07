@@ -49,6 +49,19 @@ def is_number(s):
         return False
 
 
+def is_balanced(tokens):
+    braces = 0
+    for t in tokens:
+        if t == '[':
+            braces = braces + 1
+        if t == ']':
+            braces = braces - 1
+    if braces == 0:
+        return True
+    else:
+        return False
+
+
 def tokenize(str):
     prefixes = { '`', '#', '$', '&', '\'', '"', '@', '!', '|' }
     tokens = ' '.join(str.strip().split()).split(' ')
@@ -58,10 +71,6 @@ def tokenize(str):
     while i < count:
         current = tokens[i]
         prefix = tokens[i][:1]
-        if prefix in prefixes:
-            current = tokens[i][1:]
-        else:
-            current = tokens[i]
         s = ""
         if prefix == '"':
             i, s = parse_string(tokens, i, count, '"')
@@ -80,17 +89,11 @@ def condense_lines(code):
     r = []
     i = 0
     while i < len(code):
-        braces = 0
         if code[i].endswith(' \\\n'):
             s = s + ' ' + code[i][:-2].strip()
         else:
             s = s + ' ' + code[i].strip()
-        for t in tokenize(s):
-            if t == '[':
-                braces = braces + 1
-            if t == ']':
-                braces = braces - 1
-        if braces == 0:
+        if is_balanced(tokenize(s)):
             r.append(s.strip())
             s = ''
         i = i + 1
@@ -1624,6 +1627,10 @@ def collect_garbage():
 #   `   Bytecodes
 #   '   Strings
 #   "   Comments
+#   |   Function Calls
+#
+# To aid in readability, the compiler also allows for use of number and
+# functions calls without the prefixes.
 #
 # The bytecode forms are kept simple:
 #
@@ -1647,15 +1654,17 @@ def collect_garbage():
 #   &<pointer> #1 fetch
 #   &<pointer> #1 store
 #
-# The compiler handle two implicit pieces of functionality: [ and ]. These
-# are used to begin and end quotations.
+# The compiler handle two implicit pieces of functionality: [ and ].
+# These are used to begin and end quotations.
 #
-# Bytecodes get wrapped into named functions. At this point they are not
-# inlined. This hurts performance, but makes the implementation much simpler.
+# Bytecodes get wrapped into named functions. At this point they are
+# not inlined. This hurts performance, but makes the implementation
+# much simpler.
 #
-# The compile_ functions take a parameter, a slice, and the current offset
-# in that slice. They lay down the appropriate byte codes for the type of
-# item they are compiling. When done, they return the new offset.
+# The compile_ functions take a parameter, a slice, and the current
+# offset in that slice. They lay down the appropriate byte codes
+# for the type of item they are compiling. When done, they return
+# the new offset.
 
 
 def compile_string(string, slice, offset):
@@ -1758,26 +1767,18 @@ def compile(str, slice):
     should_abort = False
     prefixes = { '`', '#', '$', '&', '\'', '"', '@', '!', '|' }
     nest = []
-    tokens = ' '.join(str.split()).split(' ')
-    count = len(tokens)
-    i = 0
+    tokens = tokenize(str)
     offset = 0
-    current = ""
-    prefix = ""
-    while i < count:
-        current = tokens[i]
-        prefix = tokens[i][:1]
+    for token in tokens:
+        prefix = token[:1]
         if prefix in prefixes:
-            current = tokens[i][1:]
+            current = token[1:]
         else:
-            current = tokens[i]
-        s = ""
+            current = token
         if prefix == '"':
-            i, s = parse_string(tokens, i, count, '"')
-            offset = compile_comment(s[1:-1], slice, offset)
+            offset = compile_comment(current[:-1], slice, offset)
         elif prefix == "'":
-            i, s = parse_string(tokens, i, count, '\'')
-            offset = compile_string(s[1:-1], slice, offset)
+            offset = compile_string(current[:-1], slice, offset)
         elif prefix == "$":
             v = ord(current[0].encode('utf-8'))
             offset = compile_character(v, slice, offset)
@@ -1819,7 +1820,6 @@ def compile(str, slice):
                 offset = compile_number(current, slice, offset)
             else:
                 offset = compile_function_call(current, slice, offset)
-        i += 1
         if offset == 0:
             store(BC_NOP, slice, offset, TYPE_BYTECODE)
     if len(nest) != 0:
