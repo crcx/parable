@@ -1249,6 +1249,44 @@ def convert_to_string(original):
         return 0
 
 
+def convert_to_character(original):
+    global stack
+    if original == TYPE_STRING:
+        s = slice_to_string(stack_pop())
+        stack_push(ord(s[0].encode('utf-8')), TYPE_CHARACTER)
+    else:
+        s = stack_pop()
+        stack_push(int(s), TYPE_CHARACTER)
+
+
+def convert_to_pointer(original):
+    global stack
+    a = stack_pop()
+    stack_push(a, TYPE_POINTER)
+
+
+def convert_to_flag(original):
+    global stack
+    if original == TYPE_STRING:
+        s = slice_to_string(stack_pop())
+        if s == 'true':
+            stack_push(-1, TYPE_FLAG)
+        elif s == 'false':
+            stack_push(0, TYPE_FLAG)
+        else:
+            stack_push(1, TYPE_FLAG)
+    else:
+        s = stack_pop()
+        stack_push(s, TYPE_FLAG)
+
+
+def convert_to_funcall(original):
+    global stack
+    if original == TYPE_NUMBER or original == TYPE_POINTER:
+        a = stack_pop()
+        stack_push(a, TYPE_FUNCALL)
+
+
 def stack_change_type(desired):
     """convert the type of an item on the stack to a different type"""
     global stack
@@ -1260,31 +1298,13 @@ def stack_change_type(desired):
     elif desired == TYPE_STRING:
         convert_to_string(original)
     elif desired == TYPE_CHARACTER:
-        if original == TYPE_STRING:
-            s = slice_to_string(stack_pop())
-            stack_push(ord(s[0].encode('utf-8')), TYPE_CHARACTER)
-        else:
-            s = stack_pop()
-            stack_push(int(s), TYPE_CHARACTER)
+        convert_to_character(original)
     elif desired == TYPE_POINTER:
-        a = stack_pop()
-        stack_push(a, TYPE_POINTER)
+        convert_to_pointer(original)
     elif desired == TYPE_FLAG:
-        if original == TYPE_STRING:
-            s = slice_to_string(stack_pop())
-            if s == 'true':
-                stack_push(-1, TYPE_FLAG)
-            elif s == 'false':
-                stack_push(0, TYPE_FLAG)
-            else:
-                stack_push(1, TYPE_FLAG)
-        else:
-            s = stack_pop()
-            stack_push(s, TYPE_FLAG)
+        convert_to_flag(original)
     elif desired == TYPE_FUNCALL:
-        if original == TYPE_NUMBER or original == TYPE_POINTER:
-            a = stack_pop()
-            stack_push(a, TYPE_FUNCALL)
+        convert_to_funcall(original)
     else:
         a = stack_pop()
         stack_push(a, desired)
