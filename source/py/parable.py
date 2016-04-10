@@ -1204,46 +1204,61 @@ def stack_dup():
         stack_push(av, at)
 
 
+def convert_to_bytecode(original):
+    global stack
+    if original == TYPE_NUMBER:
+        a = stack_pop()
+        stack_push(a, TYPE_BYTECODE)
+
+
+def convert_to_number(original):
+    global stack
+    if original == TYPE_STRING:
+        a = stack_pop()
+        if is_number(slice_to_string(a)):
+            stack_push(float(slice_to_string(a)), TYPE_NUMBER)
+        else:
+            stack_push(float('nan'), TYPE_NUMBER)
+    else:
+        a = stack_pop()
+        stack_push(a, TYPE_NUMBER)
+
+
+def convert_to_string(original):
+    global stack
+    if original == TYPE_NUMBER:
+        stack_push(string_to_slice(str(stack_pop())), TYPE_STRING)
+    elif original == TYPE_CHARACTER:
+        v = stack_pop()
+        if (v >= 32 and v <= 128) or v == 10 or v == 13:
+            stack_push(string_to_slice(str(chr(v))), TYPE_STRING)
+        else:
+            stack_push(string_to_slice(str(chr(0))), TYPE_STRING)
+    elif original == TYPE_FLAG:
+        s = stack_pop()
+        if s == -1:
+            stack_push(string_to_slice('true'), TYPE_STRING)
+        elif s == 0:
+            stack_push(string_to_slice('false'), TYPE_STRING)
+        else:
+            stack_push(string_to_slice('malformed flag'), TYPE_STRING)
+    elif original == TYPE_POINTER or original == TYPE_REMARK:
+        a = stack_pop()
+        stack_push(a, TYPE_STRING)
+    else:
+        return 0
+
+
 def stack_change_type(desired):
     """convert the type of an item on the stack to a different type"""
     global stack
     original = stack_type()
     if desired == TYPE_BYTECODE:
-        if original == TYPE_NUMBER:
-            a = stack_pop()
-            stack_push(a, TYPE_BYTECODE)
+        convert_to_bytecode(original)
     elif desired == TYPE_NUMBER:
-        if original == TYPE_STRING:
-            a = stack_pop()
-            if is_number(slice_to_string(a)):
-                stack_push(float(slice_to_string(a)), TYPE_NUMBER)
-            else:
-                stack_push(float('nan'), TYPE_NUMBER)
-        else:
-            a = stack_pop()
-            stack_push(a, TYPE_NUMBER)
+        convert_to_number(original)
     elif desired == TYPE_STRING:
-        if original == TYPE_NUMBER:
-            stack_push(string_to_slice(str(stack_pop())), TYPE_STRING)
-        elif original == TYPE_CHARACTER:
-            v = stack_pop()
-            if (v >= 32 and v <= 128) or v == 10 or v == 13:
-                stack_push(string_to_slice(str(chr(v))), TYPE_STRING)
-            else:
-                stack_push(string_to_slice(str(chr(0))), TYPE_STRING)
-        elif original == TYPE_FLAG:
-            s = stack_pop()
-            if s == -1:
-                stack_push(string_to_slice('true'), TYPE_STRING)
-            elif s == 0:
-                stack_push(string_to_slice('false'), TYPE_STRING)
-            else:
-                stack_push(string_to_slice('malformed flag'), TYPE_STRING)
-        elif original == TYPE_POINTER or original == TYPE_REMARK:
-            a = stack_pop()
-            stack_push(a, TYPE_STRING)
-        else:
-            return 0
+        convert_to_string(original)
     elif desired == TYPE_CHARACTER:
         if original == TYPE_STRING:
             s = slice_to_string(stack_pop())
