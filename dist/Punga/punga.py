@@ -79,39 +79,46 @@ def dump_stack():
     while i < depth:
         tos = parable.stack_value_for(i)
         type = parable.stack_type_for(i)
+        s = ""
         if type == parable.TYPE_NUMBER:
-            html = html + stack_item(i, "#" + str(tos))
+            s = "#" + str(tos)
+            s = s + "<br>Type: {0}, Raw Value: {1}".format(type, tos)
         elif type == parable.TYPE_CHARACTER:
-            html = html + stack_item(i, "$" + str(chr(tos)))
+            s = "$" + str(chr(tos))
+            s = s + "<br>Type: {0}, Raw Value: {1}".format(type, tos)
         elif type == parable.TYPE_STRING:
             s = "'" + parable.slice_to_string(tos) + "'"
             s = s + "<br>Store at: " + str(tos)
-            html = html + stack_item(i, s)
+            s = s + "<br>Type: {0}, Raw Value: {1}".format(type, tos)
         elif type == parable.TYPE_POINTER:
             s = "&amp;" + str(tos)
             if parable.pointer_to_name(tos) != "":
                 s = s + "<br>Pointer to: " + parable.pointer_to_name(tos)
-            html = html + stack_item(i, s)
+            s = s + "<br>Type: {0}, Raw Value: {1}".format(type, tos)
         elif type == parable.TYPE_FLAG:
             if tos == -1:
-                html = html + stack_item(i, "true")
+                s = "true"
             elif tos == 0:
-                html = html + stack_item(i, "false")
+                s = "false"
             else:
-                html = html + stack_item(i, "malformed flag")
+                s = "malformed flag"
+            s = s + "<br>Type: {0}, Raw Value: {1}".format(type, tos)
         elif type == parable.TYPE_BYTECODE:
-            html = html + stack_item(i, "`" + str(tos))
+            s = "`" + str(tos)
+            s = s + "<br>Type: {0}, Raw Value: {1}".format(type, tos)
         elif type == parable.TYPE_REMARK:
             s = "\"" + parable.slice_to_string(tos) + "\""
-            s = s + "<br>Store at: " + str(tos)
-            html = html + stack_item(i, s)
+            s = s + "<br>Stored at: " + str(tos)
+            s = s + "<br>Type: {0}, Raw Value: {1}".format(type, tos)
         elif type == parable.TYPE_FUNCALL:
-            s = "Call: " + str(tos)
+            s = "|" + str(tos)
             if parable.pointer_to_name(tos) != "":
                 s = s + "<br>Pointer to: " + parable.pointer_to_name(tos)
-            html = html + stack_item(i, s)
+            s = s + "<br>Type: {0}, Raw Value: {1}".format(type, tos)
         else:
-            html = html + stack_item(i, "unmatched type on stack!<br>(" + str(tos) + "," + str(type) + ")")
+            s = stack_item(i, "unmatched type on stack!<br>(" + str(tos) + "," + str(type) + ")")
+            s = s + "<br>Type: {0}, Raw Value: {1}".format(type, tos)
+        html = html + stack_item(i, s)
         i += 1
     html = html + "</table>"
     return html

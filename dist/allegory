@@ -66,18 +66,19 @@ def tokenize(str):
     prefixes = { '`', '#', '$', '&', '\'', '"', '@', '!', '|' }
     tokens = ' '.join(str.strip().split()).split(' ')
     cleaned = []
-    count = len(tokens)
     i = 0
-    while i < count:
+    while i < len(tokens):
         current = tokens[i]
         prefix = tokens[i][:1]
         s = ""
         if prefix == '"':
-            i, s = parse_string(tokens, i, count, '"')
+            i, s = parse_string(tokens, i, len(tokens), '"')
         elif prefix == "'":
-            i, s = parse_string(tokens, i, count, '\'')
-        if s != "": cleaned.append(s)
-        elif current != '': cleaned.append(current)
+            i, s = parse_string(tokens, i, len(tokens), '\'')
+        if s != "":
+            cleaned.append(s)
+        elif current != '':
+            cleaned.append(current)
         i = i + 1
     return cleaned
 
@@ -87,16 +88,14 @@ def condense_lines(code):
     """the new array"""
     s = ''
     r = []
-    i = 0
-    while i < len(code):
-        if code[i].endswith(' \\\n'):
-            s = s + ' ' + code[i][:-2].strip()
+    for line in code:
+        if line.endswith(' \\\n'):
+            s = s + ' ' + line[:-2].strip()
         else:
-            s = s + ' ' + code[i].strip()
+            s = s + ' ' + line.strip()
         if is_balanced(tokenize(s)):
             r.append(s.strip())
             s = ''
-        i = i + 1
     return r
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -490,10 +489,9 @@ def bytecode_flow_until(opcode, offset, more):
 def bytecode_flow_times(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_POINTER]):
         quote = stack_pop()
-        count = stack_pop()
-        while count > 0:
+        count = int(stack_pop())
+        for i in range(0, count):
             interpret(quote, more)
-            count -= 1
     else:
         abort_run(opcode, offset)
 
@@ -1013,9 +1011,7 @@ should_abort = False        # Used to indicate if an error was detected during
 def abort_run(opcode, offset):
     global should_abort
     emsg = "E__: "
-    emsg = emsg + "Error processing `" + str(opcode) + " "
-    emsg = emsg + "at offset " + str(offset) + " in slice "
-    emsg = emsg + str(current_slice)
+    emsg = emsg + "Error processing `{0} at offset {1} in slice {2}".format(opcode, offset, current_slice)
     report(emsg)
     should_abort = True
 
@@ -1114,11 +1110,9 @@ def parsed_item(i):
 
 
 def parsed_stack():
-    i = 0
     r = []
-    while i < len(stack):
-        r.append(parsed_item(a))
-        i += 1
+    for i in range(0, stack_depth()):
+        r.append(parsed_item(i))
     return r
 
 
@@ -1343,7 +1337,7 @@ def add_definition(name, slice):
         dictionary.append((name, slice))
     else:
         if dictionary_warnings:
-            report('W10: ' + name + ' redefined')
+            report('W10: {0} redefined'.format(name))
         target = lookup_pointer(name)
         copy_slice(slice, target)
 
@@ -1693,8 +1687,7 @@ def compile_pointer(name, slice, offset):
             store(lookup_pointer(name), slice, offset, TYPE_POINTER)
         else:
             store(0, slice, offset, TYPE_POINTER)
-            report('E03: Compile Error: Unable to map ' +
-                   name + ' to a pointer')
+            report('E03: Compile Error: Unable to map {0} to a pointer'.format(name))
     offset += 1
     return offset
 
@@ -1704,8 +1697,7 @@ def compile_number(number, slice, offset):
         store(float(number), slice, offset, TYPE_NUMBER)
     else:
         store(float('nan'), slice, offset, TYPE_NUMBER)
-        report("E03: Compile Error: Unable to convert " +
-               number + " to a number")
+        report("E03: Compile Error: Unable to convert {0} to a number".format(number))
     offset += 1
     return offset
 
@@ -1722,7 +1714,7 @@ def compile_function_call(name, slice, offset):
         offset += 1
     else:
         if name != "":
-           report('E03: Compile Error: Unable to map `' + name + '` to a pointer')
+           report('E03: Compile Error: Unable to map `{0}` to a pointer'.format(name))
     return offset
 
 
@@ -1735,7 +1727,7 @@ def compile_function_call_prefixed(name, slice, offset):
             store(int(name), slice, offset, TYPE_FUNCALL)
             offset += 1
         else:
-           report('E03: Compile Error: Unable to map `' + name + '` to a pointer')
+           report('E03: Compile Error: Unable to map `{0}` to a pointer'.format(name))
     return offset
 
 
@@ -1802,8 +1794,7 @@ def compile(str, slice):
         elif prefix == "|":
             offset = compile_function_call_prefixed(current, slice, offset)
         elif current == "[":
-            nest.append(slice)
-            nest.append(offset)
+            nest.append((slice, offset))
             slice = request_slice()
             offset = 0
         elif current == "]":
@@ -1814,8 +1805,7 @@ def compile(str, slice):
                 old = slice
                 if offset == 0:
                     store(BC_NOP, slice, offset, TYPE_BYTECODE)
-                offset = nest.pop()
-                slice = nest.pop()
+                slice, offset = nest.pop()
                 store(old, slice, offset, TYPE_POINTER)
                 offset += 1
         else:
@@ -1838,8 +1828,7 @@ def compile(str, slice):
 def parse_bootstrap(f):
     """compile the bootstrap package it into memory"""
     for line in condense_lines(f):
-        if len(line) > 0:
-            interpret(compile(line, request_slice()))
+        if len(line) > 0: interpret(compile(line, request_slice()))
 
 
 # some parts of the language (prefixes, brackets) are understood as part of
