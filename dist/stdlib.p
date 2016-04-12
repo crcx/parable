@@ -265,6 +265,10 @@
 [ "q-q"  1 over length? subslice "Return the second through last items in a slice" ] 'body' :
 [ "p-v"  dup length? 1 - fetch "Return the last item in a slice" ] 'tail' :
 
+[ "p-vv"  [ head ] [ tail ] bi
+  "Return the head and tail of a slice"
+] 'decons' :
+
 [ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset' ] ::
 [ "q-"
   @Found [ @Value [ @XT [ @Source [ @Target [ @Offset [ invoke ] dip !Offset ] dip !Target ] dip !Source ] dip !XT ] dip !Value ] dip !Found ] 'localize' :
@@ -580,8 +584,7 @@
   [ "ps-pn"
     !K !S 0 !O #nan !M
     [ match? [ @O !M ] if-true &O increment done? ] until
-    @M nan? [ 'ERROR: No key found' abort<with-error> ] if-true
-    @S @M fetch 1
+    @M nan? [ #nan :p #nan ] [ @S @M fetch 1 ] if
     "Return an offset for a key in a slice of key:value pairs"
   ] 'byKey:' :
 }
