@@ -17,22 +17,32 @@
 * fixed bugs in BC_MEM_FETCH and B_MEM_STORE
 * line condenser no longer requires a \ to join lines
 * rewrote tokenizer
+* refactored stack_change_type()
 
 ### Standard Library
 
-* add cycle
-* add decons
-* add vocab{
-* add }vocab
-* round now written in parable
-* fix lookup-word
-* add byKey:
-* removed \ from multi-line definitions
+* additions
+
+  * byKey:
+  * cycle
+  * decons
+  * vocab{
+  * }vocab
+
+* bug fixes
+
+  * lookup-word
+
+* other improvements
+
+  * round now written in parable
+  * removed \ from multi-line definitions
 
 ### Interfaces
 
 * PaaS: revised API
 * Allegory: load on_startup.md from the parable side, not the python
+* Punga: more detailed stack display
 
 ### Documentation
 

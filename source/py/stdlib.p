@@ -133,6 +133,7 @@
 [ "n-n"  [ 1 / ] [ 1 rem ] bi - "Return the smallest integer less than or equal to the starting value" ] 'floor' :
 [ "n-n"  dup floor dup-pair eq? [ drop ] [ nip 1 + ] if "Return the smallest integer greater than or equal to the starting value" ] 'ceil' :
 [ "n-n"  0.5 + floor "Round a number to the nearest integer value" ] 'round' :
+[ "nn-nn" dup-pair rem [ / floor ] dip "Divide and return floored result and remainder" ] '/rem' :
 
 
 "Slice Functions"
