@@ -584,8 +584,7 @@
   [ "ps-pn"
     !K !S 0 !O #nan !M
     [ match? [ @O !M ] if-true &O increment done? ] until
-    @M nan? [ 'ERROR: No key found' abort<with-error> ] if-true
-    @S @M fetch 1
+    @M nan? [ #nan :p #nan ] [ @S @M fetch 1 ] if
     "Return an offset for a key in a slice of key:value pairs"
   ] 'byKey:' :
 }
