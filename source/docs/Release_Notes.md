@@ -21,6 +21,7 @@
 ### Standard Library
 
 * add cycle
+* add decons
 * add vocab{
 * add }vocab
 * round now written in parable

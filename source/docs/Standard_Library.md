@@ -1108,6 +1108,12 @@ Example:
 
 ````
 
+## decons
+
+    p-vv
+
+Return the head and tail of a slice
+
 ## push
 
     vp-

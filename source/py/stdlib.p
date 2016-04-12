@@ -265,6 +265,10 @@
 [ "q-q"  1 over length? subslice "Return the second through last items in a slice" ] 'body' :
 [ "p-v"  dup length? 1 - fetch "Return the last item in a slice" ] 'tail' :
 
+[ "p-vv"  [ head ] [ tail ] bi
+  "Return the head and tail of a slice"
+] 'decons' :
+
 [ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset' ] ::
 [ "q-"
   @Found [ @Value [ @XT [ @Source [ @Target [ @Offset [ invoke ] dip !Offset ] dip !Target ] dip !Source ] dip !XT ] dip !Value ] dip !Found ] 'localize' :
