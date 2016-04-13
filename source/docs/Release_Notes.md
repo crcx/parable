@@ -18,6 +18,7 @@
 * line condenser no longer requires a \ to join lines
 * rewrote tokenizer
 * refactored stack_change_type()
+* fixed BC_LOGN
 
 ### Standard Library
 

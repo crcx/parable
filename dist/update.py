@@ -43,7 +43,7 @@ tools = [
         ]
 
 print('Downloading')
-download(core, '.')
+# download(core, '.')
 download(allegory, '.')
 download(legend, '.')
 download(paas, 'PaaS')

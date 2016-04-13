@@ -296,7 +296,10 @@ def bytecode_logn(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
         b = stack_pop()
-        stack_push(math.log(b, a), TYPE_NUMBER)
+        if a > 0 and b > 0:
+            stack_push(math.log(b, a), TYPE_NUMBER)
+        else:
+            abort_run(opcode, offset)
     else:
         abort_run(opcode, offset)
 
