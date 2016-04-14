@@ -513,6 +513,8 @@ This can be thrown in the following conditions:
 
 ## E04: Divide by Zero
 
+## E05: Invalid Types or Stack Underflow
+
 # Appendix: Garbage Collection
 
 Parable's memory model leads to a lot of slices being allocated and used for short periods of time. While it's possible to manually track and release these, this is not something that is normally needed. The memory manager in Parable includes a *garbage collector* which is capable of finding slices that are no longer in use and reclaiming them when necessary.
