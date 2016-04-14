@@ -130,6 +130,7 @@ def dump_errors():
     if parable.errors:
         for error in parable.errors:
             html = html + "<tt>" + error + "</tt><br>"
+    parable.clear_errors()
     return html
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
