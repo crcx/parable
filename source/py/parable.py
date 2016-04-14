@@ -1064,6 +1064,11 @@ def interpret(slice, more=None):
             if more is not None:
                 offset = more(slice, offset, opcode)
         offset += 1
+    if should_abort:
+        if pointer_to_name(slice) == '':
+            report('BT: &{0} #{1}'.format(slice, offset))
+        else:
+            report('BT: &{0} #{1}\t\t{2}'.format(slice, offset, pointer_to_name(slice)))
     current_slice = 0
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
