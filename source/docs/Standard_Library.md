@@ -649,6 +649,12 @@ Return the smallest integer greater than or equal to the starting value
 
 Round a number to the nearest integer value
 
+## /rem
+
+    nn-nn
+
+Divide and return floored result and remainder
+
 ## adjust-slice-length
 
     np-
