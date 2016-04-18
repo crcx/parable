@@ -267,7 +267,7 @@ def bytecode_add(opcode, offset, more):
     elif precheck([TYPE_POINTER, TYPE_POINTER]):
         bytecode_add_PP()
     elif precheck([TYPE_CHARACTER, TYPE_REMARK]):
-        bytecode_add_RS()
+        bytecode_add_CR()
     elif precheck([TYPE_REMARK, TYPE_CHARACTER]):
         bytecode_add_RC()
     else:
