@@ -58,7 +58,6 @@ def is_balanced(tokens):
 
 
 def tokenize(str):
-    prefixes = { '`', '#', '$', '&', '\'', '"', '@', '!', '|' }
     tokens = ' '.join(str.strip().split()).split(' ')
     cleaned = []
     i = 0
