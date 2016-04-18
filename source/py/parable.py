@@ -239,11 +239,15 @@ def bytecode_add_PP():
     memory_types[c] = memory_types[b] + memory_types[a]
     stack_push(c, TYPE_POINTER)
 
-# Other forms we may want to add:
-# def bytecode_add_CR():
-# def bytecode_add_RC():
-# def bytecode_add_SR():
-# def bytecode_add_RS():
+def bytecode_add_CR():
+    a = slice_to_string(stack_pop())
+    b = chr(int(stack_pop()))
+    stack_push(string_to_slice(b + a), TYPE_REMARK)
+
+def bytecode_add_RC():
+    a = chr(int(stack_pop()))
+    b = slice_to_string(stack_pop())
+    stack_push(string_to_slice(b + a), TYPE_REMARK)
 
 # --[ Finished specific conversions for BC_ADD ]--
 
@@ -263,6 +267,10 @@ def bytecode_add(opcode, offset, more):
         bytecode_add_RR()
     elif precheck([TYPE_POINTER, TYPE_POINTER]):
         bytecode_add_PP()
+    elif precheck([TYPE_CHARACTER, TYPE_REMARK]):
+        bytecode_add_RS()
+    elif precheck([TYPE_REMARK, TYPE_CHARACTER]):
+        bytecode_add_RC()
     else:
         abort_run(opcode, offset)
 
