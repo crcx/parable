@@ -50,10 +50,8 @@ def is_number(s):
 def is_balanced(tokens):
     braces = 0
     for t in tokens:
-        if t == '[':
-            braces = braces + 1
-        if t == ']':
-            braces = braces - 1
+        if t == '[':  braces = braces + 1
+        if t == ']':  braces = braces - 1
     if braces == 0:
         return True
     else:
@@ -199,40 +197,72 @@ def bytecode_get_type(opcode, offset, more):
         abort_run(opcode, offset)
 
 
+# --[ Factor out specific conversions for BC_ADD ]--
+
+def bytecode_add_NN():
+    a = stack_pop()
+    b = stack_pop()
+    stack_push(b + a, TYPE_NUMBER)
+
+def bytecode_add_SS():
+    a = slice_to_string(stack_pop())
+    b = slice_to_string(stack_pop())
+    stack_push(string_to_slice(b + a), TYPE_STRING)
+
+def bytecode_add_CC():
+    a = chr(int(stack_pop()))
+    b = chr(int(stack_pop()))
+    stack_push(string_to_slice(b + a), TYPE_STRING)
+
+def bytecode_add_CS():
+    a = slice_to_string(stack_pop())
+    b = chr(int(stack_pop()))
+    stack_push(string_to_slice(b + a), TYPE_STRING)
+
+def bytecode_add_SC():
+    a = chr(int(stack_pop()))
+    b = slice_to_string(stack_pop())
+    stack_push(string_to_slice(b + a), TYPE_STRING)
+
+def bytecode_add_RR():
+    a = slice_to_string(stack_pop())
+    b = slice_to_string(stack_pop())
+    stack_push(string_to_slice(b + a), TYPE_REMARK)
+
+def bytecode_add_PP():
+    a = stack_pop()
+    b = stack_pop()
+    c = request_slice()
+    d = get_last_index(b) + get_last_index(a) + 1
+    set_slice_last_index(c, d)
+    memory_values[c] = memory_values[b] + memory_values[a]
+    memory_types[c] = memory_types[b] + memory_types[a]
+    stack_push(c, TYPE_POINTER)
+
+# Other forms we may want to add:
+# def bytecode_add_CR():
+# def bytecode_add_RC():
+# def bytecode_add_SR():
+# def bytecode_add_RS():
+
+# --[ Finished specific conversions for BC_ADD ]--
+
+
 def bytecode_add(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
-        a = stack_pop()
-        b = stack_pop()
-        stack_push(b + a, TYPE_NUMBER)
+        bytecode_add_NN()
     elif precheck([TYPE_STRING, TYPE_STRING]):
-        a = slice_to_string(stack_pop())
-        b = slice_to_string(stack_pop())
-        stack_push(string_to_slice(b + a), TYPE_STRING)
+        bytecode_add_SS()
     elif precheck([TYPE_CHARACTER, TYPE_CHARACTER]):
-        a = chr(int(stack_pop()))
-        b = chr(int(stack_pop()))
-        stack_push(string_to_slice(b + a), TYPE_STRING)
+        bytecode_add_CC()
     elif precheck([TYPE_CHARACTER, TYPE_STRING]):
-        a = slice_to_string(stack_pop())
-        b = chr(int(stack_pop()))
-        stack_push(string_to_slice(b + a), TYPE_STRING)
+        bytecode_add_CS()
     elif precheck([TYPE_STRING, TYPE_CHARACTER]):
-        a = chr(int(stack_pop()))
-        b = slice_to_string(stack_pop())
-        stack_push(string_to_slice(b + a), TYPE_STRING)
+        bytecode_add_SC()
     elif precheck([TYPE_REMARK, TYPE_REMARK]):
-        a = slice_to_string(stack_pop())
-        b = slice_to_string(stack_pop())
-        stack_push(string_to_slice(b + a), TYPE_REMARK)
+        bytecode_add_RR()
     elif precheck([TYPE_POINTER, TYPE_POINTER]):
-        a = stack_pop()
-        b = stack_pop()
-        c = request_slice()
-        d = get_last_index(b) + get_last_index(a) + 1
-        set_slice_last_index(c, d)
-        memory_values[c] = memory_values[b] + memory_values[a]
-        memory_types[c] = memory_types[b] + memory_types[a]
-        stack_push(c, TYPE_POINTER)
+        bytecode_add_PP()
     else:
         abort_run(opcode, offset)
 
