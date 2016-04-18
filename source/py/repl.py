@@ -17,18 +17,18 @@ import parable
 # setup_readline() attempts to import and initialize readline support. if this
 # fails, we just return and don't get to benefit from readline.
 #
-# completer() provides for tab completion for anything named in the parable
-# dictionary.
+# tab_completion() provides for tab completion for anything named in the
+# parable dictionary.
 
 def setup_readline():
     try:
         import readline
-        readline.set_completer(completer)
+        readline.set_completer(tab_completion)
         readline.parse_and_bind("tab: complete")
     except:
         pass
 
-def completer(text, state):
+def tab_completion(text, state):
     options = [x for x in parable.dictionary_names() if x.startswith(text)]
     try:
         return options[state]
@@ -78,18 +78,13 @@ def init_from_snapshot(s):
 
 def get_input():
     done = False
-    s = ''
     s = input("\ninput> ")
     while not done:
-        if s.endswith(' \\'):
-            s = s[:-2].strip() + ' '
-            s = s + input("       ")
+        if parable.is_balanced(parable.tokenize(s)):
+            done = True
         else:
-            if parable.is_balanced(parable.tokenize(s)):
-                done = True
-            else:
-                s = s.strip() + ' '
-                s = s + input("       ")
+            s = s.strip() + ' '
+            s = s + input("       ")
     return s
 
 
