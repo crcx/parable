@@ -8,7 +8,6 @@
 #
 import math
 import random
-import sys
 
 #
 # Memory Configuration
@@ -50,10 +49,8 @@ def is_number(s):
 def is_balanced(tokens):
     braces = 0
     for t in tokens:
-        if t == '[':
-            braces = braces + 1
-        if t == ']':
-            braces = braces - 1
+        if t == '[':  braces = braces + 1
+        if t == ']':  braces = braces - 1
     if braces == 0:
         return True
     else:
@@ -199,40 +196,80 @@ def bytecode_get_type(opcode, offset, more):
         abort_run(opcode, offset)
 
 
+# --[ Factor out specific conversions for BC_ADD ]--
+
+def bytecode_add_NN():
+    a = stack_pop()
+    b = stack_pop()
+    stack_push(b + a, TYPE_NUMBER)
+
+def bytecode_add_SS():
+    a = slice_to_string(stack_pop())
+    b = slice_to_string(stack_pop())
+    stack_push(string_to_slice(b + a), TYPE_STRING)
+
+def bytecode_add_CC():
+    a = chr(int(stack_pop()))
+    b = chr(int(stack_pop()))
+    stack_push(string_to_slice(b + a), TYPE_STRING)
+
+def bytecode_add_CS():
+    a = slice_to_string(stack_pop())
+    b = chr(int(stack_pop()))
+    stack_push(string_to_slice(b + a), TYPE_STRING)
+
+def bytecode_add_SC():
+    a = chr(int(stack_pop()))
+    b = slice_to_string(stack_pop())
+    stack_push(string_to_slice(b + a), TYPE_STRING)
+
+def bytecode_add_RR():
+    a = slice_to_string(stack_pop())
+    b = slice_to_string(stack_pop())
+    stack_push(string_to_slice(b + a), TYPE_REMARK)
+
+def bytecode_add_PP():
+    a = stack_pop()
+    b = stack_pop()
+    c = request_slice()
+    d = get_last_index(b) + get_last_index(a) + 1
+    set_slice_last_index(c, d)
+    memory_values[c] = memory_values[b] + memory_values[a]
+    memory_types[c] = memory_types[b] + memory_types[a]
+    stack_push(c, TYPE_POINTER)
+
+def bytecode_add_CR():
+    a = slice_to_string(stack_pop())
+    b = chr(int(stack_pop()))
+    stack_push(string_to_slice(b + a), TYPE_REMARK)
+
+def bytecode_add_RC():
+    a = chr(int(stack_pop()))
+    b = slice_to_string(stack_pop())
+    stack_push(string_to_slice(b + a), TYPE_REMARK)
+
+# --[ Finished specific conversions for BC_ADD ]--
+
+
 def bytecode_add(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
-        a = stack_pop()
-        b = stack_pop()
-        stack_push(b + a, TYPE_NUMBER)
+        bytecode_add_NN()
     elif precheck([TYPE_STRING, TYPE_STRING]):
-        a = slice_to_string(stack_pop())
-        b = slice_to_string(stack_pop())
-        stack_push(string_to_slice(b + a), TYPE_STRING)
+        bytecode_add_SS()
     elif precheck([TYPE_CHARACTER, TYPE_CHARACTER]):
-        a = chr(int(stack_pop()))
-        b = chr(int(stack_pop()))
-        stack_push(string_to_slice(b + a), TYPE_STRING)
+        bytecode_add_CC()
     elif precheck([TYPE_CHARACTER, TYPE_STRING]):
-        a = slice_to_string(stack_pop())
-        b = chr(int(stack_pop()))
-        stack_push(string_to_slice(b + a), TYPE_STRING)
+        bytecode_add_CS()
     elif precheck([TYPE_STRING, TYPE_CHARACTER]):
-        a = chr(int(stack_pop()))
-        b = slice_to_string(stack_pop())
-        stack_push(string_to_slice(b + a), TYPE_STRING)
+        bytecode_add_SC()
     elif precheck([TYPE_REMARK, TYPE_REMARK]):
-        a = slice_to_string(stack_pop())
-        b = slice_to_string(stack_pop())
-        stack_push(string_to_slice(b + a), TYPE_REMARK)
+        bytecode_add_RR()
     elif precheck([TYPE_POINTER, TYPE_POINTER]):
-        a = stack_pop()
-        b = stack_pop()
-        c = request_slice()
-        d = get_last_index(b) + get_last_index(a) + 1
-        set_slice_last_index(c, d)
-        memory_values[c] = memory_values[b] + memory_values[a]
-        memory_types[c] = memory_types[b] + memory_types[a]
-        stack_push(c, TYPE_POINTER)
+        bytecode_add_PP()
+    elif precheck([TYPE_CHARACTER, TYPE_REMARK]):
+        bytecode_add_RS()
+    elif precheck([TYPE_REMARK, TYPE_CHARACTER]):
+        bytecode_add_RC()
     else:
         abort_run(opcode, offset)
 
@@ -1794,9 +1831,10 @@ def parse_string(tokens, i, count, delimiter):
     return i, final.replace("\\", "")
 
 
-def compile(str, slice):
+def compile(str, slice=None):
     global should_abort
     should_abort = False
+    if slice == None:  slice = request_slice()
     prefixes = { '`', '#', '$', '&', '\'', '"', '@', '!', '|' }
     nest = []
     tokens = tokenize(str)
@@ -1868,7 +1906,7 @@ def compile(str, slice):
 def parse_bootstrap(f):
     """compile the bootstrap package it into memory"""
     for line in condense_lines(f):
-        if len(line) > 0: interpret(compile(line, request_slice()))
+        if len(line) > 0: interpret(compile(line))
 
 
 # some parts of the language (prefixes, brackets) are understood as part of
@@ -1878,6 +1916,4 @@ def parse_bootstrap(f):
 
 def prepare_dictionary():
     """setup the initial dictionary"""
-    s = request_slice()
-    compile('"ps-" `{0} "Attach a name to a pointer"'.format(BC_QUOTE_NAME), s)
-    add_definition(':', s)
+    add_definition(':', compile('"ps-" `{0} "Attach a name to a pointer"'.format(BC_QUOTE_NAME)))

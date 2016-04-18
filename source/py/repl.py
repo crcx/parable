@@ -146,7 +146,7 @@ def opcodes(slice, offset, opcode):
 # source a bit more readable.
 
 def evaluate(s):
-    parable.interpret(parable.compile(s, parable.request_slice()), opcodes)
+    parable.interpret(parable.compile(s), opcodes)
 
 
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+

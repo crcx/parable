@@ -8,7 +8,6 @@
 #
 import math
 import random
-import sys
 
 #
 # Memory Configuration
@@ -1832,9 +1831,10 @@ def parse_string(tokens, i, count, delimiter):
     return i, final.replace("\\", "")
 
 
-def compile(str, slice):
+def compile(str, slice=None):
     global should_abort
     should_abort = False
+    if slice == None:  slice = request_slice()
     prefixes = { '`', '#', '$', '&', '\'', '"', '@', '!', '|' }
     nest = []
     tokens = tokenize(str)
@@ -1906,7 +1906,7 @@ def compile(str, slice):
 def parse_bootstrap(f):
     """compile the bootstrap package it into memory"""
     for line in condense_lines(f):
-        if len(line) > 0: interpret(compile(line, request_slice()))
+        if len(line) > 0: interpret(compile(line))
 
 
 # some parts of the language (prefixes, brackets) are understood as part of
@@ -1916,6 +1916,4 @@ def parse_bootstrap(f):
 
 def prepare_dictionary():
     """setup the initial dictionary"""
-    s = request_slice()
-    compile('"ps-" `{0} "Attach a name to a pointer"'.format(BC_QUOTE_NAME), s)
-    add_definition(':', s)
+    add_definition(':', compile('"ps-" `{0} "Attach a name to a pointer"'.format(BC_QUOTE_NAME)))
