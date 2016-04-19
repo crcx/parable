@@ -2088,18 +2088,14 @@ def load_tagfile():
                 ctags.append(line.split('\t'))
 
 
-def tag(tag):
-    name = tag[0]
-    file = os.getcwd() + '/' + tag[1][2:]
-    line = tag[2]
-    return name + '\t' + file + '\t' + str(line)
-
+def tag(t):
+    return t[0] + '\t' + t[1] + '\t' + t[2]
 
 def write_tagfile():
     if os.path.exists('tags'):
         with open('tags', 'w') as f:
             for l in sorted(ctags):
-                f.write(tag(l) + '\n')
+                f.write(tag(l))
 
 
 def determine_form(src):
