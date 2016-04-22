@@ -5,7 +5,7 @@
 * **reverse** now preserves the pointer type (pointer, stack, remark)
 * **+** now supports new forms: cs-s, sc-s, and cc-s
 * the stack is now implemented as a single array of tuples (value, type)
-* remove BC_ROUND
+* remove BC\_ROUND
 * remove BC\_FLOW\_RETURN
 * BC_MEM_COPY now works with any pointer types
 * added parsed_stack()
@@ -18,7 +18,8 @@
 * line condenser no longer requires a \ to join lines
 * rewrote tokenizer
 * refactored stack_change_type()
-* fixed BC_LOGN
+* fixed BC\_LOGN
+* BC\_SUBSLICE now remembers the type of pointer
 
 ### Standard Library
 
