@@ -58,7 +58,6 @@ def is_balanced(tokens):
 
 
 def tokenize(str):
-    prefixes = { '`', '#', '$', '&', '\'', '"', '@', '!', '|' }
     tokens = ' '.join(str.strip().split()).split(' ')
     cleaned = []
     i = 0
@@ -744,9 +743,10 @@ def bytecode_slice_subslice(opcode, offset, more):
     if precheck([TYPE_POINTER, TYPE_NUMBER, TYPE_NUMBER]) or \
        precheck([TYPE_STRING, TYPE_NUMBER, TYPE_NUMBER]) or \
        precheck([TYPE_REMARK, TYPE_NUMBER, TYPE_NUMBER]):
-        a = int(stack_pop())
-        b = int(stack_pop())
-        s = int(stack_pop())
+        a = int(stack_pop())  # end
+        b = int(stack_pop())  # start
+        s, t = stack_pop(type=True)  # pointer
+        s = int(s)
         c = memory_values[s]
         d = c[b:a]
         dt = memory_types[s]
@@ -756,7 +756,7 @@ def bytecode_slice_subslice(opcode, offset, more):
         while i < len(d):
             store(d[i], e, i, dt[i])
             i = i + 1
-        stack_push(e, TYPE_POINTER)
+        stack_push(e, t)
     else:
         abort_run(opcode, offset)
 
