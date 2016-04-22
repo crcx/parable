@@ -27,6 +27,8 @@
   * byKey:
   * cycle
   * decons
+  * subslice&lt;left&gt;
+  * subslice&lt;right&gt;
   * vocab{
   * }vocab
 

@@ -673,6 +673,18 @@ Make a copy of a slice, returning a pointer to the copy
 
 Return the length of a slice
 
+## subslice&lt;right&gt;
+
+    pn-p
+
+Return a new slice containing the contents of the original slice, including the specified number of values. This copies the rightmost (trailing) elements.
+
+## subslice&lt;left&gt;
+
+    pn-p
+
+Return a new slice containing the contents of the original slice, including the specified number of values. This copies the leftmost (leading) elements.
+
 ## var!
 
     vs-

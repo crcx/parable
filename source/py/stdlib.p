@@ -144,6 +144,15 @@
 [ "p-p"   request [ copy ] sip   "Make a copy of a slice, returning a pointer to the copy" ] 'duplicate-slice' :
 [ "p-n"   get<final-offset> 1 +  "Return the length of a slice" ] 'length?' :
 
+[ "pn-p"
+  [ dup length? dup ] dip - swap subslice
+  "Return a new slice containing the contents of the original slice, including the specified number of values. This copies the rightmost (trailing) elements."
+] 'subslice<right>' :
+
+[ "pn-p"
+  0 swap subslice
+  "Return a new slice containing the contents of the original slice, including the specified number of values. This copies the leftmost (leading) elements."
+] 'subslice<left>' :
 
 "Simple variables are just named slices, with functions to access the first element. They're useful for holding single values."
 
