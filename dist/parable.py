@@ -7,7 +7,6 @@
 # Dependencies
 #
 import math
-import random
 
 #
 # Memory Configuration
@@ -392,7 +391,13 @@ def bytecode_bitwise_xor(opcode, offset, more):
 
 
 def bytecode_random(opcode, offset, more):
-    stack_push(random.SystemRandom().random(), TYPE_NUMBER)
+    try:
+        import random
+        stack_push(random.SystemRandom().random(), TYPE_NUMBER)
+    except:
+        import os
+        rand = (int.from_bytes(os.urandom(7), 'big') >> 3) / (1 << 53)
+        stack_push(rand, TYPE_NUMBER)
 
 
 def bytecode_sqrt(opcode, offset, more):
@@ -1088,6 +1093,7 @@ def interpret(slice, more=None):
         current_slice = slice
     while offset <= size and should_abort is not True:
         opcode, optype = fetch(slice, offset)
+        opcode = int(opcode)
         if optype != TYPE_BYTECODE:
             stack_push(opcode, optype)
             if optype == TYPE_REMARK:

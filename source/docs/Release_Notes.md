@@ -20,6 +20,7 @@
 * refactored stack_change_type()
 * fixed BC\_LOGN
 * BC\_SUBSLICE now remembers the type of pointer
+* added support for micropython
 
 ### Standard Library
 
