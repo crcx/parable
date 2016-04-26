@@ -1764,15 +1764,15 @@ functions calls without the prefixes.
 
 The bytecode forms are kept simple:
 
-|  type        |   stored       |  type          |
-|  ==========  |   ============ | ============== |
-|  Functions   |   pointer      |  function call |
-|  Strings     |   pointer      |  string        |
-|  Numbers     |   VALUE        |  number        |
-|  Characters  |   ASCII_VALUE  |  character     |
-|  Pointers    |   pointer      |  pointer       |
-|  Bytecodes   |   bytecode     |  bytecode      |
-|  Comments    |   pointer      |  comment       |
+| type         | stored       | type          |
+| ------------ | ------------ | ------------- |
+| Functions    | pointer      | function call |
+| Strings      | pointer      | string        |
+| Numbers      | VALUE        | number        |
+| Characters   | ASCII_VALUE  | character     |
+| Pointers     | pointer      | pointer       |
+| Bytecodes    | bytecode     | bytecode      |
+| Comments     | pointer      | comment       |
 
 
 ````
