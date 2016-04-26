@@ -13,6 +13,7 @@ import math
 #
 
 INITIAL_SLICES = 9250
+PREALLOCATE = 1250
 
 #
 # Constants for data types
@@ -1093,7 +1094,10 @@ def interpret(slice, more=None):
         current_slice = slice
     while offset <= size and should_abort is not True:
         opcode, optype = fetch(slice, offset)
-        opcode = int(opcode)
+        if math.isnan(opcode):
+            opcode == BC_NOP
+        else:
+            opcode = int(opcode)
         if optype != TYPE_BYTECODE:
             stack_push(opcode, optype)
             if optype == TYPE_REMARK:
@@ -1473,15 +1477,15 @@ def request_slice():
             return i
         else:
             i += 1
+    if stack_depth() == 0:
+        collect_garbage()
     x = 0
-    while x < 1250:
+    while x < PREALLOCATE:
         memory_map.append(0)
         memory_values.append([0])
         memory_types.append([0])
         memory_size.append(0)
         x = x + 1
-#    if stack_depth() == 0:
-#        collect_garbage()
     memory_map[i] = 1
     memory_values[i] = [0]
     memory_types[i] = [0]
