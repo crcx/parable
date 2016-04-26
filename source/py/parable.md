@@ -150,6 +150,9 @@ BC_VM_MEM_ALLOC = 66
 
 Here Parable has a few functions that are used later, in various places.
 
+
+**is_number()** determines if a string can be treated as a number.
+
 ````
 def is_number(s):
     """return True if s is a number, or False otherwise"""
@@ -158,8 +161,12 @@ def is_number(s):
         return True
     except ValueError:
         return False
+````
 
+**is_balanced()** determines if a list of tokens contains a balanced number of
+brackets.
 
+````
 def is_balanced(tokens):
     braces = 0
     for t in tokens:
@@ -169,8 +176,14 @@ def is_balanced(tokens):
         return True
     else:
         return False
+````
 
+**tokenize()** breaks a string into a series of tokens. The resulting list is
+used with **is_balanced()** and **condense_lines()**. Tokenization is mostly
+just splitting on spaces, but this also accounts for strings (delimited by ')
+and remarks (delimited by ").
 
+````
 def tokenize(str):
     tokens = ' '.join(str.strip().split()).split(' ')
     cleaned = []
@@ -189,8 +202,17 @@ def tokenize(str):
             cleaned.append(current)
         i = i + 1
     return cleaned
+````
 
+The Parable compiler expects each function to be on a single line of source.
+This routine, **condense_lines()** takes an array of lines, tokenizes them,
+checks for balanced brackets, and merges them as needed. It then returns a new
+array with one line per function.
 
+*Note: this currently also allows use of a trailing \ to merge lines. This
+is deprecated and will be removed in a future release.*
+
+````
 def condense_lines(code):
     """Take an array of code, join lines ending with a \, and return"""
     """the new array"""

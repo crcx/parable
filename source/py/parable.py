@@ -94,8 +94,6 @@ def is_number(s):
         return True
     except ValueError:
         return False
-
-
 def is_balanced(tokens):
     braces = 0
     for t in tokens:
@@ -105,8 +103,6 @@ def is_balanced(tokens):
         return True
     else:
         return False
-
-
 def tokenize(str):
     tokens = ' '.join(str.strip().split()).split(' ')
     cleaned = []
@@ -125,8 +121,6 @@ def tokenize(str):
             cleaned.append(current)
         i = i + 1
     return cleaned
-
-
 def condense_lines(code):
     """Take an array of code, join lines ending with a \, and return"""
     """the new array"""
@@ -1649,38 +1643,7 @@ def collect_garbage():
         if not i in refs and memory_map[i] == 1:
             release_slice(i)
         i = i + 1
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-# The Compiler
 #
-# This is the core of the user-facing language. It takes a string, breaks it
-# into tokens, then lays down code based on the prefix each token has.
-#
-# Prefixes are:
-#
-#   #   Numbers
-#   $   Characters
-#   &   Pointers
-#   `   Bytecodes
-#   '   Strings
-#   "   Comments
-#   |   Function Calls
-#
-# To aid in readability, the compiler also allows for use of number and
-# functions calls without the prefixes.
-#
-# The bytecode forms are kept simple:
-#
-#   type           stored         type
-#   ==========     ============================
-#   Functions      pointer        function call
-#   Strings        pointer        string
-#   Numbers        VALUE          number
-#   Characters     ASCII_VALUE    character
-#   Pointers       pointer        pointer
-#   Bytecodes      bytecode       bytecode
-#   Comments       pointer        comment
 #
 # There are two special prefixes:
 #
