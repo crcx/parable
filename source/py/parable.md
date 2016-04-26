@@ -1742,38 +1742,41 @@ def collect_garbage():
         if not i in refs and memory_map[i] == 1:
             release_slice(i)
         i = i + 1
+````
 
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+### The Compiler
 
-# The Compiler
+This is the core of the user-facing language. It takes a string, breaks it
+into tokens, then lays down code based on the prefix each token has.
+
+| Prefix | Token is...    |
+| ------ | -------------- |
+|  #     |  Numbers       |
+|   $    | Characters     |
+|   &    | Pointers       |
+|   `    | Bytecodes      |
+|   '    | Strings        |
+|   "    | Comments       |
+|   \|   | Function Calls |
+
+To aid in readability, the compiler also allows for use of number and
+functions calls without the prefixes.
+
+The bytecode forms are kept simple:
+
+|  type        |   stored       |  type          |
+|  ==========  |   ============ | ============== |
+|  Functions   |   pointer      |  function call |
+|  Strings     |   pointer      |  string        |
+|  Numbers     |   VALUE        |  number        |
+|  Characters  |   ASCII_VALUE  |  character     |
+|  Pointers    |   pointer      |  pointer       |
+|  Bytecodes   |   bytecode     |  bytecode      |
+|  Comments    |   pointer      |  comment       |
+
+
+````
 #
-# This is the core of the user-facing language. It takes a string, breaks it
-# into tokens, then lays down code based on the prefix each token has.
-#
-# Prefixes are:
-#
-#   #   Numbers
-#   $   Characters
-#   &   Pointers
-#   `   Bytecodes
-#   '   Strings
-#   "   Comments
-#   |   Function Calls
-#
-# To aid in readability, the compiler also allows for use of number and
-# functions calls without the prefixes.
-#
-# The bytecode forms are kept simple:
-#
-#   type           stored         type
-#   ==========     ============================
-#   Functions      pointer        function call
-#   Strings        pointer        string
-#   Numbers        VALUE          number
-#   Characters     ASCII_VALUE    character
-#   Pointers       pointer        pointer
-#   Bytecodes      bytecode       bytecode
-#   Comments       pointer        comment
 #
 # There are two special prefixes:
 #
@@ -1962,6 +1965,7 @@ def compile(str, slice=None):
 ### Final Bits
 
 To initialize Parable
+
 ````
 #
 # A few things to help get the initial environment up and running.
