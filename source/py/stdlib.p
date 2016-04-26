@@ -1,4 +1,3 @@
-"Name the byte codes"
 [ "-"      `0  "Does nothing" ] 'nop' :
 [ "vt-v"   `1  "Convert a value to the specified type" ] 'set-type' :
 [ "v-vn"   `2  "Return the type constant for a value" ] 'type?' :
@@ -65,7 +64,6 @@
 [ "-p"     `64 "Return an array indicating which slices are allocated and which are free. Each index corresponds to a slice. If the stored value is 0, the slice is free. If 1, the slice is allocated." ] 'vm.memory<map>' :
 [ "-p"     `65 "Return an array indicating the size of each slice (in cells). Each index corresponds to a slice; the stored value is the length of the slice." ] 'vm.memory<sizes>' :
 [ "-p"     `66 "Return an array of slice numbers which are currently marked as allocated." ] 'vm.memory<allocated>' :
-
 [ "vV-vVv"
   [ dup ] dip swap
   "Put a copy of the second item on top of the stack"

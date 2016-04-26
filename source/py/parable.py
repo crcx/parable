@@ -1,24 +1,15 @@
+INITIAL_SLICES = 9250
+PREALLOCATE = 1250
 # parable
 # Copyright (c) 2012-2016, Charles Childers
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 # coding: utf-8
-
-#
-# Dependencies
-#
 import math
 
-#
-# Memory Configuration
-#
-
-INITIAL_SLICES = 9250
-PREALLOCATE = 1250
-
-#
-# Constants for data types
-#
-
+try:
+    import random
+except:
+    import os
 TYPE_NUMBER = 100
 TYPE_STRING = 200
 TYPE_CHARACTER = 300
@@ -27,84 +18,8 @@ TYPE_FLAG = 500
 TYPE_BYTECODE = 600
 TYPE_REMARK = 700
 TYPE_FUNCALL = 800
-
-# For precheck(), we also allow matching agains two "generic" types:
-
 TYPE_ANY = 0
 TYPE_ANY_PTR = 1
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-# Support code used later on
-
-def is_number(s):
-    """return True if s is a number, or False otherwise"""
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
-
-
-def is_balanced(tokens):
-    braces = 0
-    for t in tokens:
-        if t == '[':  braces = braces + 1
-        if t == ']':  braces = braces - 1
-    if braces == 0:
-        return True
-    else:
-        return False
-
-
-def tokenize(str):
-    tokens = ' '.join(str.strip().split()).split(' ')
-    cleaned = []
-    i = 0
-    while i < len(tokens):
-        current = tokens[i]
-        prefix = tokens[i][:1]
-        s = ""
-        if prefix == '"':
-            i, s = parse_string(tokens, i, len(tokens), '"')
-        elif prefix == "'":
-            i, s = parse_string(tokens, i, len(tokens), '\'')
-        if s != "":
-            cleaned.append(s)
-        elif current != '':
-            cleaned.append(current)
-        i = i + 1
-    return cleaned
-
-
-def condense_lines(code):
-    """Take an array of code, join lines ending with a \, and return"""
-    """the new array"""
-    s = ''
-    r = []
-    for line in code:
-        if line.endswith(' \\\n'):
-            s = s + ' ' + line[:-2].strip()
-        else:
-            s = s + ' ' + line.strip()
-        if is_balanced(tokenize(s)):
-            r.append(s.strip())
-            s = ''
-    return r
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-# Byte Codes
-#
-# The Parable virtual machine is byte coded; each byte code corresponds to a
-# single instruction. In this section we assign each byte code a symbolic
-# name and value, provide an implementation for each (with one exception:
-# see interpet() for details on this), and then build a dispatch table that
-# maps each instuction to its handler.
-
-
-# Constants for byte codes
-
 BC_NOP = 0
 BC_SET_TYPE = 1
 BC_GET_TYPE = 2
@@ -172,10 +87,60 @@ BC_TRIG_ATAN2 = 63
 BC_VM_MEM_MAP = 64
 BC_VM_MEM_SIZES = 65
 BC_VM_MEM_ALLOC = 66
+def is_number(s):
+    """return True if s is a number, or False otherwise"""
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
 
 
-# Implement the byte code functions
+def is_balanced(tokens):
+    braces = 0
+    for t in tokens:
+        if t == '[':  braces = braces + 1
+        if t == ']':  braces = braces - 1
+    if braces == 0:
+        return True
+    else:
+        return False
 
+
+def tokenize(str):
+    tokens = ' '.join(str.strip().split()).split(' ')
+    cleaned = []
+    i = 0
+    while i < len(tokens):
+        current = tokens[i]
+        prefix = tokens[i][:1]
+        s = ""
+        if prefix == '"':
+            i, s = parse_string(tokens, i, len(tokens), '"')
+        elif prefix == "'":
+            i, s = parse_string(tokens, i, len(tokens), '\'')
+        if s != "":
+            cleaned.append(s)
+        elif current != '':
+            cleaned.append(current)
+        i = i + 1
+    return cleaned
+
+
+def condense_lines(code):
+    """Take an array of code, join lines ending with a \, and return"""
+    """the new array"""
+    s = ''
+    r = []
+    for line in code:
+        if line.endswith(' \\\n'):
+            s = s + ' ' + line[:-2].strip()
+        else:
+            s = s + ' ' + line.strip()
+        if is_balanced(tokenize(s)):
+            r.append(s.strip())
+            s = ''
+    return r
 def bytecode_nop(opcode, offset, more):
     return
 
@@ -393,10 +358,8 @@ def bytecode_bitwise_xor(opcode, offset, more):
 
 def bytecode_random(opcode, offset, more):
     try:
-        import random
         stack_push(random.SystemRandom().random(), TYPE_NUMBER)
     except:
-        import os
         rand = (int.from_bytes(os.urandom(7), 'big') >> 3) / (1 << 53)
         stack_push(rand, TYPE_NUMBER)
 
@@ -938,10 +901,6 @@ def bytecode_vm_mem_alloc(opcode, offset, more):
             n = n + 1
         i = i + 1
     stack_push(s, TYPE_POINTER)
-
-
-# Create the dispatch table mapping byte code numbers to their implementations
-
 bytecodes = {
     BC_NOP:            bytecode_nop,
     BC_SET_TYPE:       bytecode_set_type,
@@ -1011,7 +970,6 @@ bytecodes = {
     BC_VM_MEM_SIZES:   bytecode_vm_mem_sizes,
     BC_VM_MEM_ALLOC:   bytecode_vm_mem_alloc,
 }
-
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 # Error logging
@@ -1035,7 +993,6 @@ def report(text):
     """report an error"""
     global errors
     errors.append(text)
-
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 # Byte Code Interpreter
@@ -1906,10 +1863,6 @@ def compile(str, slice=None):
     if len(nest) != 0:
         report('E03: Compile Error - quotations not balanced')
     return slice
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-# Final Bits
 #
 # A few things to help get the initial environment up and running.
 
