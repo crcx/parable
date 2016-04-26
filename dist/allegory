@@ -2305,12 +2305,13 @@ def extract_from_markdown(name):
     s = []
     fence = False
     for l in v:
+        clean = l.strip()
         if l.startswith('    '): s.append(l[4:])
-        elif fence == True and l != '````\n':
+        elif fence == True and clean != '````':
             s.append(l)
-        elif l == '````\n' and fence == True:
+        elif clean == '````' and fence == True:
             fence = False
-        elif l == '````\n' and fence == False:
+        elif clean == '````' and fence == False:
             fence = True
     return s
 
