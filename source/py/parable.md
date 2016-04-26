@@ -1664,19 +1664,22 @@ def slice_to_string(slice):
         except: pass
         i += 1
     return ''.join(s)
+````
 
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+### Garbage Collection
 
-# Garbage Collection
-#
-# Parable's memory model is flexible, but prone to wasting memory due to the
-# existance of short-lived allocations. This isn't generally a problem, but
-# it's useful to be able to reclaim memory if/when the memory space begins
-# getting restricted.
-#
-# The solution to this is the garbage collector. It's a piece of code that
-# scans memory for slices that aren't referenced, and reclaims them.
+Parable's memory model is flexible, but prone to wasting memory due to the
+existance of short-lived allocations. This isn't generally a problem, but
+it's useful to be able to reclaim memory if/when the memory space begins
+getting restricted.
 
+The solution to this is the garbage collector. It's a piece of code that
+scans memory for slices that aren't referenced, and reclaims them.
+
+The first piece is a little something to determine if the value is a pointer. Parable considers pointers to be of types **TYPE_POINTER**,
+**TYPE_STRING**, **TYPE_REMARK**, **TYPE_FUNCALL**.
+
+````
 def is_pointer(type):
     flag = False
     if type == TYPE_POINTER or \
@@ -1687,8 +1690,12 @@ def is_pointer(type):
     else:
         flag = False
     return flag
+````
 
+Next is a function to scan a slice, returning a list of all pointers it
+contains.
 
+````
 def scan_slice(s):
     ptrs = []
     i = get_last_index(s)
@@ -1704,8 +1711,17 @@ def scan_slice(s):
                 ptrs.append(v)
         i = i - 1
     return ptrs
+````
 
+We then have a function which uses this repeatedly, scanning a slice for
+pointers, then scanning each pointer in turn for more pointers. This
+repeats until the final list stops growing.
 
+*Note: we used to have this as a recursive approach, but that proved
+problematic with larger programs. This is a little less elegant, but
+works consistently.*
+
+````
 def find_references(s):
     ptrs = scan_slice(s)
     l = len(ptrs)
@@ -1719,8 +1735,9 @@ def find_references(s):
                     ptrs.append(n)
         ln = len(ptrs)
     return ptrs
+````
 
-
+````
 def seek_all_references():
     """return a list of all references in all named slices and stack items"""
     global dictionary, stack, types, current_slice
@@ -1782,7 +1799,7 @@ into tokens, then lays down code based on the prefix each token has.
 |   \|   | Function Calls |
 
 To aid in readability, the compiler also allows for use of number and
-functions calls without the prefixes.
+functions calls without the prefixes in most cases.
 
 The bytecode forms are kept simple:
 
@@ -1796,33 +1813,32 @@ The bytecode forms are kept simple:
 | Bytecodes    | bytecode     | bytecode      |
 | Comments     | pointer      | comment       |
 
+The compiler recognizes two special prefixes: @ and !
+
+| Example | Equivalent to... |
+| ------- | ---------------- |
+| @Base   | &Base #1 fetch   |
+| !Base   | &Base #1 store   |
+
+There are two additional implicit pieces of syntax: [ and ]. These form
+the basis of *quotations*. A quotation is an anonymous function. **[**
+marks the start of a quotation and **]** ends one.
+
+Each prefix has a function to handle it. These functions (which start with
+**compile_**) each take a parameter, a slice number, and the current
+offset. They are responsible for laying down the appropriate byte codes
+for their corresponding data. They each return the new offset into the
+slice.
+
+*Note: there is some redundancy here. We could merge some of them, but
+prefer keeping them separate to better map them to the individual
+prefixes.*
+
+First up are strings and remarks. Since these can contain spaces, there is
+also a **parse_string** function which returns a new index into the token
+stream and the complete string.
 
 ````
-#
-#
-# There are two special prefixes:
-#
-#   @<pointer>
-#   !<pointer>
-#
-# These correspond to the following bytecode sequences:
-#
-#   &<pointer> #1 fetch
-#   &<pointer> #1 store
-#
-# The compiler handle two implicit pieces of functionality: [ and ].
-# These are used to begin and end quotations.
-#
-# Bytecodes get wrapped into named functions. At this point they are
-# not inlined. This hurts performance, but makes the implementation
-# much simpler.
-#
-# The compile_ functions take a parameter, a slice, and the current
-# offset in that slice. They lay down the appropriate byte codes
-# for the type of item they are compiling. When done, they return
-# the new offset.
-
-
 def compile_string(string, slice, offset):
     store(string_to_slice(string), slice, offset, TYPE_STRING)
     offset += 1
@@ -1832,64 +1848,6 @@ def compile_string(string, slice, offset):
 def compile_comment(string, slice, offset):
     store(string_to_slice(string), slice, offset, TYPE_REMARK)
     offset += 1
-    return offset
-
-
-def compile_character(character, slice, offset):
-    store(character, slice, offset, TYPE_CHARACTER)
-    offset += 1
-    return offset
-
-
-def compile_pointer(name, slice, offset):
-    if is_number(name):
-        store(float(name), slice, offset, TYPE_POINTER)
-    else:
-        if lookup_pointer(name) != -1:
-            store(lookup_pointer(name), slice, offset, TYPE_POINTER)
-        else:
-            store(0, slice, offset, TYPE_POINTER)
-            report('E03: Compile Error: Unable to map {0} to a pointer'.format(name))
-    offset += 1
-    return offset
-
-
-def compile_number(number, slice, offset):
-    if is_number(number):
-        store(float(number), slice, offset, TYPE_NUMBER)
-    else:
-        store(float('nan'), slice, offset, TYPE_NUMBER)
-        report("E03: Compile Error: Unable to convert {0} to a number".format(number))
-    offset += 1
-    return offset
-
-
-def compile_bytecode(bytecode, slice, offset):
-    store(float(bytecode), slice, offset, TYPE_BYTECODE)
-    offset += 1
-    return offset
-
-
-def compile_function_call(name, slice, offset):
-    if lookup_pointer(name) != -1:
-        store(lookup_pointer(name), slice, offset, TYPE_FUNCALL)
-        offset += 1
-    else:
-        if name != "":
-           report('E03: Compile Error: Unable to map `{0}` to a pointer'.format(name))
-    return offset
-
-
-def compile_function_call_prefixed(name, slice, offset):
-    if lookup_pointer(name) != -1:
-        store(lookup_pointer(name), slice, offset, TYPE_FUNCALL)
-        offset += 1
-    else:
-        if is_number(name):
-            store(int(name), slice, offset, TYPE_FUNCALL)
-            offset += 1
-        else:
-           report('E03: Compile Error: Unable to map `{0}` to a pointer'.format(name))
     return offset
 
 
@@ -1914,8 +1872,88 @@ def parse_string(tokens, i, count, delimiter):
             j += 1
     final = s.replace("\\n", "\n").replace("\\t", "\t")
     return i, final.replace("\\", "")
+````
+
+Now on to some simpler types: bytecodes, characters, and numbers.
+
+````
+def compile_character(character, slice, offset):
+    store(character, slice, offset, TYPE_CHARACTER)
+    offset += 1
+    return offset
 
 
+def compile_number(number, slice, offset):
+    if is_number(number):
+        store(float(number), slice, offset, TYPE_NUMBER)
+    else:
+        store(float('nan'), slice, offset, TYPE_NUMBER)
+        report("E03: Compile Error: Unable to convert {0} to a number".format(number))
+    offset += 1
+    return offset
+
+
+def compile_bytecode(bytecode, slice, offset):
+    store(float(bytecode), slice, offset, TYPE_BYTECODE)
+    offset += 1
+    return offset
+````
+
+Pointers are a little more complex. A pointer can either be a name or a
+slice number, so we have to check for both. If it's not a number or a
+name, this will report an error.
+
+````
+def compile_pointer(name, slice, offset):
+    if is_number(name):
+        store(float(name), slice, offset, TYPE_POINTER)
+    else:
+        if lookup_pointer(name) != -1:
+            store(lookup_pointer(name), slice, offset, TYPE_POINTER)
+        else:
+            store(0, slice, offset, TYPE_POINTER)
+            report('E03: Compile Error: Unable to map {0} to a pointer'.format(name))
+    offset += 1
+    return offset
+````
+
+Function calls. There are two cases here: name only, with no prefix, and
+calls that have a **|** prefix. Calls with a prefix can be either named or
+numbered, so like pointers, we have to handle both forms.
+
+````
+def compile_function_call(name, slice, offset):
+    if lookup_pointer(name) != -1:
+        store(lookup_pointer(name), slice, offset, TYPE_FUNCALL)
+        offset += 1
+    else:
+        if name != "":
+           report('E03: Compile Error: Unable to map `{0}` to a pointer'.format(name))
+    return offset
+
+
+def compile_function_call_prefixed(name, slice, offset):
+    if lookup_pointer(name) != -1:
+        store(lookup_pointer(name), slice, offset, TYPE_FUNCALL)
+        offset += 1
+    else:
+        if is_number(name):
+            store(int(name), slice, offset, TYPE_FUNCALL)
+            offset += 1
+        else:
+           report('E03: Compile Error: Unable to map `{0}` to a pointer'.format(name))
+    return offset
+````
+
+And that wraps up the individual prefix handlers. All that's left is to
+tie it all together. Oh, and handle the **[** and **]** for quotations and
+the **!** and **@** prefixes for variable access shorthand.
+
+*Note: this really should be cleaned up further. It'd be beneficial to use
+a table for mapping the prefixes to their handlers instead of the nasty
+multipart conditional block used here.*
+
+````
 def compile(str, slice=None):
     global should_abort
     should_abort = False
@@ -2007,4 +2045,3 @@ def prepare_dictionary():
     """setup the initial dictionary"""
     add_definition(':', compile('"ps-" `{0} "Attach a name to a pointer"'.format(BC_QUOTE_NAME)))
 ````
-
