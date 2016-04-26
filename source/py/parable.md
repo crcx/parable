@@ -235,8 +235,8 @@ def condense_lines(code):
 The Parable virtual machine is byte coded; each byte code corresponds to a
 single instruction. In this section we assign each byte code a symbolic
 name and value, provide an implementation for each (with one exception:
-see **interpet()** for details on this), and then build a dispatch table that
-maps each instuction to its handler.
+see **interpet()** for details on this), and then build a dispatch table
+that maps each instuction to its handler.
 
 ````
 def bytecode_nop(opcode, offset, more):
@@ -1077,18 +1077,15 @@ bytecodes = {
 }
 ````
 
+### Error Log
+
+Errors are stored in an array, with a couple of helper functions to record
+and clear them.
+
+The interface layer should provide access to the the log (displaying when
+appropriate).
 
 ````
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-# Error logging
-
-# Errors are stored in an array, with a couple of helper functions to record
-# and clear them.
-#
-# The interface layer should provide access to the the log (displaying when
-# appropriate).
-
 errors = []
 
 
@@ -1188,15 +1185,15 @@ def interpret(slice, more=None):
         else:
             report('BT: &{0}\t#{1}\t{2}'.format(slice, offset - 1, pointer_to_name(slice)))
     current_slice = 0
+````
 
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+### Data Stack
 
-# Data Stack
-#
-# The data stack holds all non-permanent items. It's a basic, Forth-style
-# last-in, first-out (LIFO) model. But it does track types as well as the raw
-# values.
+The data stack holds all non-permanent items. It's a basic, Forth-style
+last-in, first-out (LIFO) model. But it does track types as well as the
+raw values.
 
+````
 stack = []
 
 
@@ -1434,18 +1431,27 @@ def stack_change_type(desired):
     else:
         a = stack_pop()
         stack_push(a, desired)
+````
 
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+### The Dictionary
 
-# The Dictionary
-#
-# Like Forth, Parable uses a dictionary to map names to pointers. Ours consists
-# of two arrays: one for the names and a second one for the pointers.
+Like Forth, Parable uses a dictionary to map names to pointers. Ours
+consists of a list of tuples. Each tuple has a name and corresponding
+slice number.
 
+(We also maintain a second list with the slices that used to be named but
+have since been hidden by the user.)
+
+````
 dictionary_warnings = False     # Used to trigger a warning if a name is redefined
 dictionary_hidden_slices = []   # Holds a list of slices that previously had names
 dictionary = []
+````
 
+Ok, first up are some quick helpers to return a list of the names and a
+separate list of the slice numbers they correspond to.
+
+````
 def dictionary_names():
     r = []
     for w in dictionary:
@@ -1458,22 +1464,25 @@ def dictionary_slices():
     for w in dictionary:
         r.append(w[1])
     return r
+````
 
-
+````
 def in_dictionary(s):
     for w in dictionary_names():
         if w == s:
             return True
     return False
+````
 
-
+````
 def dict_entry(name):
     for i in dictionary:
         if i[0] == name:
             return i[1]
     return -1
+````
 
-
+````
 def dict_index(name):
     n = 0
     for i in dictionary:
@@ -1481,15 +1490,22 @@ def dict_index(name):
             return n
         n = n + 1
     return -1
+````
 
-
+````
 def lookup_pointer(name):
     if in_dictionary(name) is False:
         return -1
     else:
         return dict_entry(name)
+````
 
+This next function adds a name to the dictionary. Typically this is pretty
+easy: just append the tuple to the dictionary list. But sometimes an
+existing name is passed. In this case we need to copy the contents of the
+passed slice in place of the original one.
 
+````
 def add_definition(name, slice):
     global dictionary
     if in_dictionary(name) is False:
@@ -1499,8 +1515,12 @@ def add_definition(name, slice):
             report('W10: {0} redefined'.format(name))
         target = lookup_pointer(name)
         copy_slice(slice, target)
+````
 
+Removal of a name is next. This is pretty easy: we copy the slice number
+to the list of hidden slices, then delete it from the list of tuples.
 
+````
 def remove_name(name):
     global dictionary, dictionary_hidden_slices
     if in_dictionary(name) is not False:
@@ -1508,8 +1528,9 @@ def remove_name(name):
         if not dictionary[i][1] in dictionary_hidden_slices:
             dictionary_hidden_slices.append(dictionary[i][1])
         del dictionary[i]
+````
 
-
+````
 def pointer_to_name(ptr):
     """given a parable pointer, return the corresponding name, or"""
     """an empty string"""
@@ -1517,25 +1538,36 @@ def pointer_to_name(ptr):
         if i[1] == ptr:
             return i[0]
     return ''
+````
 
+### Memory
 
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+Parable has a segmented memory model. Memory is divided into regions
+called slices. Each slice stores values, and has a shadow slice which
+stores the associated types.
 
-# Memory
-#
-# Parable has a segmented memory model. Memory is divided into regions called
-# slices. Each slice stores values, and has a shadow slice which stores the
-# associated types.
-#
-# Parable implements this over several arrays:
+At present this is implemented using multiple arrays.
 
+*It is intended that this be replaced with something simpler.*
+
+````
 memory_values = []    # Contains the slices for storing data
 memory_types = []     # Contains the slices for storing types
 memory_map = []       # A simple structure for indicating which slices are in use
 memory_size = []      # A simple structure for indicating the number of items
                       # in each slice
+````
 
+**request_slice()** allocates a new slice and returns the slice number. It 
+is actually pretty involved. The full process is:
 
+* scan the memory map for a non allocated slice
+* if one is found, mark it as allocated, then return the slice number
+* if one isn't found and the stack is empty, perform a garbage collection
+* then, add **PREALLOCATE** number of slices to the map and other arrays
+* and return a pointer to the first of these new slices
+
+````
 def request_slice():
     """request a new memory slice"""
     global memory_values, memory_types, memory_map, memory_size
@@ -1563,8 +1595,11 @@ def request_slice():
     memory_types[i] = [0]
     memory_size[i] = 0
     return i
+````
 
+Next up is **release_slice()**. This is pretty straightforward: mark the slice as free, and store empty values in the appropriate other arrays.
 
+````
 def release_slice(slice):
     """release a slice. the slice should not be used after this is done"""
     global memory_map, memory_size, memory_values, memory_types
@@ -1573,9 +1608,9 @@ def release_slice(slice):
     memory_size[slice] = 0
     memory_values[slice] = [0]
     memory_types[slice] = [0]
+````
 
-
-
+````
 def copy_slice(source, dest):
     """copy the contents of one slice to another"""
     global memory_size
@@ -1737,6 +1772,10 @@ def find_references(s):
     return ptrs
 ````
 
+Our next routine is intended to collect a master list of all references.
+We have to pull values from several sources: the stack, the dictionary,
+named items that have been hidden, and the current slice.
+
 ````
 def seek_all_references():
     """return a list of all references in all named slices and stack items"""
@@ -1771,8 +1810,12 @@ def seek_all_references():
                 refs.append(x)
 
     return refs
+````
 
+And finally tie it all together. This collects all references and then
+releases any slices not in the list.
 
+````
 def collect_garbage():
     """scan memory, and collect unused slices"""
     i = 0
