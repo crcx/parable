@@ -2306,23 +2306,21 @@ def compile(str, slice=None):
 
 ### Final Bits
 
-To initialize Parable
+A few things to help get the initial environment up and running.
 
 ````
-#
-# A few things to help get the initial environment up and running.
-
 def parse_bootstrap(f):
     """compile the bootstrap package it into memory"""
     for line in condense_lines(f):
         if len(line) > 0: interpret(compile(line))
+````
 
+Some parts of the language (prefixes, brackets) are understood as part of
+the parser. but one important bit, the ability to give a name to an item,
+is not. this routine sets up an initial dictionary containing the **define**
+function. with this loaded, all else can be built.
 
-# some parts of the language (prefixes, brackets) are understood as part of
-# the parser. but one important bit, the ability to give a name to an item,
-# is not. this routine sets up an initial dictionary containing the *define*
-# function. with this loaded, all else can be built.
-
+````
 def prepare_dictionary():
     """setup the initial dictionary"""
     add_definition(':', compile('"ps-" `{0} "Attach a name to a pointer"'.format(BC_QUOTE_NAME)))
