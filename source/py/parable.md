@@ -238,6 +238,40 @@ that maps each instuction to its handler.
 
 Some commentary will be provided for each byte code.
 
+First, we have a couple of things that are used to help catch type errors
+and gracefully abort execution when issues are detected.
+
+````
+should_abort = False        # Used to indicate if an error was detected during
+                            # the current run.
+
+def abort_run(opcode, offset):
+    global should_abort
+    report("E05: Invalid Types or Stack Underflow")
+    report("Error processing `{0} at offset {1} in slice {2}".format(opcode, offset, current_slice))
+    should_abort = True
+
+
+def precheck(req):
+    flag = True
+    if stack_depth() < len(req):
+        flag = False
+    i = stack_depth() - 1
+    if flag:
+        for t in reversed(req):
+            if t == TYPE_ANY_PTR:
+                if stack_type_for(i) != TYPE_POINTER and \
+                   stack_type_for(i) != TYPE_STRING and \
+                   stack_type_for(i) != TYPE_REMARK and \
+                   stack_type_for(i) != TYPE_FUNCALL:
+                    flag = False
+            elif t != stack_type_for(i) and t != TYPE_ANY:
+                flag = False
+            i = i - 1
+    return flag
+````
+
+
 The simplest instruction is **BC_NOP** which does nothing. It's useful for
 padding things.
 
@@ -422,6 +456,8 @@ def bytecode_remainder(opcode, offset, more):
         abort_run(opcode, offset)
 ````
 
+**BC_POW** raises a number to a specific power.
+
 ````
 def bytecode_pow(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
@@ -431,6 +467,8 @@ def bytecode_pow(opcode, offset, more):
     else:
         abort_run(opcode, offset)
 ````
+
+**BC\_LOG\_N** returns the logarithm of a number in the specified base.
 
 ````
 def bytecode_logn(opcode, offset, more):
@@ -462,6 +500,8 @@ def bytecode_bitwise_shift(opcode, offset, more):
         abort_run(opcode, offset)
 ````
 
+**BC\_BITWISE\_AND** performs a bitwise AND operation on numbers or flags.
+
 ````
 def bytecode_bitwise_and(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
@@ -476,6 +516,8 @@ def bytecode_bitwise_and(opcode, offset, more):
         abort_run(opcode, offset)
 ````
 
+**BC\_BITWISE\_OR** performs a bitwise OR operation on numbers or flags.
+
 ````
 def bytecode_bitwise_or(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
@@ -489,6 +531,8 @@ def bytecode_bitwise_or(opcode, offset, more):
     else:
         abort_run(opcode, offset)
 ````
+
+**BC\_BITWISE\_XOR** performs a bitwise XOR operation on numbers or flags.
 
 ````
 def bytecode_bitwise_xor(opcode, offset, more):
@@ -518,12 +562,17 @@ def bytecode_random(opcode, offset, more):
         stack_push(rand, TYPE_NUMBER)
 ````
 
-````def bytecode_sqrt(opcode, offset, more):
+**BC_SQRT** returns the square root of a number.
+
+````
+def bytecode_sqrt(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
         stack_push(math.sqrt(stack_pop()), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
 ````
+
+**BC\_COMPARE\_LT** compares two numbers for a condition of less than.
 
 ````
 def bytecode_compare_lt(opcode, offset, more):
@@ -538,6 +587,8 @@ def bytecode_compare_lt(opcode, offset, more):
         abort_run(opcode, offset)
 ````
 
+**BC\_COMPARE\_GT** compares two numbers for a condition of greater than.
+
 ````
 def bytecode_compare_gt(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
@@ -550,6 +601,9 @@ def bytecode_compare_gt(opcode, offset, more):
     else:
         abort_run(opcode, offset)
 ````
+
+**BC\_COMPARE\_LTEQ** compares two numbers for a condition of less than or
+equal to.
 
 ````
 def bytecode_compare_lteq(opcode, offset, more):
@@ -564,6 +618,9 @@ def bytecode_compare_lteq(opcode, offset, more):
         abort_run(opcode, offset)
 ````
 
+**BC\_COMPARE\_GTEQ** compares two numbers for a condition of greater than or
+equal to.
+
 ````
 def bytecode_compare_gteq(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
@@ -576,6 +633,8 @@ def bytecode_compare_gteq(opcode, offset, more):
     else:
         abort_run(opcode, offset)
 ````
+
+**BC\_COMPARE\_EQ** compares two values for equality.
 
 ````
 def bytecode_compare_eq(opcode, offset, more):
@@ -592,6 +651,8 @@ def bytecode_compare_eq(opcode, offset, more):
         stack_push(0, TYPE_FLAG)
 ````
 
+**BC\_COMPARE\_NEQ** compares two values for inequality.
+
 ````
 def bytecode_compare_neq(opcode, offset, more):
     if precheck([TYPE_STRING, TYPE_STRING]) or \
@@ -607,6 +668,10 @@ def bytecode_compare_neq(opcode, offset, more):
         stack_push(0, TYPE_FLAG)
 ````
 
+**BC\_FLOW\_IF** implements conditional calls based on two pointers and a
+flag. When the flag is true it'll run the first quote (NOS) and when false
+it runs the second (TOS).
+
 ````
 def bytecode_flow_if(opcode, offset, more):
     if precheck([TYPE_FLAG, TYPE_POINTER, TYPE_POINTER]):
@@ -620,6 +685,10 @@ def bytecode_flow_if(opcode, offset, more):
     else:
         abort_run(opcode, offset)
 ````
+
+**BC\_FLOW\_WHILE** is one of three looping functions. It executes a quote
+(which needs to return a flag). As long as the flag is true, the quote is
+executed again. When false, execution ends.
 
 ````
 def bytecode_flow_while(opcode, offset, more):
@@ -638,6 +707,11 @@ def bytecode_flow_while(opcode, offset, more):
         abort_run(opcode, offset)
 ````
 
+**BC\_FLOW\_UNTIL** is one of three looping functions. It executes a quote
+(which needs to return a flag). As long as the flag is false, the quote is
+executed again. When true, execution ends. *This is the inverse of the
+**BC\_FLOW\_WHILE** instruction*.
+
 ````
 def bytecode_flow_until(opcode, offset, more):
     if precheck([TYPE_POINTER]):
@@ -655,6 +729,9 @@ def bytecode_flow_until(opcode, offset, more):
         abort_run(opcode, offset)
 ````
 
+The last of the looping instructions is **BC\_FLOW\_TIMES** which takes a
+pointer and a count. It then executes the quote the specified number of times.
+
 ````
 def bytecode_flow_times(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_POINTER]):
@@ -666,6 +743,13 @@ def bytecode_flow_times(opcode, offset, more):
         abort_run(opcode, offset)
 ````
 
+The **BC\_FLOW\_CALL** instruction invokes a function. Pass the pointer on the
+stack.
+
+*Note: it's technically possible to execute any slice, but we don't allow for
+direct execution of strings and remarks: convert them to pointers first if you
+need this.*
+
 ````
 def bytecode_flow_call(opcode, offset, more):
     if precheck([TYPE_POINTER]) or precheck([TYPE_FUNCALL]):
@@ -674,6 +758,10 @@ def bytecode_flow_call(opcode, offset, more):
     else:
         abort_run(opcode, offset)
 ````
+
+**BC\_FLOW\_DIP** is a handy combinator: it takes a quote and a value and
+moves the value off the stack before invoking the quote. It then restores the
+value.
 
 ````
 def bytecode_flow_dip(opcode, offset, more):
@@ -685,6 +773,10 @@ def bytecode_flow_dip(opcode, offset, more):
     else:
         abort_run(opcode, offset)
 ````
+
+**BC\_FLOW\_SIP** is similar to **BC\_FLOW\_DIP** in that it takes a value and
+a quote. But it leaves the original value on the stack and pushes a copy back
+once the quote has finished executing.
 
 ````
 def bytecode_flow_sip(opcode, offset, more):
@@ -829,6 +921,11 @@ def bytecode_mem_set_last(opcode, offset, more):
         abort_run(opcode, offset)
 ````
 
+**BC\_MEM\_SET\_TYPE** sets the stored type constant for a value without going
+through a conversion process.
+
+*This may be removed in a later Parable release*
+
 ````
 def bytecode_mem_set_type(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_POINTER, TYPE_NUMBER]):
@@ -839,6 +936,10 @@ def bytecode_mem_set_type(opcode, offset, more):
     else:
         abort_run(opcode, offset)
 ````
+
+**BC\_MEM\_GET\_TYPE** fetches the stored type constant for a value.
+
+*This may be removed in a later Parable release*
 
 ````
 def bytecode_mem_get_type(opcode, offset, more):
@@ -953,7 +1054,7 @@ def bytecode_string_numeric(opcode, offset, more):
 ````
 
 **BC\_SLICE\_REVERSE** will invert the order of values stored in a slice.
-This modifies the contents of the original slice: 
+This modifies the contents of the original slice:
 
 ````
 def bytecode_slice_reverse(opcode, offset, more):
@@ -1249,55 +1350,22 @@ def report(text):
 
 ### The Byte Code Interpreter
 
+This is the heart of the virtual machine: it's responsible for actually
+running the code stored in a slice.
+
 ````
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-# Byte Code Interpreter
-#
-# This is the heart of the virtual machine: it's responsible for actually
-# running the code stored in a slice.
-
-
 current_slice = 0           # This is set by interpret() to the slice being run
                             # It's used for error reports, and as a guard to
                             # prevent garbage collection of a slice being run.
+````
 
-should_abort = False        # Used to indicate if an error was detected during
-                            # the current run.
+The **interpret()** function handles:
 
+* pushing values to the stack (based on stored type)
+* invoking the handler for each byte code
+* sets / clears the **current_slice** variable
 
-def abort_run(opcode, offset):
-    global should_abort
-    report("E05: Invalid Types or Stack Underflow")
-    report("Error processing `{0} at offset {1} in slice {2}".format(opcode, offset, current_slice))
-    should_abort = True
-
-
-def precheck(req):
-    flag = True
-    if stack_depth() < len(req):
-        flag = False
-    i = stack_depth() - 1
-    if flag:
-        for t in reversed(req):
-            if t == TYPE_ANY_PTR:
-                if stack_type_for(i) != TYPE_POINTER and \
-                   stack_type_for(i) != TYPE_STRING and \
-                   stack_type_for(i) != TYPE_REMARK and \
-                   stack_type_for(i) != TYPE_FUNCALL:
-                    flag = False
-            elif t != stack_type_for(i) and t != TYPE_ANY:
-                flag = False
-            i = i - 1
-    return flag
-
-
-# The interpret() function handles:
-#
-# - pushing values to the stack (based on stored type)
-# - invoking the handler for each byte code
-# - sets / clears the **current_slice** variable
-
+````
 def interpret(slice, more=None):
     """Interpret the byte codes contained in a slice."""
     global current_slice
