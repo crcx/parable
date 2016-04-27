@@ -1,8 +1,14 @@
 # Parable
 
-This is the heart of Parable. It provides the compiler, byte code interpreter,
-and minimal fundamentals to build a complete language.
+This is the heart of Parable. It provides the compiler, byte code
+interpreter, and minimal fundamentals to build a complete language.
 
+### Preamble
+
+````
+# parable
+# coding: utf-8
+````
 
 ### Configuration
 
@@ -18,14 +24,6 @@ save some memory.
 ````
 INITIAL_SLICES = 9250
 PREALLOCATE = 1250
-````
-
-
-````
-# parable
-# Copyright (c) 2012-2016, Charles Childers
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-# coding: utf-8
 ````
 
 ### Dependencies
@@ -50,8 +48,8 @@ except:
 
 ### Constants
 
-Parable has a *lot* of constants. These are used for data types and byte code
-numbers.
+Parable has a *lot* of constants. These are used for data types and byte
+code numbers.
 
 First up, the fundamental data types:
 
@@ -66,7 +64,7 @@ TYPE_REMARK = 700
 TYPE_FUNCALL = 800
 ````
 
-For **precheck()**, we also allow matching against some "generic" types:
+For **precheck()**, we also allow matching against some *generic* types:
 
 ````
 TYPE_ANY = 0
@@ -150,7 +148,6 @@ BC_VM_MEM_ALLOC = 66
 
 Here Parable has a few functions that are used later, in various places.
 
-
 **is_number()** determines if a string can be treated as a number.
 
 ````
@@ -163,8 +160,8 @@ def is_number(s):
         return False
 ````
 
-**is_balanced()** determines if a list of tokens contains a balanced number of
-brackets.
+**is_balanced()** determines if a list of tokens contains a balanced
+number of brackets.
 
 ````
 def is_balanced(tokens):
@@ -178,10 +175,10 @@ def is_balanced(tokens):
         return False
 ````
 
-**tokenize()** breaks a string into a series of tokens. The resulting list is
-used with **is_balanced()** and **condense_lines()**. Tokenization is mostly
-just splitting on spaces, but this also accounts for strings (delimited by ')
-and remarks (delimited by ").
+**tokenize()** breaks a string into a series of tokens. The resulting list
+is used with **is_balanced()** and **condense_lines()**. Tokenization is
+mostly just splitting on spaces, but this also accounts for strings
+(delimited by ') and remarks (delimited by ").
 
 ````
 def tokenize(str):
@@ -204,10 +201,10 @@ def tokenize(str):
     return cleaned
 ````
 
-The Parable compiler expects each function to be on a single line of source.
-This routine, **condense_lines()** takes an array of lines, tokenizes them,
-checks for balanced brackets, and merges them as needed. It then returns a new
-array with one line per function.
+The Parable compiler expects each function to be on a single line of
+source. This routine, **condense_lines()** takes an array of lines,
+tokenizes them, checks for balanced brackets, and merges them as needed.
+It then returns a new array with one line per function.
 
 *Note: this currently also allows use of a trailing \ to merge lines. This
 is deprecated and will be removed in a future release.*
@@ -238,26 +235,53 @@ name and value, provide an implementation for each (with one exception:
 see **interpet()** for details on this), and then build a dispatch table
 that maps each instuction to its handler.
 
+Some commentary will be provided for each byte code.
+
+The simplest instruction is **BC_NOP** which does nothing. It's useful for
+padding things.
+
 ````
 def bytecode_nop(opcode, offset, more):
     return
+````
 
+**BC\_SET\_TYPE** allows for setting the type for a value on the stack.
+You can use any value, but only the ones corresponding to a **TYPE_**
+constant have any real meaning to Parable. This uses
+**stack\_change\_type()** to do the conversions.
 
+````
 def bytecode_set_type(opcode, offset, more):
     if precheck([TYPE_ANY, TYPE_NUMBER]):
         a = stack_pop()
         stack_change_type(a)
     else:
         abort_run(opcode, offset)
+````
 
+**BC\_GET\_TYPE** pushes a number repesenting the type constant for the
+top item on the stack.
 
+````
 def bytecode_get_type(opcode, offset, more):
     if precheck([TYPE_ANY]):
         stack_push(stack_type(), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
+````
 
+The most complex of the byte codes is **BC_ADD**. The complexity arises
+from the number of types this deals with. The **BC_ADD** instruction can:
 
+* add two numbers
+* merge two strings, remarks, or slices into a new string, remark, or slice
+* combine two characters to a string
+* append or prepend characters to a string or remark
+
+We implement each specific combination as a separate function and then
+wrap them all up in a single top level function.
+
+````
 # --[ Factor out specific conversions for BC_ADD ]--
 
 def bytecode_add_NN():
@@ -312,7 +336,6 @@ def bytecode_add_RC():
 
 # --[ Finished specific conversions for BC_ADD ]--
 
-
 def bytecode_add(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         bytecode_add_NN()
@@ -334,8 +357,13 @@ def bytecode_add(opcode, offset, more):
         bytecode_add_RC()
     else:
         abort_run(opcode, offset)
+````
 
+And with that taken care of, we can move on to the rest of the byte codes.
 
+**BC_SUBTRACT** subtracts one number from another.
+
+````
 def bytecode_subtract(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -343,8 +371,11 @@ def bytecode_subtract(opcode, offset, more):
         stack_push(b - a, TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
+````
 
+**BC_MULTIPLY** multiplies two numbers.
 
+````
 def bytecode_multiply(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -352,8 +383,12 @@ def bytecode_multiply(opcode, offset, more):
         stack_push(b * a, TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
+````
 
+**BC_DIVIDE** divides two numbers. Errors in division will push *#nan* to
+the stack and abort with a divide by zero error.
 
+````
 def bytecode_divide(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -366,8 +401,12 @@ def bytecode_divide(opcode, offset, more):
             abort_run(opcode, offset)
     else:
         abort_run(opcode, offset)
+````
 
+**BC_REMAINDER** divdes two numbers and returns the remainder. Like the
+**BC_DIVIDE**, errors will push *#nan* and abort with an error.
 
+````
 def bytecode_remainder(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -380,8 +419,9 @@ def bytecode_remainder(opcode, offset, more):
             abort_run(opcode, offset)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_pow(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -401,8 +441,13 @@ def bytecode_logn(opcode, offset, more):
             abort_run(opcode, offset)
     else:
         abort_run(opcode, offset)
+````
 
+**BC\_BITWISE\_SHIFT** performs a bitwise shift. If the second number is
+negative this does a left shift. If positive, it does a right shift
+instead.
 
+````
 def bytecode_bitwise_shift(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = int(stack_pop())
@@ -413,8 +458,9 @@ def bytecode_bitwise_shift(opcode, offset, more):
             stack_push(b >> a, TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_bitwise_and(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = int(stack_pop())
@@ -452,17 +498,23 @@ def bytecode_bitwise_xor(opcode, offset, more):
         stack_push(b ^ a, TYPE_FLAG)
     else:
         abort_run(opcode, offset)
+````
 
+Random number generation: we have two approaches. The better one is to
+just use Python's **random.SystemRandom().random()**. But *micropython*
+lacks the **random** module at this point (*2016.04*), so we have a
+fallback using **os.urandom()** instead.
 
+````
 def bytecode_random(opcode, offset, more):
     try:
         stack_push(random.SystemRandom().random(), TYPE_NUMBER)
     except:
         rand = (int.from_bytes(os.urandom(7), 'big') >> 3) / (1 << 53)
         stack_push(rand, TYPE_NUMBER)
+````
 
-
-def bytecode_sqrt(opcode, offset, more):
+````def bytecode_sqrt(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
         stack_push(math.sqrt(stack_pop()), TYPE_NUMBER)
     else:
@@ -987,8 +1039,12 @@ def bytecode_vm_mem_sizes(opcode, offset, more):
         store(a, s, i, TYPE_NUMBER)
         i = i + 1
     stack_push(s, TYPE_POINTER)
+````
 
+**BC\_VM\_MEM\_ALLOC** allocates a slice and populates it the slice
+numbers for each allocated slice.
 
+````
 def bytecode_vm_mem_alloc(opcode, offset, more):
     s = request_slice()
     i = 0
@@ -1001,9 +1057,9 @@ def bytecode_vm_mem_alloc(opcode, offset, more):
     stack_push(s, TYPE_POINTER)
 ````
 
-Now that all of the byte codes are implemented, we construct a map of byte code
-numbers to their implementations. This will be used by **interpret()** to call
-the handlers.
+Now that all of the byte codes are implemented, we construct a map of byte
+code numbers to their implementations. This will be used by
+**interpret()** to call the handlers.
 
 ````
 bytecodes = {
