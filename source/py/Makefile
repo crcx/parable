@@ -3,6 +3,7 @@ include ../Makefile.config
 default: clean all
 
 all:
+	$(PY) gensource.py
 	$(PY) gen-snapshot.py
 
 clean:
