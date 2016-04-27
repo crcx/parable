@@ -1,23 +1,13 @@
-# parable
-# Copyright (c) 2012-2016, Charles Childers
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+# Parable, Copyright (c) 2012-2016 Charles Childers
 # coding: utf-8
-
-#
-# Dependencies
-#
+INITIAL_SLICES = 9250
+PREALLOCATE = 1250
 import math
 
-#
-# Memory Configuration
-#
-
-INITIAL_SLICES = 9250
-
-#
-# Constants for data types
-#
-
+try:
+    import random
+except:
+    import os
 TYPE_NUMBER = 100
 TYPE_STRING = 200
 TYPE_CHARACTER = 300
@@ -26,84 +16,8 @@ TYPE_FLAG = 500
 TYPE_BYTECODE = 600
 TYPE_REMARK = 700
 TYPE_FUNCALL = 800
-
-# For precheck(), we also allow matching agains two "generic" types:
-
 TYPE_ANY = 0
 TYPE_ANY_PTR = 1
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-# Support code used later on
-
-def is_number(s):
-    """return True if s is a number, or False otherwise"""
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
-
-
-def is_balanced(tokens):
-    braces = 0
-    for t in tokens:
-        if t == '[':  braces = braces + 1
-        if t == ']':  braces = braces - 1
-    if braces == 0:
-        return True
-    else:
-        return False
-
-
-def tokenize(str):
-    tokens = ' '.join(str.strip().split()).split(' ')
-    cleaned = []
-    i = 0
-    while i < len(tokens):
-        current = tokens[i]
-        prefix = tokens[i][:1]
-        s = ""
-        if prefix == '"':
-            i, s = parse_string(tokens, i, len(tokens), '"')
-        elif prefix == "'":
-            i, s = parse_string(tokens, i, len(tokens), '\'')
-        if s != "":
-            cleaned.append(s)
-        elif current != '':
-            cleaned.append(current)
-        i = i + 1
-    return cleaned
-
-
-def condense_lines(code):
-    """Take an array of code, join lines ending with a \, and return"""
-    """the new array"""
-    s = ''
-    r = []
-    for line in code:
-        if line.endswith(' \\\n'):
-            s = s + ' ' + line[:-2].strip()
-        else:
-            s = s + ' ' + line.strip()
-        if is_balanced(tokenize(s)):
-            r.append(s.strip())
-            s = ''
-    return r
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-# Byte Codes
-#
-# The Parable virtual machine is byte coded; each byte code corresponds to a
-# single instruction. In this section we assign each byte code a symbolic
-# name and value, provide an implementation for each (with one exception:
-# see interpet() for details on this), and then build a dispatch table that
-# maps each instuction to its handler.
-
-
-# Constants for byte codes
-
 BC_NOP = 0
 BC_SET_TYPE = 1
 BC_GET_TYPE = 2
@@ -171,29 +85,94 @@ BC_TRIG_ATAN2 = 63
 BC_VM_MEM_MAP = 64
 BC_VM_MEM_SIZES = 65
 BC_VM_MEM_ALLOC = 66
+def is_number(s):
+    """return True if s is a number, or False otherwise"""
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+def is_balanced(tokens):
+    braces = 0
+    for t in tokens:
+        if t == '[':  braces = braces + 1
+        if t == ']':  braces = braces - 1
+    if braces == 0:
+        return True
+    else:
+        return False
+def tokenize(str):
+    tokens = ' '.join(str.strip().split()).split(' ')
+    cleaned = []
+    i = 0
+    while i < len(tokens):
+        current = tokens[i]
+        prefix = tokens[i][:1]
+        s = ""
+        if prefix == '"':
+            i, s = parse_string(tokens, i, len(tokens), '"')
+        elif prefix == "'":
+            i, s = parse_string(tokens, i, len(tokens), '\'')
+        if s != "":
+            cleaned.append(s)
+        elif current != '':
+            cleaned.append(current)
+        i = i + 1
+    return cleaned
+def condense_lines(code):
+    """Take an array of code, join lines ending with a \, and return"""
+    """the new array"""
+    s = ''
+    r = []
+    for line in code:
+        if line.endswith(' \\\n'):
+            s = s + ' ' + line[:-2].strip()
+        else:
+            s = s + ' ' + line.strip()
+        if is_balanced(tokenize(s)):
+            r.append(s.strip())
+            s = ''
+    return r
+should_abort = False        # Used to indicate if an error was detected during
+                            # the current run.
+
+def abort_run(opcode, offset):
+    global should_abort
+    report("E05: Invalid Types or Stack Underflow")
+    report("Error processing `{0} at offset {1} in slice {2}".format(opcode, offset, current_slice))
+    should_abort = True
 
 
-# Implement the byte code functions
-
+def precheck(req):
+    flag = True
+    if stack_depth() < len(req):
+        flag = False
+    i = stack_depth() - 1
+    if flag:
+        for t in reversed(req):
+            if t == TYPE_ANY_PTR:
+                if stack_type_for(i) != TYPE_POINTER and \
+                   stack_type_for(i) != TYPE_STRING and \
+                   stack_type_for(i) != TYPE_REMARK and \
+                   stack_type_for(i) != TYPE_FUNCALL:
+                    flag = False
+            elif t != stack_type_for(i) and t != TYPE_ANY:
+                flag = False
+            i = i - 1
+    return flag
 def bytecode_nop(opcode, offset, more):
     return
-
-
 def bytecode_set_type(opcode, offset, more):
     if precheck([TYPE_ANY, TYPE_NUMBER]):
         a = stack_pop()
         stack_change_type(a)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_get_type(opcode, offset, more):
     if precheck([TYPE_ANY]):
         stack_push(stack_type(), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
-
-
 # --[ Factor out specific conversions for BC_ADD ]--
 
 def bytecode_add_NN():
@@ -248,7 +227,6 @@ def bytecode_add_RC():
 
 # --[ Finished specific conversions for BC_ADD ]--
 
-
 def bytecode_add(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         bytecode_add_NN()
@@ -270,8 +248,6 @@ def bytecode_add(opcode, offset, more):
         bytecode_add_RC()
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_subtract(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -279,8 +255,6 @@ def bytecode_subtract(opcode, offset, more):
         stack_push(b - a, TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_multiply(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -288,8 +262,6 @@ def bytecode_multiply(opcode, offset, more):
         stack_push(b * a, TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_divide(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -302,8 +274,6 @@ def bytecode_divide(opcode, offset, more):
             abort_run(opcode, offset)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_remainder(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -316,8 +286,6 @@ def bytecode_remainder(opcode, offset, more):
             abort_run(opcode, offset)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_pow(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -325,8 +293,6 @@ def bytecode_pow(opcode, offset, more):
         stack_push(math.pow(b, a), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_logn(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -337,8 +303,6 @@ def bytecode_logn(opcode, offset, more):
             abort_run(opcode, offset)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_bitwise_shift(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = int(stack_pop())
@@ -349,8 +313,6 @@ def bytecode_bitwise_shift(opcode, offset, more):
             stack_push(b >> a, TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_bitwise_and(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = int(stack_pop())
@@ -362,8 +324,6 @@ def bytecode_bitwise_and(opcode, offset, more):
         stack_push(b & a, TYPE_FLAG)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_bitwise_or(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = int(stack_pop())
@@ -375,8 +335,6 @@ def bytecode_bitwise_or(opcode, offset, more):
         stack_push(b | a, TYPE_FLAG)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_bitwise_xor(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = int(stack_pop())
@@ -388,25 +346,17 @@ def bytecode_bitwise_xor(opcode, offset, more):
         stack_push(b ^ a, TYPE_FLAG)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_random(opcode, offset, more):
     try:
-        import random
         stack_push(random.SystemRandom().random(), TYPE_NUMBER)
     except:
-        import os
         rand = (int.from_bytes(os.urandom(7), 'big') >> 3) / (1 << 53)
         stack_push(rand, TYPE_NUMBER)
-
-
 def bytecode_sqrt(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
         stack_push(math.sqrt(stack_pop()), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_compare_lt(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -417,8 +367,6 @@ def bytecode_compare_lt(opcode, offset, more):
             stack_push(0, TYPE_FLAG)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_compare_gt(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -429,8 +377,6 @@ def bytecode_compare_gt(opcode, offset, more):
             stack_push(0, TYPE_FLAG)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_compare_lteq(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -441,8 +387,6 @@ def bytecode_compare_lteq(opcode, offset, more):
             stack_push(0, TYPE_FLAG)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_compare_gteq(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -453,8 +397,6 @@ def bytecode_compare_gteq(opcode, offset, more):
             stack_push(0, TYPE_FLAG)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_compare_eq(opcode, offset, more):
     if precheck([TYPE_STRING, TYPE_STRING]) or \
        precheck([TYPE_REMARK, TYPE_REMARK]):
@@ -467,8 +409,6 @@ def bytecode_compare_eq(opcode, offset, more):
         stack_push(-1, TYPE_FLAG)
     else:
         stack_push(0, TYPE_FLAG)
-
-
 def bytecode_compare_neq(opcode, offset, more):
     if precheck([TYPE_STRING, TYPE_STRING]) or \
        precheck([TYPE_REMARK, TYPE_REMARK]):
@@ -481,8 +421,6 @@ def bytecode_compare_neq(opcode, offset, more):
         stack_push(-1, TYPE_FLAG)
     else:
         stack_push(0, TYPE_FLAG)
-
-
 def bytecode_flow_if(opcode, offset, more):
     if precheck([TYPE_FLAG, TYPE_POINTER, TYPE_POINTER]):
         a = stack_pop()  # false
@@ -494,8 +432,6 @@ def bytecode_flow_if(opcode, offset, more):
             interpret(a, more)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_flow_while(opcode, offset, more):
     if precheck([TYPE_POINTER]):
         quote = stack_pop()
@@ -510,8 +446,6 @@ def bytecode_flow_while(opcode, offset, more):
                 a = 0
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_flow_until(opcode, offset, more):
     if precheck([TYPE_POINTER]):
         quote = stack_pop()
@@ -526,8 +460,6 @@ def bytecode_flow_until(opcode, offset, more):
                 a = -1
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_flow_times(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_POINTER]):
         quote = stack_pop()
@@ -536,16 +468,12 @@ def bytecode_flow_times(opcode, offset, more):
             interpret(quote, more)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_flow_call(opcode, offset, more):
     if precheck([TYPE_POINTER]) or precheck([TYPE_FUNCALL]):
         a = stack_pop()
         interpret(a, more)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_flow_dip(opcode, offset, more):
     if precheck([TYPE_ANY, TYPE_POINTER]):
         quote = stack_pop()
@@ -554,8 +482,6 @@ def bytecode_flow_dip(opcode, offset, more):
         stack_push(v, t)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_flow_sip(opcode, offset, more):
     if precheck([TYPE_ANY, TYPE_POINTER]):
         quote = stack_pop()
@@ -565,8 +491,6 @@ def bytecode_flow_sip(opcode, offset, more):
         stack_push(v, t)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_flow_bi(opcode, offset, more):
     if precheck([TYPE_ANY, TYPE_POINTER, TYPE_POINTER]):
         a = stack_pop()
@@ -578,8 +502,6 @@ def bytecode_flow_bi(opcode, offset, more):
         interpret(a, more)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_flow_tri(opcode, offset, more):
     if precheck([TYPE_ANY, TYPE_POINTER, TYPE_POINTER, TYPE_POINTER]):
         a = stack_pop()
@@ -596,13 +518,9 @@ def bytecode_flow_tri(opcode, offset, more):
         interpret(a, more)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_flow_abort(opcode, offset, more):
     global should_abort
     should_abort = True
-
-
 def bytecode_mem_copy(opcode, offset, more):
     if precheck([TYPE_ANY_PTR, TYPE_ANY_PTR]):
         a = stack_pop()
@@ -610,8 +528,6 @@ def bytecode_mem_copy(opcode, offset, more):
         copy_slice(b, a)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_mem_fetch(opcode, offset, more):
     if precheck([TYPE_ANY_PTR, TYPE_NUMBER]):
         a = stack_pop()     # offset
@@ -623,8 +539,6 @@ def bytecode_mem_fetch(opcode, offset, more):
             stack_push(v, t)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_mem_store(opcode, offset, more):
     if precheck([TYPE_ANY, TYPE_ANY_PTR, TYPE_NUMBER]):
         a = stack_pop()     # offset
@@ -636,23 +550,15 @@ def bytecode_mem_store(opcode, offset, more):
             store(c, b, a, t)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_mem_request(opcode, offset, more):
     stack_push(request_slice(), TYPE_POINTER)
-
-
 def bytecode_mem_release(opcode, offset, more):
     if precheck([TYPE_POINTER]):
         release_slice(stack_pop())
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_mem_collect(opcode, offset, more):
     collect_garbage()
-
-
 def bytecode_mem_get_last(opcode, offset, more):
     if precheck([TYPE_POINTER]) or \
        precheck([TYPE_STRING]) or \
@@ -661,8 +567,6 @@ def bytecode_mem_get_last(opcode, offset, more):
         stack_push(get_last_index(a), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_mem_set_last(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_POINTER]):
         a = stack_pop()
@@ -670,8 +574,6 @@ def bytecode_mem_set_last(opcode, offset, more):
         set_slice_last_index(a, b)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_mem_set_type(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_POINTER, TYPE_NUMBER]):
         a = stack_pop()  # offset
@@ -680,8 +582,6 @@ def bytecode_mem_set_type(opcode, offset, more):
         store_type(b, a, c)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_mem_get_type(opcode, offset, more):
     if precheck([TYPE_POINTER, TYPE_NUMBER]):
         a = stack_pop()
@@ -690,33 +590,23 @@ def bytecode_mem_get_type(opcode, offset, more):
         stack_push(int(t), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_stack_dup(opcode, offset, more):
     if precheck([TYPE_ANY]):
         stack_dup()
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_stack_drop(opcode, offset, more):
     if precheck([TYPE_ANY]):
         stack_drop()
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_stack_swap(opcode, offset, more):
     if precheck([TYPE_ANY, TYPE_ANY]):
         stack_swap()
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_stack_depth(opcode, offset, more):
     stack_push(stack_depth(), TYPE_NUMBER)
-
-
 def bytecode_quote_name(opcode, offset, more):
     if precheck([TYPE_ANY_PTR, TYPE_STRING]):
         name = slice_to_string(stack_pop())
@@ -724,8 +614,6 @@ def bytecode_quote_name(opcode, offset, more):
         add_definition(name, ptr)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_function_hide(opcode, offset, more):
     if precheck([TYPE_STRING]):
         name = slice_to_string(stack_pop())
@@ -733,8 +621,6 @@ def bytecode_function_hide(opcode, offset, more):
             remove_name(name)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_string_seek(opcode, offset, more):
     if precheck([TYPE_STRING, TYPE_STRING]):
         a = slice_to_string(stack_pop())
@@ -742,8 +628,6 @@ def bytecode_string_seek(opcode, offset, more):
         stack_push(b.find(a), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_slice_subslice(opcode, offset, more):
     if precheck([TYPE_POINTER, TYPE_NUMBER, TYPE_NUMBER]) or \
        precheck([TYPE_STRING, TYPE_NUMBER, TYPE_NUMBER]) or \
@@ -764,8 +648,6 @@ def bytecode_slice_subslice(opcode, offset, more):
         stack_push(e, t)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_string_numeric(opcode, offset, more):
     if precheck([TYPE_STRING]):
         a = slice_to_string(stack_pop())
@@ -775,8 +657,6 @@ def bytecode_string_numeric(opcode, offset, more):
             stack_push(0, TYPE_FLAG)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_slice_reverse(opcode, offset, more):
     if precheck([TYPE_POINTER]) or \
        precheck([TYPE_STRING]) or \
@@ -788,8 +668,6 @@ def bytecode_slice_reverse(opcode, offset, more):
         stack_push(a, t)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_to_upper(opcode, offset, more):
     if precheck([TYPE_STRING]):
         ptr = stack_pop()
@@ -806,8 +684,6 @@ def bytecode_to_upper(opcode, offset, more):
             abort_run(opcode, offset)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_to_lower(opcode, offset, more):
     if precheck([TYPE_STRING]):
         ptr = stack_pop()
@@ -824,15 +700,11 @@ def bytecode_to_lower(opcode, offset, more):
             abort_run(opcode, offset)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_report(opcode, offset, more):
     if precheck([TYPE_STRING]):
         report(slice_to_string(stack_pop()))
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_vm_names(opcode, offset, more):
     s = request_slice()
     i = 0
@@ -841,8 +713,6 @@ def bytecode_vm_names(opcode, offset, more):
         store(value, s, i, TYPE_STRING)
         i = i + 1
     stack_push(s, TYPE_POINTER)
-
-
 def bytecode_vm_slices(opcode, offset, more):
     s = request_slice()
     i = 0
@@ -850,56 +720,42 @@ def bytecode_vm_slices(opcode, offset, more):
         store(ptr, s, i, TYPE_POINTER)
         i = i + 1
     stack_push(s, TYPE_POINTER)
-
-
 def bytecode_trig_sin(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
         a = stack_pop()
         stack_push(math.sin(a), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_trig_cos(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
         a = stack_pop()
         stack_push(math.cos(a), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_trig_tan(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
         a = stack_pop()
         stack_push(math.tan(a), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_trig_asin(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
         a = stack_pop()
         stack_push(math.asin(a), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_trig_acos(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
         a = stack_pop()
         stack_push(math.acos(a), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_trig_atan(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
         a = stack_pop()
         stack_push(math.atan(a), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_trig_atan2(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -907,8 +763,6 @@ def bytecode_trig_atan2(opcode, offset, more):
         stack_push(math.atan2(b, a), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
-
-
 def bytecode_vm_mem_map(opcode, offset, more):
     s = request_slice()
     i = 0
@@ -916,8 +770,6 @@ def bytecode_vm_mem_map(opcode, offset, more):
         store(a, s, i, TYPE_NUMBER)
         i = i + 1
     stack_push(s, TYPE_POINTER)
-
-
 def bytecode_vm_mem_sizes(opcode, offset, more):
     s = request_slice()
     i = 0
@@ -925,8 +777,6 @@ def bytecode_vm_mem_sizes(opcode, offset, more):
         store(a, s, i, TYPE_NUMBER)
         i = i + 1
     stack_push(s, TYPE_POINTER)
-
-
 def bytecode_vm_mem_alloc(opcode, offset, more):
     s = request_slice()
     i = 0
@@ -937,10 +787,6 @@ def bytecode_vm_mem_alloc(opcode, offset, more):
             n = n + 1
         i = i + 1
     stack_push(s, TYPE_POINTER)
-
-
-# Create the dispatch table mapping byte code numbers to their implementations
-
 bytecodes = {
     BC_NOP:            bytecode_nop,
     BC_SET_TYPE:       bytecode_set_type,
@@ -1010,17 +856,6 @@ bytecodes = {
     BC_VM_MEM_SIZES:   bytecode_vm_mem_sizes,
     BC_VM_MEM_ALLOC:   bytecode_vm_mem_alloc,
 }
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-# Error logging
-
-# Errors are stored in an array, with a couple of helper functions to record
-# and clear them.
-#
-# The interface layer should provide access to the the log (displaying when
-# appropriate).
-
 errors = []
 
 
@@ -1034,55 +869,9 @@ def report(text):
     """report an error"""
     global errors
     errors.append(text)
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-# Byte Code Interpreter
-#
-# This is the heart of the virtual machine: it's responsible for actually
-# running the code stored in a slice.
-
-
 current_slice = 0           # This is set by interpret() to the slice being run
                             # It's used for error reports, and as a guard to
                             # prevent garbage collection of a slice being run.
-
-should_abort = False        # Used to indicate if an error was detected during
-                            # the current run.
-
-
-def abort_run(opcode, offset):
-    global should_abort
-    report("E05: Invalid Types or Stack Underflow")
-    report("Error processing `{0} at offset {1} in slice {2}".format(opcode, offset, current_slice))
-    should_abort = True
-
-
-def precheck(req):
-    flag = True
-    if stack_depth() < len(req):
-        flag = False
-    i = stack_depth() - 1
-    if flag:
-        for t in reversed(req):
-            if t == TYPE_ANY_PTR:
-                if stack_type_for(i) != TYPE_POINTER and \
-                   stack_type_for(i) != TYPE_STRING and \
-                   stack_type_for(i) != TYPE_REMARK and \
-                   stack_type_for(i) != TYPE_FUNCALL:
-                    flag = False
-            elif t != stack_type_for(i) and t != TYPE_ANY:
-                flag = False
-            i = i - 1
-    return flag
-
-
-# The interpret() function handles:
-#
-# - pushing values to the stack (based on stored type)
-# - invoking the handler for each byte code
-# - sets / clears the **current_slice** variable
-
 def interpret(slice, more=None):
     """Interpret the byte codes contained in a slice."""
     global current_slice
@@ -1093,7 +882,10 @@ def interpret(slice, more=None):
         current_slice = slice
     while offset <= size and should_abort is not True:
         opcode, optype = fetch(slice, offset)
-        opcode = int(opcode)
+        if math.isnan(opcode):
+            opcode == BC_NOP
+        else:
+            opcode = int(opcode)
         if optype != TYPE_BYTECODE:
             stack_push(opcode, optype)
             if optype == TYPE_REMARK:
@@ -1112,20 +904,10 @@ def interpret(slice, more=None):
         else:
             report('BT: &{0}\t#{1}\t{2}'.format(slice, offset - 1, pointer_to_name(slice)))
     current_slice = 0
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-# Data Stack
-#
-# The data stack holds all non-permanent items. It's a basic, Forth-style
-# last-in, first-out (LIFO) model. But it does track types as well as the raw
-# values.
-
 stack = []
-
-
 def format_item(prefix, value):
     return  prefix + str(value)
+
 
 def parsed_item(i):
     r = ""
@@ -1162,8 +944,6 @@ def parsed_stack():
     for i in range(0, stack_depth()):
         r.append(parsed_item(i))
     return r
-
-
 def stack_values():
     r = []
     for w in stack:
@@ -1176,8 +956,6 @@ def stack_types():
     for w in stack:
         r.append(w[1])
     return r
-
-
 def stack_depth():
     return len(stack)
 
@@ -1188,8 +966,6 @@ def stack_type_for(d):
 
 def stack_value_for(d):
     return stack[d][0]
-
-
 def stack_clear():
     """remove all values from the stack"""
     global stack
@@ -1252,8 +1028,6 @@ def stack_dup():
         stack_push(s, at)
     else:
         stack_push(av, at)
-
-
 def convert_to_bytecode(original):
     global stack
     if original == TYPE_NUMBER:
@@ -1358,18 +1132,9 @@ def stack_change_type(desired):
     else:
         a = stack_pop()
         stack_push(a, desired)
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-# The Dictionary
-#
-# Like Forth, Parable uses a dictionary to map names to pointers. Ours consists
-# of two arrays: one for the names and a second one for the pointers.
-
 dictionary_warnings = False     # Used to trigger a warning if a name is redefined
 dictionary_hidden_slices = []   # Holds a list of slices that previously had names
 dictionary = []
-
 def dictionary_names():
     r = []
     for w in dictionary:
@@ -1382,22 +1147,16 @@ def dictionary_slices():
     for w in dictionary:
         r.append(w[1])
     return r
-
-
 def in_dictionary(s):
     for w in dictionary_names():
         if w == s:
             return True
     return False
-
-
 def dict_entry(name):
     for i in dictionary:
         if i[0] == name:
             return i[1]
     return -1
-
-
 def dict_index(name):
     n = 0
     for i in dictionary:
@@ -1405,15 +1164,11 @@ def dict_index(name):
             return n
         n = n + 1
     return -1
-
-
 def lookup_pointer(name):
     if in_dictionary(name) is False:
         return -1
     else:
         return dict_entry(name)
-
-
 def add_definition(name, slice):
     global dictionary
     if in_dictionary(name) is False:
@@ -1423,8 +1178,6 @@ def add_definition(name, slice):
             report('W10: {0} redefined'.format(name))
         target = lookup_pointer(name)
         copy_slice(slice, target)
-
-
 def remove_name(name):
     global dictionary, dictionary_hidden_slices
     if in_dictionary(name) is not False:
@@ -1432,8 +1185,6 @@ def remove_name(name):
         if not dictionary[i][1] in dictionary_hidden_slices:
             dictionary_hidden_slices.append(dictionary[i][1])
         del dictionary[i]
-
-
 def pointer_to_name(ptr):
     """given a parable pointer, return the corresponding name, or"""
     """an empty string"""
@@ -1441,25 +1192,11 @@ def pointer_to_name(ptr):
         if i[1] == ptr:
             return i[0]
     return ''
-
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-# Memory
-#
-# Parable has a segmented memory model. Memory is divided into regions called
-# slices. Each slice stores values, and has a shadow slice which stores the
-# associated types.
-#
-# Parable implements this over several arrays:
-
 memory_values = []    # Contains the slices for storing data
 memory_types = []     # Contains the slices for storing types
 memory_map = []       # A simple structure for indicating which slices are in use
 memory_size = []      # A simple structure for indicating the number of items
                       # in each slice
-
-
 def request_slice():
     """request a new memory slice"""
     global memory_values, memory_types, memory_map, memory_size
@@ -1473,22 +1210,20 @@ def request_slice():
             return i
         else:
             i += 1
+    if stack_depth() == 0:
+        collect_garbage()
     x = 0
-    while x < 1250:
+    while x < PREALLOCATE:
         memory_map.append(0)
         memory_values.append([0])
         memory_types.append([0])
         memory_size.append(0)
         x = x + 1
-#    if stack_depth() == 0:
-#        collect_garbage()
     memory_map[i] = 1
     memory_values[i] = [0]
     memory_types[i] = [0]
     memory_size[i] = 0
     return i
-
-
 def release_slice(slice):
     """release a slice. the slice should not be used after this is done"""
     global memory_map, memory_size, memory_values, memory_types
@@ -1497,9 +1232,6 @@ def release_slice(slice):
     memory_size[slice] = 0
     memory_values[slice] = [0]
     memory_types[slice] = [0]
-
-
-
 def copy_slice(source, dest):
     """copy the contents of one slice to another"""
     global memory_size
@@ -1588,19 +1320,6 @@ def slice_to_string(slice):
         except: pass
         i += 1
     return ''.join(s)
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-# Garbage Collection
-#
-# Parable's memory model is flexible, but prone to wasting memory due to the
-# existance of short-lived allocations. This isn't generally a problem, but
-# it's useful to be able to reclaim memory if/when the memory space begins
-# getting restricted.
-#
-# The solution to this is the garbage collector. It's a piece of code that
-# scans memory for slices that aren't referenced, and reclaims them.
-
 def is_pointer(type):
     flag = False
     if type == TYPE_POINTER or \
@@ -1611,8 +1330,6 @@ def is_pointer(type):
     else:
         flag = False
     return flag
-
-
 def scan_slice(s):
     ptrs = []
     i = get_last_index(s)
@@ -1628,8 +1345,6 @@ def scan_slice(s):
                 ptrs.append(v)
         i = i - 1
     return ptrs
-
-
 def find_references(s):
     ptrs = scan_slice(s)
     l = len(ptrs)
@@ -1643,8 +1358,6 @@ def find_references(s):
                     ptrs.append(n)
         ln = len(ptrs)
     return ptrs
-
-
 def seek_all_references():
     """return a list of all references in all named slices and stack items"""
     global dictionary, stack, types, current_slice
@@ -1678,8 +1391,6 @@ def seek_all_references():
                 refs.append(x)
 
     return refs
-
-
 def collect_garbage():
     """scan memory, and collect unused slices"""
     i = 0
@@ -1688,62 +1399,6 @@ def collect_garbage():
         if not i in refs and memory_map[i] == 1:
             release_slice(i)
         i = i + 1
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-# The Compiler
-#
-# This is the core of the user-facing language. It takes a string, breaks it
-# into tokens, then lays down code based on the prefix each token has.
-#
-# Prefixes are:
-#
-#   #   Numbers
-#   $   Characters
-#   &   Pointers
-#   `   Bytecodes
-#   '   Strings
-#   "   Comments
-#   |   Function Calls
-#
-# To aid in readability, the compiler also allows for use of number and
-# functions calls without the prefixes.
-#
-# The bytecode forms are kept simple:
-#
-#   type           stored         type
-#   ==========     ============================
-#   Functions      pointer        function call
-#   Strings        pointer        string
-#   Numbers        VALUE          number
-#   Characters     ASCII_VALUE    character
-#   Pointers       pointer        pointer
-#   Bytecodes      bytecode       bytecode
-#   Comments       pointer        comment
-#
-# There are two special prefixes:
-#
-#   @<pointer>
-#   !<pointer>
-#
-# These correspond to the following bytecode sequences:
-#
-#   &<pointer> #1 fetch
-#   &<pointer> #1 store
-#
-# The compiler handle two implicit pieces of functionality: [ and ].
-# These are used to begin and end quotations.
-#
-# Bytecodes get wrapped into named functions. At this point they are
-# not inlined. This hurts performance, but makes the implementation
-# much simpler.
-#
-# The compile_ functions take a parameter, a slice, and the current
-# offset in that slice. They lay down the appropriate byte codes
-# for the type of item they are compiling. When done, they return
-# the new offset.
-
-
 def compile_string(string, slice, offset):
     store(string_to_slice(string), slice, offset, TYPE_STRING)
     offset += 1
@@ -1753,64 +1408,6 @@ def compile_string(string, slice, offset):
 def compile_comment(string, slice, offset):
     store(string_to_slice(string), slice, offset, TYPE_REMARK)
     offset += 1
-    return offset
-
-
-def compile_character(character, slice, offset):
-    store(character, slice, offset, TYPE_CHARACTER)
-    offset += 1
-    return offset
-
-
-def compile_pointer(name, slice, offset):
-    if is_number(name):
-        store(float(name), slice, offset, TYPE_POINTER)
-    else:
-        if lookup_pointer(name) != -1:
-            store(lookup_pointer(name), slice, offset, TYPE_POINTER)
-        else:
-            store(0, slice, offset, TYPE_POINTER)
-            report('E03: Compile Error: Unable to map {0} to a pointer'.format(name))
-    offset += 1
-    return offset
-
-
-def compile_number(number, slice, offset):
-    if is_number(number):
-        store(float(number), slice, offset, TYPE_NUMBER)
-    else:
-        store(float('nan'), slice, offset, TYPE_NUMBER)
-        report("E03: Compile Error: Unable to convert {0} to a number".format(number))
-    offset += 1
-    return offset
-
-
-def compile_bytecode(bytecode, slice, offset):
-    store(float(bytecode), slice, offset, TYPE_BYTECODE)
-    offset += 1
-    return offset
-
-
-def compile_function_call(name, slice, offset):
-    if lookup_pointer(name) != -1:
-        store(lookup_pointer(name), slice, offset, TYPE_FUNCALL)
-        offset += 1
-    else:
-        if name != "":
-           report('E03: Compile Error: Unable to map `{0}` to a pointer'.format(name))
-    return offset
-
-
-def compile_function_call_prefixed(name, slice, offset):
-    if lookup_pointer(name) != -1:
-        store(lookup_pointer(name), slice, offset, TYPE_FUNCALL)
-        offset += 1
-    else:
-        if is_number(name):
-            store(int(name), slice, offset, TYPE_FUNCALL)
-            offset += 1
-        else:
-           report('E03: Compile Error: Unable to map `{0}` to a pointer'.format(name))
     return offset
 
 
@@ -1835,8 +1432,58 @@ def parse_string(tokens, i, count, delimiter):
             j += 1
     final = s.replace("\\n", "\n").replace("\\t", "\t")
     return i, final.replace("\\", "")
+def compile_character(character, slice, offset):
+    store(character, slice, offset, TYPE_CHARACTER)
+    offset += 1
+    return offset
 
 
+def compile_number(number, slice, offset):
+    if is_number(number):
+        store(float(number), slice, offset, TYPE_NUMBER)
+    else:
+        store(float('nan'), slice, offset, TYPE_NUMBER)
+        report("E03: Compile Error: Unable to convert {0} to a number".format(number))
+    offset += 1
+    return offset
+
+
+def compile_bytecode(bytecode, slice, offset):
+    store(float(bytecode), slice, offset, TYPE_BYTECODE)
+    offset += 1
+    return offset
+def compile_pointer(name, slice, offset):
+    if is_number(name):
+        store(float(name), slice, offset, TYPE_POINTER)
+    else:
+        if lookup_pointer(name) != -1:
+            store(lookup_pointer(name), slice, offset, TYPE_POINTER)
+        else:
+            store(0, slice, offset, TYPE_POINTER)
+            report('E03: Compile Error: Unable to map {0} to a pointer'.format(name))
+    offset += 1
+    return offset
+def compile_function_call(name, slice, offset):
+    if lookup_pointer(name) != -1:
+        store(lookup_pointer(name), slice, offset, TYPE_FUNCALL)
+        offset += 1
+    else:
+        if name != "":
+           report('E03: Compile Error: Unable to map `{0}` to a pointer'.format(name))
+    return offset
+
+
+def compile_function_call_prefixed(name, slice, offset):
+    if lookup_pointer(name) != -1:
+        store(lookup_pointer(name), slice, offset, TYPE_FUNCALL)
+        offset += 1
+    else:
+        if is_number(name):
+            store(int(name), slice, offset, TYPE_FUNCALL)
+            offset += 1
+        else:
+           report('E03: Compile Error: Unable to map `{0}` to a pointer'.format(name))
+    return offset
 def compile(str, slice=None):
     global should_abort
     should_abort = False
@@ -1902,24 +1549,10 @@ def compile(str, slice=None):
     if len(nest) != 0:
         report('E03: Compile Error - quotations not balanced')
     return slice
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-# Final Bits
-#
-# A few things to help get the initial environment up and running.
-
 def parse_bootstrap(f):
     """compile the bootstrap package it into memory"""
     for line in condense_lines(f):
         if len(line) > 0: interpret(compile(line))
-
-
-# some parts of the language (prefixes, brackets) are understood as part of
-# the parser. but one important bit, the ability to give a name to an item,
-# is not. this routine sets up an initial dictionary containing the *define*
-# function. with this loaded, all else can be built.
-
 def prepare_dictionary():
     """setup the initial dictionary"""
     add_definition(':', compile('"ps-" `{0} "Attach a name to a pointer"'.format(BC_QUOTE_NAME)))
