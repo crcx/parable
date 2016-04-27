@@ -5,8 +5,9 @@ interpreter, and minimal fundamentals to build a complete language.
 
 ### Preamble
 
+
 ````
-# parable
+# Parable, Copyright (c) 2012-2016 Charles Childers
 # coding: utf-8
 ````
 
@@ -429,8 +430,9 @@ def bytecode_pow(opcode, offset, more):
         stack_push(math.pow(b, a), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_logn(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -472,8 +474,9 @@ def bytecode_bitwise_and(opcode, offset, more):
         stack_push(b & a, TYPE_FLAG)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_bitwise_or(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = int(stack_pop())
@@ -485,8 +488,9 @@ def bytecode_bitwise_or(opcode, offset, more):
         stack_push(b | a, TYPE_FLAG)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_bitwise_xor(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = int(stack_pop())
@@ -519,8 +523,9 @@ def bytecode_random(opcode, offset, more):
         stack_push(math.sqrt(stack_pop()), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_compare_lt(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -531,8 +536,9 @@ def bytecode_compare_lt(opcode, offset, more):
             stack_push(0, TYPE_FLAG)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_compare_gt(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -543,8 +549,9 @@ def bytecode_compare_gt(opcode, offset, more):
             stack_push(0, TYPE_FLAG)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_compare_lteq(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -555,8 +562,9 @@ def bytecode_compare_lteq(opcode, offset, more):
             stack_push(0, TYPE_FLAG)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_compare_gteq(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -567,8 +575,9 @@ def bytecode_compare_gteq(opcode, offset, more):
             stack_push(0, TYPE_FLAG)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_compare_eq(opcode, offset, more):
     if precheck([TYPE_STRING, TYPE_STRING]) or \
        precheck([TYPE_REMARK, TYPE_REMARK]):
@@ -581,8 +590,9 @@ def bytecode_compare_eq(opcode, offset, more):
         stack_push(-1, TYPE_FLAG)
     else:
         stack_push(0, TYPE_FLAG)
+````
 
-
+````
 def bytecode_compare_neq(opcode, offset, more):
     if precheck([TYPE_STRING, TYPE_STRING]) or \
        precheck([TYPE_REMARK, TYPE_REMARK]):
@@ -595,8 +605,9 @@ def bytecode_compare_neq(opcode, offset, more):
         stack_push(-1, TYPE_FLAG)
     else:
         stack_push(0, TYPE_FLAG)
+````
 
-
+````
 def bytecode_flow_if(opcode, offset, more):
     if precheck([TYPE_FLAG, TYPE_POINTER, TYPE_POINTER]):
         a = stack_pop()  # false
@@ -608,8 +619,9 @@ def bytecode_flow_if(opcode, offset, more):
             interpret(a, more)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_flow_while(opcode, offset, more):
     if precheck([TYPE_POINTER]):
         quote = stack_pop()
@@ -624,8 +636,9 @@ def bytecode_flow_while(opcode, offset, more):
                 a = 0
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_flow_until(opcode, offset, more):
     if precheck([TYPE_POINTER]):
         quote = stack_pop()
@@ -640,8 +653,9 @@ def bytecode_flow_until(opcode, offset, more):
                 a = -1
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_flow_times(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_POINTER]):
         quote = stack_pop()
@@ -650,16 +664,18 @@ def bytecode_flow_times(opcode, offset, more):
             interpret(quote, more)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_flow_call(opcode, offset, more):
     if precheck([TYPE_POINTER]) or precheck([TYPE_FUNCALL]):
         a = stack_pop()
         interpret(a, more)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_flow_dip(opcode, offset, more):
     if precheck([TYPE_ANY, TYPE_POINTER]):
         quote = stack_pop()
@@ -668,8 +684,9 @@ def bytecode_flow_dip(opcode, offset, more):
         stack_push(v, t)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_flow_sip(opcode, offset, more):
     if precheck([TYPE_ANY, TYPE_POINTER]):
         quote = stack_pop()
@@ -679,8 +696,9 @@ def bytecode_flow_sip(opcode, offset, more):
         stack_push(v, t)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_flow_bi(opcode, offset, more):
     if precheck([TYPE_ANY, TYPE_POINTER, TYPE_POINTER]):
         a = stack_pop()
@@ -692,8 +710,9 @@ def bytecode_flow_bi(opcode, offset, more):
         interpret(a, more)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_flow_tri(opcode, offset, more):
     if precheck([TYPE_ANY, TYPE_POINTER, TYPE_POINTER, TYPE_POINTER]):
         a = stack_pop()
@@ -710,13 +729,20 @@ def bytecode_flow_tri(opcode, offset, more):
         interpret(a, more)
     else:
         abort_run(opcode, offset)
+````
 
+**BC\_FLOW\_ABORT** stops executing a slice and all of its ancestors. It
+sets the global **should_abort** flag, which ends all **interpret()**
+loops. The next compilation will reset the flag, or the interface layer
+can manually reset it as needed.
 
+````
 def bytecode_flow_abort(opcode, offset, more):
     global should_abort
     should_abort = True
+````
 
-
+````
 def bytecode_mem_copy(opcode, offset, more):
     if precheck([TYPE_ANY_PTR, TYPE_ANY_PTR]):
         a = stack_pop()
@@ -724,8 +750,9 @@ def bytecode_mem_copy(opcode, offset, more):
         copy_slice(b, a)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_mem_fetch(opcode, offset, more):
     if precheck([TYPE_ANY_PTR, TYPE_NUMBER]):
         a = stack_pop()     # offset
@@ -737,8 +764,9 @@ def bytecode_mem_fetch(opcode, offset, more):
             stack_push(v, t)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_mem_store(opcode, offset, more):
     if precheck([TYPE_ANY, TYPE_ANY_PTR, TYPE_NUMBER]):
         a = stack_pop()     # offset
@@ -750,23 +778,37 @@ def bytecode_mem_store(opcode, offset, more):
             store(c, b, a, t)
     else:
         abort_run(opcode, offset)
+````
 
+Need a slice? Use **BC\_MEM\_REQUEST** to allocate one and push the slice
+number to the stack.
 
+````
 def bytecode_mem_request(opcode, offset, more):
     stack_push(request_slice(), TYPE_POINTER)
+````
 
+Don't need a slice anymore? **BC\_MEM\_RELEASE** will use
+**release_slice()** to return it to the pool of unused slices.
 
+````
 def bytecode_mem_release(opcode, offset, more):
     if precheck([TYPE_POINTER]):
         release_slice(stack_pop())
     else:
         abort_run(opcode, offset)
+````
 
+While Parable attempts to collect garbage automatically, it's sometimes a
+good idea to manually trigger a collection cycle. You can do this with
+**BC\_MEM\_COLLECT**.
 
+````
 def bytecode_mem_collect(opcode, offset, more):
     collect_garbage()
+````
 
-
+````
 def bytecode_mem_get_last(opcode, offset, more):
     if precheck([TYPE_POINTER]) or \
        precheck([TYPE_STRING]) or \
@@ -775,8 +817,9 @@ def bytecode_mem_get_last(opcode, offset, more):
         stack_push(get_last_index(a), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_mem_set_last(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_POINTER]):
         a = stack_pop()
@@ -784,8 +827,9 @@ def bytecode_mem_set_last(opcode, offset, more):
         set_slice_last_index(a, b)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_mem_set_type(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_POINTER, TYPE_NUMBER]):
         a = stack_pop()  # offset
@@ -794,8 +838,9 @@ def bytecode_mem_set_type(opcode, offset, more):
         store_type(b, a, c)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_mem_get_type(opcode, offset, more):
     if precheck([TYPE_POINTER, TYPE_NUMBER]):
         a = stack_pop()
@@ -804,33 +849,42 @@ def bytecode_mem_get_type(opcode, offset, more):
         stack_push(int(t), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_stack_dup(opcode, offset, more):
     if precheck([TYPE_ANY]):
         stack_dup()
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_stack_drop(opcode, offset, more):
     if precheck([TYPE_ANY]):
         stack_drop()
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_stack_swap(opcode, offset, more):
     if precheck([TYPE_ANY, TYPE_ANY]):
         stack_swap()
     else:
         abort_run(opcode, offset)
+````
 
+**BC\_STACK\_DEPTH** returns the number of items currently on the stack.
 
+````
 def bytecode_stack_depth(opcode, offset, more):
     stack_push(stack_depth(), TYPE_NUMBER)
+````
 
+**BC\_QUOTE\_NAME** attaches a name to a slice.
 
+````
 def bytecode_quote_name(opcode, offset, more):
     if precheck([TYPE_ANY_PTR, TYPE_STRING]):
         name = slice_to_string(stack_pop())
@@ -838,8 +892,9 @@ def bytecode_quote_name(opcode, offset, more):
         add_definition(name, ptr)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_function_hide(opcode, offset, more):
     if precheck([TYPE_STRING]):
         name = slice_to_string(stack_pop())
@@ -847,8 +902,9 @@ def bytecode_function_hide(opcode, offset, more):
             remove_name(name)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_string_seek(opcode, offset, more):
     if precheck([TYPE_STRING, TYPE_STRING]):
         a = slice_to_string(stack_pop())
@@ -856,8 +912,9 @@ def bytecode_string_seek(opcode, offset, more):
         stack_push(b.find(a), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_slice_subslice(opcode, offset, more):
     if precheck([TYPE_POINTER, TYPE_NUMBER, TYPE_NUMBER]) or \
        precheck([TYPE_STRING, TYPE_NUMBER, TYPE_NUMBER]) or \
@@ -878,8 +935,12 @@ def bytecode_slice_subslice(opcode, offset, more):
         stack_push(e, t)
     else:
         abort_run(opcode, offset)
+````
 
+**BC\_STRING\_NUMERIC** will return a flag indicating true if a string can
+be converted to a number or false otherwise.
 
+````
 def bytecode_string_numeric(opcode, offset, more):
     if precheck([TYPE_STRING]):
         a = slice_to_string(stack_pop())
@@ -889,8 +950,12 @@ def bytecode_string_numeric(opcode, offset, more):
             stack_push(0, TYPE_FLAG)
     else:
         abort_run(opcode, offset)
+````
 
+**BC\_SLICE\_REVERSE** will invert the order of values stored in a slice.
+This modifies the contents of the original slice: 
 
+````
 def bytecode_slice_reverse(opcode, offset, more):
     if precheck([TYPE_POINTER]) or \
        precheck([TYPE_STRING]) or \
@@ -902,8 +967,13 @@ def bytecode_slice_reverse(opcode, offset, more):
         stack_push(a, t)
     else:
         abort_run(opcode, offset)
+````
 
+**BC\_TO\_UPPER** converts a character or string to uppercase.
 
+*Note: this currently assumes an ASCII character set.*
+
+````
 def bytecode_to_upper(opcode, offset, more):
     if precheck([TYPE_STRING]):
         ptr = stack_pop()
@@ -920,8 +990,13 @@ def bytecode_to_upper(opcode, offset, more):
             abort_run(opcode, offset)
     else:
         abort_run(opcode, offset)
+````
 
+**BC\_TO\_LOWER** convers a character or string to lowercase.
 
+*Note: this currently assumes an ASCII character set.*
+
+````
 def bytecode_to_lower(opcode, offset, more):
     if precheck([TYPE_STRING]):
         ptr = stack_pop()
@@ -938,15 +1013,19 @@ def bytecode_to_lower(opcode, offset, more):
             abort_run(opcode, offset)
     else:
         abort_run(opcode, offset)
+````
 
+**BC_REPORT** appends a string to the error log.
 
+````
 def bytecode_report(opcode, offset, more):
     if precheck([TYPE_STRING]):
         report(slice_to_string(stack_pop()))
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_vm_names(opcode, offset, more):
     s = request_slice()
     i = 0
@@ -955,8 +1034,9 @@ def bytecode_vm_names(opcode, offset, more):
         store(value, s, i, TYPE_STRING)
         i = i + 1
     stack_push(s, TYPE_POINTER)
+````
 
-
+````
 def bytecode_vm_slices(opcode, offset, more):
     s = request_slice()
     i = 0
@@ -964,56 +1044,63 @@ def bytecode_vm_slices(opcode, offset, more):
         store(ptr, s, i, TYPE_POINTER)
         i = i + 1
     stack_push(s, TYPE_POINTER)
+````
 
-
+````
 def bytecode_trig_sin(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
         a = stack_pop()
         stack_push(math.sin(a), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_trig_cos(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
         a = stack_pop()
         stack_push(math.cos(a), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_trig_tan(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
         a = stack_pop()
         stack_push(math.tan(a), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_trig_asin(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
         a = stack_pop()
         stack_push(math.asin(a), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_trig_acos(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
         a = stack_pop()
         stack_push(math.acos(a), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_trig_atan(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
         a = stack_pop()
         stack_push(math.atan(a), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_trig_atan2(opcode, offset, more):
     if precheck([TYPE_NUMBER, TYPE_NUMBER]):
         a = stack_pop()
@@ -1021,8 +1108,9 @@ def bytecode_trig_atan2(opcode, offset, more):
         stack_push(math.atan2(b, a), TYPE_NUMBER)
     else:
         abort_run(opcode, offset)
+````
 
-
+````
 def bytecode_vm_mem_map(opcode, offset, more):
     s = request_slice()
     i = 0
@@ -1030,8 +1118,9 @@ def bytecode_vm_mem_map(opcode, offset, more):
         store(a, s, i, TYPE_NUMBER)
         i = i + 1
     stack_push(s, TYPE_POINTER)
+````
 
-
+````
 def bytecode_vm_mem_sizes(opcode, offset, more):
     s = request_slice()
     i = 0
@@ -1251,10 +1340,21 @@ raw values.
 
 ````
 stack = []
+````
 
+Until the 2016.04 release, Parable interfaces have had to construct code
+to render the stack items in a human readable format. The current release
+provides a few functions for doing this and generating a list of the
+parsed values.
 
+This isn't essential, and not all interfaces will use it, but I've found
+it handy to have. If using on a constrained memory target it might be
+worth removing this bit unless you need it.
+
+````
 def format_item(prefix, value):
     return  prefix + str(value)
+
 
 def parsed_item(i):
     r = ""
@@ -1291,8 +1391,14 @@ def parsed_stack():
     for i in range(0, stack_depth()):
         r.append(parsed_item(i))
     return r
+````
 
+Ok, so with that aside taken care of, here's the actual code that
+implements the data stack.
 
+First up: some stuff to separate values and types:
+
+````
 def stack_values():
     r = []
     for w in stack:
@@ -1305,8 +1411,11 @@ def stack_types():
     for w in stack:
         r.append(w[1])
     return r
+````
 
+Then on to wrappers to aid in readability:
 
+````
 def stack_depth():
     return len(stack)
 
@@ -1317,8 +1426,9 @@ def stack_type_for(d):
 
 def stack_value_for(d):
     return stack[d][0]
+````
 
-
+````
 def stack_clear():
     """remove all values from the stack"""
     global stack
@@ -1381,8 +1491,13 @@ def stack_dup():
         stack_push(s, at)
     else:
         stack_push(av, at)
+````
 
+The most complicated bit of code in the stack is the
+**stack\_change\_type()** function. This is responsible for a lot of what
+makes Parable useful. Each conversion mode has a separate handler.
 
+````
 def convert_to_bytecode(original):
     global stack
     if original == TYPE_NUMBER:
