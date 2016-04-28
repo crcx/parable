@@ -1,5 +1,14 @@
 # Parable's Standard Library
 
+The heart of the Parable language is very minimal. You have some minimal
+syntax (**[** and **]** for creating quotes, prefixes for the individual
+tokens) and a single function (**:**) to attach a name to a slice.
+
+But the underlying virtual machine provides a fairly wide array of basic
+functionality via the byte codes. The standard library will take these,
+assign names to each, and then use them to implement an actually useful
+language.
+
 Starting off, a simple list with the version information. Parable's version
 numbering is done like this:
 
@@ -16,9 +25,16 @@ would be $A and so on.
 [ "-nnc"   2016 05 $_ ] 'ParableVersion' :
 ````
 
-# Primitives
+With that taken care of we can proceed to attach names to the byte codes. This
+will start a pattern for how functions are defined: a stack comment, followed
+by the code, and ending with a short description of what the function does.
 
-These are the core functions that map directly to the Parable VM instructions.
+We'll also introduce some terminology here: functions are called *words* and
+*words* which operate on slices of memory (including other functions) are
+called *combinators*. Oh, and *primitives* are words which correspond directly
+to the Parable byte codes.
+
+Ok, so here are the primitives:
 
 ````
 [ "-"      `0  "Does nothing" ] 'nop' :
@@ -89,9 +105,65 @@ These are the core functions that map directly to the Parable VM instructions.
 [ "-p"     `66 "Return an array of slice numbers which are currently marked as allocated." ] 'vm.memory<allocated>' :
 ````
 
-# Stage 2
+And with that we're ready to start building a useful language.
 
-The rest of the standard library.
+This begins by naming the data types. By convention Parable uses UPPERCASE for
+naming constants. Note that a constant is just a word that returns a single
+value.
+
+````
+[ "-n"  100 "Type constant" ] 'NUMBER' :
+[ "-n"  200 "Type constant" ] 'STRING' :
+[ "-n"  300 "Type constant" ] 'CHARACTER' :
+[ "-n"  400 "Type constant" ] 'POINTER' :
+[ "-n"  500 "Type constant" ] 'FLAG' :
+[ "-n"  600 "Type constant" ] 'BYTECODE' :
+[ "-n"  700 "Type constant" ] 'REMARK' :
+[ "-n"  800 "Type constant" ] 'FUNCALL' :
+[ "-n"    0 "Type constant" ] 'UNKNOWN' :
+````
+
+Now that the types are named, we can combine them with **set-type** to allow
+for conversions between them. We'll define a series of words for doing this.
+
+````
+[ "v-b" BYTECODE  set-type  "Convert value to a BYTECODE" ] ':b' :
+[ "v-n" NUMBER    set-type  "Convert value to a NUMBER" ] ':n' :
+[ "v-s" STRING    set-type  "Convert value to a STRING" ] ':s' :
+[ "v-c" CHARACTER set-type  "Convert value to a CHARACTER" ] ':c' :
+[ "v-p" POINTER   set-type  "Convert value to a POINTER" ] ':p' :
+[ "v-f" FLAG      set-type  "Convert value to a FLAG" ] ':f' :
+[ "v-f" FUNCALL   set-type  "Convert value to a FUNCALL" ] ':x' :
+[ "v-c" REMARK    set-type  "Convert value to a REMARK" ] ':r' :
+[ "v-v" UNKNOWN   set-type  "Convert value to a UNKNOWN" ] ':u' :
+````
+
+(I'll put in a brief note here: **UNKNOWN** is set to 0; Parable doesn't care
+what this is: anything that's not an actual named type is assumed to be of
+unknown type.)
+
+And then we can also define words to compare a value to a type. These can be
+helpful in filtering invalid inputs.
+
+````
+[ "v-vf" type? NUMBER    eq?  "Return true if value is a NUMBER or false otherwise" ] 'number?' :
+[ "v-vf" type? STRING    eq?  "Return true if value is a STRING or false otherwise" ] 'string?' :
+[ "v-vf" type? CHARACTER eq?  "Return true if value is a CHARACTER or false otherwise" ] 'character?' :
+[ "v-vf" type? POINTER   eq?  "Return true if value is a POINTER or false otherwise" ] 'pointer?' :
+[ "v-vf" type? FLAG      eq?  "Return true if value is a FLAG or false otherwise" ] 'flag?' :
+[ "v-vf" type? BYTECODE  eq?  "Return true if value is a BYTECODE or false otherwise" ] 'bytecode?' :
+[ "v-vf" type? REMARK    eq?  "Return true if value is a REMARK or false otherwise" ] 'remark?' :
+[ "v-vf" type? FUNCALL   eq?  "Return true if value is a FUNCALL or false otherwise" ] 'funcall?' :
+[ "v-vf" type? UNKNOWN   eq?  "Return true if value is UNKNOWN or false otherwise" ] 'unknown?' :
+````
+
+So now we have our *primitives* named, types named, and some additional words
+to compare and convert types to expected forms. Now it's time to shift focus
+into other areas that will help improve the usefulness significantly.
+
+The lowest level stack operations (provided as primitives) are **swap**,
+**dup**, **drop**, **depth**, **dip**, **sip**, **bi**, and **tri**. There
+are several other stack shufflers from Forth that I've found useful.
 
 ````
 [ "vV-vVv"
@@ -114,46 +186,32 @@ The rest of the standard library.
   "Remove all items from the stack"
 ] 'reset' :
 
+[ "vV-vVvV"
+  over over
+  "Duplicate the top two items on the stack"
+] 'dup-pair' :
+
+[ "vv-"
+  drop drop
+  "Discard the top two items on the stack"
+] 'drop-pair' :
+
+[ "?n-"
+  [ drop ] times
+  "Discard an arbitrary number of items from the stack"
+] 'drop<n>' :
+````
+
+----
+
+````
 [ "sp-"
   swap :
   "Attach a name to a slice"
 ] '.' :
 
-"Symbolic names for data types"
-[ "-n"  100 "Type constant" ] 'NUMBER' :
-[ "-n"  200 "Type constant" ] 'STRING' :
-[ "-n"  300 "Type constant" ] 'CHARACTER' :
-[ "-n"  400 "Type constant" ] 'POINTER' :
-[ "-n"  500 "Type constant" ] 'FLAG' :
-[ "-n"  600 "Type constant" ] 'BYTECODE' :
-[ "-n"  700 "Type constant" ] 'REMARK' :
-[ "-n"  800 "Type constant" ] 'FUNCALL' :
-[ "-n"    0 "Type constant" ] 'UNKNOWN' :
-
-[ "v-b" BYTECODE  set-type  "Convert value to a BYTECODE" ] ':b' :
-[ "v-n" NUMBER    set-type  "Convert value to a NUMBER" ] ':n' :
-[ "v-s" STRING    set-type  "Convert value to a STRING" ] ':s' :
-[ "v-c" CHARACTER set-type  "Convert value to a CHARACTER" ] ':c' :
-[ "v-p" POINTER   set-type  "Convert value to a POINTER" ] ':p' :
-[ "v-f" FLAG      set-type  "Convert value to a FLAG" ] ':f' :
-[ "v-f" FUNCALL   set-type  "Convert value to a FUNCALL" ] ':x' :
-[ "v-c" REMARK    set-type  "Convert value to a REMARK" ] ':r' :
-[ "v-v" UNKNOWN   set-type  "Convert value to a UNKNOWN" ] ':u' :
-
-[ "v-vf" type? NUMBER    eq?  "Return true if value is a NUMBER or false otherwise" ] 'number?' :
-[ "v-vf" type? STRING    eq?  "Return true if value is a STRING or false otherwise" ] 'string?' :
-[ "v-vf" type? CHARACTER eq?  "Return true if value is a CHARACTER or false otherwise" ] 'character?' :
-[ "v-vf" type? POINTER   eq?  "Return true if value is a POINTER or false otherwise" ] 'pointer?' :
-[ "v-vf" type? FLAG      eq?  "Return true if value is a FLAG or false otherwise" ] 'flag?' :
-[ "v-vf" type? BYTECODE  eq?  "Return true if value is a BYTECODE or false otherwise" ] 'bytecode?' :
-[ "v-vf" type? REMARK    eq?  "Return true if value is a REMARK or false otherwise" ] 'remark?' :
-[ "v-vf" type? FUNCALL   eq?  "Return true if value is a FUNCALL or false otherwise" ] 'funcall?' :
-[ "v-vf" type? UNKNOWN   eq?  "Return true if value is UNKNOWN or false otherwise" ] 'unknown?' :
 
 "Stack Flow"
-[ "vV-vVvV"  over over   "Duplicate the top two items on the stack" ] 'dup-pair' :
-[ "vv-"      drop drop   "Discard the top two items on the stack" ] 'drop-pair' :
-[ "?n-"      [ drop ] times   "Discard an arbitrary number of items from the stack" ] 'drop<n>' :
 [ "q-...n"   depth [ invoke ] dip depth swap -
   "Execute a quotation, returning a value indicating th stack depth change as a result"
 ] 'invoke<depth?>' :
