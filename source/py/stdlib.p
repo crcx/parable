@@ -1,3 +1,4 @@
+[ "-nnc"   2016 05 $_ ] 'ParableVersion' :
 [ "-"      `0  "Does nothing" ] 'nop' :
 [ "vt-v"   `1  "Convert a value to the specified type" ] 'set-type' :
 [ "v-vn"   `2  "Return the type constant for a value" ] 'type?' :
@@ -64,6 +65,33 @@
 [ "-p"     `64 "Return an array indicating which slices are allocated and which are free. Each index corresponds to a slice. If the stored value is 0, the slice is free. If 1, the slice is allocated." ] 'vm.memory<map>' :
 [ "-p"     `65 "Return an array indicating the size of each slice (in cells). Each index corresponds to a slice; the stored value is the length of the slice." ] 'vm.memory<sizes>' :
 [ "-p"     `66 "Return an array of slice numbers which are currently marked as allocated." ] 'vm.memory<allocated>' :
+[ "-n"  100 "Type constant" ] 'NUMBER' :
+[ "-n"  200 "Type constant" ] 'STRING' :
+[ "-n"  300 "Type constant" ] 'CHARACTER' :
+[ "-n"  400 "Type constant" ] 'POINTER' :
+[ "-n"  500 "Type constant" ] 'FLAG' :
+[ "-n"  600 "Type constant" ] 'BYTECODE' :
+[ "-n"  700 "Type constant" ] 'REMARK' :
+[ "-n"  800 "Type constant" ] 'FUNCALL' :
+[ "-n"    0 "Type constant" ] 'UNKNOWN' :
+[ "v-b" BYTECODE  set-type  "Convert value to a BYTECODE" ] ':b' :
+[ "v-n" NUMBER    set-type  "Convert value to a NUMBER" ] ':n' :
+[ "v-s" STRING    set-type  "Convert value to a STRING" ] ':s' :
+[ "v-c" CHARACTER set-type  "Convert value to a CHARACTER" ] ':c' :
+[ "v-p" POINTER   set-type  "Convert value to a POINTER" ] ':p' :
+[ "v-f" FLAG      set-type  "Convert value to a FLAG" ] ':f' :
+[ "v-f" FUNCALL   set-type  "Convert value to a FUNCALL" ] ':x' :
+[ "v-c" REMARK    set-type  "Convert value to a REMARK" ] ':r' :
+[ "v-v" UNKNOWN   set-type  "Convert value to a UNKNOWN" ] ':u' :
+[ "v-vf" type? NUMBER    eq?  "Return true if value is a NUMBER or false otherwise" ] 'number?' :
+[ "v-vf" type? STRING    eq?  "Return true if value is a STRING or false otherwise" ] 'string?' :
+[ "v-vf" type? CHARACTER eq?  "Return true if value is a CHARACTER or false otherwise" ] 'character?' :
+[ "v-vf" type? POINTER   eq?  "Return true if value is a POINTER or false otherwise" ] 'pointer?' :
+[ "v-vf" type? FLAG      eq?  "Return true if value is a FLAG or false otherwise" ] 'flag?' :
+[ "v-vf" type? BYTECODE  eq?  "Return true if value is a BYTECODE or false otherwise" ] 'bytecode?' :
+[ "v-vf" type? REMARK    eq?  "Return true if value is a REMARK or false otherwise" ] 'remark?' :
+[ "v-vf" type? FUNCALL   eq?  "Return true if value is a FUNCALL or false otherwise" ] 'funcall?' :
+[ "v-vf" type? UNKNOWN   eq?  "Return true if value is UNKNOWN or false otherwise" ] 'unknown?' :
 [ "vV-vVv"
   [ dup ] dip swap
   "Put a copy of the second item on top of the stack"
@@ -84,46 +112,45 @@
   "Remove all items from the stack"
 ] 'reset' :
 
+[ "vV-vVvV"
+  over over
+  "Duplicate the top two items on the stack"
+] 'dup-pair' :
+
+[ "vv-"
+  drop drop
+  "Discard the top two items on the stack"
+] 'drop-pair' :
+
+[ "?n-"
+  [ drop ] times
+  "Discard an arbitrary number of items from the stack"
+] 'drop<n>' :
+[ "vvpp-?"
+  [ dip ] dip invoke
+  "Invoke p1 against v1 and p2 against v2"
+] 'bi*' :
+
+[ "vvvppp-?"
+  [ [ swap [ dip ] dip ] dip dip ] dip invoke
+  "Invoke p1 against v1, p2 against v2, and p3 against v3"
+] 'tri*' :
+[ "vvp-?"
+  dup bi*
+  "Invoke p1 against v1 and again against v2"
+] 'bi@' :
+
+[ "vvvp-?"
+  dup dup tri*
+  "Invoke p1 against v1, then v2, then v3"
+] 'tri@' :
 [ "sp-"
   swap :
   "Attach a name to a slice"
 ] '.' :
 
-"Symbolic names for data types"
-[ "-n"  100 "Type constant" ] 'NUMBER' :
-[ "-n"  200 "Type constant" ] 'STRING' :
-[ "-n"  300 "Type constant" ] 'CHARACTER' :
-[ "-n"  400 "Type constant" ] 'POINTER' :
-[ "-n"  500 "Type constant" ] 'FLAG' :
-[ "-n"  600 "Type constant" ] 'BYTECODE' :
-[ "-n"  700 "Type constant" ] 'REMARK' :
-[ "-n"  800 "Type constant" ] 'FUNCALL' :
-[ "-n"    0 "Type constant" ] 'UNKNOWN' :
-
-[ "v-b" BYTECODE  set-type  "Convert value to a BYTECODE" ] ':b' :
-[ "v-n" NUMBER    set-type  "Convert value to a NUMBER" ] ':n' :
-[ "v-s" STRING    set-type  "Convert value to a STRING" ] ':s' :
-[ "v-c" CHARACTER set-type  "Convert value to a CHARACTER" ] ':c' :
-[ "v-p" POINTER   set-type  "Convert value to a POINTER" ] ':p' :
-[ "v-f" FLAG      set-type  "Convert value to a FLAG" ] ':f' :
-[ "v-f" FUNCALL   set-type  "Convert value to a FUNCALL" ] ':x' :
-[ "v-c" REMARK    set-type  "Convert value to a REMARK" ] ':r' :
-[ "v-v" UNKNOWN   set-type  "Convert value to a UNKNOWN" ] ':u' :
-
-[ "v-vf" type? NUMBER    eq?  "Return true if value is a NUMBER or false otherwise" ] 'number?' :
-[ "v-vf" type? STRING    eq?  "Return true if value is a STRING or false otherwise" ] 'string?' :
-[ "v-vf" type? CHARACTER eq?  "Return true if value is a CHARACTER or false otherwise" ] 'character?' :
-[ "v-vf" type? POINTER   eq?  "Return true if value is a POINTER or false otherwise" ] 'pointer?' :
-[ "v-vf" type? FLAG      eq?  "Return true if value is a FLAG or false otherwise" ] 'flag?' :
-[ "v-vf" type? BYTECODE  eq?  "Return true if value is a BYTECODE or false otherwise" ] 'bytecode?' :
-[ "v-vf" type? REMARK    eq?  "Return true if value is a REMARK or false otherwise" ] 'remark?' :
-[ "v-vf" type? FUNCALL   eq?  "Return true if value is a FUNCALL or false otherwise" ] 'funcall?' :
-[ "v-vf" type? UNKNOWN   eq?  "Return true if value is UNKNOWN or false otherwise" ] 'unknown?' :
 
 "Stack Flow"
-[ "vV-vVvV"  over over   "Duplicate the top two items on the stack" ] 'dup-pair' :
-[ "vv-"      drop drop   "Discard the top two items on the stack" ] 'drop-pair' :
-[ "?n-"      [ drop ] times   "Discard an arbitrary number of items from the stack" ] 'drop<n>' :
 [ "q-...n"   depth [ invoke ] dip depth swap -
   "Execute a quotation, returning a value indicating th stack depth change as a result"
 ] 'invoke<depth?>' :
@@ -189,23 +216,6 @@
 [ "nn-n"  over over lt? [ nip ] [ drop ] if "Return the greater of two values" ] 'max' :
 [ "nn-n"  over over gt? [ nip ] [ drop ] if "Return the smaller of two values" ] 'min' :
 [ "n-n"   dup -1 * max "Return the absolute value of a number" ] 'abs' :
-
-"The basic bi/tri combinators provided as part of the primitives allow application of multiple quotes to a single data element. Here we add new forms that are very useful."
-"We consider the bi/tri variants to consist of one of three types."
-"Cleave combinators (bi, tri) apply multiple quotations to a single value (or set of values)."
-
-
-"Spread combinators (bi*, tri*) apply multiple quotations to multiple values."
-[ "vvpp-?"   [ dip ] dip invoke "Invoke p1 against v1 and p2 against v2" ] 'bi*' :
-
-[ "vvvppp-?" [ [ swap [ dip ] dip ] dip dip ] dip invoke
-  "Invoke p1 against v1, p2 against v2, and p3 against v3"
-] 'tri*' :
-
-
-"Apply combinators (bi@, tri@) apply a single quotation to multiple values."
-[ "vvp-?"    dup bi* "Invoke p1 against v1 and again against v2" ] 'bi@' :
-[ "vvvp-?"   dup dup tri* "Invoke p1 against v1, then v2, then v3" ] 'tri@' :
 
 
 "Expand the basic conditionals into a more useful set."
@@ -598,6 +608,7 @@
     "Construct a range from the values in q1, then execute q2 as a for-each against them"
   ] 'times<with-index>' :
 }
+
 
 [ 'byKey:' ] {
   [ 'S' 'O' 'K' 'M' ] ::

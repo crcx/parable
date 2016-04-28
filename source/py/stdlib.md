@@ -202,6 +202,43 @@ are several other stack shufflers from Forth that I've found useful.
 ] 'drop<n>' :
 ````
 
+In addition to the basic shufflers, there are also some additional forms of
+the **bi** and **tri** combinators that are very useful.
+
+So some terminology as we go along. **bi** and **tri** are *cleave
+combinators* which apply multiple quotations to a single value (or set of
+values).
+
+The second grouping here are *spread combinators* which apply multiple
+quotations to multiple values.
+
+````
+[ "vvpp-?"
+  [ dip ] dip invoke
+  "Invoke p1 against v1 and p2 against v2"
+] 'bi*' :
+
+[ "vvvppp-?"
+  [ [ swap [ dip ] dip ] dip dip ] dip invoke
+  "Invoke p1 against v1, p2 against v2, and p3 against v3"
+] 'tri*' :
+````
+
+And the final type here are *apply combinators* which apply a single quotation
+to multiple values.
+
+````
+[ "vvp-?"
+  dup bi*
+  "Invoke p1 against v1 and again against v2"
+] 'bi@' :
+
+[ "vvvp-?"
+  dup dup tri*
+  "Invoke p1 against v1, then v2, then v3"
+] 'tri@' :
+````
+
 ----
 
 ````
@@ -277,23 +314,6 @@ are several other stack shufflers from Forth that I've found useful.
 [ "nn-n"  over over lt? [ nip ] [ drop ] if "Return the greater of two values" ] 'max' :
 [ "nn-n"  over over gt? [ nip ] [ drop ] if "Return the smaller of two values" ] 'min' :
 [ "n-n"   dup -1 * max "Return the absolute value of a number" ] 'abs' :
-
-"The basic bi/tri combinators provided as part of the primitives allow application of multiple quotes to a single data element. Here we add new forms that are very useful."
-"We consider the bi/tri variants to consist of one of three types."
-"Cleave combinators (bi, tri) apply multiple quotations to a single value (or set of values)."
-
-
-"Spread combinators (bi*, tri*) apply multiple quotations to multiple values."
-[ "vvpp-?"   [ dip ] dip invoke "Invoke p1 against v1 and p2 against v2" ] 'bi*' :
-
-[ "vvvppp-?" [ [ swap [ dip ] dip ] dip dip ] dip invoke
-  "Invoke p1 against v1, p2 against v2, and p3 against v3"
-] 'tri*' :
-
-
-"Apply combinators (bi@, tri@) apply a single quotation to multiple values."
-[ "vvp-?"    dup bi* "Invoke p1 against v1 and again against v2" ] 'bi@' :
-[ "vvvp-?"   dup dup tri* "Invoke p1 against v1, then v2, then v3" ] 'tri@' :
 
 
 "Expand the basic conditionals into a more useful set."
