@@ -882,10 +882,6 @@ def interpret(slice, more=None):
         current_slice = slice
     while offset <= size and should_abort is not True:
         opcode, optype = fetch(slice, offset)
-        if math.isnan(opcode):
-            opcode == BC_NOP
-        else:
-            opcode = int(opcode)
         if optype != TYPE_BYTECODE:
             stack_push(opcode, optype)
             if optype == TYPE_REMARK:
@@ -893,6 +889,10 @@ def interpret(slice, more=None):
             if optype == TYPE_FUNCALL:
                 interpret(stack_pop(), more)
         else:
+            if math.isnan(opcode):
+                opcode == BC_NOP
+            else:
+                opcode = int(opcode)
             if opcode in bytecodes:
                 bytecodes[opcode](opcode, offset, more)
             if more is not None:
