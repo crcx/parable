@@ -28,3 +28,8 @@ if __name__ == '__main__':
         for line in lines:
             file.write(line)
             file.write('\n')
+    with open('repl.py', 'w') as file:
+        lines = extract_from_markdown('repl.md')
+        for line in lines:
+            file.write(line)
+            file.write('\n')
