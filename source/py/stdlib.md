@@ -1,3 +1,21 @@
+# Parable's Standard Library
+
+Starting off, a simple list with the version information. Parable's version
+numbering is done like this:
+
+| Code       | Use                                     | Type      |
+| ---------- | --------------------------------------- | --------- |
+| YYYY       | Release year                            | Number    |
+| MM         | Release month                           | Number    |
+| PATCHLEVEL | Indicate bugfixes after initial release | Character |
+
+For the initial release, patchlevel is set as $_. The first bugfix level
+would be $A and so on.
+
+````
+[ "-nnc"   2016 05 $_ ] 'ParableVersion' :
+````
+
 # Primitives
 
 These are the core functions that map directly to the Parable VM instructions.
@@ -610,6 +628,7 @@ The rest of the standard library.
     "Construct a range from the values in q1, then execute q2 as a for-each against them"
   ] 'times<with-index>' :
 }
+
 
 [ 'byKey:' ] {
   [ 'S' 'O' 'K' 'M' ] ::

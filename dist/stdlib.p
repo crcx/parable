@@ -315,16 +315,32 @@
 
 [ "p-p"    capture-results<in-stack-order> reverse "Invoke a quote and capture the results into a new array" ] 'capture-results' :
 
+[ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset'  'localize' ] hide-words
+
+
+[ 'V' 'S' 'O' 'L' ] ::
+
+[ "pv-p|n"
+  !V !S 0 !O
+  request-empty !L
+  @S @V contains?
+  [ @S length?
+    [ @S @O fetch @V types-match?
+      [ eq? [ @O @L push ] if-true ]
+      [ drop-pair ] if
+      &O increment
+    ] times @L
+  ]
+  [ #nan ] if
+  "Given a slice and a value, return the offsets the value is located at, or #nan if none are found"
+] 'indexes' :
+
 [ "pv-n"
-  [ dup-pair !Value !Source
-    contains?
-    [ 0 !Offset #nan !Found @Source length? [ @Source @Offset fetch @Value types-match? [ eq? [ @Offset !Found ] if-true ] [ drop-pair ] if &Offset increment ] times @Found ]
-    [ #nan ] if
-  ] localize
+  indexes dup nan? [ head ] if-false
   "Given a slice and a value, return the offset the value is located at, or #nan if not found"
 ] 'index-of' :
 
-[ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset'  'localize' ] hide-words
+[ 'V' 'S' 'O' 'L' ] hide-words
 
 
 [ "s-f"  vm.dict<names> swap contains? "Return true if the named word exists or false otherwise" ] 'word-exists?' :
