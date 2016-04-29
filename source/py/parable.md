@@ -790,6 +790,10 @@ def bytecode_flow_sip(opcode, offset, more):
         abort_run(opcode, offset)
 ````
 
+**BC\_FLOW\_BI** takes a value and two quotes. It then pushes the value and
+the first quote to the stack, executes this, then repeats with a copy of the
+value and the second quote.
+
 ````
 def bytecode_flow_bi(opcode, offset, more):
     if precheck([TYPE_ANY, TYPE_POINTER, TYPE_POINTER]):
@@ -803,6 +807,11 @@ def bytecode_flow_bi(opcode, offset, more):
     else:
         abort_run(opcode, offset)
 ````
+
+**BC\_FLOW\_TRI** takes a value and three quotes. It then pushes the value and
+the first quote to the stack, executes this, then repeats with a copy of the
+value and the second quote. The process is repeated once more with the final
+quote.
 
 ````
 def bytecode_flow_tri(opcode, offset, more):
@@ -834,6 +843,10 @@ def bytecode_flow_abort(opcode, offset, more):
     should_abort = True
 ````
 
+**BC\_MEM\_COPY** copies the contents of one slice to another. This doesn't do
+partial copies: use **BC\_SUBSLICE** to extract a copy of a subset if you need
+this.
+
 ````
 def bytecode_mem_copy(opcode, offset, more):
     if precheck([TYPE_ANY_PTR, TYPE_ANY_PTR]):
@@ -843,6 +856,8 @@ def bytecode_mem_copy(opcode, offset, more):
     else:
         abort_run(opcode, offset)
 ````
+
+**BC\_MEM\_FETCH** retrieves a stored value from a slice.
 
 ````
 def bytecode_mem_fetch(opcode, offset, more):
@@ -857,6 +872,8 @@ def bytecode_mem_fetch(opcode, offset, more):
     else:
         abort_run(opcode, offset)
 ````
+
+**BC\_MEM\_STORE** stores a value into a slice.
 
 ````
 def bytecode_mem_store(opcode, offset, more):
@@ -900,6 +917,9 @@ def bytecode_mem_collect(opcode, offset, more):
     collect_garbage()
 ````
 
+**BC\_MEM\_GET\_LAST** returns the last index into a slice. This can be used
+to check the *length* of the slice.
+
 ````
 def bytecode_mem_get_last(opcode, offset, more):
     if precheck([TYPE_POINTER]) or \
@@ -910,6 +930,9 @@ def bytecode_mem_get_last(opcode, offset, more):
     else:
         abort_run(opcode, offset)
 ````
+
+**BC\_MEM\_SET\_LAST** sets the last index into a slice. This can be used to
+grow or shrink a slice.
 
 ````
 def bytecode_mem_set_last(opcode, offset, more):
@@ -952,6 +975,10 @@ def bytecode_mem_get_type(opcode, offset, more):
         abort_run(opcode, offset)
 ````
 
+**BC\_STACK\_DUP** duplicates the top item on the stack. If this is a string
+or remark, it'll make a copy of the string or remark and not just duplicate
+the pointer.
+
 ````
 def bytecode_stack_dup(opcode, offset, more):
     if precheck([TYPE_ANY]):
@@ -960,6 +987,8 @@ def bytecode_stack_dup(opcode, offset, more):
         abort_run(opcode, offset)
 ````
 
+**BC\_STACK\_DROP** discards the top item on the stack.
+
 ````
 def bytecode_stack_drop(opcode, offset, more):
     if precheck([TYPE_ANY]):
@@ -967,6 +996,9 @@ def bytecode_stack_drop(opcode, offset, more):
     else:
         abort_run(opcode, offset)
 ````
+
+**BC\_STACK\_SWAP** switches the locations of the top and secondary items on
+the stack.
 
 ````
 def bytecode_stack_swap(opcode, offset, more):
@@ -994,6 +1026,9 @@ def bytecode_quote_name(opcode, offset, more):
     else:
         abort_run(opcode, offset)
 ````
+
+To remove something from the dictionary, use **BC\_FUNCTION\_HIDE**. It takes
+a string and removes the header.
 
 ````
 def bytecode_function_hide(opcode, offset, more):
@@ -1126,6 +1161,9 @@ def bytecode_report(opcode, offset, more):
         abort_run(opcode, offset)
 ````
 
+**BC\_VM\_NAMES** constructs a slice containing strings for the names of each
+word in the dictionary.
+
 ````
 def bytecode_vm_names(opcode, offset, more):
     s = request_slice()
@@ -1137,6 +1175,9 @@ def bytecode_vm_names(opcode, offset, more):
     stack_push(s, TYPE_POINTER)
 ````
 
+**BC\_VM\_SLICES** constructs a slice containing pointers to the slice of each
+word in the dictionary.
+
 ````
 def bytecode_vm_slices(opcode, offset, more):
     s = request_slice()
@@ -1146,6 +1187,10 @@ def bytecode_vm_slices(opcode, offset, more):
         i = i + 1
     stack_push(s, TYPE_POINTER)
 ````
+
+And now we have a bunch of byte codes for mathmatic functions. I'm hoping to
+eventually have Parable code for these, though byte coded variants are likely
+to remain much faster.
 
 ````
 def bytecode_trig_sin(opcode, offset, more):
@@ -1211,6 +1256,11 @@ def bytecode_trig_atan2(opcode, offset, more):
         abort_run(opcode, offset)
 ````
 
+And then a final couple of byte codes for intropsection.
+
+**BC\_VM\_MEM\_MAP** constructs a slice containing a copy of the internal
+memory map and pushes a pointer to this to the stack.
+
 ````
 def bytecode_vm_mem_map(opcode, offset, more):
     s = request_slice()
@@ -1220,6 +1270,9 @@ def bytecode_vm_mem_map(opcode, offset, more):
         i = i + 1
     stack_push(s, TYPE_POINTER)
 ````
+
+**BC\_VM\_MEM\_SIZES** constructs a slice containing the length of each slice
+and pushes a pointer to this to the stack.
 
 ````
 def bytecode_vm_mem_sizes(opcode, offset, more):
@@ -1496,6 +1549,9 @@ def stack_value_for(d):
     return stack[d][0]
 ````
 
+So now we enter the meat of the stack implementation. The next few are all
+pretty simple:
+
 ````
 def stack_clear():
     """remove all values from the stack"""
@@ -1513,8 +1569,15 @@ def stack_drop():
     """remove a value from the stack"""
     global stack
     stack.pop()
+````
 
+And then for something longer. The function to remove a value from the stack
+has is written to be fairly flexible in that it supports both LIFO (the model
+used by Parable) and optionally FIFO.
 
+(I have plans to eventually experiment with FIFO in the future.)
+
+````
 def stack_pop(type = False, fifo = False):
     """remove and return a value from the stack"""
     global stack
@@ -1528,8 +1591,14 @@ def stack_pop(type = False, fifo = False):
             return stack.pop()
         else:
             return stack.pop()[0]
+````
 
+More simple functions follow.
 
+I'm not sure that I like the naming of **tos()**; it's likely to change in the
+future.
+
+````
 def tos():
     """return a pointer to the top element in the stack"""
     return stack_depth() - 1
@@ -1564,6 +1633,30 @@ def stack_dup():
 The most complicated bit of code in the stack is the
 **stack\_change\_type()** function. This is responsible for a lot of what
 makes Parable useful. Each conversion mode has a separate handler.
+
+| Short    | Means     |
+| -------- | --------- |
+| `B`      | Bytecode  |
+| `N`      | Number    |
+| `C`      | Character |
+| `S`      | String    |
+| `R`      | Remark    |
+| `P`      | Pointer   |
+| `F`      | Flag      |
+| `X`      | Funcall   |
+
+With that, here's a quick reference for converting between types:
+
+| Original | Converts To |
+| -------- | ----------- |
+| `B`      | ` NC     `  |
+| `N`      | `B CSRPFX`  |
+| `C`      | ` N SPPFX`  |
+| `S`      | ` NC RPF `  |
+| `R`      | `   S P  `  |
+| `P`      | ` N SR  X`  |
+| `F`      | ` N S    `  |
+| `X`      | ` N   P  `  |
 
 ````
 def convert_to_bytecode(original):
@@ -1647,8 +1740,14 @@ def convert_to_funcall(original):
     if original == TYPE_NUMBER or original == TYPE_POINTER:
         a = stack_pop()
         stack_push(a, TYPE_FUNCALL)
+````
 
+With the type-specific conversions above, **stack_change_type()** just needs
+to choose which one to invoke.
 
+**Future: use a dispatch table instead of the multiple if blocks**
+
+````
 def stack_change_type(desired):
     """convert the type of an item on the stack to a different type"""
     global stack
@@ -1705,6 +1804,9 @@ def dictionary_slices():
     return r
 ````
 
+The **in_dictionary()** function looks for a name in the dictionary and
+returns a flag inidicating whether or not it was found.
+
 ````
 def in_dictionary(s):
     for w in dictionary_names():
@@ -1713,6 +1815,8 @@ def in_dictionary(s):
     return False
 ````
 
+This function returns the slice a name corresponds to.
+
 ````
 def dict_entry(name):
     for i in dictionary:
@@ -1720,6 +1824,8 @@ def dict_entry(name):
             return i[1]
     return -1
 ````
+
+And this one returns the index of a dictionary entry.
 
 ````
 def dict_index(name):
@@ -1730,6 +1836,10 @@ def dict_index(name):
         n = n + 1
     return -1
 ````
+
+Use **lookup_pointer()** to get the slice a word corresponds to or -1 if not
+found. This is just a bit of a wrapper over **in_dictionary()** and
+**dict_entry()**.
 
 ````
 def lookup_pointer(name):
@@ -1769,6 +1879,10 @@ def remove_name(name):
         del dictionary[i]
 ````
 
+This next function maps a pointer to its corresponding name. It'll return the
+first name found for a pointer. (You can have multiple names pointing to the
+same slice).
+
 ````
 def pointer_to_name(ptr):
     """given a parable pointer, return the corresponding name, or"""
@@ -1797,7 +1911,7 @@ memory_size = []      # A simple structure for indicating the number of items
                       # in each slice
 ````
 
-**request_slice()** allocates a new slice and returns the slice number. It 
+**request_slice()** allocates a new slice and returns the slice number. It
 is actually pretty involved. The full process is:
 
 * scan the memory map for a non allocated slice
@@ -1913,8 +2027,12 @@ def set_slice_last_index(slice, size):
             del memory_values[int(slice)][-1]
             del memory_types[int(slice)][-1]
     memory_size[int(slice)] = size
+````
 
+Strings in Parable are stored as a series of characters within a slice. This
+function converts a Python string into a Parable string.
 
+````
 def string_to_slice(string):
     """convert a string into a slice"""
     s = request_slice()
@@ -1926,18 +2044,15 @@ def string_to_slice(string):
     else:
         set_slice_last_index(s, -1)
     return s
+````
 
+It's also necessary to translate Parable strings to Python strings. The
+following function handles this.
 
+````
 def slice_to_string(slice):
     """convert a slice into a string"""
-    s = []
-    i = 0
-    size = get_last_index(int(slice))
-    while i <= size:
-        try: s.append(chr(int(fetch(slice, i)[0])))
-        except: pass
-        i += 1
-    return ''.join(s)
+    return ''.join(map(lambda x: chr(int(x)), memory_values[slice]))
 ````
 
 ### Garbage Collection

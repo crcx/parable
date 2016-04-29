@@ -982,8 +982,6 @@ def stack_drop():
     """remove a value from the stack"""
     global stack
     stack.pop()
-
-
 def stack_pop(type = False, fifo = False):
     """remove and return a value from the stack"""
     global stack
@@ -997,8 +995,6 @@ def stack_pop(type = False, fifo = False):
             return stack.pop()
         else:
             return stack.pop()[0]
-
-
 def tos():
     """return a pointer to the top element in the stack"""
     return stack_depth() - 1
@@ -1109,8 +1105,6 @@ def convert_to_funcall(original):
     if original == TYPE_NUMBER or original == TYPE_POINTER:
         a = stack_pop()
         stack_push(a, TYPE_FUNCALL)
-
-
 def stack_change_type(desired):
     """convert the type of an item on the stack to a different type"""
     global stack
@@ -1295,8 +1289,6 @@ def set_slice_last_index(slice, size):
             del memory_values[int(slice)][-1]
             del memory_types[int(slice)][-1]
     memory_size[int(slice)] = size
-
-
 def string_to_slice(string):
     """convert a string into a slice"""
     s = request_slice()
@@ -1308,18 +1300,9 @@ def string_to_slice(string):
     else:
         set_slice_last_index(s, -1)
     return s
-
-
 def slice_to_string(slice):
     """convert a slice into a string"""
-    s = []
-    i = 0
-    size = get_last_index(int(slice))
-    while i <= size:
-        try: s.append(chr(int(fetch(slice, i)[0])))
-        except: pass
-        i += 1
-    return ''.join(s)
+    return ''.join(map(lambda x: chr(int(x)), memory_values[slice]))
 def is_pointer(type):
     flag = False
     if type == TYPE_POINTER or \
