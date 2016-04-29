@@ -101,8 +101,10 @@ if __name__ == '__main__':
             try:
                 evaluate(src)
             except KeyboardInterrupt:
+                import sys
                 sys.stdout.write("\n")
                 pass
         for e in parable.errors:
+            import sys
             sys.stdout.write(e + "\n")
         parable.clear_errors()

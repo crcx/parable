@@ -274,6 +274,7 @@ allow CTRL+C to stop a long execution.
             try:
                 evaluate(src)
             except KeyboardInterrupt:
+                import sys
                 sys.stdout.write("\n")
                 pass
 ````
@@ -283,6 +284,7 @@ before the loop begins again.
 
 ````
         for e in parable.errors:
+            import sys
             sys.stdout.write(e + "\n")
         parable.clear_errors()
 ````
