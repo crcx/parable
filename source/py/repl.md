@@ -105,70 +105,120 @@ def get_input():
     return s
 ````
 
+Parable allows interfaces to add new byte codes. This is a good way to deal
+with byte codes for I/O and other functionality that may be specific to your
+applications.
+
+Here's a simple byte code extension which adds new byte codes:
+
+| Instruction | Stack | Usage                               |
+| ----------- | ----- | ----------------------------------- |
+| `9000       | "-"   | display the stack                   |
+| `9001       | "-"   | display all names in the dictionary |
+| `9002       | "-"   | exit REPL                           |
+| `9003       | "s-"  | load and evaluate code in a file    |
+
+For easier maintanence, we define a separate function for each, then tie
+them all together at the end.
+
+The first is code to display the stack. Parable provides a **parsed_item()**
+function which returns a readable (and compilable) representation of a stack
+item. We display this, along with and index number.
+
 ````
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-# byte code extensions
-#
-# it's often useful to add additional byte codes for i/o and/or other
-# functionality that can't be portably implemented in parable.
-#
-# as an example, this provides three additional byte codes:
-#
-# `9000  "-"   display the stack
-# `9001  "-"   display all names in the dictionary
-# `9002  "-"   exit REPL
-# `9003  "s-"  load and evaluate code in a file
+def opcode_display_stack():
+    i = 0
+    while i < len(parable.stack):
+        print("\t{0}\t{1}".format(i, parable.parsed_item(i)))
+        i += 1
+````
 
-import os
-import sys
+Next, a function to display a list of names from the dictionary. Parable has
+**dictionary_names()** which returns a list of these, so we can just iterate
+over them. Or, even better, just join the strings:
 
+````
+def opcode_display_words():
+    print(' '.join(parable.dictionary_names()))
+````
+
+To exit the REPL, we have a simple function:
+
+````
+def opcode_exit_repl():
+    opcode_display_stack()
+    exit()
+````
+
+Note that we display the stack before quitting; this is a preference of mine,
+since it reflects my typical usage model. Any shutdown related functionality
+would go here.
+
+And the last addition is for loading and parsing a file. This one is a little
+longer, but pretty straightforward:
+
+* See if the file exists
+* If yes, read the lines into a list
+* Then condense them (since Parable expects each function to correspond to
+  a single line of input)
+* Then evaluate the condensed lines
+
+Or just use Parable's **parse_bootstrap()** method which handles the last
+two bits for us:
+
+````
+def opcode_include_file():
+    import os
+    name = parable.slice_to_string(parable.stack_pop())
+    if os.path.exists(name):
+        source = open(name).readlines()
+        parable.parse_bootstrap(source)
+````
+
+And now it's time to tie things together. This uses a very simple set of
+if/elif comparisons; for larger sets of instructions it's probably better to
+use a dispatch table. (See **parable.md** for an example of this)
+
+````
 def opcodes(slice, offset, opcode):
+    import os, sys
     if opcode == 9000:
-        i = 0
-        while i < len(parable.stack):
-            sys.stdout.write("\t" + str(i))
-            sys.stdout.write("\t" + parable.parsed_item(i) + "\n")
-            i += 1
+        opcode_display_stack()
     elif opcode == 9001:
-        l = ''
-        for w in parable.dictionary_names():
-            l = l + w + ' '
-        sys.stdout.write(l)
-        sys.stdout.write("\n")
+        opcode_display_words()
     elif opcode == 9002:
-        print(parable.stack)
-        exit()
+        opcode_exit_repl()
     elif opcode == 9003:
-        name = parable.slice_to_string(parable.stack_pop())
-        if os.path.exists(name):
-            lines = parable.condense_lines(open(name).readlines())
-            for l in lines:
-                evaluate(l)
+        opcode_include_file()
     return offset
+````
 
+Now another helper function: **evaluate()**. To run code in Parable one must:
 
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-# evaluate: a helper function
-#
-# evaluation of code requires:
-#
-# - obtaining a slice
-# - compiling source into the slice
-# - interpreting the compiled byte code
-#
-# this one-line function wraps this all up and lets us keep the rest of the
-# source a bit more readable.
+* obtain a slice
+* compile the source into the slice
+* interpret the compiled byte code in the slice
 
+This one line function wraps up this functionality for us.
+
+````
 def evaluate(s):
     parable.interpret(parable.compile(s), opcodes)
+````
 
+And now to tie all of the above together and implement our interface. It
+begins with some boilerplate:
 
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-# main entry point
-
+````
 if __name__ == '__main__':
-    setup_readline()
+    import os
+````
 
+And then we can setup Parable and try loading GNU Readline. We try to load a
+snapshot first (if it exists), otherwise we fall back to manually initializing
+and compiling the *stdlib.p*.
+
+````
     if os.path.exists('parable.snapshot'):
         init_from_snapshot(open('parable.snapshot').read())
     else:
@@ -176,37 +226,64 @@ if __name__ == '__main__':
         parable.prepare_dictionary()
         parable.parse_bootstrap(open('stdlib.p').readlines())
 
+    setup_readline()
+````
+
+Next we use our **evaluate** function to bind the custom byte codes to names:
+
+````
     evaluate("[ \"-\"   `9000 ] '.s' :")
     evaluate("[ \"-\"   `9001 ] 'words' :")
     evaluate("[ \"-\"   `9002 ] 'bye' :")
     evaluate("[ \"s-\"  `9003 ] 'include' :")
+````
 
+Display a startup banner:
 
+````
     print('Parable Listener, (c) 2013-2016 Charles Childers')
     print('------------------------------------------------')
     print('.s       Display Stack')
     print('bye      Exit Listener')
     print('words    Display a list of all named items')
     print('------------------------------------------------\n')
+````
 
+And (finally) the main loop. This has a couple of key bits.
 
-    while 1 == 1:
+````
+    while True:
+````
+
+First, it gets input (and allows for a graceful exit in case of error).
+
+````
         try:
             src = get_input()
         except:
             sys.stdout.write("\n")
             exit()
+````
 
+Then it evaluates the input. It catches the **KeyboardInterrupt** error to
+allow CTRL+C to stop a long execution.
+
+````
         if len(src) >= 1:
             try:
                 evaluate(src)
             except KeyboardInterrupt:
                 sys.stdout.write("\n")
                 pass
+````
 
+The final bit is to display any error messages and then clear the error log
+before the loop begins again.
+
+````
         for e in parable.errors:
             sys.stdout.write(e + "\n")
-
         parable.clear_errors()
-        sys.stdout.flush()
 ````
+
+And that's it: a not quite minimal example of a Parable interface layer.

@@ -41,69 +41,37 @@ def get_input():
             s = s.strip() + ' '
             s = s + input("       ")
     return s
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-# byte code extensions
-#
-# it's often useful to add additional byte codes for i/o and/or other
-# functionality that can't be portably implemented in parable.
-#
-# as an example, this provides three additional byte codes:
-#
-# `9000  "-"   display the stack
-# `9001  "-"   display all names in the dictionary
-# `9002  "-"   exit REPL
-# `9003  "s-"  load and evaluate code in a file
-
-import os
-import sys
-
+def opcode_display_stack():
+    i = 0
+    while i < len(parable.stack):
+        print("\t{0}\t{1}".format(i, parable.parsed_item(i)))
+        i += 1
+def opcode_display_words():
+    print(' '.join(parable.dictionary_names()))
+def opcode_exit_repl():
+    opcode_display_stack()
+    exit()
+def opcode_include_file():
+    import os
+    name = parable.slice_to_string(parable.stack_pop())
+    if os.path.exists(name):
+        source = open(name).readlines()
+        parable.parse_bootstrap(source)
 def opcodes(slice, offset, opcode):
+    import os, sys
     if opcode == 9000:
-        i = 0
-        while i < len(parable.stack):
-            sys.stdout.write("\t" + str(i))
-            sys.stdout.write("\t" + parable.parsed_item(i) + "\n")
-            i += 1
+        opcode_display_stack()
     elif opcode == 9001:
-        l = ''
-        for w in parable.dictionary_names():
-            l = l + w + ' '
-        sys.stdout.write(l)
-        sys.stdout.write("\n")
+        opcode_display_words()
     elif opcode == 9002:
-        print(parable.stack)
-        exit()
+        opcode_exit_repl()
     elif opcode == 9003:
-        name = parable.slice_to_string(parable.stack_pop())
-        if os.path.exists(name):
-            lines = parable.condense_lines(open(name).readlines())
-            for l in lines:
-                evaluate(l)
+        opcode_include_file()
     return offset
-
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-# evaluate: a helper function
-#
-# evaluation of code requires:
-#
-# - obtaining a slice
-# - compiling source into the slice
-# - interpreting the compiled byte code
-#
-# this one-line function wraps this all up and lets us keep the rest of the
-# source a bit more readable.
-
 def evaluate(s):
     parable.interpret(parable.compile(s), opcodes)
-
-
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-# main entry point
-
 if __name__ == '__main__':
-    setup_readline()
-
+    import os
     if os.path.exists('parable.snapshot'):
         init_from_snapshot(open('parable.snapshot').read())
     else:
@@ -111,36 +79,29 @@ if __name__ == '__main__':
         parable.prepare_dictionary()
         parable.parse_bootstrap(open('stdlib.p').readlines())
 
+    setup_readline()
     evaluate("[ \"-\"   `9000 ] '.s' :")
     evaluate("[ \"-\"   `9001 ] 'words' :")
     evaluate("[ \"-\"   `9002 ] 'bye' :")
     evaluate("[ \"s-\"  `9003 ] 'include' :")
-
-
     print('Parable Listener, (c) 2013-2016 Charles Childers')
     print('------------------------------------------------')
     print('.s       Display Stack')
     print('bye      Exit Listener')
     print('words    Display a list of all named items')
     print('------------------------------------------------\n')
-
-
-    while 1 == 1:
+    while True:
         try:
             src = get_input()
         except:
             sys.stdout.write("\n")
             exit()
-
         if len(src) >= 1:
             try:
                 evaluate(src)
             except KeyboardInterrupt:
                 sys.stdout.write("\n")
                 pass
-
         for e in parable.errors:
             sys.stdout.write(e + "\n")
-
         parable.clear_errors()
-        sys.stdout.flush()
