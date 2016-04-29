@@ -94,6 +94,7 @@ if __name__ == '__main__':
         try:
             src = get_input()
         except:
+            import sys
             sys.stdout.write("\n")
             exit()
         if len(src) >= 1:

@@ -261,6 +261,7 @@ First, it gets input (and allows for a graceful exit in case of error).
         try:
             src = get_input()
         except:
+            import sys
             sys.stdout.write("\n")
             exit()
 ````
