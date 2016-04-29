@@ -1,34 +1,7 @@
-# Read-Eval-Print-Loop for Parable
-
-A Parable system consists of three fundamental parts:
-
-* The Parable Compiler/Runtime (*parable.py*)
-* The Standard Library (*stdlib.p*)
-* An Interface Layer (in this case, *repl.py*)
-
-This interface layer isn't the most minimal, but should serve as a decent
-starting point and reference.
-
-First up, some boilerplate: we use Python 3, and have a copyright notice, etc.
-
-````
 #!/usr/bin/env python3
 # Copyright (c) 2013-2016, Charles Childers
 # coding: utf-8
-````
-
-Now we load Parable:
-
-````
 import parable
-````
-
-GNU Readline (and some alternatives with better licensing) allows for input
-history and editing. It makes for a much nicer user experience. The next few
-lines will load this if available and setup tab completion. If readline isn't
-provided, it'll just silently fall back to the standard input model.
-
-````
 def setup_readline():
     try:
         import readline
@@ -36,43 +9,12 @@ def setup_readline():
         readline.parse_and_bind("tab: complete")
     except:
         pass
-````
-
-Readline allows for tab completion. This is really useful, so we provide a
-function (mapped to tab by the **setup_readline()** above). This searches
-for the partial current word in the parable dictionary.
-
-````
 def tab_completion(text, state):
     options = [x for x in parable.dictionary_names() if x.startswith(text)]
     try:
         return options[state]
     except IndexError:
         return None
-````
-
-And that's it for supporting GNU Readline. The REPL doesn't *need* these two
-routines, but they don't hurt anything to have and make for a much nicer user
-experience.
-
-Ok, now to something interesting. We have two options for loading the standard
-library: we can load and compile **stdlib.p** on startup, or we can use a
-*snapshot*. Snapshots are precompiled exports of a Parable's state. They
-include the memory map, copies of all values in memory, the dictionary
-headers, stack contents, and error logs. Loading a snapshot is considerably
-faster though more complex.
-
-A snapshot file contains a json formatted version of the data which is then
-compressed using bzip2 and then base64 encoded.
-
-The downside to snapshots is that they aren't guaranteed to be portable across
-Parable releases. Since they represent the internal Parable state and some of
-the implementation details, it's subject to change as the underlying code
-evolves.
-
-**TODO: adapt this to try snapshot first, then stdlib.p**
-
-````
 def init_from_snapshot(s):
     try:
         import base64, bz2, json
@@ -89,10 +31,6 @@ def init_from_snapshot(s):
         parable.dictionary_hidden_slices = j['hidden_slices']
     except:
         pass
-````
-
-
-````
 def get_input():
     done = False
     s = input("\ninput> ")
@@ -103,9 +41,6 @@ def get_input():
             s = s.strip() + ' '
             s = s + input("       ")
     return s
-````
-
-````
 # -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 # byte code extensions
 #
@@ -209,4 +144,3 @@ if __name__ == '__main__':
 
         parable.clear_errors()
         sys.stdout.flush()
-````

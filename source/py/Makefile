@@ -1,6 +1,6 @@
 include ../Makefile.config
 
-default: clean all
+default: clean all permissions
 
 all:
 	$(PY) gensource.py
@@ -8,3 +8,8 @@ all:
 
 clean:
 	rm -rf *.pyc __pycache__ *~
+
+permissions:
+	chmod +x parable.py
+	chmod +x repl.py
+
