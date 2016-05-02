@@ -996,29 +996,18 @@ def stack_pop(type = False, fifo = False):
         else:
             return stack.pop()[0]
 def tos():
-    """return a pointer to the top element in the stack"""
     return stack_depth() - 1
-
-
 def stack_type():
-    """return the type identifier for the top item on the stack"""
     return stack_type_for(tos())
-
-
 def stack_swap():
-    """switch the positions of the top items on the stack"""
     av, at = stack_pop(type = True)
     bv, bt = stack_pop(type = True)
     stack_push(av, at)
     stack_push(bv, bt)
-
-
 def stack_dup():
-    """duplicate the top item on the stack"""
-    """if the value is a string, makes a copy of it"""
     av, at = stack_pop(type = True)
     stack_push(av, at)
-    if at == TYPE_STRING:
+    if at == TYPE_STRING or at == TYPE_REMARK:
         s = request_slice()
         copy_slice(av, s)
         stack_push(s, at)
@@ -1105,24 +1094,19 @@ def convert_to_funcall(original):
     if original == TYPE_NUMBER or original == TYPE_POINTER:
         a = stack_pop()
         stack_push(a, TYPE_FUNCALL)
+type_converters = {
+    TYPE_BYTECODE:   convert_to_bytecode,
+    TYPE_NUMBER:     convert_to_number,
+    TYPE_STRING:     convert_to_string,
+    TYPE_CHARACTER:  convert_to_character,
+    TYPE_FLAG:       convert_to_flag,
+    TYPE_POINTER:    convert_to_pointer,
+    TYPE_FUNCALL:    convert_to_funcall
+}
 def stack_change_type(desired):
-    """convert the type of an item on the stack to a different type"""
-    global stack
     original = stack_type()
-    if desired == TYPE_BYTECODE:
-        convert_to_bytecode(original)
-    elif desired == TYPE_NUMBER:
-        convert_to_number(original)
-    elif desired == TYPE_STRING:
-        convert_to_string(original)
-    elif desired == TYPE_CHARACTER:
-        convert_to_character(original)
-    elif desired == TYPE_POINTER:
-        convert_to_pointer(original)
-    elif desired == TYPE_FLAG:
-        convert_to_flag(original)
-    elif desired == TYPE_FUNCALL:
-        convert_to_funcall(original)
+    if int(desired) in type_converters:
+        type_converters[int(desired)](original)
     else:
         a = stack_pop()
         stack_push(a, desired)

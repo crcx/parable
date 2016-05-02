@@ -1750,27 +1750,25 @@ def convert_to_funcall(original):
 With the type-specific conversions above, **stack_change_type()** just needs
 to choose which one to invoke.
 
+````
+type_converters = {
+    TYPE_BYTECODE:   convert_to_bytecode,
+    TYPE_NUMBER:     convert_to_number,
+    TYPE_STRING:     convert_to_string,
+    TYPE_CHARACTER:  convert_to_character,
+    TYPE_FLAG:       convert_to_flag,
+    TYPE_POINTER:    convert_to_pointer,
+    TYPE_FUNCALL:    convert_to_funcall
+}
+````
+
 **Future: use a dispatch table instead of the multiple if blocks**
 
 ````
 def stack_change_type(desired):
-    """convert the type of an item on the stack to a different type"""
-    global stack
     original = stack_type()
-    if desired == TYPE_BYTECODE:
-        convert_to_bytecode(original)
-    elif desired == TYPE_NUMBER:
-        convert_to_number(original)
-    elif desired == TYPE_STRING:
-        convert_to_string(original)
-    elif desired == TYPE_CHARACTER:
-        convert_to_character(original)
-    elif desired == TYPE_POINTER:
-        convert_to_pointer(original)
-    elif desired == TYPE_FLAG:
-        convert_to_flag(original)
-    elif desired == TYPE_FUNCALL:
-        convert_to_funcall(original)
+    if int(desired) in type_converters:
+        type_converters[int(desired)](original)
     else:
         a = stack_pop()
         stack_push(a, desired)
