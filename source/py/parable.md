@@ -1596,33 +1596,38 @@ def stack_pop(type = False, fifo = False):
 More simple functions follow.
 
 I'm not sure that I like the naming of **tos()**; it's likely to change in the
-future.
+future. It returns the index to the top element in the stack.
 
 ````
 def tos():
-    """return a pointer to the top element in the stack"""
     return stack_depth() - 1
+````
 
+**stack_type()** returns the type constant for the top item on the stack.
 
+````
 def stack_type():
-    """return the type identifier for the top item on the stack"""
     return stack_type_for(tos())
+````
 
+Use **stack_swap()** to switch the positions of the top items on the stack.
 
+````
 def stack_swap():
-    """switch the positions of the top items on the stack"""
     av, at = stack_pop(type = True)
     bv, bt = stack_pop(type = True)
     stack_push(av, at)
     stack_push(bv, bt)
+````
 
+This one duplicates the top value on the stack For strings and remarks it will
+push a copy (in a new slice) to the stack.
 
+````
 def stack_dup():
-    """duplicate the top item on the stack"""
-    """if the value is a string, makes a copy of it"""
     av, at = stack_pop(type = True)
     stack_push(av, at)
-    if at == TYPE_STRING:
+    if at == TYPE_STRING or at == TYPE_REMARK:
         s = request_slice()
         copy_slice(av, s)
         stack_push(s, at)
