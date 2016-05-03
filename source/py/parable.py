@@ -1103,6 +1103,7 @@ type_converters = {
     TYPE_POINTER:    convert_to_pointer,
     TYPE_FUNCALL:    convert_to_funcall
 }
+
 def stack_change_type(desired):
     original = stack_type()
     if int(desired) in type_converters:

@@ -239,7 +239,9 @@ to multiple values.
 ] 'tri@' :
 ````
 
-----
+The primary means of naming a word is to use **:**. In some cases it may be
+more readable to have the name first, then the definition. We provide **.**
+for this.
 
 ````
 [ "sp-"
@@ -367,24 +369,86 @@ to multiple values.
 [ "v-f"  dup to-lowercase eq? "Return true if value is a lowercase string or ASCII character, or false otherwise" ] 'lowercase?' :
 [ "v-f"  dup to-uppercase eq? "Return true if value is an uppercase string or ASCII character, or false otherwise" ] 'uppercase?' :
 [ "p-s"  invoke<depth?> 1 - [ [ :s ] bi@ + ] times "Execute a quotation, constructing a string from the values it returns." ] 'build-string' :
+````
 
+Code and data are functionally equivilent to Parable. With the extensive use
+of quotations it's useful to be able construct new functions programatically.
+The following functions help with this.
 
-"Programatic Creation of Quotes"
-[ "vv-p"  swap request [ 0 store ] sip [ 1 store ] sip
+**cons** combines two values into a new quote. Some examples of equivilents:
+
+    100 200 cons
+    [ 100 200 ]
+
+    'Hello, World!' &to-uppercase :x cons
+    [ 'Hello, World!' |to-uppercase ]
+
+It's generally cleaner to require a quotation directly, but this provides an
+alternative if this isn't feasible in a specific application.
+
+````
+[ "vv-p"
+  swap request [ 0 store ] sip [ 1 store ] sip
   "Bind two values into a new slice"
 ] 'cons' :
-[ "vp-p"  :x cons "Bind a value and a quote, returning a new quote which executes the specified one against the provided value" ] 'curry' :
-[ "p-p"   :x request [ 0 store ] sip "Wrap a pointer into a new quote, converting the pointer into a FUNCALL" ] 'enquote' :
+````
 
-"Arrays and Operations on Quotations"
+The second example for **curry** showed combining a data element and a
+function call. Parable provides **curry** as a more readable way to do this.
+These are all equivilent:
+
+    'Hello, World!' &to-uppercase :x cons
+    'Hello, World!' &to-uppercase curry
+    [ 'Hello, World!' |to-uppercase ]
+
+````
+[ "vp-p"
+  :x cons
+  "Bind a value and a quote, returning a new quote which executes the specified one against the provided value"
+] 'curry' :
+````
+
+Parable also provides **enquote** to convert a pointer into a function call
+and wrap the call inside a new quotation.
+
+````
+[ "p-p"
+  :x request [ 0 store ] sip
+  "Wrap a pointer into a new quote, converting the pointer into a FUNCALL"
+] 'enquote' :
+````
+
+We now begin delving into deeper operations on slices. A slice is represented
+as a linear array of values. Consider the following sequence:
+
+    1 2 + 3 *
+
+In memory this looks like (the header denotes the offset of each value):
+
+|  0  |  1  |  2  |  3  |  4  |
+| --- | --- | --- | --- | --- |
+| #1  | #2  | \|+ | #3  | \|* |
+
+We call the first cell (offset 0) the *head* and the remaining cells the
+*body*. The last cell in the *body* is the *tail*.
+
+````
 [ "q-v"  0 fetch "Return the first item in a slice" ] 'head' :
 [ "q-q"  1 over length? subslice "Return the second through last items in a slice" ] 'body' :
 [ "p-v"  dup length? 1 - fetch "Return the last item in a slice" ] 'tail' :
+````
 
+As described earlier, **cons** can be used to merge two values into a quote.
+Using **head** and **tail** we can implement **decons** which unpacks the
+values.
+
+````
 [ "p-vv"  [ head ] [ tail ] bi
   "Return the head and tail of a slice"
 ] 'decons' :
+````
 
+````
 [ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset' ] ::
 [ "q-"
   @Found [ @Value [ @XT [ @Source [ @Target [ @Offset [ invoke ] dip !Offset ] dip !Target ] dip !Source ] dip !XT ] dip !Value ] dip !Found ] 'localize' :
@@ -468,8 +532,17 @@ to multiple values.
 [ "s-s" :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while 1 - [ dup get<final-offset> 1 + ] dip swap subslice :s "Remove leading whitespace from a string" ] 'trim-left' :
 [ "s-s" reverse trim-left reverse :s "Remove trailing whitespace from a string" ] 'trim-right' :
 [ "s-s" trim-right trim-left "Remove leading and trailing whitespace from a string" ] 'trim' :
+````
 
+Parable has a single, global dictionary. But it's often useful to factor out
+and hide some definitions. This can be done manually (using **hide-word**),
+but providing a lexical scoping system makes things much more readable.
 
+The approach used here is to take a list of names to keep and provides some
+minimal syntax: the scoped area is enclosed in curly brackets ({ and }). The
+list of names to keep can be put on the stack at any point prior to the }.
+
+````
 "Scope"
 [ 'Public'  'Private' ] ::
 [ "-" vm.dict<names> !Private "Begin a lexically scoped area" ] '{' :
@@ -486,8 +559,41 @@ to multiple values.
   "End a lexically scoped region, removing any headers not specified in the provided array."
 ] '}' :
 [ 'Public'  'Private' ] hide-words
+````
 
-"Vocabularies"
+Lexical scope is nice, but sometimes there's a need for even more control. The
+addition of *vocabularies* allows for grouping related functions and exposing
+them selectively.
+
+Parable provides a couple of ways to create a vocabulary:
+
+The first is a variant on the lexical scoping functionality. By adding a
+string with the vocabulary name after the list of exposed names and ending
+with a **}}**, Parable will create a vocabulary with the exposed names amd
+hide the rest.
+
+    [ 'a' 'b' 'c' ]  'Letters~'' {
+      [ $A ] 'a' :
+      [ $B ] 'b' :
+      [ $C ] 'c' :
+    }}
+
+The second form uses **vocab**. This takes a list of names and a string for
+the vocabulary name to create. It moves the headers for the specified names
+to the vocabulary.
+
+    [ 'a' 'b' 'c' ] 'Letters~' vocab
+
+The third and final form is using **vocab{** and **}vocab** to construct a
+lexical area whose definitions will be placed into a vocabulary:
+
+    'Letters~' vocab{
+      [ $A ] 'a' :
+      [ $B ] 'b' :
+      [ $C ] 'c' :
+    }vocab
+
+````
 [ 'with' 'without' 'vocab' '}vocab' '}}' 'vocab.add-word' ] {
   [ 'Vocabulary' ] ::
 
@@ -519,8 +625,9 @@ to multiple values.
   [ "-"  vm.dict<names> length? !o "Start a vocabulary block" ] 'vocab{' :
   [ "s-" vm.dict<names> @o over length? subslice swap vocab "End a vocabulary block" ] '}vocab' :
 }
+````
 
-
+````
 [ 'invoke<preserving>' ] {
   [ 'Prior'  'List' ] ::
   [ "qq-"
@@ -535,7 +642,9 @@ to multiple values.
     "Executes the code quotation, preserving and restoring the contents of the variables specified."
   ] 'invoke<preserving>' :
 }
+````
 
+````
 [ 'zip' ] {
   [ 'A'  'B'  'X'  'C' ] ::
 

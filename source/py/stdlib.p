@@ -269,24 +269,24 @@
 [ "v-f"  dup to-lowercase eq? "Return true if value is a lowercase string or ASCII character, or false otherwise" ] 'lowercase?' :
 [ "v-f"  dup to-uppercase eq? "Return true if value is an uppercase string or ASCII character, or false otherwise" ] 'uppercase?' :
 [ "p-s"  invoke<depth?> 1 - [ [ :s ] bi@ + ] times "Execute a quotation, constructing a string from the values it returns." ] 'build-string' :
-
-
-"Programatic Creation of Quotes"
-[ "vv-p"  swap request [ 0 store ] sip [ 1 store ] sip
+[ "vv-p"
+  swap request [ 0 store ] sip [ 1 store ] sip
   "Bind two values into a new slice"
 ] 'cons' :
-[ "vp-p"  :x cons "Bind a value and a quote, returning a new quote which executes the specified one against the provided value" ] 'curry' :
-[ "p-p"   :x request [ 0 store ] sip "Wrap a pointer into a new quote, converting the pointer into a FUNCALL" ] 'enquote' :
-
-"Arrays and Operations on Quotations"
+[ "vp-p"
+  :x cons
+  "Bind a value and a quote, returning a new quote which executes the specified one against the provided value"
+] 'curry' :
+[ "p-p"
+  :x request [ 0 store ] sip
+  "Wrap a pointer into a new quote, converting the pointer into a FUNCALL"
+] 'enquote' :
 [ "q-v"  0 fetch "Return the first item in a slice" ] 'head' :
 [ "q-q"  1 over length? subslice "Return the second through last items in a slice" ] 'body' :
 [ "p-v"  dup length? 1 - fetch "Return the last item in a slice" ] 'tail' :
-
 [ "p-vv"  [ head ] [ tail ] bi
   "Return the head and tail of a slice"
 ] 'decons' :
-
 [ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset' ] ::
 [ "q-"
   @Found [ @Value [ @XT [ @Source [ @Target [ @Offset [ invoke ] dip !Offset ] dip !Target ] dip !Source ] dip !XT ] dip !Value ] dip !Found ] 'localize' :
@@ -370,8 +370,6 @@
 [ "s-s" :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while 1 - [ dup get<final-offset> 1 + ] dip swap subslice :s "Remove leading whitespace from a string" ] 'trim-left' :
 [ "s-s" reverse trim-left reverse :s "Remove trailing whitespace from a string" ] 'trim-right' :
 [ "s-s" trim-right trim-left "Remove leading and trailing whitespace from a string" ] 'trim' :
-
-
 "Scope"
 [ 'Public'  'Private' ] ::
 [ "-" vm.dict<names> !Private "Begin a lexically scoped area" ] '{' :
@@ -388,8 +386,6 @@
   "End a lexically scoped region, removing any headers not specified in the provided array."
 ] '}' :
 [ 'Public'  'Private' ] hide-words
-
-"Vocabularies"
 [ 'with' 'without' 'vocab' '}vocab' '}}' 'vocab.add-word' ] {
   [ 'Vocabulary' ] ::
 
@@ -421,8 +417,6 @@
   [ "-"  vm.dict<names> length? !o "Start a vocabulary block" ] 'vocab{' :
   [ "s-" vm.dict<names> @o over length? subslice swap vocab "End a vocabulary block" ] '}vocab' :
 }
-
-
 [ 'invoke<preserving>' ] {
   [ 'Prior'  'List' ] ::
   [ "qq-"
@@ -437,7 +431,6 @@
     "Executes the code quotation, preserving and restoring the contents of the variables specified."
   ] 'invoke<preserving>' :
 }
-
 [ 'zip' ] {
   [ 'A'  'B'  'X'  'C' ] ::
 
