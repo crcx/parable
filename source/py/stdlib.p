@@ -186,8 +186,8 @@
 ] 'var!' :
 
 [ "s-"   0 :u swap var! "Create a variable" ] 'var' :
-[ "p-"   0 swap 1 store "Set a variable to a value of 0" ] 'off' :
-[ "p-"   -1 swap 1 store "Set a variable to a value of -1" ] 'on' :
+[ "p-"   false swap 1 store "Set a variable to a value of false" ] 'off' :
+[ "p-"   true swap 1 store "Set a variable to a value of true" ] 'on' :
 
 [ "np-"  swap over 1 fetch + swap 1 store
   "Increment a variable by the specified amount"
