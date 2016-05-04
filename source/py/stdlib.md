@@ -27,7 +27,8 @@ would be $A and so on.
 
 With that taken care of we can proceed to attach names to the byte codes. This
 will start a pattern for how functions are defined: a stack comment, followed
-by the code, and ending with a short description of what the function does.
+by the code, and ending with a short description of what the function does
+(called the *docstring*).
 
 We'll also introduce some terminology here: functions are called *words* and
 *words* which operate on slices of memory (including other functions) are
@@ -596,26 +597,26 @@ string with the vocabulary name after the list of exposed names and ending
 with a **}}**, Parable will create a vocabulary with the exposed names amd
 hide the rest.
 
-    [ 'a' 'b' 'c' ]  'Letters~'' {
-      [ $A ] 'a' :
-      [ $B ] 'b' :
-      [ $C ] 'c' :
-    }}
+    |E|  [ 'a' 'b' 'c' ]  'Letters~' {
+    |E|    [ $A ] 'a' :
+    |E|    [ $B ] 'b' :
+    |E|    [ $C ] 'c' :
+    |E|  }}
 
 The second form uses **vocab**. This takes a list of names and a string for
 the vocabulary name to create. It moves the headers for the specified names
 to the vocabulary.
 
-    [ 'a' 'b' 'c' ] 'Letters~' vocab
+    |E|  [ 'a' 'b' 'c' ] 'Letters~' vocab
 
 The third and final form is using **vocab{** and **}vocab** to construct a
 lexical area whose definitions will be placed into a vocabulary:
 
-    'Letters~' vocab{
-      [ $A ] 'a' :
-      [ $B ] 'b' :
-      [ $C ] 'c' :
-    }vocab
+    |E|  'Letters~' vocab{
+    |E|    [ $A ] 'a' :
+    |E|    [ $B ] 'b' :
+    |E|    [ $C ] 'c' :
+    |E|  }vocab
 
 ````
 [ 'with' 'without' 'vocab' '}vocab' '}}' 'vocab.add-word' ] {
@@ -681,20 +682,9 @@ lexical area whose definitions will be placed into a vocabulary:
     "For each item in source1, push the item and the corresponding item from source2 to the stack. Execute the specified code. Push results into a new array, repeating until all items are exhausted. Returns the new array. This expects the code to return a single value as a result. It also assumes that both sources are the same size (or at least that the second does not contain less than the first"
   ] 'zip' :
 }
+````
 
-
-"Hashing functions"
-389 'Hash-Prime' var!
-[ "s-n" 0 swap [ :n xor ] for-each "Hash a string using the XOR algorithim" ] 'hash:xor' :
-[ "s-n" 5381 swap [ :n over -5 shift + + ] for-each "Hash a string using the DJB2 algorithim" ] 'hash:djb2' :
-[ :n over -6 shift + over -16 shift + swap - ] 'hash:sdbm<n>' :
-[ "s-n" 0 swap [ :c swap hash:sdbm<n> ] for-each "Hash a string using the SDBM algorithim" ] 'hash:sdbm' :
-[ "s-b" hash:djb2 "The preferred hash algorithim (defaults to DJB2)" ] 'chosen-hash' :
-[ "s-n" chosen-hash @Hash-Prime rem "Hash a string using chosen-hash and Hash-Prime" ] 'hash' :
-'hash:sdbm<n>' hide-word
-
-
-
+````
 [ 'when' ] {
   [ 'Offset'  'Tests'  'Done' ] ::
 
@@ -779,19 +769,6 @@ lexical area whose definitions will be placed into a vocabulary:
     "Given an array of values and a string with insertion points, construct a new string, copying the values into the insertion points. If the array of values is less than the number of insertion points, cycle through them again."
   ] 'interpolate<cycling>' :
 }
-
-
-"?"
-[ '?' ] {
-  [ "p-?" &head &tail bi [ remark? [ drop ] if-false ] bi@ ] 'desc' :
-
-  [ "s-s | s-ss"
-    dup word-exists?
-    [ lookup-word desc ]
-    [ 'word "' swap + '" not found' + report-error ] if
-    "Lookup the stack comment and description (if existing) for a named item"
-  ] '?' :
-}
 ````
 
 It's sometimes useful to have direct access to values on the stack. Parable
@@ -836,6 +813,9 @@ You can access the names in the dictionary using **vm.dict&lt;names&gt;**. If
 you need a subset of them you can use **vm.dict&lt;names-like&gt;** which
 takes a string and returns a list of names that contain the string.
 
+    |E|  "Find probable vocabularies"
+    |E|  '~' vm.dict<names-like>
+
 ````
 [ 'vm.dict<names-like>' ] {
  'Pattern' var
@@ -852,9 +832,16 @@ takes a string and returns a list of names that contain the string.
 [ "-n"   3.14159265359 "Mathmatical constant for PI" ] 'PI' :
 [ "n-n"  E log<n> "Return the base E logarithm of a number" ] 'log' :
 [ "n-n"  10 log<n> "Return the base 10 logarithm of a number" ] 'log10' :
+````
 
-[ "p-p"  [ remark? not nip ] filter "Return a copy of the slice with embedded comments removed" ] 'strip-remarks' :
+````
+[ "p-p"
+  [ remark? not nip ] filter
+  "Return a copy of the slice with embedded comments removed"
+] 'strip-remarks' :
+````
 
+````
 [ 'times<with-index>' ] {
   '_' var
   [ "qq-"
@@ -896,4 +883,60 @@ are a better choice for larger data sets.
     "Return an offset for a key in a slice of key:value pairs"
   ] 'byKey:' :
 }
+````
+
+**?** is a simple tool that tries to help you recall how to use a word. Given
+a name it returns the stack comment and docstring (if they exist).
+
+````
+"?"
+[ '?' ] {
+  [ "p-?" &head &tail bi [ remark? [ drop ] if-false ] bi@ ] 'desc' :
+
+  [ "s-s | s-ss"
+    dup word-exists?
+    [ lookup-word desc ]
+    [ 'word "' swap + '" not found' + report-error ] if
+    "Lookup the stack comment and description (if existing) for a named item"
+  ] '?' :
+}
+````
+
+----
+
+Being able to hash a string has many uses. Parable provides a top level
+**hash** function for this, with some capacity for quickly changing the
+underlying algorithm.
+
+This provides:
+
+* XOR hash
+* DJB2 hash
+* SDBM hash
+
+````
+"Hashing functions"
+389 'Hash-Prime' var!
+[ "s-n" 0 swap [ :n xor ] for-each "Hash a string using the XOR algorithim" ] 'hash:xor' :
+[ "s-n" 5381 swap [ :n over -5 shift + + ] for-each "Hash a string using the DJB2 algorithim" ] 'hash:djb2' :
+[ :n over -6 shift + over -16 shift + swap - ] 'hash:sdbm<n>' :
+[ "s-n" 0 swap [ :c swap hash:sdbm<n> ] for-each "Hash a string using the SDBM algorithim" ] 'hash:sdbm' :
+[ "s-b" hash:djb2 "The preferred hash algorithim (defaults to DJB2)" ] 'chosen-hash' :
+[ "s-n" chosen-hash @Hash-Prime rem "Hash a string using chosen-hash and Hash-Prime" ] 'hash' :
+'hash:sdbm<n>' hide-word
+````
+
+
+----
+
+## Future Additions
+
+**WIP**: invoke&;lt;preserving-stack&gt;
+
+````
+[ "...p-..."
+  [ stack-values [ reset ] dip ] dip swap [ invoke ] dip &nop for-each
+  "Invoke a quote, making a copy of the stack contents which will be removed
+   prior to invocation and restored after the quote returns."
+] 'invoke<preserving-stack>' :
 ````

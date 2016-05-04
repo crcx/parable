@@ -440,20 +440,6 @@
     "For each item in source1, push the item and the corresponding item from source2 to the stack. Execute the specified code. Push results into a new array, repeating until all items are exhausted. Returns the new array. This expects the code to return a single value as a result. It also assumes that both sources are the same size (or at least that the second does not contain less than the first"
   ] 'zip' :
 }
-
-
-"Hashing functions"
-389 'Hash-Prime' var!
-[ "s-n" 0 swap [ :n xor ] for-each "Hash a string using the XOR algorithim" ] 'hash:xor' :
-[ "s-n" 5381 swap [ :n over -5 shift + + ] for-each "Hash a string using the DJB2 algorithim" ] 'hash:djb2' :
-[ :n over -6 shift + over -16 shift + swap - ] 'hash:sdbm<n>' :
-[ "s-n" 0 swap [ :c swap hash:sdbm<n> ] for-each "Hash a string using the SDBM algorithim" ] 'hash:sdbm' :
-[ "s-b" hash:djb2 "The preferred hash algorithim (defaults to DJB2)" ] 'chosen-hash' :
-[ "s-n" chosen-hash @Hash-Prime rem "Hash a string using chosen-hash and Hash-Prime" ] 'hash' :
-'hash:sdbm<n>' hide-word
-
-
-
 [ 'when' ] {
   [ 'Offset'  'Tests'  'Done' ] ::
 
@@ -538,19 +524,6 @@
     "Given an array of values and a string with insertion points, construct a new string, copying the values into the insertion points. If the array of values is less than the number of insertion points, cycle through them again."
   ] 'interpolate<cycling>' :
 }
-
-
-"?"
-[ '?' ] {
-  [ "p-?" &head &tail bi [ remark? [ drop ] if-false ] bi@ ] 'desc' :
-
-  [ "s-s | s-ss"
-    dup word-exists?
-    [ lookup-word desc ]
-    [ 'word "' swap + '" not found' + report-error ] if
-    "Lookup the stack comment and description (if existing) for a named item"
-  ] '?' :
-}
 [ 'stack-values' 'rso' ] {
   'S' var
 
@@ -579,9 +552,10 @@
 [ "-n"   3.14159265359 "Mathmatical constant for PI" ] 'PI' :
 [ "n-n"  E log<n> "Return the base E logarithm of a number" ] 'log' :
 [ "n-n"  10 log<n> "Return the base 10 logarithm of a number" ] 'log10' :
-
-[ "p-p"  [ remark? not nip ] filter "Return a copy of the slice with embedded comments removed" ] 'strip-remarks' :
-
+[ "p-p"
+  [ remark? not nip ] filter
+  "Return a copy of the slice with embedded comments removed"
+] 'strip-remarks' :
 [ 'times<with-index>' ] {
   '_' var
   [ "qq-"
@@ -603,3 +577,28 @@
     "Return an offset for a key in a slice of key:value pairs"
   ] 'byKey:' :
 }
+"?"
+[ '?' ] {
+  [ "p-?" &head &tail bi [ remark? [ drop ] if-false ] bi@ ] 'desc' :
+
+  [ "s-s | s-ss"
+    dup word-exists?
+    [ lookup-word desc ]
+    [ 'word "' swap + '" not found' + report-error ] if
+    "Lookup the stack comment and description (if existing) for a named item"
+  ] '?' :
+}
+"Hashing functions"
+389 'Hash-Prime' var!
+[ "s-n" 0 swap [ :n xor ] for-each "Hash a string using the XOR algorithim" ] 'hash:xor' :
+[ "s-n" 5381 swap [ :n over -5 shift + + ] for-each "Hash a string using the DJB2 algorithim" ] 'hash:djb2' :
+[ :n over -6 shift + over -16 shift + swap - ] 'hash:sdbm<n>' :
+[ "s-n" 0 swap [ :c swap hash:sdbm<n> ] for-each "Hash a string using the SDBM algorithim" ] 'hash:sdbm' :
+[ "s-b" hash:djb2 "The preferred hash algorithim (defaults to DJB2)" ] 'chosen-hash' :
+[ "s-n" chosen-hash @Hash-Prime rem "Hash a string using chosen-hash and Hash-Prime" ] 'hash' :
+'hash:sdbm<n>' hide-word
+[ "...p-..."
+  [ stack-values [ reset ] dip ] dip swap [ invoke ] dip &nop for-each
+  "Invoke a quote, making a copy of the stack contents which will be removed
+   prior to invocation and restored after the quote returns."
+] 'invoke<preserving-stack>' :
