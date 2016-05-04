@@ -278,16 +278,87 @@ for this.
   0 swap subslice
   "Return a new slice containing the contents of the original slice, including the specified number of values. This copies the leftmost (leading) elements."
 ] 'subslice<left>' :
+````
 
-"Simple variables are just named slices, with functions to access the first element. They're useful for holding single values."
+Code and data are functionally equivilent to Parable. With the extensive use
+of quotations it's useful to be able construct new functions programatically.
+The following functions help with this.
 
-[ "vs-"  [ request [ '-v' :r swap 0 store ] sip [ 1 store ] sip ] dip :
+**cons** combines two values into a new quote. Some examples of equivilents:
+
+    100 200 cons
+    [ 100 200 ]
+
+    'Hello, World!' &to-uppercase :x cons
+    [ 'Hello, World!' |to-uppercase ]
+
+It's generally cleaner to require a quotation directly, but this provides an
+alternative if this isn't feasible in a specific application.
+
+````
+[ "vv-p"
+  swap request [ 0 store ] sip [ 1 store ] sip
+  "Bind two values into a new slice"
+] 'cons' :
+````
+
+The second example for **curry** showed combining a data element and a
+function call. Parable provides **curry** as a more readable way to do this.
+These are all equivilent:
+
+    'Hello, World!' &to-uppercase :x cons
+    'Hello, World!' &to-uppercase curry
+    [ 'Hello, World!' |to-uppercase ]
+
+````
+[ "vp-p"
+  :x cons
+  "Bind a value and a quote, returning a new quote which executes the specified one against the provided value"
+] 'curry' :
+````
+
+Parable also provides **enquote** to convert a pointer into a function call
+and wrap the call inside a new quotation.
+
+````
+[ "p-p"
+  :x request [ 0 store ] sip
+  "Wrap a pointer into a new quote, converting the pointer into a FUNCALL"
+] 'enquote' :
+````
+
+A variable is represented as a function with a stack comment and a single
+return value. As an example (columns mark the offsets), a variable storing the
+value #100 would look like this in memory:
+
+| 0    | 1    |
+| ---- | ---- |
+| "-v" | #100 |
+
+You can directly execute variables in many cases, but it's preferred to use
+the **@** and **!** prefixes for obtaining and setting the value.
+
+The fundamental building block of variable definition is **var!** which takes
+a value and a name. It creates a function with a stack comment of "-v" and
+the provided value, then binds it to the specified name.
+
+````
+[ "vs-"
+  [ '-v' :r swap cons ] dip :
   "Create a variable with an initial value"
 ] 'var!' :
+````
 
+A corresponding function is **var** which creates a variable with an undefined
+initial value.
+
+````
 [ "s-"   0 :u swap var! "Create a variable" ] 'var' :
-[ "p-"   false swap 1 store "Set a variable to a value of false" ] 'off' :
-[ "p-"   true swap 1 store "Set a variable to a value of true" ] 'on' :
+````
+
+````
+[ "p-"   0 :f swap 1 store "Set a variable to a value of false" ] 'off' :
+[ "p-"  -1 :f swap 1 store "Set a variable to a value of true" ] 'on' :
 
 [ "np-"  swap over 1 fetch + swap 1 store
   "Increment a variable by the specified amount"
@@ -369,53 +440,6 @@ for this.
 [ "v-f"  dup to-lowercase eq? "Return true if value is a lowercase string or ASCII character, or false otherwise" ] 'lowercase?' :
 [ "v-f"  dup to-uppercase eq? "Return true if value is an uppercase string or ASCII character, or false otherwise" ] 'uppercase?' :
 [ "p-s"  invoke<depth?> 1 - [ [ :s ] bi@ + ] times "Execute a quotation, constructing a string from the values it returns." ] 'build-string' :
-````
-
-Code and data are functionally equivilent to Parable. With the extensive use
-of quotations it's useful to be able construct new functions programatically.
-The following functions help with this.
-
-**cons** combines two values into a new quote. Some examples of equivilents:
-
-    100 200 cons
-    [ 100 200 ]
-
-    'Hello, World!' &to-uppercase :x cons
-    [ 'Hello, World!' |to-uppercase ]
-
-It's generally cleaner to require a quotation directly, but this provides an
-alternative if this isn't feasible in a specific application.
-
-````
-[ "vv-p"
-  swap request [ 0 store ] sip [ 1 store ] sip
-  "Bind two values into a new slice"
-] 'cons' :
-````
-
-The second example for **curry** showed combining a data element and a
-function call. Parable provides **curry** as a more readable way to do this.
-These are all equivilent:
-
-    'Hello, World!' &to-uppercase :x cons
-    'Hello, World!' &to-uppercase curry
-    [ 'Hello, World!' |to-uppercase ]
-
-````
-[ "vp-p"
-  :x cons
-  "Bind a value and a quote, returning a new quote which executes the specified one against the provided value"
-] 'curry' :
-````
-
-Parable also provides **enquote** to convert a pointer into a function call
-and wrap the call inside a new quotation.
-
-````
-[ "p-p"
-  :x request [ 0 store ] sip
-  "Wrap a pointer into a new quote, converting the pointer into a FUNCALL"
-] 'enquote' :
 ````
 
 We now begin delving into deeper operations on slices. A slice is represented

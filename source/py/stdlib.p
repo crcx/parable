@@ -178,16 +178,25 @@
   0 swap subslice
   "Return a new slice containing the contents of the original slice, including the specified number of values. This copies the leftmost (leading) elements."
 ] 'subslice<left>' :
-
-"Simple variables are just named slices, with functions to access the first element. They're useful for holding single values."
-
-[ "vs-"  [ request [ '-v' :r swap 0 store ] sip [ 1 store ] sip ] dip :
+[ "vv-p"
+  swap request [ 0 store ] sip [ 1 store ] sip
+  "Bind two values into a new slice"
+] 'cons' :
+[ "vp-p"
+  :x cons
+  "Bind a value and a quote, returning a new quote which executes the specified one against the provided value"
+] 'curry' :
+[ "p-p"
+  :x request [ 0 store ] sip
+  "Wrap a pointer into a new quote, converting the pointer into a FUNCALL"
+] 'enquote' :
+[ "vs-"
+  [ '-v' :r swap cons ] dip :
   "Create a variable with an initial value"
 ] 'var!' :
-
 [ "s-"   0 :u swap var! "Create a variable" ] 'var' :
-[ "p-"   false swap 1 store "Set a variable to a value of false" ] 'off' :
-[ "p-"   true swap 1 store "Set a variable to a value of true" ] 'on' :
+[ "p-"   0 :f swap 1 store "Set a variable to a value of false" ] 'off' :
+[ "p-"  -1 :f swap 1 store "Set a variable to a value of true" ] 'on' :
 
 [ "np-"  swap over 1 fetch + swap 1 store
   "Increment a variable by the specified amount"
@@ -269,18 +278,6 @@
 [ "v-f"  dup to-lowercase eq? "Return true if value is a lowercase string or ASCII character, or false otherwise" ] 'lowercase?' :
 [ "v-f"  dup to-uppercase eq? "Return true if value is an uppercase string or ASCII character, or false otherwise" ] 'uppercase?' :
 [ "p-s"  invoke<depth?> 1 - [ [ :s ] bi@ + ] times "Execute a quotation, constructing a string from the values it returns." ] 'build-string' :
-[ "vv-p"
-  swap request [ 0 store ] sip [ 1 store ] sip
-  "Bind two values into a new slice"
-] 'cons' :
-[ "vp-p"
-  :x cons
-  "Bind a value and a quote, returning a new quote which executes the specified one against the provided value"
-] 'curry' :
-[ "p-p"
-  :x request [ 0 store ] sip
-  "Wrap a pointer into a new quote, converting the pointer into a FUNCALL"
-] 'enquote' :
 [ "q-v"  0 fetch "Return the first item in a slice" ] 'head' :
 [ "q-q"  1 over length? subslice "Return the second through last items in a slice" ] 'body' :
 [ "p-v"  dup length? 1 - fetch "Return the last item in a slice" ] 'tail' :
