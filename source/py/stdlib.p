@@ -551,9 +551,6 @@
     "Lookup the stack comment and description (if existing) for a named item"
   ] '?' :
 }
-
-
-"unsorted"
 [ 'stack-values' 'rso' ] {
   'S' var
 
@@ -570,9 +567,6 @@
     "Reverse the order of all items on the stack"
   ] 'rso' :
 }
-
-
-
 [ 'vm.dict<names-like>' ] {
  'Pattern' var
  [ "s-f" @Pattern swap string-contains? ] 'matches' :
@@ -581,8 +575,6 @@
    "Return an array of names in the dictionary that match a given substring."
  ] 'vm.dict<names-like>' :
 }
-
-
 [ "-n"   2.71828182846 "Mathmatical constant for Euler's Number" ] 'E' :
 [ "-n"   3.14159265359 "Mathmatical constant for PI" ] 'PI' :
 [ "n-n"  E log<n> "Return the base E logarithm of a number" ] 'log' :
@@ -598,8 +590,6 @@
     "Construct a range from the values in q1, then execute q2 as a for-each against them"
   ] 'times<with-index>' :
 }
-
-
 [ 'byKey:' ] {
   [ 'S' 'O' 'K' 'M' ] ::
 

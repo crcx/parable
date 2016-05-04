@@ -286,11 +286,11 @@ The following functions help with this.
 
 **cons** combines two values into a new quote. Some examples of equivilents:
 
-    100 200 cons
-    [ 100 200 ]
-
-    'Hello, World!' &to-uppercase :x cons
-    [ 'Hello, World!' |to-uppercase ]
+    |E|  100 200 cons
+    |E|  [ 100 200 ]
+    |E|
+    |E|  'Hello, World!' &to-uppercase :x cons
+    |E|  [ 'Hello, World!' |to-uppercase ]
 
 It's generally cleaner to require a quotation directly, but this provides an
 alternative if this isn't feasible in a specific application.
@@ -306,9 +306,9 @@ The second example for **curry** showed combining a data element and a
 function call. Parable provides **curry** as a more readable way to do this.
 These are all equivilent:
 
-    'Hello, World!' &to-uppercase :x cons
-    'Hello, World!' &to-uppercase curry
-    [ 'Hello, World!' |to-uppercase ]
+    |E|  'Hello, World!' &to-uppercase :x cons
+    |E|  'Hello, World!' &to-uppercase curry
+    |E|  [ 'Hello, World!' |to-uppercase ]
 
 ````
 [ "vp-p"
@@ -792,9 +792,28 @@ lexical area whose definitions will be placed into a vocabulary:
     "Lookup the stack comment and description (if existing) for a named item"
   ] '?' :
 }
+````
 
+It's sometimes useful to have direct access to values on the stack. Parable
+provides a building block for this in **stack-values**. Invoking this will
+return an array with all values currently on the stack.
 
-"unsorted"
+You could temporarily save and restore the stack using this, **dip**,
+**reset**, and **for-each**:
+
+    |E|  stack-values [ reset ... ] dip &nop for-each
+
+Note here the use of *&nop for-each* to push the values back to the stack. If
+you know that there are no FUNCALL or REMARK items it's ok to just **invoke**
+the stack data, but this won't work as expected if FUNCALL or REMARK items are
+present.
+
+**NOTE TO SELF: look into adding a invoke&lt;preserving-stack&gt; combinator**
+
+Parable also provides a **rso** (*reverse stack order*) word to invert the
+order of items on the stack.
+
+````
 [ 'stack-values' 'rso' ] {
   'S' var
 
@@ -811,9 +830,13 @@ lexical area whose definitions will be placed into a vocabulary:
     "Reverse the order of all items on the stack"
   ] 'rso' :
 }
+````
 
+You can access the names in the dictionary using **vm.dict&lt;names&gt;**. If
+you need a subset of them you can use **vm.dict&lt;names-like&gt;** which
+takes a string and returns a list of names that contain the string.
 
-
+````
 [ 'vm.dict<names-like>' ] {
  'Pattern' var
  [ "s-f" @Pattern swap string-contains? ] 'matches' :
@@ -822,8 +845,9 @@ lexical area whose definitions will be placed into a vocabulary:
    "Return an array of names in the dictionary that match a given substring."
  ] 'vm.dict<names-like>' :
 }
+````
 
-
+````
 [ "-n"   2.71828182846 "Mathmatical constant for Euler's Number" ] 'E' :
 [ "-n"   3.14159265359 "Mathmatical constant for PI" ] 'PI' :
 [ "n-n"  E log<n> "Return the base E logarithm of a number" ] 'log' :
@@ -839,8 +863,26 @@ lexical area whose definitions will be placed into a vocabulary:
     "Construct a range from the values in q1, then execute q2 as a for-each against them"
   ] 'times<with-index>' :
 }
+````
 
+Parable has some support for arrays of key:value pairs. These are structured
+like:
 
+    |E|  [ [ 'a' 100 ]
+    |E|    [ 'b' 200 ]
+    |E|    [ 'c' 300 ] ]
+
+Access to specific elements is done using **byKey:** which takes a pointer
+and key name and returns a pointer and offset to the specific value in the
+list. E.g. if the above list was named *Data*, doing this would return the
+value #200:
+
+    |E|  &Data 'b' byKey: fetch
+
+There is a lot of overhead in the key:value lookups; other data structures
+are a better choice for larger data sets.
+
+````
 [ 'byKey:' ] {
   [ 'S' 'O' 'K' 'M' ] ::
 
