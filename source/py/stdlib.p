@@ -148,27 +148,32 @@
   swap :
   "Attach a name to a slice"
 ] '.' :
-
-
-"Stack Flow"
-[ "q-...n"   depth [ invoke ] dip depth swap -
-  "Execute a quotation, returning a value indicating th stack depth change as a result"
-] 'invoke<depth?>' :
-
 [ "n-n"  [ 1 / ] [ 1 rem ] bi - "Return the smallest integer less than or equal to the starting value" ] 'floor' :
 [ "n-n"  dup floor dup-pair eq? [ drop ] [ nip 1 + ] if "Return the smallest integer greater than or equal to the starting value" ] 'ceil' :
 [ "n-n"  0.5 + floor "Round a number to the nearest integer value" ] 'round' :
 [ "nn-nn" dup-pair rem [ / floor ] dip "Divide and return floored result and remainder" ] '/rem' :
+[ "nn-n"  over over lt? [ nip ] [ drop ] if "Return the greater of two values" ] 'max' :
+[ "nn-n"  over over gt? [ nip ] [ drop ] if "Return the smaller of two values" ] 'min' :
+[ "n-n"   dup -1 * max "Return the absolute value of a number" ] 'abs' :
+[ "nn-..."
+  dup-pair lt?
+    [ [ [ dup 1 + ] dip dup-pair eq? ] until ]
+    [ [ [ dup 1 - ] dip dup-pair eq? ] until ] if
+  drop
+  "Given two values, expand the range"
+] 'range' :
 
-
-"Slice Functions"
+[ "q-...n"   depth [ invoke ] dip depth swap -
+  "Execute a quotation, returning a value indicating th stack depth change as a result"
+] 'invoke<depth?>' :
 [ "np-"   [ get<final-offset> + ] sip set<final-offset>
   "Given a number, adjust the length of the specified slice by the requested amount."
 ] 'adjust-slice-length' :
-
-[ "p-p"   request [ copy ] sip   "Make a copy of a slice, returning a pointer to the copy" ] 'duplicate-slice' :
+[ "p-p"
+  request [ copy ] sip
+  "Make a copy of a slice, returning a pointer to the copy"
+] 'duplicate-slice' :
 [ "p-n"   get<final-offset> 1 +  "Return the length of a slice" ] 'length?' :
-
 [ "pn-p"
   [ dup length? dup ] dip - swap subslice
   "Return a new slice containing the contents of the original slice, including the specified number of values. This copies the rightmost (trailing) elements."
@@ -221,12 +226,6 @@
 ] 'preserve' :
 
 
-"Number functions"
-[ "nn-n"  over over lt? [ nip ] [ drop ] if "Return the greater of two values" ] 'max' :
-[ "nn-n"  over over gt? [ nip ] [ drop ] if "Return the smaller of two values" ] 'min' :
-[ "n-n"   dup -1 * max "Return the absolute value of a number" ] 'abs' :
-
-
 "Expand the basic conditionals into a more useful set."
 [ "s-"   report-error abort "Push a string to the error log and abort execution" ] 'abort<with-error>' :
 [ "-f"   -1 :f "Return a true flag" ] 'true' :
@@ -249,15 +248,6 @@
   "Return true if the type of both values is the same, or false otherwise"
 ] 'types-match?' :
 
-
-"numeric ranges"
-[ "nn-..."
-  dup-pair lt?
-    [ [ [ dup 1 + ] dip dup-pair eq? ] until ]
-    [ [ [ dup 1 - ] dip dup-pair eq? ] until ] if
-  drop
-  "Given two values, expand the range"
-] 'range' :
 
 
 "Misc"
