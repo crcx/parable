@@ -276,45 +276,75 @@
 ] 'decons' :
 [ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset' ] ::
 [ "q-"
-  @Found [ @Value [ @XT [ @Source [ @Target [ @Offset [ invoke ] dip !Offset ] dip !Target ] dip !Source ] dip !XT ] dip !Value ] dip !Found ] 'localize' :
+  @Found [ @Value [ @XT [ @Source [ @Target [ @Offset [ invoke ] dip !Offset ] dip !Target ] dip !Source ] dip !XT ] dip !Value ] dip !Found
+] 'localize' :
+[ "vp-"
+  :p dup length? store
+  "Append a value to the specified slice. This modifies the original slice."
+] 'push' :
 
-[ "vp-"    :p dup length? store "Append a value to the specified slice. This modifies the original slice." ] 'push' :
-
-[ "p-v"    :p [ dup get<final-offset> fetch ] sip dup length? 2 - swap set<final-offset> "Remove the last value from the specified slice. This modifies the original slice." ] 'pop' :
-
-[ "p-p"    [ head ] [ body ] bi [ push ] sip "Move the head of the slice to the tail" ] 'cycle' :
-
-[ "-p"     request [ pop drop ] sip "Request a slice with no stored values" ] 'request-empty' :
-
-[ "pnp-n"  [ !XT [ duplicate-slice ] dip over length? [ over pop @XT invoke ] times nip ] localize
+[ "p-v"
+  :p [ dup get<final-offset> fetch ] sip dup length? 2 - swap set<final-offset>
+  "Remove the last value from the specified slice. This modifies the original slice."
+] 'pop' :
+[ "p-p"
+  [ head ] [ body ] bi [ push ] sip
+  "Move the head of the slice to the tail"
+] 'cycle' :
+[ "-p"
+  request [ pop drop ] sip
+  "Request a slice with no stored values"
+] 'request-empty' :
+[ "pnp-n"
+  [ !XT
+    [ duplicate-slice ] dip over length? [ over pop @XT invoke ] times nip
+  ] localize
   "Takes a slice, a starting value, and a quote. It executes the quote once for each item in the slice, passing the item and the value to the quote. The quote should consume both and return a new value."
 ] 'reduce' :
-
-[ "pp-?"   [ !XT duplicate-slice !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke &Offset increment ] times ] localize
+[ "pp-?"
+  [ !XT
+    duplicate-slice !Source 0 !Offset
+    @Source length? [ @Source @Offset fetch @XT invoke &Offset increment ] times
+  ] localize
   "Takes a slice and a quotation. It then executes the quote once for each item in the slice, passing the individual items to the quote."
 ] 'for-each' :
-
-[ "pv-f"   false !Found !Value dup length? 0 swap [ dup-pair fetch @Value types-match? [ eq? @Found or :f !Found ] [ drop-pair ] if 1 + ] times drop-pair @Found
+[ "pv-f"
+  false !Found !Value dup length? 0 swap [ dup-pair fetch @Value types-match? [ eq? @Found or :f !Found ] [ drop-pair ] if 1 + ] times drop-pair @Found
   "Given a slice and a value, return true if the value is found in the slice, or false otherwise."
  ] 'contains?' :
-
-[ "pq-p"   [ !XT !Source request-empty !Target 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke [ @Source @Offset fetch @Target push ] if-true &Offset increment ] times @Target ] localize
+[ "pq-p"
+  [ !XT !Source
+    request-empty !Target 0 !Offset
+    @Source length? [ @Source @Offset fetch @XT invoke
+                      [ @Source @Offset fetch @Target push ] if-true
+                      &Offset increment
+                    ] times
+    @Target
+  ] localize
   "Given a slice and a quotation, this will pass each value to the quotation (executing it once per item in the slice). The quotation should return a Boolean flag. If the flag is true, copy the value to a new slice. Otherwise discard it."
 ] 'filter' :
-
-[ "pq-"    [ !XT duplicate-slice !Source 0 !Offset @Source length? [ @Source @Offset fetch @XT invoke @Source @Offset store &Offset increment ] times @Source ] localize
+[ "pq-"
+  [ !XT
+    duplicate-slice !Source 0 !Offset
+    @Source length? [ @Source @Offset fetch @XT invoke
+                      @Source @Offset store &Offset increment
+                    ] times
+    @Source
+  ] localize
   "Given a pointer to an array and a quotation, execute the quotation once for each item in the array. Construct a new array from the value returned by the quotation and return a pointer to it."
 ] 'map' :
-
-[ "p-p"    [ request !Target invoke<depth?> 0 max [ @Target push ] times @Target 1 over length? subslice :p ] localize
+[ "p-p"
+  [ request !Target
+    invoke<depth?> 0 max [ @Target push ] times
+    @Target 1 over length? subslice :p
+  ] localize
   "Invoke a quote and capture the results into a new array"
 ] 'capture-results<in-stack-order>' :
-
-[ "p-p"    capture-results<in-stack-order> reverse "Invoke a quote and capture the results into a new array" ] 'capture-results' :
-
+[ "p-p"
+  capture-results<in-stack-order> reverse
+  "Invoke a quote and capture the results into a new array"
+] 'capture-results' :
 [ 'Found'  'Value'  'XT'  'Source'  'Target'  'Offset'  'localize' ] hide-words
-
-
 [ 'V' 'S' 'O' 'L' ] ::
 
 [ "pv-p|n"
@@ -332,14 +362,11 @@
   "Given a slice and a value, return the offsets the value is located at, or #nan if none are found"
 ] 'indexes' :
 
+[ 'V' 'S' 'O' 'L' ] hide-words
 [ "pv-n"
   indexes dup nan? [ head ] if-false
   "Given a slice and a value, return the offset the value is located at, or #nan if not found"
 ] 'index-of' :
-
-[ 'V' 'S' 'O' 'L' ] hide-words
-
-
 [ "s-f"  vm.dict<names> swap contains? "Return true if the named word exists or false otherwise" ] 'word-exists?' :
 
 [ "s-p"
@@ -444,8 +471,6 @@
     "Takes a pointer to a set of quotations. Each quote in the set should consist of two other quotes: one that returns a flag, and one to be executed if the condition returns true. Executes each until one returns true, then exits."
   ] 'when' :
 }
-
-
 [ 'split'  'join' ] {
   [ 'Source'  'Value'  'Target' ] ::
   [ "n-"  [ @Source 0 ] dip subslice :s ] 'extract' :
@@ -475,9 +500,15 @@
   ] 'join' :
 }
 
-[ "s-s"  [ :n 32 128 between? ] filter :s "Remove any non-printable characters from a string" ] 'clean-string' :
+[ "s-s"
+  [ :n 32 128 between? ] filter :s
+  "Remove any non-printable characters from a string"
+] 'clean-string' :
 
-[ "sss-s"  [ split ] dip join clean-string "Replace all instances of s2 in s1 with s3" ] 'replace' :
+[ "sss-s"
+  [ split ] dip join clean-string
+  "Replace all instances of s2 in s1 with s3"
+] 'replace' :
 
 
 [ 'interpolate' ] {
