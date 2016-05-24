@@ -354,7 +354,11 @@ def bytecode_random(opcode, offset, more):
         stack_push(rand, TYPE_NUMBER)
 def bytecode_sqrt(opcode, offset, more):
     if precheck([TYPE_NUMBER]):
-        stack_push(math.sqrt(stack_pop()), TYPE_NUMBER)
+        i = stack_pop()
+        if i > 0:
+            stack_push(math.sqrt(i), TYPE_NUMBER)
+        else:
+            abort_run(opcode, offset)
     else:
         abort_run(opcode, offset)
 def bytecode_compare_lt(opcode, offset, more):
