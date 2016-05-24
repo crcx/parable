@@ -1050,6 +1050,10 @@ def bytecode_string_seek(opcode, offset, more):
         abort_run(opcode, offset)
 ````
 
+**BC\_SLICE\_SUBSLICE** takes a pointer, a starting offset, and an ending
+offset and copies the subset of the original slice into a new one.  It then
+returns a pointer to the new slice.
+
 ````
 def bytecode_slice_subslice(opcode, offset, more):
     if precheck([TYPE_POINTER, TYPE_NUMBER, TYPE_NUMBER]) or \
