@@ -340,6 +340,7 @@
   ] localize
   "Invoke a quote and capture the results into a new array"
 ] 'capture-results<in-stack-order>' :
+
 [ "p-p"
   capture-results<in-stack-order> reverse
   "Invoke a quote and capture the results into a new array"
@@ -367,7 +368,14 @@
   indexes dup nan? [ head ] if-false
   "Given a slice and a value, return the offset the value is located at, or #nan if not found"
 ] 'index-of' :
-[ "s-f"  vm.dict<names> swap contains? "Return true if the named word exists or false otherwise" ] 'word-exists?' :
+"Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
+[ "s-s" :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while 1 - [ dup get<final-offset> 1 + ] dip swap subslice :s "Remove leading whitespace from a string" ] 'trim-left' :
+[ "s-s" reverse trim-left reverse :s "Remove trailing whitespace from a string" ] 'trim-right' :
+[ "s-s" trim-right trim-left "Remove leading and trailing whitespace from a string" ] 'trim' :
+[ "s-f"
+  vm.dict<names> swap contains?
+  "Return true if the named word exists or false otherwise"
+] 'word-exists?' :
 
 [ "s-p"
   dup word-exists?
@@ -376,14 +384,27 @@
   "Return a pointer to the named word if it exists, or #nan otherwise"
 ] 'lookup-word' :
 
-[ "p-s"  :p vm.dict<slices> over contains? [ vm.dict<slices> swap index-of vm.dict<names> swap fetch ] [ drop '' ] if "If the pointer corresponds to a named item, return the name. Otherwise return an empty string." ] 'lookup-name' :
+[ "p-s"
+  :p vm.dict<slices> over contains?
+  [ vm.dict<slices> swap index-of vm.dict<names> swap fetch ]
+  [ drop '' ] if
+  "If the pointer corresponds to a named item, return the name. Otherwise return an empty string."
+] 'lookup-name' :
 
-[ "ss-"  swap dup word-exists? [ dup lookup-word swap hide-word swap : ] [ drop ] if "Change a name from s1 to s2" ] 'rename-word' :
+[ "ss-"
+  swap dup word-exists? [ dup lookup-word swap hide-word swap : ] [ drop ] if
+  "Change a name from s1 to s2"
+] 'rename-word' :
+'Pattern' var
 
-"Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
-[ "s-s" :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while 1 - [ dup get<final-offset> 1 + ] dip swap subslice :s "Remove leading whitespace from a string" ] 'trim-left' :
-[ "s-s" reverse trim-left reverse :s "Remove trailing whitespace from a string" ] 'trim-right' :
-[ "s-s" trim-right trim-left "Remove leading and trailing whitespace from a string" ] 'trim' :
+[ "s-f" @Pattern swap string-contains? ] 'matches' :
+
+[ "s-p"
+  !Pattern vm.dict<names> &matches filter
+  "Return an array of names in the dictionary that match a given substring."
+] 'vm.dict<names-like>' :
+
+[ 'Pattern' 'matches' ] hide-words
 "Scope"
 [ 'Public'  'Private' ] ::
 [ "-" vm.dict<names> !Private "Begin a lexically scoped area" ] '{' :
@@ -499,18 +520,14 @@
     "Given an array of values and a string, convert each value to a string and merge, using the provided string between them"
   ] 'join' :
 }
-
 [ "s-s"
   [ :n 32 128 between? ] filter :s
   "Remove any non-printable characters from a string"
 ] 'clean-string' :
-
 [ "sss-s"
   [ split ] dip join clean-string
   "Replace all instances of s2 in s1 with s3"
 ] 'replace' :
-
-
 [ 'interpolate' ] {
   [ 'Data'  'Source'  'String' ] ::
 
@@ -529,8 +546,6 @@
     "Given an array of values and a string with insertion points, construct a new string, copying the values into the insertion points."
   ] 'interpolate' :
 }
-
-
 [ 'interpolate<cycling>' ] {
   [ 'D'  'S'  'L' ] ::
 
@@ -560,14 +575,6 @@
     stack-values reverse [ reset ] dip &nop for-each
     "Reverse the order of all items on the stack"
   ] 'rso' :
-}
-[ 'vm.dict<names-like>' ] {
- 'Pattern' var
- [ "s-f" @Pattern swap string-contains? ] 'matches' :
- [ "s-p"
-   !Pattern vm.dict<names> &matches filter
-   "Return an array of names in the dictionary that match a given substring."
- ] 'vm.dict<names-like>' :
 }
 [ "-n"   2.71828182846 "Mathmatical constant for Euler's Number" ] 'E' :
 [ "-n"   3.14159265359 "Mathmatical constant for PI" ] 'PI' :

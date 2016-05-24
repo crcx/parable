@@ -599,6 +599,12 @@ case.
 ] 'filter' :
 ````
 
+**map** takes a list and a quotation and applies the quote to each item in the
+list. The resulting value (the quote should consume and return a single value)
+will be stored in a new list which is returned at the end.
+
+    |E|  [ 1 2 3 4 5 ]  [ 10 * ] map
+
 ````
 [ "pq-"
   [ !XT
@@ -612,6 +618,18 @@ case.
 ] 'map' :
 ````
 
+A function can return multiple values. Parable provides two combinators for
+capturing the results into a list: **capture-results&lt;in-stack-order&gt;**
+and **capture-results**.
+
+The difference is pretty simple:
+
+    |E|  [ 1 2 3 ] capture-results
+    |E|  "Resulting list: [ 1 2 3 ]"
+    |E|
+    |E|  [ 1 2 3 ] capture-results<in-stack-order>
+    |E|  "Resulting list: [ 3 2 1 ]
+
 ````
 [ "p-p"
   [ request !Target
@@ -620,9 +638,7 @@ case.
   ] localize
   "Invoke a quote and capture the results into a new array"
 ] 'capture-results<in-stack-order>' :
-````
 
-````
 [ "p-p"
   capture-results<in-stack-order> reverse
   "Invoke a quote and capture the results into a new array"
@@ -683,9 +699,29 @@ occurance of a value in a slice.
 ] 'index-of' :
 ````
 
+````
+"Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
+[ "s-s" :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while 1 - [ dup get<final-offset> 1 + ] dip swap subslice :s "Remove leading whitespace from a string" ] 'trim-left' :
+[ "s-s" reverse trim-left reverse :s "Remove trailing whitespace from a string" ] 'trim-right' :
+[ "s-s" trim-right trim-left "Remove leading and trailing whitespace from a string" ] 'trim' :
+````
+
+## Dictionary and Scope
+
+Up to this point the code has used **hide-word** to remove headers we don't
+want to leave visible. But we now have a language that is complete enough to
+build on. This section expands the dictionary functions to provide for better
+control of name visibility via lexical scope and vocabularies.
+
+This begins with a trio of words: **word-exists?** for checking to see if a
+name is in the dictionary, **lookup-word** to find a pointer corresponding to
+a name, and **rename-word** for renaming words.
 
 ````
-[ "s-f"  vm.dict<names> swap contains? "Return true if the named word exists or false otherwise" ] 'word-exists?' :
+[ "s-f"
+  vm.dict<names> swap contains?
+  "Return true if the named word exists or false otherwise"
+] 'word-exists?' :
 
 [ "s-p"
   dup word-exists?
@@ -694,14 +730,37 @@ occurance of a value in a slice.
   "Return a pointer to the named word if it exists, or #nan otherwise"
 ] 'lookup-word' :
 
-[ "p-s"  :p vm.dict<slices> over contains? [ vm.dict<slices> swap index-of vm.dict<names> swap fetch ] [ drop '' ] if "If the pointer corresponds to a named item, return the name. Otherwise return an empty string." ] 'lookup-name' :
+[ "p-s"
+  :p vm.dict<slices> over contains?
+  [ vm.dict<slices> swap index-of vm.dict<names> swap fetch ]
+  [ drop '' ] if
+  "If the pointer corresponds to a named item, return the name. Otherwise return an empty string."
+] 'lookup-name' :
 
-[ "ss-"  swap dup word-exists? [ dup lookup-word swap hide-word swap : ] [ drop ] if "Change a name from s1 to s2" ] 'rename-word' :
+[ "ss-"
+  swap dup word-exists? [ dup lookup-word swap hide-word swap : ] [ drop ] if
+  "Change a name from s1 to s2"
+] 'rename-word' :
+````
 
-"Functions for trimming leading and trailing whitespace off of a string. The left side trim is iterative; the right side trim is recursive."
-[ "s-s" :s #0 [ dup-pair fetch :n 32 eq? [ 1 + ] dip ] while 1 - [ dup get<final-offset> 1 + ] dip swap subslice :s "Remove leading whitespace from a string" ] 'trim-left' :
-[ "s-s" reverse trim-left reverse :s "Remove trailing whitespace from a string" ] 'trim-right' :
-[ "s-s" trim-right trim-left "Remove leading and trailing whitespace from a string" ] 'trim' :
+You can access the names in the dictionary using **vm.dict&lt;names&gt;**. If
+you need a subset of them you can use **vm.dict&lt;names-like&gt;** which
+takes a string and returns a list of names that contain the string.
+
+    |E|  "Find probable vocabularies"
+    |E|  '~' vm.dict<names-like>
+
+````
+'Pattern' var
+
+[ "s-f" @Pattern swap string-contains? ] 'matches' :
+
+[ "s-p"
+  !Pattern vm.dict<names> &matches filter
+  "Return an array of names in the dictionary that match a given substring."
+] 'vm.dict<names-like>' :
+
+[ 'Pattern' 'matches' ] hide-words
 ````
 
 Parable has a single, global dictionary. But it's often useful to factor out
@@ -829,6 +888,25 @@ lexical area whose definitions will be placed into a vocabulary:
 }
 ````
 
+When is a combinator for handling multiple conditions. An example:
+
+    |E|  [
+    |E|    [ [ dup even? ] [ 'number is even!' ] ]
+    |E|    [ [ dup odd?  ] [ 'number is odd!'  ] ]
+    |E|    [ [ true      ] [ 'hmm, this is a strange number!' ] ]
+    |E|  ] when
+
+So the basic skeleton is:
+
+    |E|  [
+    |E|    [ [ test ]  [ action if true ] ]
+    |E|  ] when
+
+At a minimum there should be a test returning *true*; this is the default
+case which will be executed if all others fail. Before this there can be
+any number of tests/action pairs. Execution will end after the first
+successful test case.
+
 ````
 [ 'when' ] {
   [ 'Offset'  'Tests'  'Done' ] ::
@@ -845,6 +923,7 @@ lexical area whose definitions will be placed into a vocabulary:
   ] 'when' :
 }
 ````
+
 
 ````
 [ 'split'  'join' ] {
@@ -875,18 +954,64 @@ lexical area whose definitions will be placed into a vocabulary:
     "Given an array of values and a string, convert each value to a string and merge, using the provided string between them"
   ] 'join' :
 }
+````
 
+Sometimes stings will contain non-printable characters outside of the ASCII
+range. Parable provides **clean-string** to filter these out.
+
+````
 [ "s-s"
   [ :n 32 128 between? ] filter :s
   "Remove any non-printable characters from a string"
 ] 'clean-string' :
+````
 
+To replace all instances of a substring with another string, Parable provides
+**replace**. This is used like:
+
+    |E|  'Hello World. How is the weather?'
+    |E|  'e'
+    |E|  '7'
+    |E|  replace
+    |E|  "Resulting string is:"
+    |E|  "H7llo World. How is th7 w7ath7r?'
+
+````
 [ "sss-s"
   [ split ] dip join clean-string
   "Replace all instances of s2 in s1 with s3"
 ] 'replace' :
+````
 
+It's possible to construct a string by converting the pieces to strings and
+using **+** to concatenate them or using **build-string**, but these can be
+messy and difficult to follow. Consider a simple case:
 
+    |E|  "We want the following string:"
+    |E|  '1.0 + 2.0 = 3.0'
+    |E|
+    |E|  1 :s ' + ' + 2 :s + ' = ' + 3 :s +
+    |E|  [ 1 ' + ' 2 ' = ' 3 ] build-string
+
+The first is just too clumsy for anything that needs to be maintained later.
+The second works and is easier to deal with, but still suffers a little, plus
+it requires that all values be provided within the quote, so if we wanted to
+replace the values with variables, we'd need to do something ugly like:
+
+    |A|  1 !A  2 !B  3 !C
+    |E|  [ @A ' + ' @B ' = ' @C ] build-string
+
+To resolve this, Parable provides **interpolate** which allows values to be
+merged into a string template, resulting in a new string. Our example can thus
+be rewritten into something like:
+
+    |E|  [ 1 2 3 ] '{v} + {v} = {v}' interpolate
+
+Interpolation will place the values in the source list into the provided
+string at the location of each *{v}*. The values are inserted in order from
+first to last.
+
+````
 [ 'interpolate' ] {
   [ 'Data'  'Source'  'String' ] ::
 
@@ -905,8 +1030,15 @@ lexical area whose definitions will be placed into a vocabulary:
     "Given an array of values and a string with insertion points, construct a new string, copying the values into the insertion points."
   ] 'interpolate' :
 }
+````
 
+Sometimes you will need to construct a string with a repeating set of values.
+Parable provides **interpolate&lt;cycling&gt;** for this. An example:
 
+    |E|  [ 'bottles' ] '99 {v} of beer on the wall, 99 {v} of beer'
+    |E|  interpolate<cycling>
+
+````
 [ 'interpolate<cycling>' ] {
   [ 'D'  'S'  'L' ] ::
 
@@ -961,23 +1093,6 @@ order of items on the stack.
 }
 ````
 
-You can access the names in the dictionary using **vm.dict&lt;names&gt;**. If
-you need a subset of them you can use **vm.dict&lt;names-like&gt;** which
-takes a string and returns a list of names that contain the string.
-
-    |E|  "Find probable vocabularies"
-    |E|  '~' vm.dict<names-like>
-
-````
-[ 'vm.dict<names-like>' ] {
- 'Pattern' var
- [ "s-f" @Pattern swap string-contains? ] 'matches' :
- [ "s-p"
-   !Pattern vm.dict<names> &matches filter
-   "Return an array of names in the dictionary that match a given substring."
- ] 'vm.dict<names-like>' :
-}
-````
 
 ````
 [ "-n"   2.71828182846 "Mathmatical constant for Euler's Number" ] 'E' :
