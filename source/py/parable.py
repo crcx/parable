@@ -1282,8 +1282,12 @@ def string_to_slice(string):
     """convert a string into a slice"""
     s = request_slice()
     if string != '':
-        memory_values[s] = list(map(lambda x: ord(x.encode('utf-8')), list(string)))
-        memory_size[s] = len(memory_values[s])
+        i = 0
+        for char in list(string):
+            store(ord(char.encode('utf-8')), s, i, TYPE_CHARACTER)
+            i += 1
+#        memory_values[s] = list(map(lambda x: ord(x.encode('utf-8')), list(string)))
+#        memory_size[s] = len(memory_values[s])
     else:
         set_slice_last_index(s, -1)
     return s
