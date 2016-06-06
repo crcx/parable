@@ -521,7 +521,7 @@
   ] 'join' :
 }
 [ "s-s"
-  [ :n 32 128 between? ] filter :s
+  [ :n [ 32 128 between? ] [ 9 13 between? ] bi or ] filter :s
   "Remove any non-printable characters from a string"
 ] 'clean-string' :
 [ "sss-s"
